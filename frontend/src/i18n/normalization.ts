@@ -1,0 +1,22 @@
+// Doctor workspace currently uses English labels; patient source language is preserved.
+export const normalizationCopy = {
+  title: 'Machine normalization',
+  unverified: 'Machine output — not clinician verified',
+  machineNormalized: 'Machine normalized',
+  needsVerification: 'Needs verification',
+  unavailable: 'Normalization unavailable — needs verification',
+  unknown: 'Unknown / not reported — no concept assigned',
+  certainty: 'Reported certainty',
+  confidence: 'Provider confidence (not clinical certainty)',
+  provenance: 'Normalization source',
+  provider: 'Provider',
+  model: 'Model',
+  prompt: 'Prompt version',
+  polarity: 'Reported polarity',
+  absent: 'Absent / denied',
+  present: 'Present (see certainty)',
+  source: 'Source answer',
+  language: 'Original language',
+  reason: 'Result reason',
+  notProcessed: 'Not processed',
+};

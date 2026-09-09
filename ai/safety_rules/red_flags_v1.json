@@ -1,0 +1,192 @@
+{
+  "schema_version": "1.0",
+  "rules_version": "1.0.0",
+  "description": "Deterministic red-flag safety screening rules for pre-consultation clinical intake.",
+  "rules": [
+    {
+      "rule_id": "RF-CHEST-001",
+      "version": "1.0.0",
+      "flow_id": "chest_pain",
+      "priority": "emergency",
+      "category": "cardiovascular",
+      "reason": "Severe radiating chest pain (potential acute coronary syndrome).",
+      "conditions": [
+        {
+          "field": "hpi.severity",
+          "operator": "greater_than_or_equal",
+          "value": 8
+        },
+        {
+          "field": "hpi.radiation",
+          "operator": "equals",
+          "value": true
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-CHEST-002",
+      "version": "1.0.0",
+      "flow_id": "chest_pain",
+      "priority": "urgent",
+      "category": "cardiovascular",
+      "reason": "Chest pain associated with shortness of breath (dyspnea).",
+      "conditions": [
+        {
+          "field": "concept:DYSPNEA",
+          "operator": "equals",
+          "value": true
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-CHEST-003",
+      "version": "1.0.0",
+      "flow_id": "chest_pain",
+      "priority": "urgent",
+      "category": "cardiovascular",
+      "reason": "Chest pain associated with diaphoresis (sweating) or dizziness.",
+      "conditions": [
+        {
+          "field": "any_concept",
+          "operator": "in",
+          "value": ["SWEATING", "DIZZINESS"]
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-RESP-001",
+      "version": "1.0.0",
+      "flow_id": "cough_breathlessness",
+      "priority": "emergency",
+      "category": "respiratory",
+      "reason": "Constant breathlessness requiring immediate respiratory assessment.",
+      "conditions": [
+        {
+          "field": "hpi.symptom",
+          "operator": "in",
+          "value": ["breathlessness", "both"]
+        },
+        {
+          "field": "hpi.timing",
+          "operator": "equals",
+          "value": "constant"
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-RESP-002",
+      "version": "1.0.0",
+      "flow_id": "cough_breathlessness",
+      "priority": "urgent",
+      "category": "respiratory",
+      "reason": "Reported hemoptysis (coughing blood) in respiratory intake.",
+      "conditions": [
+        {
+          "field": "hpi.sputum_details",
+          "operator": "contains_any_word",
+          "value": ["blood", "bloody", "red", "hemoptysis", "রক্ত", "खून"]
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-FEV-001",
+      "version": "1.0.0",
+      "flow_id": "fever",
+      "priority": "emergency",
+      "category": "infectious",
+      "reason": "Hyperpyrexia (measured temperature ≥ 40.0°C / 104°F).",
+      "conditions": [
+        {
+          "field": "hpi.temperature",
+          "operator": "greater_than_or_equal",
+          "value": 40.0
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-FEV-002",
+      "version": "1.0.0",
+      "flow_id": "fever",
+      "priority": "urgent",
+      "category": "infectious",
+      "reason": "Prolonged fever (onset ≥ 14 days) or fever with systemic chills.",
+      "conditions": [
+        {
+          "field": "hpi.associated",
+          "operator": "contains",
+          "value": "chills"
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-HEAD-001",
+      "version": "1.0.0",
+      "flow_id": "headache",
+      "priority": "emergency",
+      "category": "neurological",
+      "reason": "Thunderclap headache pattern (sudden onset with maximal severity ≥ 9).",
+      "conditions": [
+        {
+          "field": "hpi.severity",
+          "operator": "greater_than_or_equal",
+          "value": 9
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-HEAD-002",
+      "version": "1.0.0",
+      "flow_id": "headache",
+      "priority": "urgent",
+      "category": "neurological",
+      "reason": "Severe headache radiating to neck or other sites.",
+      "conditions": [
+        {
+          "field": "hpi.severity",
+          "operator": "greater_than_or_equal",
+          "value": 7
+        },
+        {
+          "field": "hpi.radiation",
+          "operator": "equals",
+          "value": true
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-ABD-001",
+      "version": "1.0.0",
+      "flow_id": "abdominal_pain",
+      "priority": "emergency",
+      "category": "gastrointestinal",
+      "reason": "Severe constant acute abdominal pain (potential acute surgical abdomen).",
+      "conditions": [
+        {
+          "field": "hpi.severity",
+          "operator": "greater_than_or_equal",
+          "value": 8
+        },
+        {
+          "field": "hpi.timing",
+          "operator": "equals",
+          "value": "constant"
+        }
+      ]
+    },
+    {
+      "rule_id": "RF-ABD-002",
+      "version": "1.0.0",
+      "flow_id": "abdominal_pain",
+      "priority": "urgent",
+      "category": "gastrointestinal",
+      "reason": "Severe abdominal pain associated with persistent vomiting.",
+      "conditions": [
+        {
+          "field": "concept:VOMITING",
+          "operator": "equals",
+          "value": true
+        }
+      ]
+    }
+  ]
+}

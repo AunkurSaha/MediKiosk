@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "flow_id": "ayush_demo.history",
+  "version": "1.0.0",
+  "namespace": "ayush_demo",
+  "label": {
+    "en": "AYUSH demonstration",
+    "bn": "AYUSH প্রদর্শন",
+    "hi": "AYUSH प्रदर्शन"
+  },
+  "applicable_complaint": "ayush_demo.history",
+  "content_status": "prototype_unvalidated",
+  "traversal": "ordered_applicable",
+  "completion": "all_applicable_addressed",
+  "sections": [
+    {
+      "section_id": "ayush_demo",
+      "label": {
+        "en": "AYUSH demonstration only",
+        "bn": "শুধু AYUSH প্রদর্শন",
+        "hi": "केवल AYUSH प्रदर्शन"
+      },
+      "questions": [
+        {
+          "question_id": "ayush_demo.prakriti",
+          "field": "ayush_demo.prakriti",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Prakriti: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "প্রকৃতি: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "प्रकृति: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.vikriti",
+          "field": "ayush_demo.vikriti",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Vikriti: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "বিকৃতি: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "विकृति: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.sara",
+          "field": "ayush_demo.sara",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Sara: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "সার: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "सार: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.samhanana",
+          "field": "ayush_demo.samhanana",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Samhanana: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "সংহনন: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "संहनन: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.pramana",
+          "field": "ayush_demo.pramana",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Pramana: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "প্রমাণ: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "प्रमाण: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.satmya",
+          "field": "ayush_demo.satmya",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Satmya: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "সাত্ম্য: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "सात्म्य: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.sattva",
+          "field": "ayush_demo.sattva",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Sattva: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "সত্ত্ব: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "सत्त्व: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.ahara_shakti",
+          "field": "ayush_demo.ahara_shakti",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Ahara Shakti: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "আহার শক্তি: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "आहार शक्ति: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.vyayama_shakti",
+          "field": "ayush_demo.vyayama_shakti",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Vyayama Shakti: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "ব্যায়াম শক্তি: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "व्यायाम शक्ति: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.vaya",
+          "field": "ayush_demo.vaya",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Vaya: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "বয়স: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "वय: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        },
+        {
+          "question_id": "ayush_demo.ahara_vihara",
+          "field": "ayush_demo.ahara_vihara",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Ahara-Vihara: share what you already know or have been told. Choose unknown if unfamiliar.",
+            "bn": "আহার-বিহার: যা জানেন বা আগে শুনেছেন তা বলুন। জানা না থাকলে 'জানা নেই' বেছে নিন।",
+            "hi": "आहार-विहार: जो जानते हैं या पहले बताया गया है, वह बताएँ। परिचित न हों तो 'पता नहीं' चुनें।"
+          }
+        }
+      ]
+    }
+  ]
+}

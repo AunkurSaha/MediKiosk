@@ -1,0 +1,255 @@
+import hashlib
+import json
+
+from sqlalchemy import select
+
+from app import models
+from app.core.errors import WorkflowError
+from app.schemas.adaptive import Fact, FlowChoice, InterviewState
+from app.schemas.alert import AlertSummary
+from app.schemas.flow import Flow
+from app.services import intake, normalization, red_flags
+from app.services.flow_registry import registry
+from app.services.interview_engine import InterviewEngine, validate_answer
+
+
+def rows(db, session_id):
+    return db.scalars(
+        select(models.InterviewAnswer)
+        .where(models.InterviewAnswer.session_id == session_id)
+        .order_by(models.InterviewAnswer.created_at, models.InterviewAnswer.id)
+    ).all()
+
+
+def flow_for(db, session_id):
+    run = db.get(models.InterviewRun, session_id)
+    if run:
+        return Flow.model_validate(run.flow_snapshot), run
+    if rows(db, session_id):
+        return registry()["legacy.intake"], None
+    return None, None
+
+
+def engine_for(db, session_id, flow):
+    questions = {q.question_id: q for _, q in flow.questions()}
+    facts = {}
+    normalized = normalization.for_answers(db, session_id)
+    for row in rows(db, session_id):
+        question = questions.get(row.question_id)
+        if question is None:
+            raise WorkflowError(
+                "FLOW_DATA_MISMATCH", "Saved answer is absent from the pinned flow."
+            )
+        stored = json.loads(row.value_json)
+        envelope = (
+            stored
+            if isinstance(stored, dict) and "status" in stored
+            else {
+                "status": "answered",
+                "value": stored,
+            }
+        )
+        facts[row.question_id] = Fact(
+            answer_id=row.id,
+            question_id=row.question_id,
+            field=row.field,
+            label=question.text,
+            status=envelope["status"],
+            value=envelope["value"],
+            raw_value=row.raw_value,
+            source=row.source,
+            language=row.language,
+            recorded_at=row.created_at,
+            normalization=normalization.enrich(row, question, normalized),
+        )
+    return InterviewEngine(flow, facts)
+
+
+def state(db, session_id):
+    intake.get_session(db, session_id)
+    intake.require_consent(db, session_id)
+    flow, run = flow_for(db, session_id)
+    if flow is None:
+        return InterviewState(
+            selection_required=True,
+            flows=[
+                FlowChoice(
+                    flow_id=f.flow_id, version=f.version, namespace=f.namespace, label=f.label
+                )
+                for f in registry().values()
+                if f.namespace != "legacy"
+            ],
+        )
+    res = engine_for(db, session_id, flow).state(
+        run.cursor if run else None, run.revision if run else 0
+    )
+    alerts = red_flags.get_session_alerts(db, session_id)
+    active_alerts = [a for a in alerts if a.status in ("new", "acknowledged")]
+    if active_alerts:
+        highest = sorted(
+            active_alerts,
+            key=lambda a: (0 if a.priority == "emergency" else 1, a.created_at),
+        )[0]
+        res.red_flag_alert = AlertSummary(
+            id=highest.id,
+            rule_id=highest.rule_id,
+            priority=highest.priority,
+            category=highest.category,
+            reason=highest.reason,
+            created_at=highest.created_at,
+        )
+    return res
+
+
+def editable(db, session_id):
+    session = intake.get_session(db, session_id)
+    intake.require_consent(db, session_id)
+    if session.status != "intake":
+        raise WorkflowError("SESSION_LOCKED", "Completed answers cannot be changed.")
+    return session
+
+
+def select_flow(db, session_id, payload):
+    editable(db, session_id)
+    flow, run = flow_for(db, session_id)
+    if flow is not None:
+        if flow.flow_id != payload.flow_id:
+            raise WorkflowError(
+                "FLOW_LOCKED", "This intake already has a flow. Start a new intake to change it."
+            )
+        return state(db, session_id)
+    flow = registry().get(payload.flow_id)
+    if flow is None or flow.namespace == "legacy":
+        raise WorkflowError(
+            "INVALID_FLOW", "Choose a supported complaint or the AYUSH demonstration.", 422
+        )
+    run = models.InterviewRun(
+        session_id=session_id,
+        flow_id=flow.flow_id,
+        flow_version=flow.version,
+        flow_snapshot=flow.model_dump(mode="json"),
+        cursor=flow.questions()[0][1].question_id,
+        revision=0,
+    )
+    db.add(run)
+    intake.audit(
+        db,
+        "interview_flow_selected",
+        session_id,
+        metadata={"flow_id": flow.flow_id, "version": flow.version},
+    )
+    db.commit()
+    return state(db, session_id)
+
+
+def require_run(db, session_id):
+    flow, run = flow_for(db, session_id)
+    if flow is None:
+        raise WorkflowError("FLOW_REQUIRED", "Select a complaint before answering.", 422)
+    if run is None:
+        run = models.InterviewRun(
+            session_id=session_id,
+            flow_id=flow.flow_id,
+            flow_version=flow.version,
+            flow_snapshot=flow.model_dump(mode="json"),
+            revision=0,
+        )
+        db.add(run)
+        db.flush()
+    return flow, run
+
+
+def check_revision(run, expected):
+    if run.revision != expected:
+        raise WorkflowError(
+            "INTERVIEW_CONFLICT", "This interview changed. Reload before continuing."
+        )
+
+
+def submit(db, session_id, payload):
+    session = editable(db, session_id)
+    flow, run = require_run(db, session_id)
+    digest = hashlib.sha256(
+        json.dumps(payload.model_dump(mode="json"), sort_keys=True, ensure_ascii=False).encode()
+    ).hexdigest()
+    receipt = db.get(models.InterviewRequest, (session_id, str(payload.request_id)))
+    if receipt:
+        if receipt.payload_hash != digest:
+            raise WorkflowError(
+                "ID_CONFLICT", "This request ID was already used for another answer."
+            )
+        return state(db, session_id)
+    check_revision(run, payload.expected_revision)
+    engine = engine_for(db, session_id, flow)
+    current = engine.state(run.cursor).question
+    if current is None or current.question_id != payload.question_id:
+        raise WorkflowError("QUESTION_NOT_CURRENT", "Reload the current interview question.", 409)
+    if payload.language != session.language:
+        raise WorkflowError("INVALID_ANSWER", "Answer language must match the session.", 422)
+    validate_answer(current, payload)
+    value = payload.model_dump(mode="json")["value"]
+    previous = engine.answers.get(payload.question_id)
+    saved_answer = None
+    if previous is None or (
+        previous.status,
+        previous.model_dump(mode="json")["value"],
+        previous.raw_value,
+        previous.source,
+    ) != (payload.status, value, payload.raw_value, payload.source):
+        saved_answer = models.InterviewAnswer(
+            session_id=session_id,
+            question_id=current.question_id,
+            field=current.field,
+            value_json=json.dumps({"status": payload.status, "value": value}, ensure_ascii=False),
+            raw_value=payload.raw_value,
+            source=payload.source,
+            language=payload.language,
+            verification_status="patient_reported",
+            created_at=intake.now(),
+        )
+        db.add(saved_answer)
+        intake.audit(
+            db,
+            "answer_recorded",
+            session_id,
+            metadata={"field": current.field, "flow_version": flow.version},
+        )
+        db.flush()
+    run.cursor = engine_for(db, session_id, flow).after(payload.question_id)
+    run.revision += 1
+    session.updated_at = intake.now()
+    db.add(
+        models.InterviewRequest(
+            session_id=session_id, request_id=str(payload.request_id), payload_hash=digest
+        )
+    )
+    db.commit()
+    if saved_answer is not None:
+        normalization.persist_committed(db, saved_answer, current, flow, payload.status)
+    active_engine = engine_for(db, session_id, flow)
+    red_flags.evaluate_and_persist(db, session_id, flow.flow_id, list(active_engine.active.values()))
+    db.commit()
+    return state(db, session_id)
+
+
+def navigate(db, session_id, payload):
+    editable(db, session_id)
+    flow, run = require_run(db, session_id)
+    check_revision(run, payload.expected_revision)
+    engine = engine_for(db, session_id, flow)
+    allowed = set(engine.active) | set(engine.pending[:1])
+    if payload.question_id not in allowed:
+        raise WorkflowError(
+            "QUESTION_NOT_ACTIVE",
+            "Only active saved answers or the next pending question may be opened.",
+            422,
+        )
+    run.cursor = payload.question_id
+    run.revision += 1
+    db.commit()
+    return state(db, session_id)
+
+
+def history(db, session_id):
+    flow, _ = flow_for(db, session_id)
+    return engine_for(db, session_id, flow).history() if flow else None

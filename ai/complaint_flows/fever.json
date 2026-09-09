@@ -1,0 +1,675 @@
+{
+  "schema_version": 1,
+  "flow_id": "fever",
+  "version": "1.0.0",
+  "namespace": "standard",
+  "label": {
+    "en": "Fever",
+    "bn": "জ্বর",
+    "hi": "बुखार"
+  },
+  "applicable_complaint": "fever",
+  "content_status": "prototype_unvalidated",
+  "traversal": "ordered_applicable",
+  "completion": "all_applicable_addressed",
+  "sections": [
+    {
+      "section_id": "chief_complaint",
+      "label": {
+        "en": "Chief complaint",
+        "bn": "প্রধান সমস্যা",
+        "hi": "मुख्य समस्या"
+      },
+      "questions": [
+        {
+          "question_id": "chief_complaint.description",
+          "field": "chief_complaint.description",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Describe your main concern in your own words.",
+            "bn": "আপনার প্রধান সমস্যা নিজের ভাষায় বলুন।",
+            "hi": "अपनी मुख्य समस्या अपने शब्दों में बताएँ।"
+          }
+        }
+      ]
+    },
+    {
+      "section_id": "hpi",
+      "label": {
+        "en": "History of present illness",
+        "bn": "বর্তমান সমস্যার ইতিহাস",
+        "hi": "वर्तमान समस्या का इतिहास"
+      },
+      "questions": [
+        {
+          "question_id": "hpi.onset",
+          "field": "hpi.onset",
+          "type": "duration",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "How long ago did this problem start?",
+            "bn": "এই সমস্যা কতদিন আগে শুরু হয়েছে?",
+            "hi": "यह समस्या कितने समय पहले शुरू हुई?"
+          },
+          "constraints": {
+            "minimum": 0,
+            "maximum": 1000
+          }
+        },
+        {
+          "question_id": "hpi.measured",
+          "field": "hpi.measured",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Have you measured your temperature?",
+            "bn": "তাপমাত্রা মেপেছেন কি?",
+            "hi": "क्या आपने तापमान मापा है?"
+          }
+        },
+        {
+          "question_id": "hpi.temperature",
+          "field": "hpi.temperature",
+          "type": "number",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "What was the highest measured temperature in °C?",
+            "bn": "মাপা সর্বোচ্চ তাপমাত্রা °C-এ কত ছিল?",
+            "hi": "मापा गया सबसे अधिक तापमान °C में कितना था?"
+          },
+          "constraints": {
+            "minimum": 0,
+            "maximum": 60,
+            "unit": "°C"
+          },
+          "depends_on": [
+            "hpi.measured"
+          ],
+          "when": [
+            {
+              "question_id": "hpi.measured",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        },
+        {
+          "question_id": "hpi.timing",
+          "field": "hpi.timing",
+          "type": "single_choice",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Is the problem constant or does it come and go?",
+            "bn": "সমস্যাটি কি সব সময় থাকে, নাকি আসে আর যায়?",
+            "hi": "समस्या लगातार रहती है या आती-जाती है?"
+          },
+          "options": [
+            {
+              "value": "constant",
+              "label": {
+                "en": "Constant",
+                "bn": "সব সময়",
+                "hi": "लगातार"
+              },
+              "exclusive": false
+            },
+            {
+              "value": "intermittent",
+              "label": {
+                "en": "Comes and goes",
+                "bn": "আসে আর যায়",
+                "hi": "आती-जाती है"
+              },
+              "exclusive": false
+            }
+          ]
+        },
+        {
+          "question_id": "hpi.associated",
+          "field": "hpi.associated",
+          "type": "multiple_choice",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Which of these other symptoms do you have?",
+            "bn": "এই অন্য উপসর্গগুলির মধ্যে কোনগুলি আছে?",
+            "hi": "इन अन्य लक्षणों में से कौन से हैं?"
+          },
+          "options": [
+            {
+              "value": "cough",
+              "label": {
+                "en": "Cough",
+                "bn": "কাশি",
+                "hi": "खाँसी"
+              },
+              "exclusive": false
+            },
+            {
+              "value": "headache",
+              "label": {
+                "en": "Headache",
+                "bn": "মাথাব্যথা",
+                "hi": "सिरदर्द"
+              },
+              "exclusive": false
+            },
+            {
+              "value": "chills",
+              "label": {
+                "en": "Chills",
+                "bn": "কাঁপুনি",
+                "hi": "कँपकँपी"
+              },
+              "exclusive": false
+            },
+            {
+              "value": "none",
+              "label": {
+                "en": "None of these",
+                "bn": "এগুলির কোনোটিই নেই",
+                "hi": "इनमें से कोई नहीं"
+              },
+              "exclusive": true
+            }
+          ]
+        },
+        {
+          "question_id": "hpi.associated_details",
+          "field": "hpi.associated_details",
+          "type": "short_text",
+          "required": false,
+          "allow_unknown": true,
+          "text": {
+            "en": "Describe any other symptoms with this problem. (optional)",
+            "bn": "এই সমস্যার সঙ্গে অন্য উপসর্গ থাকলে বলুন। (ঐচ্ছিক)",
+            "hi": "इस समस्या के साथ अन्य लक्षण हों तो बताएँ। (वैकल्पिक)"
+          }
+        },
+        {
+          "question_id": "hpi.travel",
+          "field": "hpi.travel",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Have you travelled in the past four weeks?",
+            "bn": "গত চার সপ্তাহে ভ্রমণ করেছেন কি?",
+            "hi": "क्या पिछले चार सप्ताह में यात्रा की है?"
+          }
+        },
+        {
+          "question_id": "hpi.travel_details",
+          "field": "hpi.travel_details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Where and when did you travel?",
+            "bn": "কোথায় এবং কখন ভ্রমণ করেছেন?",
+            "hi": "कहाँ और कब यात्रा की?"
+          },
+          "depends_on": [
+            "hpi.travel"
+          ],
+          "when": [
+            {
+              "question_id": "hpi.travel",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "past_medical_history",
+      "label": {
+        "en": "Past medical history",
+        "bn": "আগের রোগের ইতিহাস",
+        "hi": "पुरानी बीमारियों का इतिहास"
+      },
+      "questions": [
+        {
+          "question_id": "past_medical_history.diabetes",
+          "field": "past_medical_history.diabetes",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Have you been told by a clinician that you have diabetes?",
+            "bn": "চিকিৎসক কি বলেছেন যে আপনার ডায়াবেটিস আছে?",
+            "hi": "क्या किसी चिकित्सक ने बताया है कि आपको मधुमेह है?"
+          }
+        },
+        {
+          "question_id": "past_medical_history.diabetes_duration",
+          "field": "past_medical_history.diabetes_duration",
+          "type": "duration",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "How long have you known about your diabetes?",
+            "bn": "কতদিন ধরে আপনার ডায়াবেটিসের কথা জানেন?",
+            "hi": "आपको मधुमेह के बारे में कितने समय से पता है?"
+          },
+          "constraints": {
+            "minimum": 0,
+            "maximum": 1000
+          },
+          "depends_on": [
+            "past_medical_history.diabetes"
+          ],
+          "when": [
+            {
+              "question_id": "past_medical_history.diabetes",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        },
+        {
+          "question_id": "past_medical_history.diabetes_care",
+          "field": "past_medical_history.diabetes_care",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "What care or medicines do you currently receive for diabetes?",
+            "bn": "ডায়াবেটিসের জন্য বর্তমানে কী চিকিৎসা বা ওষুধ নিচ্ছেন?",
+            "hi": "मधुमेह के लिए अभी कौन सी देखभाल या दवाएँ ले रहे हैं?"
+          },
+          "depends_on": [
+            "past_medical_history.diabetes"
+          ],
+          "when": [
+            {
+              "question_id": "past_medical_history.diabetes",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        },
+        {
+          "question_id": "past_medical_history.other",
+          "field": "past_medical_history.other",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Do you have any other past or ongoing illnesses?",
+            "bn": "আপনার কি অন্য কোনো আগের বা চলমান রোগ আছে?",
+            "hi": "क्या आपको कोई अन्य पुरानी या वर्तमान बीमारी है?"
+          }
+        },
+        {
+          "question_id": "past_medical_history.details",
+          "field": "past_medical_history.details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Please describe in your own words.",
+            "bn": "নিজের ভাষায় বিস্তারিত বলুন।",
+            "hi": "कृपया अपने शब्दों में बताएँ।"
+          },
+          "depends_on": [
+            "past_medical_history.other"
+          ],
+          "when": [
+            {
+              "question_id": "past_medical_history.other",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "past_surgical_history",
+      "label": {
+        "en": "Past surgical history",
+        "bn": "অস্ত্রোপচারের ইতিহাস",
+        "hi": "ऑपरेशन का इतिहास"
+      },
+      "questions": [
+        {
+          "question_id": "past_surgical_history.any",
+          "field": "past_surgical_history.any",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Have you had any operations?",
+            "bn": "আপনার কি কোনো অস্ত্রোপচার হয়েছে?",
+            "hi": "क्या आपका कोई ऑपरेशन हुआ है?"
+          }
+        },
+        {
+          "question_id": "past_surgical_history.details",
+          "field": "past_surgical_history.details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Which operations, and approximately when?",
+            "bn": "কী অস্ত্রোপচার হয়েছে এবং আনুমানিক কখন?",
+            "hi": "कौन से ऑपरेशन हुए और लगभग कब?"
+          },
+          "depends_on": [
+            "past_surgical_history.any"
+          ],
+          "when": [
+            {
+              "question_id": "past_surgical_history.any",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "medications",
+      "label": {
+        "en": "Current medications",
+        "bn": "বর্তমান ওষুধ",
+        "hi": "वर्तमान दवाएँ"
+      },
+      "questions": [
+        {
+          "question_id": "medications.any",
+          "field": "medications.any",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Are you taking any medicines or supplements?",
+            "bn": "আপনি কি কোনো ওষুধ বা সাপ্লিমেন্ট নিচ্ছেন?",
+            "hi": "क्या आप कोई दवा या सप्लीमेंट ले रहे हैं?"
+          }
+        },
+        {
+          "question_id": "medications.details",
+          "field": "medications.details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "List names, doses and how often you take them, if known.",
+            "bn": "জানা থাকলে নাম, মাত্রা এবং কতবার নেন তা লিখুন।",
+            "hi": "यदि पता हो तो नाम, मात्रा और कितनी बार लेते हैं, बताएँ।"
+          },
+          "depends_on": [
+            "medications.any"
+          ],
+          "when": [
+            {
+              "question_id": "medications.any",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "allergies",
+      "label": {
+        "en": "Allergies",
+        "bn": "অ্যালার্জি",
+        "hi": "एलर्जी"
+      },
+      "questions": [
+        {
+          "question_id": "allergies.any",
+          "field": "allergies.any",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Do you know of any allergies?",
+            "bn": "আপনার কোনো অ্যালার্জি আছে বলে জানেন কি?",
+            "hi": "क्या आपको अपनी किसी एलर्जी के बारे में पता है?"
+          }
+        },
+        {
+          "question_id": "allergies.details",
+          "field": "allergies.details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "What are you allergic to, and what reaction occurs?",
+            "bn": "কীসে অ্যালার্জি হয় এবং কী প্রতিক্রিয়া হয়?",
+            "hi": "किस चीज़ से एलर्जी है और क्या प्रतिक्रिया होती है?"
+          },
+          "depends_on": [
+            "allergies.any"
+          ],
+          "when": [
+            {
+              "question_id": "allergies.any",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "family_history",
+      "label": {
+        "en": "Family history",
+        "bn": "পারিবারিক ইতিহাস",
+        "hi": "पारिवारिक इतिहास"
+      },
+      "questions": [
+        {
+          "question_id": "family_history.any",
+          "field": "family_history.any",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Are there illnesses in your family you want the doctor to know about?",
+            "bn": "পরিবারে এমন কোনো রোগ আছে যা চিকিৎসককে জানাতে চান?",
+            "hi": "क्या परिवार में कोई बीमारी है जिसके बारे में चिकित्सक को बताना चाहते हैं?"
+          }
+        },
+        {
+          "question_id": "family_history.details",
+          "field": "family_history.details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Please describe in your own words.",
+            "bn": "নিজের ভাষায় বিস্তারিত বলুন।",
+            "hi": "कृपया अपने शब्दों में बताएँ।"
+          },
+          "depends_on": [
+            "family_history.any"
+          ],
+          "when": [
+            {
+              "question_id": "family_history.any",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "section_id": "personal_history",
+      "label": {
+        "en": "Personal history",
+        "bn": "ব্যক্তিগত ইতিহাস",
+        "hi": "व्यक्तिगत इतिहास"
+      },
+      "questions": [
+        {
+          "question_id": "personal_history.tobacco",
+          "field": "personal_history.tobacco",
+          "type": "single_choice",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "What is your tobacco use history?",
+            "bn": "আপনার তামাক ব্যবহারের ইতিহাস কী?",
+            "hi": "आपके तंबाकू उपयोग का इतिहास क्या है?"
+          },
+          "options": [
+            {
+              "value": "never",
+              "label": {
+                "en": "Never used",
+                "bn": "কখনও ব্যবহার করিনি",
+                "hi": "कभी उपयोग नहीं किया"
+              },
+              "exclusive": false
+            },
+            {
+              "value": "previous",
+              "label": {
+                "en": "Previously used",
+                "bn": "আগে ব্যবহার করতাম",
+                "hi": "पहले उपयोग करते थे"
+              },
+              "exclusive": false
+            },
+            {
+              "value": "current",
+              "label": {
+                "en": "Currently use",
+                "bn": "বর্তমানে ব্যবহার করি",
+                "hi": "अभी उपयोग करते हैं"
+              },
+              "exclusive": false
+            }
+          ]
+        },
+        {
+          "question_id": "personal_history.tobacco_details",
+          "field": "personal_history.tobacco_details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "What type and amount of tobacco do you use?",
+            "bn": "কী ধরনের এবং কতটা তামাক ব্যবহার করেন?",
+            "hi": "किस प्रकार और कितनी मात्रा में तंबाकू उपयोग करते हैं?"
+          },
+          "depends_on": [
+            "personal_history.tobacco"
+          ],
+          "when": [
+            {
+              "question_id": "personal_history.tobacco",
+              "operator": "equals",
+              "value": "current"
+            }
+          ]
+        },
+        {
+          "question_id": "personal_history.alcohol",
+          "field": "personal_history.alcohol",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Do you currently drink alcohol?",
+            "bn": "আপনি কি বর্তমানে মদ্যপান করেন?",
+            "hi": "क्या आप अभी शराब पीते हैं?"
+          }
+        },
+        {
+          "question_id": "personal_history.alcohol_details",
+          "field": "personal_history.alcohol_details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "How much and how often?",
+            "bn": "কতটা এবং কতবার?",
+            "hi": "कितनी मात्रा और कितनी बार?"
+          },
+          "depends_on": [
+            "personal_history.alcohol"
+          ],
+          "when": [
+            {
+              "question_id": "personal_history.alcohol",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        },
+        {
+          "question_id": "personal_history.context",
+          "field": "personal_history.context",
+          "type": "short_text",
+          "required": false,
+          "allow_unknown": true,
+          "text": {
+            "en": "Anything about your work, diet, sleep or daily life to share? (optional)",
+            "bn": "কাজ, খাবার, ঘুম বা দৈনন্দিন জীবন সম্পর্কে কিছু জানাতে চান? (ঐচ্ছিক)",
+            "hi": "काम, भोजन, नींद या दैनिक जीवन के बारे में कुछ बताना चाहते हैं? (वैकल्पिक)"
+          }
+        }
+      ]
+    },
+    {
+      "section_id": "review_of_systems",
+      "label": {
+        "en": "Other symptoms",
+        "bn": "অন্যান্য উপসর্গ",
+        "hi": "अन्य लक्षण"
+      },
+      "questions": [
+        {
+          "question_id": "review_of_systems.other",
+          "field": "review_of_systems.other",
+          "type": "boolean",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Do you have any other symptoms we have not discussed?",
+            "bn": "আলোচনা হয়নি এমন অন্য কোনো উপসর্গ আছে কি?",
+            "hi": "क्या कोई अन्य लक्षण है जिसकी चर्चा नहीं हुई?"
+          }
+        },
+        {
+          "question_id": "review_of_systems.details",
+          "field": "review_of_systems.details",
+          "type": "short_text",
+          "required": true,
+          "allow_unknown": true,
+          "text": {
+            "en": "Please describe in your own words.",
+            "bn": "নিজের ভাষায় বিস্তারিত বলুন।",
+            "hi": "कृपया अपने शब्दों में बताएँ।"
+          },
+          "depends_on": [
+            "review_of_systems.other"
+          ],
+          "when": [
+            {
+              "question_id": "review_of_systems.other",
+              "operator": "equals",
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

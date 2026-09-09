@@ -1,0 +1,528 @@
+{
+  "version": "1.0.0",
+  "content_status": "prototype_unvalidated",
+  "fixtures": [
+    {
+      "text": "chest pain",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "CHEST_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "বুকে ব্যথা",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "CHEST_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "सीने में दर्द",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "CHEST_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "abdominal pain",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "ABDOMINAL_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "পেটে ব্যথা",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "ABDOMINAL_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "पेट में दर्द",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "ABDOMINAL_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "headache",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "HEADACHE",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "মাথাব্যথা",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "HEADACHE",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "सिरदर्द",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "HEADACHE",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "fever",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "FEVER",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "জ্বর",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "FEVER",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "बुखार",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "FEVER",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "cough",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "COUGH",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "কাশি",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "COUGH",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "खांसी",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "COUGH",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "shortness of breath",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "DYSPNEA",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "শ্বাসকষ্ট",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "DYSPNEA",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "सांस लेने में तकलीफ",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "DYSPNEA",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "nausea",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "NAUSEA",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "বমি বমি ভাব",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "NAUSEA",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "मतली",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "NAUSEA",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "vomiting",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "VOMITING",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "বমি",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "VOMITING",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "उल्टी",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "VOMITING",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "sweating",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "SWEATING",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "ঘাম",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "SWEATING",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "पसीना",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "SWEATING",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "dizziness",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "DIZZINESS",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "মাথা ঘোরা",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "DIZZINESS",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "चक्कर आना",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "DIZZINESS",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "pressure-like pain",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "PRESSURE_LIKE_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "চাপের মতো ব্যথা",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "PRESSURE_LIKE_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "दबाव जैसा दर्द",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "PRESSURE_LIKE_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "sharp pain",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "SHARP_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "তীক্ষ্ণ ব্যথা",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "SHARP_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "तीखा दर्द",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "SHARP_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "burning pain",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "BURNING_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "জ্বালাপোড়ার মতো ব্যথা",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "BURNING_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "जलन जैसा दर्द",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "BURNING_PAIN",
+          "certainty": "certain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "maybe chest pain",
+      "language": "en",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "CHEST_PAIN",
+          "certainty": "uncertain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "হয়তো বুকে ব্যথা",
+      "language": "bn",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "CHEST_PAIN",
+          "certainty": "uncertain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "शायद सीने में दर्द",
+      "language": "hi",
+      "status": "normalized",
+      "facts": [
+        {
+          "concept": "CHEST_PAIN",
+          "certainty": "uncertain",
+          "confidence": null
+        }
+      ]
+    },
+    {
+      "text": "not sure",
+      "language": "en",
+      "status": "unknown",
+      "facts": []
+    },
+    {
+      "text": "জানা নেই",
+      "language": "bn",
+      "status": "unknown",
+      "facts": []
+    },
+    {
+      "text": "पता नहीं",
+      "language": "hi",
+      "status": "unknown",
+      "facts": []
+    }
+  ]
+}

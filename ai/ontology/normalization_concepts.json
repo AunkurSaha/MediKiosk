@@ -1,0 +1,54 @@
+{
+  "CHEST_PAIN": {
+    "display": "Chest pain",
+    "value": true
+  },
+  "ABDOMINAL_PAIN": {
+    "display": "Abdominal pain",
+    "value": true
+  },
+  "HEADACHE": {
+    "display": "Headache",
+    "value": true
+  },
+  "FEVER": {
+    "display": "Fever",
+    "value": true
+  },
+  "COUGH": {
+    "display": "Cough",
+    "value": true
+  },
+  "DYSPNEA": {
+    "display": "Breathlessness",
+    "value": true
+  },
+  "NAUSEA": {
+    "display": "Nausea",
+    "value": true
+  },
+  "VOMITING": {
+    "display": "Vomiting",
+    "value": true
+  },
+  "SWEATING": {
+    "display": "Sweating",
+    "value": true
+  },
+  "DIZZINESS": {
+    "display": "Dizziness",
+    "value": true
+  },
+  "PRESSURE_LIKE_PAIN": {
+    "display": "Pressure-like pain",
+    "value": "pressure_like"
+  },
+  "SHARP_PAIN": {
+    "display": "Sharp pain",
+    "value": "sharp"
+  },
+  "BURNING_PAIN": {
+    "display": "Burning pain",
+    "value": "burning"
+  }
+}

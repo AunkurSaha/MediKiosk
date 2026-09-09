@@ -1,0 +1,54 @@
+# Environment / secrets
+.runtime/
+*.db.copy
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+dist/
+.vite/
+coverage/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Runtime uploads / patient data
+uploads/
+data/
+minio-data/
+*.wav
+*.webm
+
+# OCR/model caches
+.paddleocr/
+models-cache/
+
+# Logs
+*.log
+
+# Docker/local
+docker-data/
+
+# Local Claude Code settings
+.claude/settings.local.json

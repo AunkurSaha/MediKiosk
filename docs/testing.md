@@ -1,0 +1,306 @@
+# Testing Strategy — MediKiosk
+
+## Current executable checks
+
+From the root on the configured Windows machine:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-backend.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-backend.ps1 -Postgres
+cd frontend
+npm run lint
+npm run format:check
+npm test
+npm run build
+npm run test:e2e
+cd ..
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-restart.ps1
+```
+
+Start the app with `scripts/start-dev.ps1` before browser/restart tests. Install the isolated browser once with `npx playwright install chromium` in `frontend/`.
+
+The backend helper defaults to isolated SQLite tables and uses the dedicated `medikiosk_test` PostgreSQL database with `-Postgres`. Each PostgreSQL test rolls back its data using savepoints. The PostgreSQL suite applies migrations first and refuses a target whose database name does not end in `_test`.
+
+The browser tests create fictional records in the running local demo database. The restart checker stops/restarts only the recorded project services and local PostgreSQL, then verifies the last browser-test record is unchanged. Do not run it during another person's active demo.
+
+Current evidence: 159 backend tests on each database profile, 33 component tests, 7 browser tests, 2 post-restart browser resume checks, schema comparison, and real restart-persistence checks. See [implementation-status.md](implementation-status.md). The GitHub workflow runs PostgreSQL API tests and frontend checks; remote execution is not yet verified.
+
+Future-phase expectations below remain the testing strategy as those features are added.
+
+## 1. Philosophy
+
+The prototype should be impressive because it is **reliable and explainable**, not because it has many untested AI features.
+
+Test deterministic behavior heavily. Test AI/provider boundaries with fixtures/contracts.
+
+## 2. Test layers
+
+### Backend unit tests — pytest
+Cover:
+- schema validation;
+- interview state transitions;
+- consent requirements;
+- red-flag rules;
+- timeline ordering;
+- discrepancy logic;
+- summary-confirmation state;
+- authorization checks;
+- provider adapters with mocks.
+
+### Backend API integration tests
+Cover:
+- create patient/session;
+- consent;
+- record answer;
+- fetch doctor session;
+- summary edit;
+- summary confirm;
+- alert acknowledgement;
+- document metadata lifecycle when introduced.
+
+### Frontend unit/component tests
+Use:
+- Vitest;
+- React Testing Library.
+
+Cover:
+- form validation;
+- navigation guards;
+- localized labels;
+- loading/error states;
+- verification labels;
+- doctor summary editor.
+
+### End-to-end
+A Playwright suite now covers the implemented Phase 1/2 intake, review, mobile and resume paths. Extend it for later phases as those features become available.
+
+Critical flows:
+1. basic patient intake → doctor sees answers;
+2. red-flag demo;
+3. document upload → extraction → timeline;
+4. doctor edit/confirm.
+
+## 3. Phase 1 acceptance tests
+
+### Patient flow
+- user can select English/Bengali/Hindi;
+- identification creates/associates a session;
+- consent cannot be skipped if doctor-sharing is required;
+- interview answers persist;
+- page refresh does not silently create duplicate sessions if session ID is retained appropriately;
+- completion hides previous patient data when a fresh intake starts.
+
+### Doctor flow
+- doctor can list sessions;
+- doctor can open a session;
+- captured answers appear correctly;
+- doctor can edit summary;
+- confirm stores verifier and timestamp;
+- confirmed state is visible.
+
+### API
+- invalid payload returns 4xx;
+- missing resource returns 404;
+- database failure does not produce false success;
+- health route works.
+
+## 4. Red-flag testing
+
+Each safety rule requires at least:
+- positive case;
+- negative case;
+- boundary case if thresholds exist;
+- missing-data case;
+- explanation/trigger-fact assertion.
+
+Example structure:
+
+```python
+def test_chest_pain_rule_fires_when_required_facts_present():
+    ...
+
+def test_chest_pain_rule_does_not_fire_without_required_fact():
+    ...
+```
+
+Do not unit-test “the LLM knows medicine” as a safety guarantee.
+
+## 5. AI extraction tests
+
+When LLM integration begins:
+- freeze representative input fixtures;
+- assert Pydantic-valid outputs;
+- assert unknown values are not invented;
+- assert prohibited diagnosis/treatment fields are absent;
+- test malformed provider response;
+- test timeout;
+- test provider unavailable.
+
+Avoid tests that depend on nondeterministic live API responses in the default suite.
+
+## 6. OCR tests
+
+Fixture classes:
+- clean printed prescription;
+- clean lab report;
+- rotated image;
+- low-contrast image;
+- poor handwriting sample if fallback exists.
+
+Assertions:
+- original document is preserved;
+- confidence exists;
+- low confidence stays unverified;
+- extraction failure is represented explicitly.
+
+## 7. Security tests
+
+At minimum:
+- unauthenticated protected route rejected once auth is introduced;
+- patient-role cannot access doctor-only actions;
+- doctor cannot confirm nonexistent session;
+- unsafe object path/file access blocked;
+- disallowed upload types/size handled;
+- secrets not returned by config endpoints.
+
+## 8. Test data
+
+Use fictional data only.
+
+Never place real patient records, identifiable prescriptions, phone numbers, addresses, ABHA identifiers, or hospital credentials in repository fixtures.
+
+## 9. CI quality gates
+
+Target commands:
+
+Backend:
+```bash
+ruff check .
+pytest
+```
+
+Frontend:
+```bash
+npm run lint
+npm run test -- --run
+npm run build
+```
+
+Add type-check command if not already part of build.
+
+## 10. Definition of tested
+
+A feature is considered tested when:
+- happy path is covered;
+- important invalid/error path is covered;
+- clinically sensitive state transitions are covered;
+- provider failure behavior is covered when external services are involved.
+
+## Phase 2 adaptive interview acceptance
+
+The backend suite now includes schema validation, all seven answer types, all five complaint families and isolated AYUSH traversal, completion, unknown/optional behavior, deterministic evaluation, consent/provenance guards, correction history, deactivation/reactivation, delayed retries, stale revisions, pinned versions and stable answer ordering. Original Phase 1 backend tests are unchanged. The existing ten frontend regressions now mock the server-driven interview contract and retain their identity/consent/save/resume/review assertions; seventeen new component tests cover renderers and adaptive UI behavior.
+
+From the repository root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-backend.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-backend.ps1 -Postgres
+```
+
+From backend, verify migrations with the existing local app/test PostgreSQL databases running:
+
+```powershell
+.\.venv\Scripts\python.exe ..\scripts\verify-phase2-migrations.py
+```
+
+This creates two isolated schemas inside medikiosk_test, exercises empty and Phase 1 upgrades, checks model/schema agreement, removes only those temporary schemas, then verifies the local app upgrade preserves every row in all Phase 1 tables using hashes. It refuses to overwrite a pre-existing verification schema. No application data is cleared.
+
+From frontend:
+
+```powershell
+npm test
+npm run lint
+npm run format:check
+npm run build
+npm run test:e2e
+```
+
+The five browser tests include adaptive branch entry/edit/removal/restoration, refresh/resume, doctor confirmation, a legacy Phase 1 regression, Bengali mobile identity/questions, and persisted adaptive resume. They create fictional records in the local app database and deliberately leave them available for inspection. Screenshots and reference JSON files are under ignored .runtime.
+
+After browser tests, from the project root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-restart.ps1
+```
+
+The checker stops/restarts the actual backend and PostgreSQL, requires new PIDs, and compares legacy/Phase 2 confirmed records plus the unfinished Bengali interview (flow, cursor, revision, history and answers). Finally run `npm run test:e2e -- e2e/restart.spec.ts` from frontend to verify browser resume after the real restart.
+
+See [current results](implementation-status.md) and [Phase 2 report](phase2-implementation-status.md). Clinical validation and provider integration are not established by these software tests.
+
+## Phase 3A acceptance
+
+Current totals: **159 backend tests on each SQLite/PostgreSQL profile**, including all 76 Phase 1/2 regressions and 83 new normalization tests; **33 frontend tests**; **7 Chromium E2E tests**. The new tests cover all fixtures, deterministic output, raw whitespace/EN/BN/HI preservation, negation/context/no-diagnosis fallback, malformed output, confidence/certainty, timeout/unavailability/unsupported language, field/type bypass, savepoint failures, source edits, cached retries, deactivation/reactivation, structured snapshots and unverified doctor labels after confirmation.
+
+From backend with local PostgreSQL running:
+
+```powershell
+.\.venv\Scripts\python.exe ..\scripts\verify-phase3a-migrations.py
+```
+
+This verifies empty, Phase 1 and Phase 2 upgrades in isolated test schemas, then the real app upgrade; all pre-existing rows are fingerprint-compared. Alembic must report no new upgrade operations. Existing tests/start commands above remain valid.
+
+After the full E2E suite, scripts/verify-restart.ps1 compares both confirmed and unfinished Phase 3A source/result/provenance snapshots across real backend and PostgreSQL process restarts. Run `npm run test:e2e -- e2e/restart.spec.ts` afterward for two browser resume checks. Artifacts are stored in ignored .runtime. See [Phase 3A report](phase3a-implementation-status.md) for the reviewed defects and final evidence.
+
+## Phase 3B acceptance
+
+Current totals: **214 backend tests on each SQLite/PostgreSQL profile** (159 Phase 1/2/3A regressions + 55 Phase 3B contract and adversarial tests); **36 frontend tests**; **7 Chromium E2E tests**.
+
+New test coverage includes:
+- **Configuration & Secrets**: Mock defaults without API key, explicit `nvidia` configuration, invalid model/URL rejection without key echo, `SecretStr` representation and serialization exclusion.
+- **Request Minimization**: Verification that only `text`, `language`, and `canonical_field` are sent; context IDs (`session_id`, `patient_name`) and API keys are completely stripped.
+- **Conservative Sampling**: Verification of `temperature=0`, `stream=False`, `max_tokens=768`, and `chat_template_kwargs={"enable_thinking": False}`.
+- **Schema 1.1 Enforcement**: Verification of required polarity (`present`/`absent`), certainty (`certain`/`uncertain`), `confidence: null`, exact evidence substring, and rejection of prohibited diagnostic concepts.
+- **Fault Tolerance**: Network failures, timeouts, HTTP 401/403/429/500, truncated outputs, malformed JSON, duplicate keys, and schema violations all cleanly fail into explicit `unavailable` results while raw patient answers remain safely persisted.
+- **Transaction Isolation**: Verification that normalization failures never roll back or poison the committed patient answer.
+- **Secret Audit**: Value-based audit across 156 files and logs confirms zero API key leakage.
+- **Migration Continuity**: `scripts/verify-phase3b-migrations.py` confirms clean upgrades from empty, Phase 1, Phase 2, and Phase 3A, with all pre-existing application table rows and SHA-256 fingerprints unchanged.
+- **Empirical Live Diagnostic**: `scripts/evaluate-nvidia-normalization.py` probes live connectivity to `https://integrate.api.nvidia.com/v1`, testing `google/gemma-4-31b-it` directly.
+
+## Phase 4A acceptance
+
+Current totals: **231 backend tests on each SQLite/PostgreSQL profile** (214 Phase 1/2/3A/3B regressions + 17 Phase 4A speech and TTS tests); **47 frontend component tests**; **12 Chromium E2E tests**.
+
+New test coverage includes:
+- **Backend Unit & Integration Tests (`backend/tests/test_speech.py`)**:
+  - Valid mock transcription for English, Bengali, and Hindi with fixture-matching and canonical fallback.
+  - Strict consent enforcement: HTTP 403 `VOICE_CONSENT_REQUIRED` when `voice_processing = false`.
+  - Non-editable session rejection: HTTP 409 `SESSION_LOCKED` when session is already completed.
+  - Validation rejections: HTTP 415 `UNSUPPORTED_MEDIA_TYPE` (e.g. `image/png`), HTTP 422 `EMPTY_AUDIO` (0 bytes), HTTP 413 `FILE_TOO_LARGE` (>5MB), HTTP 400 `LANGUAGE_MISMATCH`.
+  - Provider failure handling: deterministic timeout/unavailability simulation returning structured failure response without crashing.
+  - Ephemeral audio cleanup verification: confirms temporary files are deleted from disk on success, provider error, and validation rejection.
+  - Persistence non-mutation: confirms ASR transcription does NOT create or mutate interview answers.
+  - Provenance verification: confirmed voice transcript persists as `source: 'voice'`; edited transcript persists as `source: 'typed'`.
+  - Normalization sequencing: confirms clinical normalization runs only downstream after explicit answer confirmation.
+  - Question TTS synthesis: verifies exact localized question text extraction, language matching, exclusion of patient answers/histories, and invalid question ID rejection (HTTP 404).
+
+- **Frontend Component Tests (`frontend/src/test/speech.test.tsx`)**:
+  - QuestionAudioPlayer: idle state, playback start, audio loading/playing, and error retry state.
+  - VoiceRecorder: browser MediaRecorder availability check, permission denied fallback banner, start/stop recording states, candidate transcript display card ("You said: ..."), confirm action, edit action with inline text saving, retry/record again action, and cancel action.
+  - Multilingual localization: verified label rendering for English, Bengali, and Hindi.
+
+- **Playwright E2E Tests (`frontend/e2e/speech.spec.ts`)**:
+  - Mock `MediaRecorder` injected into browser context to enable deterministic headless testing without physical microphone hardware.
+  - Test 1: English voice intake journey with candidate review, explicit confirmation, persistence as `source: 'voice'`, and subsequent clinical normalization.
+  - Test 2: Bengali voice intake journey with Bengali candidate review ("আপনি বলেছেন: ..."), explicit confirmation, and persistence.
+  - Test 3: Transcript edit before confirmation, verifying edited text is submitted with `source: 'typed'`.
+  - Test 4: ASR failure leading to graceful fallback message and typed answer submission.
+  - Test 5: Question TTS playback request via the `Listen` button in the question header.
+
+- **Full Regression & Restart Verification**:
+  - SQLite regression: 231 passed in 10.80s.
+  - PostgreSQL regression: 231 passed in 14.67s.
+  - Full frontend suite: 47 tests passed in 1.45s.
+  - Full E2E suite: 12 tests across 5 spec files passed in 44.6s.
+  - Real service restart verification: `scripts/verify-restart.ps1` passed 100% across real backend and PostgreSQL processes.
+
+
