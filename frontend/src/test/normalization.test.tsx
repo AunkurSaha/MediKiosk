@@ -90,6 +90,15 @@ function detail(normalization: Normalization | null, confirmed = false): Detail 
 beforeEach(() => {
   vi.restoreAllMocks();
   window.history.replaceState({}, '', '/doctor/sessions/session');
+  vi.spyOn(api, 'medicalFacts').mockResolvedValue({
+    medications: [],
+    labs: [],
+    rejected_medications: [],
+    rejected_labs: [],
+    counts: { unverified: 0, verified: 0, rejected: 0 },
+  });
+  vi.spyOn(api, 'timeline').mockResolvedValue({ known_date: [], unknown_date: [] });
+  vi.spyOn(api, 'discrepancies').mockResolvedValue({ items: [] });
 });
 
 it('shows original Bengali wording, canonical label and unverified provenance separately', async () => {

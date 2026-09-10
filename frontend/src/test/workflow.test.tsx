@@ -61,6 +61,15 @@ beforeEach(() => {
     legacyState(questions.findIndex((q) => q.question_id === submission.question_id) + 1),
   );
   vi.mocked(api.complete).mockResolvedValue({ ...detail().session, status: 'ready_for_review' });
+  vi.mocked(api.medicalFacts).mockResolvedValue({
+    medications: [],
+    labs: [],
+    rejected_medications: [],
+    rejected_labs: [],
+    counts: { unverified: 0, verified: 0, rejected: 0 },
+  });
+  vi.mocked(api.timeline).mockResolvedValue({ known_date: [], unknown_date: [] });
+  vi.mocked(api.discrepancies).mockResolvedValue({ items: [] });
 });
 describe('Patient intake', () => {
   it('records consent, saves all answers, completes and clears the kiosk', async () => {

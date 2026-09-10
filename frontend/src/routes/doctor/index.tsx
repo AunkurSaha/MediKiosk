@@ -5,6 +5,7 @@ import type { Detail, SessionList } from '../../api/client';
 import { copy, errorText } from '../../i18n';
 import NormalizationPanel from '../../components/doctor/NormalizationPanel';
 import DocumentViewer from '../../components/doctor/DocumentViewer';
+import ClinicalEvidencePanel from '../../components/doctor/ClinicalEvidencePanel';
 
 const t = copy.en;
 export default function Doctor() {
@@ -296,6 +297,11 @@ export default function Doctor() {
               )}
             </section>
           </div>
+          <ClinicalEvidencePanel
+            key={detail.session.id}
+            sessionId={detail.session.id}
+            locked={detail.session.status === 'confirmed' || detail.session.status === 'cancelled'}
+          />
           {detail.documents && detail.documents.length > 0 && (
             <DocumentViewer
               locked={

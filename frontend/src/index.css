@@ -1361,3 +1361,185 @@ details .muted {
   font-weight: 600;
   color: #1e293b;
 }
+
+/* Phase 7: source-linked facts, computed timeline, and discrepancies */
+.clinical-evidence-stack {
+  display: grid;
+  gap: 22px;
+  margin-top: 22px;
+}
+.evidence-panel {
+  padding: 28px;
+}
+.section-heading,
+.fact-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.section-heading h2,
+.fact-heading h4 {
+  margin: 0;
+}
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: #e8f1ee;
+  color: #315f55;
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+.medical-facts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 12px 0 24px;
+}
+.medical-fact-card {
+  border: 1px solid #dbe6e2;
+  border-left: 5px solid #d0a52f;
+  border-radius: 12px;
+  padding: 18px;
+  min-width: 0;
+}
+.medical-fact-card.status-verified {
+  border-left-color: #2f805c;
+}
+.medical-fact-card.status-rejected {
+  border-left-color: #8b9490;
+  background: #f7f8f7;
+}
+.fact-values {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.fact-values > div {
+  border: 0;
+  padding: 0;
+}
+.fact-values dt {
+  margin-bottom: 2px;
+}
+.fact-values dd {
+  font-size: 0.88rem;
+}
+.fact-source {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border-top: 1px solid #e4ece9;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+.fact-source details {
+  width: 100%;
+  margin: 0;
+}
+.fact-history-note {
+  color: #5c6d67;
+  font-size: 0.8rem;
+}
+.fact-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.fact-edit-grid label,
+.fact-review-controls label {
+  display: grid;
+  gap: 5px;
+  font-size: 0.78rem;
+  color: #536b63;
+}
+.fact-edit-grid input,
+.fact-review-controls input {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid #bfd0ca;
+  border-radius: 7px;
+}
+.fact-review-controls {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+.timeline-list {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 26px;
+}
+.timeline-list li {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  gap: 12px;
+  border-left: 2px solid #bfd8d0;
+  margin-left: 7px;
+  padding: 0 0 20px 18px;
+}
+.timeline-marker {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #247261;
+  border: 3px solid white;
+  box-shadow: 0 0 0 2px #247261;
+  margin-left: -26px;
+  margin-top: 3px;
+}
+.timeline-list details {
+  margin-top: 8px;
+}
+.discrepancy-list {
+  display: grid;
+  gap: 14px;
+}
+.discrepancy-card {
+  border: 1px solid #e7d39c;
+  border-left: 5px solid #c39520;
+  background: #fffdf7;
+  border-radius: 12px;
+  padding: 18px;
+}
+.discrepancy-card h4 {
+  margin: 4px 0 8px;
+}
+.discrepancy-sides {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+.discrepancy-sides > div {
+  border: 1px solid #eadfbf;
+  border-radius: 9px;
+  background: white;
+  padding: 12px;
+  min-width: 0;
+}
+.discrepancy-sides a {
+  display: block;
+  margin-top: 8px;
+}
+
+@media (max-width: 760px) {
+  .evidence-panel {
+    padding: 20px 16px;
+  }
+  .medical-facts-grid,
+  .fact-edit-grid,
+  .discrepancy-sides {
+    grid-template-columns: 1fr;
+  }
+  .medical-fact-card .actions button {
+    flex-basis: 100%;
+  }
+}

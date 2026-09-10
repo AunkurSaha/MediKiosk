@@ -104,7 +104,11 @@ export default function DocumentViewer({
   }
 
   return (
-    <section className="card document-viewer-panel" data-testid="document-viewer-panel">
+    <section
+      id="document-viewer-panel"
+      className="card document-viewer-panel"
+      data-testid="document-viewer-panel"
+    >
       <div className="doc-viewer-header">
         <div>
           <h2>{t.docDoctorReview}</h2>

@@ -48,20 +48,25 @@ export interface Summary {
 }
 import type { AlertItem } from './triage';
 
-export interface MedicationFact {
+export interface ExtractedMedication {
   name: string;
   dosage: string | null;
+  unit?: string | null;
   frequency: string | null;
   route: string | null;
   duration: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  instructions?: string | null;
 }
 
-export interface LabObservationFact {
+export interface ExtractedLabObservation {
   test_name: string;
   value: string;
   unit: string | null;
   reference_range: string | null;
   flag: string | null;
+  observation_timestamp?: string | null;
 }
 
 export interface DocumentExtractionRecord {
@@ -74,8 +79,8 @@ export interface DocumentExtractionRecord {
   structured_json: {
     document_type?: string;
     document_date?: string | null;
-    medications?: MedicationFact[];
-    observations?: LabObservationFact[];
+    medications?: ExtractedMedication[];
+    observations?: ExtractedLabObservation[];
     [key: string]: unknown;
   };
   confidence: number | null;
@@ -121,6 +126,107 @@ export interface Detail {
 }
 export interface SessionList {
   items: (Session & { patient_name: string })[];
+}
+
+export type VerificationStatus = 'unverified' | 'verified' | 'rejected';
+export interface FactSource {
+  source_type: 'document' | 'patient_answer';
+  source_id: string;
+  document_id: string | null;
+  extraction_id: string | null;
+  document_filename: string | null;
+  raw_text: string | null;
+  source_location: string | null;
+}
+export interface MedicationValue {
+  name: string;
+  dosage: string | null;
+  unit: string | null;
+  route: string | null;
+  frequency: string | null;
+  duration: string | null;
+  start_date: string | null;
+  end_date: string | null;
+  instructions: string | null;
+}
+export interface LabValue {
+  test_name: string;
+  value: string;
+  unit: string | null;
+  reference_range: string | null;
+  flag: string | null;
+  observation_timestamp: string | null;
+}
+export interface FactRevision {
+  id: string;
+  version: number;
+  review_status: VerificationStatus;
+  corrected_data: Record<string, unknown> | null;
+  reviewer_id: string;
+  review_notes: string | null;
+  reviewed_at: string;
+}
+export interface MedicalFactRecord<T> {
+  id: string;
+  fact_type: 'medication' | 'lab';
+  original: T;
+  current: T;
+  source: FactSource;
+  verification_status: VerificationStatus;
+  review_version: number;
+  verified_by: string | null;
+  verified_at: string | null;
+  verification_notes: string | null;
+  revisions: FactRevision[];
+}
+export type MedicationFactRecord = MedicalFactRecord<MedicationValue>;
+export type LabFactRecord = MedicalFactRecord<LabValue>;
+export interface MedicalFactsResponse {
+  medications: MedicationFactRecord[];
+  labs: LabFactRecord[];
+  rejected_medications: MedicationFactRecord[];
+  rejected_labs: LabFactRecord[];
+  counts: { unverified: number; verified: number; rejected: number };
+}
+export interface TimelineEntry {
+  id: string;
+  event_type: string;
+  canonical_label: string;
+  event_timestamp: string | null;
+  date_status: 'known' | 'partial' | 'unknown';
+  date_precision: 'datetime' | 'day' | 'month' | 'year' | 'unknown';
+  source: FactSource;
+  verification_status: VerificationStatus;
+}
+export interface TimelineResponse {
+  known_date: TimelineEntry[];
+  unknown_date: TimelineEntry[];
+}
+export interface DiscrepancySource {
+  source_type: 'patient_answer' | 'document_fact';
+  source_id: string;
+  label: string;
+  displayed_value: string;
+  document_id: string | null;
+  extraction_id: string | null;
+  raw_text: string | null;
+}
+export interface DiscrepancyRecord {
+  discrepancy_id: string;
+  type:
+    | 'MEDICATION_MISMATCH'
+    | 'MEDICATION_MISSING_FROM_PATIENT_REPORT'
+    | 'ALLERGY_CONFLICT'
+    | 'LAB_VALUE_CONFLICT';
+  workflow_priority: 'routine_review';
+  source_a: DiscrepancySource;
+  source_b: DiscrepancySource;
+  reason: string;
+  status: 'open';
+  verification_state: 'requires_clinician_review';
+}
+export interface DiscrepancyResponse {
+  items: DiscrepancyRecord[];
 }
 export class ApiError extends Error {
   code: string;
@@ -265,6 +371,40 @@ export const api = {
   complete: (id: string) => request<Session>('/sessions/' + id + '/complete', 'POST'),
   sessions: () => request<SessionList>('/doctor/sessions', 'GET', undefined, true),
   doctorDetail: (id: string) => request<Detail>('/doctor/sessions/' + id, 'GET', undefined, true),
+  medicalFacts: (id: string) =>
+    request<MedicalFactsResponse>(`/doctor/sessions/${id}/medical-facts`, 'GET', undefined, true),
+  timeline: (id: string) =>
+    request<TimelineResponse>(`/doctor/sessions/${id}/timeline`, 'GET', undefined, true),
+  discrepancies: (id: string) =>
+    request<DiscrepancyResponse>(`/doctor/sessions/${id}/discrepancies`, 'GET', undefined, true),
+  reviewMedicationFact: (
+    id: string,
+    factId: string,
+    expectedVersion: number,
+    status: 'verified' | 'rejected',
+    correction?: Partial<MedicationValue>,
+    notes?: string,
+  ) =>
+    request<MedicationFactRecord>(
+      `/doctor/sessions/${id}/medical-facts/medications/${factId}`,
+      'PATCH',
+      { expected_version: expectedVersion, status, correction, notes },
+      true,
+    ),
+  reviewLabFact: (
+    id: string,
+    factId: string,
+    expectedVersion: number,
+    status: 'verified' | 'rejected',
+    correction?: Partial<LabValue>,
+    notes?: string,
+  ) =>
+    request<LabFactRecord>(
+      `/doctor/sessions/${id}/medical-facts/labs/${factId}`,
+      'PATCH',
+      { expected_version: expectedVersion, status, correction, notes },
+      true,
+    ),
   saveSummary: (id: string, reviewed_text: string, expected_version: number) =>
     request<Summary>(
       '/doctor/sessions/' + id + '/summary',
