@@ -7,17 +7,20 @@ from .alert import (
     AlertSummary,
     TriggeringFact,
 )
+from .audit_trail import AuditTrailItem, AuditTrailResponse
 from .clinical_summary import (
     ClinicalSummary,
     ClinicalSummaryUpdate,
     EvidenceReference,
     StructuredClinicalSummary,
     StructuredSummarySection,
+    SummaryAmendRequest,
     SummaryConfirm,
     SummaryRegenerateRequest,
     SummaryRevisionRecord,
 )
 from .consent import Consent, ConsentUpdate
+from .cross_reference import CrossReferenceResponse, DocumentCrossReference, DocumentFactLink
 from .document import (
     DocumentExtractionResponse,
     DocumentListResponse,
@@ -25,6 +28,12 @@ from .document import (
     ExtractionVerifyRequest,
     LabObservationFact,
     MedicationFact,
+)
+from .field_verification import (
+    FieldVerificationList,
+    FieldVerificationRecord,
+    FieldVerificationRequest,
+    FieldVerificationRevisionRecord,
 )
 from .interview_answer import InterviewAnswer, InterviewAnswerCreate
 from .medical_fact import (
@@ -80,5 +89,16 @@ __all__ = [
     "SessionDetail",
     "SessionList",
     "SessionListItem",
+    "SummaryAmendRequest",
+    "AuditTrailItem",
+    "AuditTrailResponse",
+    "CrossReferenceResponse",
+    "DocumentCrossReference",
+    "DocumentFactLink",
+    "FieldVerificationList",
+    "FieldVerificationRecord",
+    "FieldVerificationRequest",
+    "FieldVerificationRevisionRecord",
     "User",
 ]
+

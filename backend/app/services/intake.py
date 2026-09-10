@@ -128,6 +128,10 @@ def enrich_summary_schema(summary: models.ClinicalSummary | None, db: Session | 
         reviewed_at=summary.reviewed_at,
         confirmed_by=summary.confirmed_by,
         confirmed_at=summary.confirmed_at,
+        amended_text=summary.amended_text,
+        amended_by=summary.amended_by,
+        amended_at=summary.amended_at,
+        amendment_notes=summary.amendment_notes,
         created_at=summary.created_at,
         updated_at=summary.updated_at,
         structured_summary=structured,
@@ -589,3 +593,104 @@ def get_summary_evidence(db, session_id) -> list[schemas.EvidenceReference]:
         db, session_id, draft_version=summary.draft_version or 1
     )
     return structured.evidence_references
+
+
+def amend_summary(
+    db: Session,
+    session_id: str,
+    payload: schemas.SummaryAmendRequest,
+    user: models.User,
+) -> schemas.ClinicalSummary:
+    get_session(db, session_id)
+    require_consent(db, session_id)
+    summary = summary_for(db, session_id)
+    if summary is None:
+        raise WorkflowError("NOT_READY", "Complete the intake before review.")
+    if summary.status not in ("confirmed", "amended"):
+        raise WorkflowError(
+            "NOT_CONFIRMED",
+            "Only confirmed clinical summaries can receive amendments. Use draft editing for working summaries.",
+            409,
+        )
+
+    if not payload.amended_text or not payload.amended_text.strip():
+        raise WorkflowError("INVALID_TEXT", "Amended summary text cannot be empty.", 422)
+    if not payload.amendment_notes or len(payload.amendment_notes.strip()) < 3:
+        raise WorkflowError(
+            "INVALID_NOTES",
+            "A clinical justification note is required for an amendment.",
+            422,
+        )
+
+    current_time = now()
+    summary.version += 1
+    summary.draft_version = (summary.draft_version or 1) + 1
+    summary.amended_text = payload.amended_text
+    summary.amended_by = user.id
+    summary.amended_at = current_time
+    summary.amendment_notes = payload.amendment_notes
+    summary.status = "amended"
+
+    db.add(
+        models.SummaryRevision(
+            summary_id=summary.id,
+            version=summary.version,
+            revision_type="amendment",
+            actor_type="DOCTOR",
+            reviewed_text=payload.amended_text,
+            actor_user_id=user.id,
+            review_notes=payload.amendment_notes,
+            structured_snapshot=None,
+            created_at=current_time,
+        )
+    )
+
+    audit(
+        db,
+        "summary_amended",
+        session_id,
+        user,
+        {
+            "version": summary.version,
+            "draft_version": summary.draft_version,
+            "notes": payload.amendment_notes,
+        },
+    )
+
+    db.commit()
+    db.refresh(summary)
+    return enrich_summary_schema(summary, db=db)
+
+
+def get_audit_trail(db: Session, session_id: str) -> schemas.AuditTrailResponse:
+    get_session(db, session_id)
+    require_consent(db, session_id)
+
+    logs = list(
+        db.scalars(
+            select(models.AuditLog)
+            .where(models.AuditLog.entity_id == session_id)
+            .order_by(models.AuditLog.created_at.asc())
+        )
+    )
+
+    items = [
+        schemas.AuditTrailItem(
+            id=log.id,
+            timestamp=log.created_at,
+            actor_type=log.actor_type,
+            actor_user_id=log.actor_user_id,
+            action=log.action,
+            entity_type=log.entity_type,
+            entity_id=log.entity_id,
+            metadata=log.metadata_json or {},
+        )
+        for log in logs
+    ]
+
+    return schemas.AuditTrailResponse(
+        session_id=session_id,
+        total=len(items),
+        items=items,
+    )
+

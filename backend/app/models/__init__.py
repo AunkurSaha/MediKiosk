@@ -4,6 +4,7 @@ from .clinical_summary import ClinicalSummary
 from .consent import Consent
 from .document import Document
 from .document_extraction import DocumentExtraction
+from .field_verification import FieldVerification, FieldVerificationRevision
 from .interview_answer import InterviewAnswer
 from .interview_run import InterviewRequest, InterviewRun
 from .lab_fact import LabFact
@@ -23,6 +24,8 @@ __all__ = [
     "Consent",
     "Document",
     "DocumentExtraction",
+    "FieldVerification",
+    "FieldVerificationRevision",
     "InterviewAnswer",
     "InterviewRun",
     "InterviewRequest",

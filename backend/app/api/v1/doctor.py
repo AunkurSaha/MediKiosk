@@ -110,3 +110,72 @@ def read_summary_evidence(
     user: models.User = Depends(get_current_user),
 ):
     return intake.get_summary_evidence(db, str(session_id))
+
+
+@router.post(
+    "/sessions/{session_id}/summary/amend",
+    response_model=schemas.ClinicalSummary,
+)
+def amend_summary(
+    session_id: UUID,
+    payload: schemas.SummaryAmendRequest,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    return intake.amend_summary(db, str(session_id), payload, user)
+
+
+@router.get(
+    "/sessions/{session_id}/field-verifications",
+    response_model=schemas.FieldVerificationList,
+)
+def read_field_verifications(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services import field_verification
+
+    return field_verification.get_verifications(db, str(session_id))
+
+
+@router.post(
+    "/sessions/{session_id}/field-verifications",
+    response_model=schemas.FieldVerificationRecord,
+)
+def create_or_update_field_verification(
+    session_id: UUID,
+    payload: schemas.FieldVerificationRequest,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services import field_verification
+
+    return field_verification.verify_field(db, str(session_id), payload, user)
+
+
+@router.get(
+    "/sessions/{session_id}/audit-trail",
+    response_model=schemas.AuditTrailResponse,
+)
+def read_audit_trail(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    return intake.get_audit_trail(db, str(session_id))
+
+
+@router.get(
+    "/sessions/{session_id}/cross-references",
+    response_model=schemas.CrossReferenceResponse,
+)
+def read_cross_references(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services import cross_reference
+
+    return cross_reference.get_cross_references(db, str(session_id))
+

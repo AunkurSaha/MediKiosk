@@ -61,7 +61,7 @@ class SummaryRevisionRecord(APIModel):
     id: str
     summary_id: str
     version: int
-    revision_type: Literal["initial_draft", "edit", "regenerate", "confirmed"]
+    revision_type: Literal["initial_draft", "edit", "regenerate", "confirmed", "amendment"]
     actor_type: Literal["SYSTEM", "DOCTOR"]
     actor_user_id: str | None = None
     actor_name: str | None = None
@@ -71,6 +71,11 @@ class SummaryRevisionRecord(APIModel):
     created_at: UTCDate
 
 
+class SummaryAmendRequest(APIModel):
+    amended_text: str = Field(..., min_length=1)
+    amendment_notes: str = Field(..., min_length=3, max_length=2000)
+
+
 class ClinicalSummary(APIModel):
     id: str
     session_id: str
@@ -78,7 +83,11 @@ class ClinicalSummary(APIModel):
     generated_structured_json: str | None = None
     reviewed_text: str | None = None
     confirmed_text: str | None = None
-    status: Literal["generated", "reviewed", "confirmed"]
+    amended_text: str | None = None
+    amended_by: str | None = None
+    amended_at: UTCDate | None = None
+    amendment_notes: str | None = None
+    status: Literal["generated", "reviewed", "confirmed", "amended"]
     draft_provider: str = "deterministic"
     draft_version: int = 1
     version: int
@@ -91,3 +100,4 @@ class ClinicalSummary(APIModel):
     updated_at: UTCDate | None = None
     structured_summary: StructuredClinicalSummary | None = None
     evidence: list[EvidenceReference] | None = None
+
