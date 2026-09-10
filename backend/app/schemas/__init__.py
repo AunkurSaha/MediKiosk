@@ -29,6 +29,11 @@ from .document import (
     LabObservationFact,
     MedicationFact,
 )
+from .fhir import (
+    BundleResource,
+    FHIRExportResponse,
+    OperationOutcome,
+)
 from .field_verification import (
     FieldVerificationList,
     FieldVerificationRecord,
@@ -99,6 +104,9 @@ __all__ = [
     "FieldVerificationRecord",
     "FieldVerificationRequest",
     "FieldVerificationRevisionRecord",
+    "BundleResource",
+    "FHIRExportResponse",
+    "OperationOutcome",
     "User",
 ]
 

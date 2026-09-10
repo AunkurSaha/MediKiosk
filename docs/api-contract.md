@@ -298,3 +298,54 @@ All Phase 9 endpoints require staff authentication (`X-Demo-Doctor: true` in dem
   - Returns `{ "session_id": string, "documents": DocumentCrossReference[], "statement_cross_references": dict }`.
   - Maps source documents to their linked medications, lab observations, discrepancies, and summary statements.
 
+## Phase 10 FHIR R4 export contract
+
+All Phase 10 endpoints require staff authentication (`X-Demo-Doctor: true` in demo mode) and active sharing consent:
+
+- `GET /api/doctor/sessions/{session_id}/fhir/export`:
+  Generates and validates an HL7 FHIR R4 export package for the session:
+  - Query parameter: `bundle_type="document"` (default, with Composition LOINC `34105-7` at `entry[0]`) or `bundle_type="collection"`.
+  - Response: `FHIRExportResponse`
+    ```json
+    {
+      "session_id": "uuid",
+      "bundle_type": "document",
+      "compliance_profile": "HL7 FHIR R4 / NRCES EHR Profile",
+      "generated_at": "ISO-8601 UTC timestamp",
+      "resource_counts": {
+        "Patient": 1,
+        "Encounter": 1,
+        "Composition": 1,
+        "QuestionnaireResponse": 1,
+        "Condition": 1,
+        "MedicationStatement": 1,
+        "Observation": 1,
+        "DocumentReference": 1
+      },
+      "validation": {
+        "resourceType": "OperationOutcome",
+        "issue": []
+      },
+      "bundle": {
+        "resourceType": "Bundle",
+        "id": "bundle-{session_id}",
+        "type": "document",
+        "timestamp": "ISO-8601 UTC",
+        "entry": [ ... ]
+      }
+    }
+    ```
+  - Audit event: Automatically records `FHIR_EXPORTED` in session audit trail.
+
+- `GET /api/doctor/sessions/{session_id}/fhir/bundle`:
+  Returns direct raw FHIR R4 Bundle JSON conforming to `application/fhir+json` MIME type:
+  - Query parameter: `bundle_type="document"` (default) or `bundle_type="collection"`.
+  - Content-Type: `application/fhir+json; charset=utf-8`.
+  - Audit event: Automatically records `FHIR_BUNDLE_ACCESSED` in session audit trail.
+
+- `POST /api/doctor/sessions/{session_id}/fhir/validate`:
+  Validates bundle conformance, document bundle invariants, and reference integrity without exporting payload:
+  - Query parameter: `bundle_type="document"` (default) or `bundle_type="collection"`.
+  - Response: `OperationOutcome` with validated status or specific conformance issues.
+
+

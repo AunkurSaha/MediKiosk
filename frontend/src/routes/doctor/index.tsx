@@ -9,6 +9,7 @@ import ClinicalEvidencePanel from '../../components/doctor/ClinicalEvidencePanel
 import SummaryWorkspace from '../../components/doctor/SummaryWorkspace';
 import { FieldVerificationBadge } from '../../components/doctor/FieldVerificationBadge';
 import { AuditTrailViewer } from '../../components/doctor/AuditTrailViewer';
+import { FHIRExportModal } from '../../components/doctor/FHIRExportModal';
 
 const t = copy.en;
 export default function Doctor() {
@@ -20,6 +21,7 @@ export default function Doctor() {
   const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState('');
   const [attempt, setAttempt] = useState(0);
+  const [fhirModalOpen, setFhirModalOpen] = useState(false);
   useEffect(() => {
     let active = true;
     if (sessionId) {
@@ -129,7 +131,30 @@ export default function Doctor() {
                 {detail.session.hospital_token} · {detail.session.language.toUpperCase()}
               </p>
             </div>
-            <span className={'badge ' + detail.session.status}>{t[detail.session.status]}</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                data-testid="export-fhir-btn"
+                onClick={() => setFhirModalOpen(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  fontSize: '13px',
+                  borderRadius: '6px',
+                  border: '1px solid #cbd5e1',
+                  backgroundColor: '#ffffff',
+                  color: '#1e293b',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                }}
+              >
+                <span>📦</span> Export FHIR R4
+              </button>
+              <span className={'badge ' + detail.session.status}>{t[detail.session.status]}</span>
+            </div>
           </div>
           {detail.alerts && detail.alerts.length > 0 && (
             <section
@@ -291,6 +316,13 @@ export default function Doctor() {
             />
           )}
           <AuditTrailViewer key={`audit-trail-${detail.session.id}`} sessionId={detail.session.id} />
+          <FHIRExportModal
+            isOpen={fhirModalOpen}
+            onClose={() => setFhirModalOpen(false)}
+            sessionId={detail.session.id}
+            patientName={detail.patient.name}
+            hospitalToken={detail.session.hospital_token}
+          />
         </>
       )}
     </div>

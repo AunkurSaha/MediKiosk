@@ -55,3 +55,23 @@ Summary drafting, review, regeneration, and confirmation endpoints reuse the exi
    - `GET /audit-trail` is restricted to authorized staff (`X-Demo-Doctor: true`).
    - Audit logs capture actor classification (`DOCTOR`, `PATIENT`, `SYSTEM`), actions, and structured metadata without exposing raw secrets, authentication tokens, or uncontrolled diagnostic claims.
 
+## Phase 10 FHIR R4 export security and privacy boundary
+
+1. **Staff Authorization Enforcement**:
+   - FHIR export and bundle retrieval endpoints (`GET /api/doctor/sessions/{session_id}/fhir/export` and `GET /api/doctor/sessions/{session_id}/fhir/bundle`) are restricted to authorized clinical staff (`X-Demo-Doctor: true`).
+   - Requests without valid clinical staff credentials or authorization fail closed with HTTP 401/403.
+   - Patient-facing routes have no direct access to FHIR export or raw bundle generation endpoints.
+2. **Audit Logging on Export Operations**:
+   - Every FHIR export operation logs a versioned audit event:
+     - `FHIR_EXPORTED` on structured export overview generation with bundle type and resource counts recorded.
+     - `FHIR_BUNDLE_ACCESSED` on raw FHIR bundle payload access with bundle type and total entry count recorded.
+   - Raw clinical bundles and patient identifiers are not written into plain application system logs.
+3. **Clinical Boundary & Non-Diagnostic Export**:
+   - Exported FHIR `Condition` resources represent provisional patient-reported symptoms and complaints only (`clinicalStatus: "active"`, `verificationStatus: "provisional"`).
+   - Non-diagnostic note added to every condition: `"Non-diagnostic. Requires clinical assessment."`
+   - FHIR export preserves the system invariant: never declare an autonomous diagnosis or prescribe medications.
+4. **Decoupled Ephemeral Generation & Provenance**:
+   - FHIR bundles are synthesized on-demand from validated PostgreSQL records using deterministic UUID-to-URN mapping (`urn:uuid:<id>`).
+   - No persistent PHI is duplicated into external FHIR databases or unverified caches.
+   - Low-confidence extractions and unverified OCR facts retain their explicit provenance and unverified flags in generated FHIR resources.
+

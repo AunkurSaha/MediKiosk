@@ -179,3 +179,60 @@ def read_cross_references(
 
     return cross_reference.get_cross_references(db, str(session_id))
 
+
+@router.get(
+    "/sessions/{session_id}/fhir/export",
+    response_model=schemas.FHIRExportResponse,
+)
+def export_fhir(
+    session_id: UUID,
+    bundle_type: str = "document",
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.fhir import FHIRAdapterService
+
+    intake.detail(db, str(session_id), doctor=True)
+    res = FHIRAdapterService.export(db, str(session_id), bundle_type=bundle_type)
+    intake.audit(db, "FHIR_EXPORTED", str(session_id), user, {"bundle_type": bundle_type})
+    db.commit()
+    return res
+
+
+@router.get("/sessions/{session_id}/fhir/bundle")
+def get_fhir_bundle(
+    session_id: UUID,
+    bundle_type: str = "document",
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from fastapi.responses import JSONResponse
+
+    from app.services.fhir import FHIRAdapterService
+
+    intake.detail(db, str(session_id), doctor=True)
+    bundle = FHIRAdapterService.build_bundle(db, str(session_id), bundle_type=bundle_type)
+    intake.audit(db, "FHIR_BUNDLE_ACCESSED", str(session_id), user, {"bundle_type": bundle_type})
+    db.commit()
+    return JSONResponse(
+        content=bundle.model_dump(by_alias=True, exclude_none=True),
+        media_type="application/fhir+json",
+    )
+
+
+@router.post(
+    "/sessions/{session_id}/fhir/validate",
+    response_model=schemas.OperationOutcome,
+)
+def validate_fhir(
+    session_id: UUID,
+    bundle_type: str = "document",
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.fhir import FHIRAdapterService
+
+    intake.detail(db, str(session_id), doctor=True)
+    bundle = FHIRAdapterService.build_bundle(db, str(session_id), bundle_type=bundle_type)
+    return FHIRAdapterService.validate_bundle(bundle)
+

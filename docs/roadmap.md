@@ -4,7 +4,7 @@ Do not jump phases merely because later phases are more impressive.
 
 Each phase should leave the repository runnable.
 
-Current status: **Phase 9 complete for the local synthetic-data prototype**. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md).
+Current status: **Phase 10 complete for the local synthetic-data prototype**. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md).
 
 The sections below describe historical or future scope, not current acceptance. Phase 3B and 4B live integrations remain unaccepted; Phase 6 has storage and explicit mock fixtures, not real OCR.
 
@@ -131,13 +131,17 @@ Delivered:
 
 ## Phase 10 — FHIR export
 
-Add:
-- mappings;
-- FHIR validation;
-- export screen/API;
-- tests against representative records.
+Status: complete for deterministic prototype scope. Decoupled pure Pydantic v2 HL7 FHIR R4 export architecture, LOINC 34105-7 Composition document bundles, collection bundles, reference integrity validation, non-diagnostic provisional condition guardrails, and doctor export UI with JSON preview and download are implemented. See [Phase 10 report](phase10-implementation-status.md).
 
-Do not block internal implementation on FHIR schema too early.
+Delivered:
+- decoupled adapter layer (`FHIRAdapterService`) leaving internal relational schemas intact;
+- robust pure Pydantic v2 HL7 FHIR R4 resource models (`Patient`, `Encounter`, `QuestionnaireResponse`, `Condition`, `MedicationStatement`, `Observation`, `DocumentReference`, `Composition`, `Bundle`, `OperationOutcome`);
+- standard FHIR Document Bundle (`type: "document"`) with LOINC `34105-7` Composition clinical summary as `entry[0]`, alongside alternative Collection Bundle (`type: "collection"`);
+- deterministic validation engine verifying document bundle invariants and internal `urn:uuid:...` reference integrity;
+- strict non-diagnostic boundary: `Condition` resources represent provisional patient-reported symptoms and complaints only (`verificationStatus: "provisional"`, note: "Non-diagnostic. Requires clinical assessment");
+- doctor export and validation endpoints (`GET /fhir/export`, `GET /fhir/bundle`, `POST /fhir/validate`) with staff identity enforcement and audit logging (`FHIR_EXPORTED`, `FHIR_BUNDLE_ACCESSED`);
+- doctor workspace `FHIRExportModal` component featuring format toggle, validation badge, resource breakdown inventory pills, syntax-styled JSON preview, clipboard copy, and `.json` file download;
+- comprehensive automated test suites (5 backend integration tests, 6 frontend component tests) with zero regressions across the codebase.
 
 ## Phase 11 — ABDM / HIS demonstration
 

@@ -238,20 +238,42 @@ validated structured history
 
 The summarizer receives structured data, not an uncontrolled full chat dump.
 
-## 11. FHIR boundary
+## 11. FHIR boundary (Phase 10)
 
-FHIR is an adapter layer after internal clinical data stabilizes.
-
-Do not make internal persistence exactly mirror FHIR from day one.
-
-Instead:
+FHIR is a decoupled adapter layer built on top of the internal clinical data model. Internal persistence does not mirror FHIR; instead, a deterministic transformation engine translates records into standards-compliant HL7 FHIR R4 on demand:
 
 ```text
-MediKiosk internal model
-→ FHIR adapter
-→ validated FHIR JSON/Bundle
-→ HIS/ABDM connector
+MediKiosk Internal Models
+(Patient, Session, InterviewAnswer, MedicationFact, LabFact, Document, ClinicalSummary)
+        ↓
+FHIRAdapterService.build_bundle()
+        ↓
+FHIR R4 Resources (Pure Pydantic v2 Models)
+        ↓
+FHIRAdapterService.validate_bundle()
+        ↓
+Validated FHIR R4 Bundle (Document / Collection)
+        ↓
+Doctor UI / HIS / ABDM Connector (Phase 11)
 ```
+
+### Key Architectural Invariants
+
+1. **Decoupled Transformation**: The database schema remains pure relational PostgreSQL. Resources are generated dynamically and referenced via uniform internal urns (`urn:uuid:<resource_type>-<id>`).
+2. **Document Bundle Standard**:
+   - For `type: "document"`, HL7 FHIR R4 mandates that `entry[0]` must be a `Composition` resource.
+   - The `Composition` resource encodes a Consultation Note (LOINC `34105-7`) structured with sections linking to chief complaint, intake responses, medications, diagnostic tests, and source records.
+3. **Strict Non-Diagnostic Clinical Boundary**:
+   - `Condition` resources represent provisional, patient-reported complaints and symptoms only.
+   - `verificationStatus` is permanently set to `provisional` with category `problem-list-item`.
+   - Mandatory non-diagnostic disclaimer note: `"Non-diagnostic. Requires clinical assessment."`
+   - Autonomous diagnosis declarations or treatment prescriptions are strictly forbidden.
+4. **Internal Reference Integrity**:
+   - All references (`subject`, `encounter`, `entry` links) within the bundle are resolved against the `fullUrl` of contained resources.
+   - Validated deterministically by `FHIRAdapterService.validate_bundle()` returning standard `OperationOutcome` resources.
+5. **Auditing and Doctor Controls**:
+   - Access to FHIR export endpoints requires verified doctor identity (`X-Demo-Doctor: true`).
+   - Every export triggers durable audit events (`FHIR_EXPORTED`, `FHIR_BUNDLE_ACCESSED`).
 
 ## 12. Failure behavior
 

@@ -1,4 +1,4 @@
-# Project memory — Phase 7 complete
+# Project memory — Phase 10 complete
 
 - Prior stabilization task: complete the authoritative [2026-09-09 audit](current-project-review-2026-09-09.md), not a new phase. No Phase 7, providers, databases or Phase 1–3 redesign. Track remaining work in [stabilization status](stabilization-implementation-status.md).
 - This is a local synthetic-data prototype; clinical content/translations are unvalidated. No diagnosis, prescribing, production-readiness or complete de-identification claims.
@@ -17,8 +17,7 @@
 
 - Latest verification (2026-09-10): 331 PostgreSQL + 331 SQLite backend tests, 61 frontend tests, 27 Playwright tests; Ruff/ESLint/Prettier/build and Alembic/migration/security checks pass. Application-only restart/resume passes. Full database restart remains blocked by Windows Application Control; do not claim database restart acceptance.
 
-- Latest user scope explicitly authorized completing Phase 7 and superseded the earlier repair-only restriction. Phase 8 remains out of scope.
-- Repaired singular medication_fact/lab_fact/timeline_fact schemas remain preserved. The current timeline is computed from source facts; the generic timeline scaffold has no producer. Known events use only explicit source dates and unknown events remain separate.
-- Medical fact materialization uses existing StructuredDocument validation, source consistency checks, an extraction-row lock/idempotent retry, and a savepoint. Preserve whole raw extraction text; leave unknown values null. Staff fact review uses optimistic versions and additive revisions; original values never change. No old document backfill.
-- Removed a local DB credential copied into tracked alembic.ini; runtime still uses environment configuration. Do not print secrets in diffs or assertion failures. Latest configured-secret scan found no remaining source/history matches.
-- Discrepancy logic is deterministic and conservative: explicit patient/document medication comparisons, explicit structured allergy conflicts, and same-test/time/unit cross-document lab conflicts only. Every output retains both sources and requires clinician review; absence of output is not agreement.
+- Phase 8 summary drafting, revision audit, and clinician confirmation implemented.
+- Phase 9 field verification hardening, clinical amendments with audit addenda, and cross-referencing implemented.
+- Phase 10 HL7 FHIR R4 export architecture implemented: decoupled on-demand adapter layer (`FHIRAdapterService`), pure Pydantic v2 schemas (`base.py`, `resources.py`, `bundle.py`), `document` (LOINC 34105-7 Composition at `entry[0]`) and `collection` bundles, non-diagnostic guardrails (`verificationStatus: provisional`), doctor UI export modal (`FHIRExportModal.tsx`), full test suites passing (345 backend, 79 frontend).
+

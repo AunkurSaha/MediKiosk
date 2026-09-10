@@ -433,3 +433,22 @@ Schema head `7a3e8b1c4f92` adds additive amendment columns to `clinical_summarie
 
 All migrations are tested on PostgreSQL and SQLite, including forward upgrades, rollbacks, and schema re-application.
 
+## Implemented Phase 10 FHIR R4 export architecture and mappings
+
+Phase 10 adheres strictly to the non-negotiable architectural invariant: **internal relational schemas remain decoupled from FHIR**. No database migrations were required. Transformations are performed on demand by `FHIRAdapterService` into standard Pydantic v2 schemas:
+
+### Entity-to-FHIR Resource Mapping
+
+| Internal Model | FHIR R4 Resource | Standard Profile / Coding | Mapped Attributes & Invariants |
+|---|---|---|---|
+| `Patient` | `Patient` | `https://nrces.in/ndhm/fhir/r4/StructureDefinition/Patient` | `id: "patient-{id}"`, official identifiers for hospital token and demo ABHA ID (`https://healthid.ndhm.gov.in`), `name: [{text: name}]`, `gender: "unknown"` (or derived), `communication: [{language: bcp:47}]`. |
+| `Session` | `Encounter` | NRCES Encounter Profile | `id: "encounter-{id}"`, `status: "finished"`, `class: AMB (ambulatory)`, `subject: Reference("urn:uuid:patient-{id}")`, `period: {start: created_at, end: completed_at}`. |
+| `InterviewAnswer` | `QuestionnaireResponse` | HL7 Standard QuestionnaireResponse | `id: "qr-{id}"`, `status: "completed"`, `item: [{linkId: question_id, text: field_label, answer: [{valueString: raw_value}]}]`. |
+| Chief Complaint / Intake | `Condition` | `https://nrces.in/ndhm/fhir/r4/StructureDefinition/Condition` | **Strict Non-Diagnostic Guardrail**: `clinicalStatus: "active"`, `verificationStatus: "provisional"`, `category: "problem-list-item"`. Note: `"Non-diagnostic. Requires clinical assessment."` |
+| `MedicationFact` | `MedicationStatement` | `https://nrces.in/ndhm/fhir/r4/StructureDefinition/MedicationStatement` | `id: "med-{id}"`, `status: "active"` (or "stopped" if rejected), `medicationCodeableConcept: {text: name}`, `dosage: [{text: dosage + frequency}]`, `statusReason: [{text: verification_status}]`. |
+| `LabFact` | `Observation` | `https://nrces.in/ndhm/fhir/r4/StructureDefinition/Observation` | `category: "laboratory"`, `code: {text: test_name}`, `valueString: "{value} {unit}"`, `interpretation: [{code: "H"/"L"/"N"}]`, `referenceRange: [{text: reference_range}]`, `status: "final"/"preliminary"/"cancelled"`. |
+| `Document` | `DocumentReference` | LOINC `11488-4` Consultation note | `id: "doc-{id}"`, `content: [{attachment: {contentType: media_type, title: original_filename, size: file_size_bytes, hash: sha256_hash}}]`. |
+| `ClinicalSummary` | `Composition` | LOINC `34105-7` Hospital Consultation note | `entry[0]` of Document Bundle. Includes structured sections linking to Chief Complaint, Questionnaire, Medications, Investigations, and Documents. Author is verified doctor (`Practitioner/{confirmed_by}`). |
+| Multi-Resource Package | `Bundle` | `type: "document"` or `"collection"` | Uniform `urn:uuid:...` internal addressing with reference integrity validation producing standard `OperationOutcome`. |
+
+

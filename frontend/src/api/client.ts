@@ -362,6 +362,41 @@ export interface DiscrepancyRecord {
 export interface DiscrepancyResponse {
   items: DiscrepancyRecord[];
 }
+export interface FHIROperationOutcomeIssue {
+  severity: 'fatal' | 'error' | 'warning' | 'information';
+  code: string;
+  diagnostics?: string;
+  expression?: string[];
+}
+export interface FHIROperationOutcome {
+  resourceType: 'OperationOutcome';
+  id?: string;
+  issue: FHIROperationOutcomeIssue[];
+}
+export interface FHIRBundleEntry {
+  fullUrl: string;
+  resource: {
+    resourceType: string;
+    id: string;
+    [key: string]: unknown;
+  };
+}
+export interface FHIRBundle {
+  resourceType: 'Bundle';
+  id: string;
+  type: 'document' | 'collection';
+  timestamp: string;
+  entry: FHIRBundleEntry[];
+}
+export interface FHIRExportResponse {
+  session_id: string;
+  bundle_type: string;
+  compliance_profile: string;
+  generated_at: string;
+  resource_counts: Record<string, number>;
+  validation: FHIROperationOutcome;
+  bundle: FHIRBundle;
+}
 export class ApiError extends Error {
   code: string;
   status: number;
@@ -621,6 +656,20 @@ export const api = {
   getCrossReferences: (id: string) =>
     request<CrossReferenceResponse>(
       '/doctor/sessions/' + id + '/cross-references',
+      'GET',
+      undefined,
+      true,
+    ),
+  getFhirExport: (id: string, bundleType: 'document' | 'collection' = 'document') =>
+    request<FHIRExportResponse>(
+      '/doctor/sessions/' + id + '/fhir/export?bundle_type=' + bundleType,
+      'GET',
+      undefined,
+      true,
+    ),
+  getFhirBundle: (id: string, bundleType: 'document' | 'collection' = 'document') =>
+    request<FHIRBundle>(
+      '/doctor/sessions/' + id + '/fhir/bundle?bundle_type=' + bundleType,
       'GET',
       undefined,
       true,
