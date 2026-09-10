@@ -1,17 +1,74 @@
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field
 
 from .common import APIModel, UTCDate
 
 
+class EvidenceReference(APIModel):
+    statement_id: str
+    section: str
+    statement_text: str
+    source_type: Literal[
+        "patient_answer",
+        "normalized_fact",
+        "medical_fact",
+        "document",
+        "alert",
+        "discrepancy",
+    ]
+    source_id: str
+    source_text: str
+    source_metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class StructuredSummarySection(APIModel):
+    section_key: str
+    title: str
+    content_lines: list[str] = Field(default_factory=list)
+    items: list[dict[str, Any]] = Field(default_factory=list)
+    evidence: list[EvidenceReference] = Field(default_factory=list)
+
+
+class StructuredClinicalSummary(APIModel):
+    session_id: str
+    generated_at: UTCDate
+    draft_version: int
+    draft_provider: str
+    sections: list[StructuredSummarySection] = Field(default_factory=list)
+    evidence_references: list[EvidenceReference] = Field(default_factory=list)
+    disclaimer: str | None = None
+
+
 class ClinicalSummaryUpdate(APIModel):
     reviewed_text: str = Field(min_length=1, max_length=64000)
     expected_version: int = Field(ge=1)
+    review_notes: str | None = Field(default=None, max_length=1000)
 
 
 class SummaryConfirm(APIModel):
     expected_version: int = Field(ge=1)
+    review_notes: str | None = Field(default=None, max_length=1000)
+
+
+class SummaryRegenerateRequest(APIModel):
+    expected_version: int = Field(ge=1)
+    review_notes: str | None = Field(default=None, max_length=1000)
+    confirm_replacement: bool = Field(default=False)
+
+
+class SummaryRevisionRecord(APIModel):
+    id: str
+    summary_id: str
+    version: int
+    revision_type: Literal["initial_draft", "edit", "regenerate", "confirmed"]
+    actor_type: Literal["SYSTEM", "DOCTOR"]
+    actor_user_id: str | None = None
+    actor_name: str | None = None
+    reviewed_text: str
+    review_notes: str | None = None
+    structured_snapshot: dict[str, Any] | None = None
+    created_at: UTCDate
 
 
 class ClinicalSummary(APIModel):
@@ -20,7 +77,10 @@ class ClinicalSummary(APIModel):
     generated_text: str | None = None
     generated_structured_json: str | None = None
     reviewed_text: str | None = None
+    confirmed_text: str | None = None
     status: Literal["generated", "reviewed", "confirmed"]
+    draft_provider: str = "deterministic"
+    draft_version: int = 1
     version: int
     generated_at: UTCDate | None = None
     reviewed_by: str | None = None
@@ -29,3 +89,5 @@ class ClinicalSummary(APIModel):
     confirmed_at: UTCDate | None = None
     created_at: UTCDate
     updated_at: UTCDate | None = None
+    structured_summary: StructuredClinicalSummary | None = None
+    evidence: list[EvidenceReference] | None = None

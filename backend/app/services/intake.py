@@ -96,6 +96,45 @@ def summary_for(db, session_id):
     )
 
 
+def enrich_summary_schema(summary: models.ClinicalSummary | None, db: Session | None = None) -> schemas.ClinicalSummary | None:
+    if summary is None:
+        return None
+    structured = None
+    evidence = None
+    if db is not None:
+        try:
+            from app.services.clinical_summary import ClinicalSummaryService
+
+            _, structured = ClinicalSummaryService.generate_draft(
+                db, summary.session_id, draft_version=summary.draft_version or 1
+            )
+            evidence = structured.evidence_references
+        except Exception:
+            pass
+
+    return schemas.ClinicalSummary(
+        id=summary.id,
+        session_id=summary.session_id,
+        generated_text=summary.generated_text,
+        generated_structured_json=summary.generated_structured_json,
+        reviewed_text=summary.reviewed_text,
+        confirmed_text=summary.confirmed_text,
+        status=summary.status,
+        draft_provider=summary.draft_provider or "deterministic",
+        draft_version=summary.draft_version or 1,
+        version=summary.version,
+        generated_at=summary.generated_at,
+        reviewed_by=summary.reviewed_by,
+        reviewed_at=summary.reviewed_at,
+        confirmed_by=summary.confirmed_by,
+        confirmed_at=summary.confirmed_at,
+        created_at=summary.created_at,
+        updated_at=summary.updated_at,
+        structured_summary=structured,
+        evidence=evidence,
+    )
+
+
 def detail(db, session_id, doctor=False):
     from app.services import adaptive, red_flags
 
@@ -173,7 +212,7 @@ def detail(db, session_id, doctor=False):
         patient=schemas.Patient.model_validate(patient),
         consent=consent_for(db, session_id),
         answers=latest_answers(db, session_id),
-        summary=summary_for(db, session_id),
+        summary=enrich_summary_schema(summary_for(db, session_id)),
         history=adaptive.history(db, session_id),
         alerts=alert_items,
         documents=doc_items,
@@ -284,28 +323,31 @@ def complete(db, session_id):
     if session.status != "intake":
         raise WorkflowError("SESSION_LOCKED", "This session cannot be completed.")
     from app.services import adaptive
-    from app.services.interview_engine import draft_from_history
+    from app.services.clinical_summary import ClinicalSummaryService
 
     history = adaptive.history(db, session_id)
     if db.get(models.InterviewRun, session_id):
         if not adaptive.state(db, session_id).is_complete:
             raise WorkflowError("ANSWERS_REQUIRED", "Address all applicable questions first.", 422)
-        draft = draft_from_history(history)
     else:
         answers = {a.field: a.value for a in latest_answers(db, session_id)}
         if any(field not in answers for field in FIELDS):
             raise WorkflowError(
                 "ANSWERS_REQUIRED", "Complete all five history questions first.", 422
             )
-        draft = "\n".join(
-            f"{label} — Patient reported: {answers[field]}" for field, label in zip(FIELDS, LABELS)
-        )
+
+    draft_text, structured_summary = ClinicalSummaryService.generate_draft(
+        db, session_id, draft_version=1
+    )
     db.add(
         models.ClinicalSummary(
             session_id=session_id,
-            generated_text=draft,
-            generated_structured_json=history.model_dump_json() if history else None,
+            generated_text=draft_text,
+            generated_structured_json=history.model_dump_json() if history else structured_summary.model_dump_json(),
+            reviewed_text=draft_text,
             status="generated",
+            draft_provider="deterministic",
+            draft_version=1,
             generated_at=now(),
             version=1,
         )
@@ -318,6 +360,17 @@ def complete(db, session_id):
     return session
 
 
+def get_summary(db: Session, session_id: str) -> schemas.ClinicalSummary:
+    get_session(db, session_id)
+    require_consent(db, session_id)
+    summary = summary_for(db, session_id)
+    if summary is None:
+        raise WorkflowError("NOT_READY", "Complete the intake before review.", 404)
+    enriched = enrich_summary_schema(summary, db=db)
+    assert enriched is not None
+    return enriched
+
+
 def review_summary(db, session_id, payload, user, confirm=False):
     session = get_session(db, session_id)
     require_consent(db, session_id)
@@ -325,7 +378,7 @@ def review_summary(db, session_id, payload, user, confirm=False):
     if summary is None:
         raise WorkflowError("NOT_READY", "Complete the intake before review.")
     if confirm and summary.status == "confirmed" and payload.expected_version == summary.version:
-        return summary
+        return enrich_summary_schema(summary)
     if summary.status == "confirmed":
         raise WorkflowError("CONFIRMED_IMMUTABLE", "The confirmed record is read-only.")
     if summary.version != payload.expected_version:
@@ -336,6 +389,7 @@ def review_summary(db, session_id, payload, user, confirm=False):
         summary.status = "confirmed"
         summary.confirmed_by = user.id
         summary.confirmed_at = now()
+        summary.confirmed_text = summary.reviewed_text
         session.status = "confirmed"
         audit(db, "summary_confirmed", session_id, user, {"version": summary.version})
     else:
@@ -345,15 +399,193 @@ def review_summary(db, session_id, payload, user, confirm=False):
         summary.reviewed_by = user.id
         summary.reviewed_at = now()
         session.status = "under_review"
+        notes = getattr(payload, "review_notes", None)
         db.add(
             models.SummaryRevision(
                 summary_id=summary.id,
                 version=summary.version,
+                revision_type="edit",
+                actor_type="DOCTOR",
                 reviewed_text=summary.reviewed_text,
                 actor_user_id=user.id,
+                review_notes=notes,
             )
         )
         audit(db, "summary_reviewed", session_id, user, {"version": summary.version})
     db.commit()
     db.refresh(summary)
-    return summary
+    return enrich_summary_schema(summary)
+
+
+def regenerate_summary(db, session_id, payload, user) -> schemas.ClinicalSummary:
+    session = get_session(db, session_id)
+    require_consent(db, session_id)
+    summary = summary_for(db, session_id)
+    if summary is None:
+        raise WorkflowError("NOT_READY", "Complete the intake before review.")
+    if summary.status == "confirmed" or session.status in ("confirmed", "cancelled"):
+        raise WorkflowError("CONFIRMED_IMMUTABLE", "The confirmed record is read-only.")
+    if summary.version != payload.expected_version:
+        raise WorkflowError("VERSION_CONFLICT", "Another edit was saved. Reload the record.")
+
+    has_manual_edits = bool(
+        summary.reviewed_text
+        and summary.generated_text
+        and summary.reviewed_text.strip() != summary.generated_text.strip()
+    )
+    if has_manual_edits and not getattr(payload, "confirm_replacement", False):
+        raise WorkflowError(
+            "CONFIRM_REPLACEMENT_REQUIRED",
+            "Manual doctor edits exist. Confirm replacement to overwrite with a regenerated draft.",
+            409,
+        )
+
+    from app.services.clinical_summary import ClinicalSummaryService
+
+    next_draft_version = (summary.draft_version or 1) + 1
+    draft_text, structured_summary = ClinicalSummaryService.generate_draft(
+        db, session_id, draft_version=next_draft_version
+    )
+
+    summary.version += 1
+    summary.draft_version = next_draft_version
+    summary.generated_text = draft_text
+    summary.generated_structured_json = structured_summary.model_dump_json()
+    summary.reviewed_text = draft_text
+    summary.status = "reviewed"
+    summary.reviewed_by = user.id
+    summary.reviewed_at = now()
+    session.status = "under_review"
+
+    notes = getattr(payload, "review_notes", None) or "Regenerated draft from structured clinical sources"
+    db.add(
+        models.SummaryRevision(
+            summary_id=summary.id,
+            version=summary.version,
+            revision_type="regenerate",
+            actor_type="DOCTOR",
+            reviewed_text=draft_text,
+            actor_user_id=user.id,
+            review_notes=notes,
+            structured_snapshot=structured_summary.model_dump(mode="json"),
+        )
+    )
+    audit(
+        db,
+        "summary_regenerated",
+        session_id,
+        user,
+        {"version": summary.version, "draft_version": summary.draft_version},
+    )
+    db.commit()
+    db.refresh(summary)
+    return enrich_summary_schema(summary)
+
+
+def get_summary_revisions(db, session_id) -> list[schemas.SummaryRevisionRecord]:
+    get_session(db, session_id)
+    require_consent(db, session_id)
+    summary = summary_for(db, session_id)
+    if summary is None:
+        raise WorkflowError("NOT_READY", "Complete the intake before review.")
+
+    persisted = list(
+        db.scalars(
+            select(models.SummaryRevision)
+            .where(models.SummaryRevision.summary_id == summary.id)
+            .order_by(models.SummaryRevision.version.asc(), models.SummaryRevision.created_at.asc())
+        )
+    )
+
+    records: list[schemas.SummaryRevisionRecord] = []
+
+    has_v1 = any(r.version == 1 for r in persisted)
+    if not has_v1 and summary.generated_text:
+        records.append(
+            schemas.SummaryRevisionRecord(
+                id=f"initial-{summary.id}",
+                summary_id=summary.id,
+                version=1,
+                revision_type="initial_draft",
+                actor_type="SYSTEM",
+                actor_user_id=None,
+                actor_name="System Generator",
+                reviewed_text=summary.generated_text,
+                review_notes="Initial deterministic draft generated upon intake completion",
+                structured_snapshot=None,
+                created_at=summary.generated_at or summary.created_at or now(),
+            )
+        )
+
+    for r in persisted:
+        actor_name = None
+        if r.actor_user_id:
+            u = db.get(models.User, r.actor_user_id)
+            actor_name = u.name if u else r.actor_user_id
+        elif r.actor_type == "SYSTEM":
+            actor_name = "System Generator"
+
+        records.append(
+            schemas.SummaryRevisionRecord(
+                id=r.id,
+                summary_id=r.summary_id,
+                version=r.version,
+                revision_type=r.revision_type or "edit",
+                actor_type=r.actor_type or "DOCTOR",
+                actor_user_id=r.actor_user_id,
+                actor_name=actor_name,
+                reviewed_text=r.reviewed_text,
+                review_notes=r.review_notes,
+                structured_snapshot=r.structured_snapshot,
+                created_at=r.created_at,
+            )
+        )
+
+    has_confirmed = any(r.revision_type == "confirmed" for r in records)
+    if summary.status == "confirmed" and not has_confirmed:
+        confirmer_name = None
+        if summary.confirmed_by:
+            u = db.get(models.User, summary.confirmed_by)
+            confirmer_name = u.name if u else summary.confirmed_by
+        records.append(
+            schemas.SummaryRevisionRecord(
+                id=f"confirmed-{summary.id}",
+                summary_id=summary.id,
+                version=summary.version,
+                revision_type="confirmed",
+                actor_type="DOCTOR",
+                actor_user_id=summary.confirmed_by,
+                actor_name=confirmer_name,
+                reviewed_text=summary.confirmed_text or summary.reviewed_text or "",
+                review_notes="Clinician verified and confirmed consultation summary",
+                structured_snapshot=None,
+                created_at=summary.confirmed_at or summary.updated_at or now(),
+            )
+        )
+
+    return records
+
+
+def get_summary_evidence(db, session_id) -> list[schemas.EvidenceReference]:
+    get_session(db, session_id)
+    require_consent(db, session_id)
+    summary = summary_for(db, session_id)
+    if summary is None:
+        raise WorkflowError("NOT_READY", "Complete the intake before review.")
+
+    if summary.generated_structured_json:
+        try:
+            structured = schemas.StructuredClinicalSummary.model_validate_json(
+                summary.generated_structured_json
+            )
+            if structured.evidence_references:
+                return structured.evidence_references
+        except Exception:
+            pass
+
+    from app.services.clinical_summary import ClinicalSummaryService
+
+    _, structured = ClinicalSummaryService.generate_draft(
+        db, session_id, draft_version=summary.draft_version or 1
+    )
+    return structured.evidence_references

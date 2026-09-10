@@ -7,7 +7,16 @@ from .alert import (
     AlertSummary,
     TriggeringFact,
 )
-from .clinical_summary import ClinicalSummary, ClinicalSummaryUpdate, SummaryConfirm
+from .clinical_summary import (
+    ClinicalSummary,
+    ClinicalSummaryUpdate,
+    EvidenceReference,
+    StructuredClinicalSummary,
+    StructuredSummarySection,
+    SummaryConfirm,
+    SummaryRegenerateRequest,
+    SummaryRevisionRecord,
+)
 from .consent import Consent, ConsentUpdate
 from .document import (
     DocumentExtractionResponse,
@@ -41,7 +50,12 @@ __all__ = [
     "TriggeringFact",
     "ClinicalSummary",
     "ClinicalSummaryUpdate",
+    "EvidenceReference",
+    "StructuredClinicalSummary",
+    "StructuredSummarySection",
     "SummaryConfirm",
+    "SummaryRegenerateRequest",
+    "SummaryRevisionRecord",
     "Consent",
     "ConsentUpdate",
     "DocumentExtractionResponse",

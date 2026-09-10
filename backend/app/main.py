@@ -105,7 +105,7 @@ def health(db: Session = Depends(get_db)):
 def public_config():
     return {
         "demo_mode": demo_enabled(),
-        "phase": "7",
+        "phase": "8",
         "languages": ["en", "bn", "hi"],
         "normalization_provider": os.getenv("CLINICAL_NORMALIZATION_PROVIDER", "mock"),
         "speech_provider": os.getenv("SPEECH_PROVIDER", "mock"),

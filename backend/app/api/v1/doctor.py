@@ -49,6 +49,25 @@ def read_session_detail(
     return result
 
 
+@router.get("/sessions/{session_id}/summary", response_model=schemas.ClinicalSummary)
+def read_summary(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    return intake.get_summary(db, str(session_id))
+
+
+@router.post("/sessions/{session_id}/summary/regenerate", response_model=schemas.ClinicalSummary)
+def regenerate_summary(
+    session_id: UUID,
+    payload: schemas.SummaryRegenerateRequest,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    return intake.regenerate_summary(db, str(session_id), payload, user)
+
+
 @router.put("/sessions/{session_id}/summary", response_model=schemas.ClinicalSummary)
 def update_summary(
     session_id: UUID,
@@ -67,3 +86,27 @@ def confirm_summary(
     user: models.User = Depends(get_current_user),
 ):
     return intake.review_summary(db, str(session_id), payload, user, confirm=True)
+
+
+@router.get(
+    "/sessions/{session_id}/summary/revisions",
+    response_model=list[schemas.SummaryRevisionRecord],
+)
+def read_summary_revisions(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    return intake.get_summary_revisions(db, str(session_id))
+
+
+@router.get(
+    "/sessions/{session_id}/summary/evidence",
+    response_model=list[schemas.EvidenceReference],
+)
+def read_summary_evidence(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    return intake.get_summary_evidence(db, str(session_id))
