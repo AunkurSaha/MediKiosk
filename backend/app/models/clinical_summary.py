@@ -14,6 +14,9 @@ class ClinicalSummary(Base):
     generated_text = Column(Text, nullable=True)
     generated_structured_json = Column(Text, nullable=True)
     reviewed_text = Column(Text, nullable=True)
+    confirmed_text = Column(Text, nullable=True)
+    draft_provider = Column(String, default="deterministic", nullable=False)
+    draft_version = Column(Integer, default=1, nullable=False)
     status = Column(String, nullable=False)  # e.g., 'generated', 'reviewed', 'confirmed'
     generated_at = Column(DateTime(timezone=True), nullable=True)
     reviewed_by = Column(String, ForeignKey("users.id"), nullable=True)
