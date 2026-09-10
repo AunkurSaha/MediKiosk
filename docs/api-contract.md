@@ -133,7 +133,7 @@ Doctor routes require DEMO_MODE=true, a seeded active doctor and X-Demo-Doctor: 
 - `PUT /doctor/sessions/{id}/summary` accepts `{"reviewed_text":"Reviewed history","expected_version":1}`. Text is 1–64,000 characters. It preserves both generated fields, increments version, appends a review revision and records server-owned reviewer/time.
 - `POST /doctor/sessions/{id}/summary/confirm` accepts `{"expected_version":2}`. It requires a saved review and matching version, records doctor/time and makes the record immutable. An identical confirmation retry preserves its timestamp.
 
-Concurrent doctor mutations are serialized by the same session-row lock. Clients cannot set generated facts, verification identity, timestamps or status. No voice, document, alert, timeline, provider, FHIR or ABDM endpoints are exposed.
+Concurrent doctor mutations are serialized by the same session-row lock. Clients cannot set generated facts, verification identity, timestamps or status. At the Phase 1 boundary described here, no voice, document, alert, timeline, provider, FHIR or ABDM endpoints were exposed; later additive contracts are documented below.
 
 ## Phase 3A additive normalization contract
 
@@ -149,7 +149,7 @@ Each normalization exposes id, source_answer_id, source_question_id, canonical_f
 
 Strict provider output only accepts the supplied field/language, schema 1.0, allowed symptom/qualitative concepts, valid confidence/certainty and source evidence. Diagnosis/treatment/extra fields fail closed. Trusted display/value and all provenance are service-owned. No provider credentials or internal exceptions are returned.
 
-Results are immutable per source answer and reused on retry/branch reactivation. Source edits generate a new result; only current active-source results appear in history. Historical and confirmed records are not backfilled/reprocessed. Summary confirmation never promotes machine facts. Original generated text/JSON remain preserved. `/api/config` now returns `phase: "3B"` and `normalization_provider`.
+Results are immutable per source answer and reused on retry/branch reactivation. Source edits generate a new result; only current active-source results appear in history. Historical and confirmed records are not backfilled/reprocessed. Summary confirmation never promotes machine facts. Original generated text/JSON remain preserved. This Phase 3B contract introduced `normalization_provider`; the current `/api/config` phase label is `"7"`.
 
 ## Phase 3B additive normalization contract & Schema 1.1
 
@@ -159,7 +159,7 @@ No additional public endpoint or changed answer-submission payload. The contract
   ```json
   {
     "demo_mode": true,
-    "phase": "3B",
+    "phase": "7",
     "languages": ["en", "bn", "hi"],
     "normalization_provider": "nvidia"
   }
@@ -206,3 +206,15 @@ Staff HTTP routes require the existing active demo-doctor identity (`X-Demo-Doct
 - POST `/sessions/{id}/interview/speech/transcribe`: multipart audio, current `question_id`, optional mock fixture_id. Requires voice/sharing consent, active intake and current free-text eligibility before provider invocation. Multipart may already have spooled to disk; the UploadFile closes in finally. Successful response adds `candidate_token`; transcription does not save an answer.
 - Adaptive answer with source voice requires `voice_candidate` signed token and exact candidate text, language, question, session and revision. Tokens expire after 10 minutes/restart. Editing uses source typed without a token. Confirmed provenance is audited in the answer transaction. Legacy answer endpoints only accept touch/typed.
 - Speech provider invocation has a 15-second overall deadline. BHASHINI live ASR rejects unchecked native browser formats and requires validated 16-kHz mono PCM WAV. This is a conservative adapter boundary, not live format acceptance.
+
+## Phase 7 staff medical-evidence contract
+
+All Phase 7 routes require the existing server-resolved doctor identity. They are not available under public `/sessions/{id}` routes.
+
+- `GET /doctor/sessions/{id}/medical-facts` returns active medication/lab facts, rejected fact groups, and verification counts. Each record contains immutable `original`, latest effective `current`, document/extraction/raw source, status, optimistic `review_version`, and additive revisions. Facts from rejected extractions are excluded.
+- `GET /doctor/sessions/{id}/timeline` returns `{known_date, unknown_date}`. Entries contain deterministic ID, event type, canonical label, explicit timestamp or null, date status/precision, source, raw reference, and verification state. Known entries sort ascending; unknown entries never receive a fabricated time.
+- `GET /doctor/sessions/{id}/discrepancies` returns deterministic open items with type, routine workflow priority, source A/B, factual reason, and `requires_clinician_review`. No absence of output establishes agreement.
+- `PATCH /doctor/sessions/{id}/medical-facts/medications/{fact_id}` accepts `{expected_version,status,correction?,notes?}` with a typed partial medication correction.
+- `PATCH /doctor/sessions/{id}/medical-facts/labs/{fact_id}` accepts the analogous typed lab correction.
+
+Review `status` is `verified` or `rejected`. Correction plus rejection is invalid. The server owns reviewer identity/time, increments the version, appends immutable original/effective values, and returns the current record. Stale versions, anonymous/forged identity, rejected source extraction, and confirmed/cancelled sessions fail closed. Corrections do not overwrite extraction rows or raw source.

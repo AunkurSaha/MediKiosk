@@ -301,3 +301,9 @@ Enforce the following architectural invariants:
 ## ADR-022 — Repair existing Phase 7 without expanding it
 
 2026-09-10: The user explicitly requested review and fixes for Phase 7 code written after stabilization. Its migrations were already applied. Preserve the deployed singular tables and generic timeline columns; align ORM models and add missing indexes through a forward migration. Materialize only the current typed medication/lab contract, validate before insertion, preserve source, isolate failures and make retry idempotent. Do not add unsupported timeline-note types, events, diagnoses or new providers. Dedicated timeline/discrepancy/fact-review workflows remain absent. This authorization does not establish completion of the earlier database-restart acceptance gate.
+
+## ADR-023 — Computed Phase 7 timeline and additive fact review
+
+**Status:** Accepted
+
+2026-09-10: After explicit authorization to complete Phase 7, derive timeline and discrepancy responses deterministically from current source facts instead of materializing timeline rows. Preserve the existing timeline table without a producer. Keep extracted fact values immutable and store every clinician verification/rejection/correction as an optimistic, additive `medical_fact_revisions` row with server-owned attribution. This supersedes ADR-022 only for its prior scope restriction; its repair and preservation decisions remain active.

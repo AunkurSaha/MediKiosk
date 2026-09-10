@@ -4,7 +4,7 @@ Do not jump phases merely because later phases are more impressive.
 
 Each phase should leave the repository runnable.
 
-Current task: **review and repair existing Phase 7 work**, explicitly authorized by the user. Missing roadmap workflows remain deferred. Phase 1–3 foundations remain; Phase 4–6 defects and final acceptance gates are tracked in [stabilization status](stabilization-implementation-status.md). No new provider/database or implementation of missing Phase 7 workflows is authorized by this repair request.
+Current status: **Phase 7 complete for the local synthetic-data prototype**. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md). Phase 8 is not authorized or implemented.
 
 The sections below describe historical or future scope, not current acceptance. Phase 3B and 4B live integrations remain unaccepted; Phase 6 has storage and explicit mock fixtures, not real OCR.
 
@@ -93,9 +93,9 @@ Local storage, content validation, typed parser fixtures and doctor review are i
 
 ## Phase 7 — Medical extraction + timeline + discrepancies
 
-Status: partial backend scaffold reviewed and repaired. Medication/lab fact materialization works from existing typed document fixtures. Timeline table exists; timeline API/UI, discrepancy engine and fact review workflow are missing. See [Phase 7 report](phase7-implementation-status.md). The list below is target scope, not completed work.
+Status: complete for deterministic synthetic-fixture scope. Medication/lab materialization, current-fact services, computed timeline, conservative discrepancy checks, additive fact review history, staff-only APIs, doctor UI, and acceptance coverage are implemented. The generic timeline table remains an unused compatibility scaffold. See [Phase 7 report](phase7-implementation-status.md).
 
-Add:
+Delivered:
 - medication/lab extraction;
 - regex + structured AI extraction where useful;
 - normalized facts;

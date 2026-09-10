@@ -20,14 +20,18 @@ Evidence must demonstrate behavior; a test count alone does not accept a feature
 | BHASHINI adapter/configuration/audio/deadline | test_bhashini_speech.py; test_stabilization_bhashini.py | Mocked transport only; native browser audio not live-accepted |
 | Schema consistency and upgrade preservation | verify-stabilization-migrations.py; Alembic check | Application upgrades only; downgrades isolated to disposable test schemas |
 | Restart preservation | verify-restart.ps1 and stabilization references | PostgreSQL control currently blocked by Windows Application Control |
-| Timeline, discrepancies, AI summary, FHIR, ABDM | No accepted implementation | Deferred; no Phase 7 work authorized |
+| Source-linked medical facts and fact review history | medical_facts.py; medical_fact_revisions; test_phase7_complete.py; phase7.test.tsx | Synthetic typed fixtures only; no real OCR or clinical validation |
+| Deterministic timeline and explicit unknown dates | timeline.py; timeline API/UI; backend and browser ordering/unknown-date tests | Computed only from explicit dates; generic timeline table remains unused |
+| Conservative discrepancies | discrepancies.py; discrepancy API/UI; medication/allergy/lab unit and browser tests | Incomparable evidence emits nothing; output always requires clinician review |
+| AI summary, FHIR, ABDM | No Phase 8+ implementation | Deferred and not authorized |
 
 
-## Existing Phase 7 repair evidence
+## Phase 7 completion evidence
 
 | Scope | Implementation | Evidence / remaining gap |
 |---|---|---|
 | Persist document medication/lab facts | medical_extractor plus medication_fact/lab_fact tables | Seven backend repair regressions; two browser upload + direct PostgreSQL + doctor display checks |
 | Preserve source and unknown flags | Raw extraction copied, extraction FK retained, missing flags/dates/locations unknown | Retry/source/logging, missing-flag and failure-isolation regressions |
-| Timeline/discrepancies | Generic timeline_fact scaffold only | No producer/API/UI/discrepancy engine; not accepted as implemented |
-| Migration integrity | Forward index repair; models aligned to deployed schema | PostgreSQL comparison/upgrades/fingerprints; Phase 7 SQLite schema and timeline-row preservation regression |
+| Timeline/discrepancies | Computed timeline service plus deterministic comparison service and doctor sections | Known/equal/unknown ordering, no invented dates/duplicates, explicit comparable evidence, stable IDs, source A/B, component and browser coverage |
+| Fact review | Staff-only typed PATCH routes and additive revisions | Authorization, forgery rejection, optimistic conflict, original/current separation, locked session and server reviewer coverage |
+| Migration integrity | Forward index repair plus additive review-history migration | PostgreSQL comparison/upgrades/fingerprints/downgrade-reupgrade; Phase 7 SQLite schema and preserved scaffold-row regression |

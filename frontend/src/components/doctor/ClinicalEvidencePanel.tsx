@@ -458,6 +458,26 @@ export default function ClinicalEvidencePanel({
               Rejected facts remain in review history and are excluded from the active timeline and
               discrepancy checks.
             </p>
+            <div className="medical-facts-grid rejected-facts-grid">
+              {data.facts.rejected_medications.map((fact) => (
+                <MedicationFactCard
+                  key={fact.id}
+                  sessionId={sessionId}
+                  fact={fact}
+                  locked={true}
+                  onSaved={refresh}
+                />
+              ))}
+              {data.facts.rejected_labs.map((fact) => (
+                <LabFactCard
+                  key={fact.id}
+                  sessionId={sessionId}
+                  fact={fact}
+                  locked={true}
+                  onSaved={refresh}
+                />
+              ))}
+            </div>
           </details>
         )}
       </section>

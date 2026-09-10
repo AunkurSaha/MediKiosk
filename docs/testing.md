@@ -307,4 +307,14 @@ New test coverage includes:
   - Full E2E suite: 12 tests across 5 spec files passed in 44.6s.
   - Real service restart verification: `scripts/verify-stabilization-restart.ps1` passed 100% across real backend and PostgreSQL processes.
 
+## Phase 7 acceptance
+
+Current totals are **331 backend tests** on each SQLite/PostgreSQL profile, **61 frontend component tests**, and **27 Chromium E2E tests**.
+
+`backend/tests/test_phase7_repairs.py` retains materialization, idempotence, atomicity, schema-alignment, provenance, null, and logging regressions. `backend/tests/test_phase7_complete.py` adds staff authorization, source exclusion, stable retrieval, verify/reject/correct review, forged identity, optimistic conflict, original/revision preservation, confirmed-state lock, timeline ordering/unknown dates/determinism/no duplicates, and conservative medication/allergy/lab discrepancy coverage.
+
+`frontend/src/test/phase7.test.tsx` covers known/unknown timeline rendering, source badges, review correction, discrepancy/no-discrepancy, loading/error/unauthorized behavior, and mobile structure. `frontend/e2e/phase7.spec.ts` exercises four real-browser synthetic journeys: prescription facts/source trace/timeline, lab null/mobile display, patient-document possible discrepancy, and correction/verification/rejection with original source retained.
+
+Run the standard full commands at the top of this document. `scripts/verify-stabilization-migrations.py` now verifies the Phase 7 additive migration and current Alembic/model comparison. Full PostgreSQL process restart remains blocked by Windows Application Control; `-ApplicationOnly` is not database-restart acceptance.
+
 

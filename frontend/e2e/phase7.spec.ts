@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 
 async function createSession(request: APIRequestContext, medication?: string) {
   const id = randomUUID();
@@ -129,7 +129,7 @@ test('fact correction, verification, and rejection preserve the original source'
   request,
 }) => {
   const id = await createSession(request);
-  await upload(request, id, 'prescription');
+  const document = await upload(request, id, 'prescription');
   await page.goto(`/doctor/sessions/${id}`);
   const paracetamol = page.locator('.medical-fact-card').filter({
     has: page.locator('.fact-heading h4').filter({ hasText: 'Paracetamol' }),
@@ -147,10 +147,16 @@ test('fact correction, verification, and rejection preserve the original source'
     has: page.locator('.fact-heading h4').filter({ hasText: 'Amoxicillin' }),
   });
   await amoxicillin.getByRole('button', { name: 'Reject' }).click();
-  await expect(page.getByText('Rejected facts (1)')).toBeVisible();
-  await expect(
-    page.locator('.medical-fact-card').filter({
+  await page.getByText('Rejected facts (1)').click();
+  const rejected = page
+    .locator('.rejected-facts-grid')
+    .locator('.medical-fact-card')
+    .filter({
       has: page.locator('.fact-heading h4').filter({ hasText: 'Amoxicillin' }),
-    }),
-  ).toHaveCount(0);
+    });
+  await expect(rejected).toContainText('Rejected');
+  await writeFile(
+    '../.runtime/phase7-reference.json',
+    JSON.stringify({ sessionId: id, documentId: document.id }),
+  );
 });

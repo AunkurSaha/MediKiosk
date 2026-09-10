@@ -212,3 +212,10 @@ Phase 3B brings `google/gemma-4-31b-it` via NVIDIA NIM into the normalization ar
    - Initial prototype coverage: English, Bengali, Hindi.
    - All fixture cases are synthetic prototype evaluation cases; no claim of clinical or general linguistic validation is made.
 
+## Phase 7 medical-evidence boundary
+
+Phase 7 structures only fields explicitly present in the current typed document schema: medication identity/details and laboratory observations. Unknown dose units, routes, frequency, duration, dates, reference ranges, flags, and source locations remain unknown. A document date is not reused as a medication start date or lab observation time.
+
+The deterministic discrepancy rules are prototype workflow aids, not clinical conclusions. Medication comparisons require an explicit patient medication answer; dosage mismatch requires the same named medication and comparable dose text. Allergy conflicts require an explicit structured document allergy statement. Lab conflicts require the same test, exact observation time, and unit across separate sources. Missing/incomparable evidence emits no discrepancy.
+
+The UI says “Possible discrepancy — requires clinician review.” It never labels a discrepancy as diagnosis, non-adherence, treatment error, or confirmed truth. No clinical severity prediction or treatment recommendation was added.

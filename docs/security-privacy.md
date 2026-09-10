@@ -17,3 +17,11 @@ Unexpected errors log only exception class, not exception messages, submitted va
 Alert delivery uses bounded writes to authorized sockets and browser resynchronization. A successful write does not establish human receipt; patient copy asks for direct staff contact. Current trigger state and acknowledgement history are separate. Rule content is prototype/unvalidated; unknown language is not evidence of absence.
 
 Security verification and outstanding acceptance gates are recorded in [stabilization status](stabilization-implementation-status.md). Full production authorization, encrypted deployment, consent revocation across active sessions, retention operations and crash-recovery controls require separate scope and review.
+
+## Phase 7 access and audit boundary
+
+Medical-fact, timeline, discrepancy, and fact-review APIs reuse the existing staff dependency and sharing-consent check. No parallel demo bypass or public patient fact endpoint was added. Reviewer ID and review time come from the server-resolved active doctor; extra caller-supplied identity fields are rejected.
+
+Original clinical values and raw source remain immutable. Corrections are additive revisions with optimistic versions; confirmed/cancelled sessions reject mutations. Audit metadata records only fact identifiers, type, status, and version—not corrected clinical values. Raw fact/source content is not intentionally written to application logs.
+
+This remains header-gated local demo authorization, not production authentication. Source-document links are still fetched through authorized backend routes. No production encryption, retention, tenant isolation, external identity, or clinical compliance claim follows from these controls.

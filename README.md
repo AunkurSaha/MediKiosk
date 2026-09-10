@@ -4,11 +4,11 @@ MediKiosk is a local SIH prototype for pre-consultation intake. The patient supp
 
 ## Current working scope
 
-Phase 1–3 intake, adaptive questioning, optional normalization, PostgreSQL persistence, doctor review and confirmation remain implemented. Phase 4–6 adds mock speech, a BHASHINI adapter, deterministic demo alerts/triage and document storage with explicit synthetic extraction fixtures. These later phases are undergoing audit remediation; advancement is frozen.
+Phases 1–7 are implemented for the local synthetic-data prototype: deterministic intake, optional normalization, mock speech, deterministic demo alerts, document storage/typed fixture extraction, source-linked medication/lab facts, a computed timeline, conservative discrepancies, and doctor fact review.
 
 The draft is a deterministic rendering of saved answers. Back/edit preserves prior source answers; resume uses the pinned flow and cursor. Confirmed records are locked. Doctor review remains separate from machine output.
 
-Real OCR is not implemented. BHASHINI live ASR/TTS is not demonstrated. NVIDIA live evidence is mixed and does not establish reliable acceptance. Rules, question wording and translations are prototype content without clinical validation. See the [stabilization report](docs/stabilization-implementation-status.md) for each original finding, fix, regression, evidence and limitation. The user subsequently authorized review and repair of existing Phase 7 code. See the [Phase 7 report](docs/phase7-implementation-status.md): medication/lab materialization is repaired; timeline/discrepancy workflows remain missing.
+Real OCR is not implemented. BHASHINI live ASR/TTS is not demonstrated. NVIDIA live evidence is mixed and does not establish reliable acceptance. Rules, question wording, translations, extraction fixtures, and discrepancy comparisons are prototype content without clinical validation. See the [Phase 7 report](docs/phase7-implementation-status.md) and [stabilization report](docs/stabilization-implementation-status.md) for evidence and limitations. Phase 8 is not implemented.
 
 ## Run on this configured Windows machine
 
@@ -41,7 +41,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-dev.ps1 -Databa
 
 Windows Application Control currently blocks this machine's PostgreSQL control executable. While the existing database is running, use `scripts/start-dev.ps1 -NormalizationProvider mock -UseRunningDatabase` to start only the application services. Full database restart acceptance remains pending resolution through Windows security policy.
 
-Structured data is in PostgreSQL database `medikiosk`, schema `public`: `patients`, `sessions`, `consents`, interview/answer and normalization tables, `alerts`, `documents`, `document_extractions`, summaries and audit records. Uploaded file bytes are in the configured local upload directory; PostgreSQL stores their object keys, hashes and metadata. Database files are under ignored `.runtime/pgdata`; inspect records through SQL or a database client rather than editing those files.
+Structured data is in PostgreSQL database `medikiosk`, schema `public`: `patients`, `sessions`, `consents`, interview/answer and normalization tables, `alerts`, `documents`, `document_extractions`, `medication_fact`, `lab_fact`, `medical_fact_revisions`, summaries, and audit records. The timeline is computed from source facts; the older generic `timeline_fact` table is an unused compatibility scaffold. Uploaded file bytes are in the configured local upload directory; PostgreSQL stores their object keys, hashes and metadata. Database files are under ignored `.runtime/pgdata`; inspect records through SQL or a database client rather than editing those files.
 
 See [setup](docs/setup.md) for fresh installation and manual commands, [testing](docs/testing.md) for acceptance checks, and [implementation status](docs/implementation-status.md) for results and next work.
 

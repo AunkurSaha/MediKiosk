@@ -1,6 +1,6 @@
 # Architecture — MediKiosk
 
-Current implementation is Phase 5; see the implemented boundaries at the end and [status](phase5-implementation-status.md). The broader module/deployment diagrams describe the target roadmap, including unimplemented future integrations.
+Current implementation is Phase 7; see the implemented boundaries at the end and [status](phase7-implementation-status.md). The broader module/deployment diagrams describe the target roadmap, including unimplemented future integrations.
 
 ## 1. Architectural style
 
@@ -297,7 +297,7 @@ Module boundaries are chosen so high-load components can be separated later if r
 
 ## Implemented Phase 2 boundary
 
-Sections describing voice, real normalization providers, safety, documents, WebSockets, FHIR and deployment above are target architecture for later phases. The current runnable app is a REST-only modular monolith with local PostgreSQL; those integrations remain unimplemented.
+This historical Phase 2 subsection described the runnable boundary at that milestone. Later sections below supersede it for normalization, voice, alerts, documents, WebSockets, and Phase 7 medical evidence. FHIR and deployment remain future work.
 
 The active path is:
 
@@ -380,3 +380,21 @@ Staff HTTP routes require the existing active demo-doctor identity (`X-Demo-Doct
 
 
 See the stabilization report for verification and remaining limits. Earlier conceptual diagrams describe planned scope where they exceed implemented boundaries.
+
+## Implemented Phase 7 boundary
+
+Phase 7 extends the modular monolith with three deterministic services behind the existing staff authorization dependency:
+
+```text
+typed document extraction
+→ MedicalFactService (persisted medication/lab facts + source/review history)
+├→ TimelineService (computed, deterministic, known/unknown date groups)
+└→ DiscrepancyService (conservative explicit-evidence comparisons)
+→ doctor evidence workspace
+```
+
+The timeline is computed from current source facts rather than materialized. The existing `timeline_fact` table is preserved as an unused compatibility scaffold; no producer writes to it. This avoids reconciliation/version drift and prevents upload timestamps from being presented as clinical dates.
+
+Fact clinical fields remain immutable machine extraction. Clinician corrections are effective overlays stored in append-only `medical_fact_revisions`, with optimistic fact versions and server-owned reviewer identity. Rejected facts and facts from rejected source extractions are excluded from current timeline/discrepancy evaluation while remaining auditable.
+
+Discrepancy IDs and timeline IDs are deterministic UUIDv5 values derived from stable source identifiers and comparison content. The engine does not call an LLM and does not infer diagnosis, adherence, treatment significance, dates, ranges, or normality. See [Phase 7 status](phase7-implementation-status.md).
