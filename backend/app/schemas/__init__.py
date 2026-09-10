@@ -18,6 +18,15 @@ from .document import (
     MedicationFact,
 )
 from .interview_answer import InterviewAnswer, InterviewAnswerCreate
+from .medical_fact import (
+    DiscrepancyResponse,
+    LabFactRecord,
+    LabFactReview,
+    MedicalFactsResponse,
+    MedicationFactRecord,
+    MedicationFactReview,
+    TimelineResponse,
+)
 from .patient import Patient, PatientCreate
 from .session import Session, SessionCreate, SessionDetail, SessionList, SessionListItem
 from .user import User
@@ -43,6 +52,13 @@ __all__ = [
     "MedicationFact",
     "InterviewAnswer",
     "InterviewAnswerCreate",
+    "MedicalFactsResponse",
+    "MedicationFactRecord",
+    "MedicationFactReview",
+    "LabFactRecord",
+    "LabFactReview",
+    "TimelineResponse",
+    "DiscrepancyResponse",
     "Patient",
     "PatientCreate",
     "Session",
@@ -52,4 +68,3 @@ __all__ = [
     "SessionListItem",
     "User",
 ]
-

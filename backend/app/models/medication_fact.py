@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text, text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -22,9 +22,12 @@ class MedicationFact(Base):
     # Medication details
     name = Column(String, nullable=False)
     dosage = Column(String, nullable=True)
+    unit = Column(String, nullable=True)
     frequency = Column(String, nullable=True)
     route = Column(String, nullable=True)
     duration = Column(String, nullable=True)
+    start_date = Column(DateTime(timezone=True), nullable=True)
+    end_date = Column(DateTime(timezone=True), nullable=True)
     instructions = Column(String, nullable=True)
     # Source information
     source_text = Column(Text, nullable=True)  # original text from which this was extracted
@@ -33,6 +36,7 @@ class MedicationFact(Base):
     verification_status = Column(
         String, nullable=False, server_default="unverified", index=True
     )  # unverified, verified, rejected
+    review_version = Column(Integer, nullable=False, server_default="0")
     verified_by = Column(String, nullable=True)
     verified_at = Column(DateTime(timezone=True), nullable=True)
     verification_notes = Column(String, nullable=True)

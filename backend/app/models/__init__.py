@@ -7,6 +7,7 @@ from .document_extraction import DocumentExtraction
 from .interview_answer import InterviewAnswer
 from .interview_run import InterviewRequest, InterviewRun
 from .lab_fact import LabFact
+from .medical_fact_revision import MedicalFactRevision
 from .medication_fact import MedicationFact
 from .normalization import NormalizationResult
 from .patient import Patient
@@ -30,7 +31,7 @@ __all__ = [
     "Session",
     "TimelineFact",
     "MedicationFact",
+    "MedicalFactRevision",
     "LabFact",
     "User",
 ]
-

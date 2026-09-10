@@ -6,16 +6,21 @@ from pydantic import AliasChoices, ConfigDict, Field
 from .common import APIModel
 
 DocumentType = Literal["prescription", "lab_report", "other"]
-ProcessingStatus = Literal["pending", "processing", "completed", "failed", "unavailable", "mock_fixture"]
+ProcessingStatus = Literal[
+    "pending", "processing", "completed", "failed", "unavailable", "mock_fixture"
+]
 VerificationStatus = Literal["unverified", "verified", "rejected"]
 
 
 class MedicationFact(APIModel):
     name: str
     dosage: str | None = None
+    unit: str | None = None
     frequency: str | None = None
     route: str | None = None
     duration: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
     instructions: str | None = None
 
 
@@ -25,6 +30,13 @@ class LabObservationFact(APIModel):
     unit: str | None = None
     reference_range: str | None = None
     flag: str | None = None  # "normal", "high", "low", "abnormal"
+    observation_timestamp: datetime | None = None
+
+
+class AllergyStatement(APIModel):
+    statement: Literal["allergy", "no_known_allergies"]
+    substance: str | None = None
+    raw_text: str
 
 
 class StructuredDocument(APIModel):
@@ -36,6 +48,7 @@ class StructuredDocument(APIModel):
     observations: list[LabObservationFact] = Field(
         default_factory=list, validation_alias=AliasChoices("observations", "lab_observations")
     )
+    allergies: list[AllergyStatement] = Field(default_factory=list)
 
 
 class DocumentExtractionResponse(APIModel):

@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import Column, DateTime, ForeignKey, String, Text, text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -34,6 +34,7 @@ class LabFact(Base):
     verification_status = Column(
         String, nullable=False, server_default="unverified", index=True
     )  # unverified, verified, rejected
+    review_version = Column(Integer, nullable=False, server_default="0")
     verified_by = Column(String, nullable=True)
     verified_at = Column(DateTime(timezone=True), nullable=True)
     verification_notes = Column(String, nullable=True)

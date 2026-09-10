@@ -25,3 +25,4 @@ class Session(Base):
     medication_facts = relationship("MedicationFact", back_populates="session")
     lab_facts = relationship("LabFact", back_populates="session")
     timeline_facts = relationship("TimelineFact", back_populates="session")
+    medical_fact_revisions = relationship("MedicalFactRevision", back_populates="session")
