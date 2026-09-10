@@ -1,6 +1,6 @@
 # Architecture — MediKiosk
 
-Current implementation is Phase 7; see the implemented boundaries at the end and [status](phase7-implementation-status.md). The broader module/deployment diagrams describe the target roadmap, including unimplemented future integrations.
+Current implementation is Phase 8; see the implemented boundaries at the end and [status](phase8-implementation-status.md). The broader module/deployment diagrams describe the target roadmap, including unimplemented future integrations.
 
 ## 1. Architectural style
 
@@ -398,3 +398,49 @@ The timeline is computed from current source facts rather than materialized. The
 Fact clinical fields remain immutable machine extraction. Clinician corrections are effective overlays stored in append-only `medical_fact_revisions`, with optimistic fact versions and server-owned reviewer identity. Rejected facts and facts from rejected source extractions are excluded from current timeline/discrepancy evaluation while remaining auditable.
 
 Discrepancy IDs and timeline IDs are deterministic UUIDv5 values derived from stable source identifiers and comparison content. The engine does not call an LLM and does not infer diagnosis, adherence, treatment significance, dates, ranges, or normality. See [Phase 7 status](phase7-implementation-status.md).
+
+## Implemented Phase 8 boundary
+
+Phase 8 implements the clinician-controlled deterministic draft clinical summary workflow:
+
+```text
+Patient Interview + Normalization
++ Source-Linked Medical Facts (Medications & Labs)
++ Chronological Timeline
++ Conservative Discrepancies
++ Safety Screening Alerts
+        ↓
+Deterministic ClinicalSummaryService
+(10 Fixed Structured Sections + Evidence Attribution)
+        ↓
+Immutable Machine Draft (generated_text, generated_structured_json)
+        ↓
+Doctor Working Review (reviewed_text, version tracking, revision notes)
+        ↓
+Append-Only Revision History (SummaryRevision records with ACTOR_TYPE)
+        ↓
+Confirmed Summary (confirmed_text, confirmed_by, confirmed_at, permanent lock)
+```
+
+Key architectural guarantees:
+1. **Zero Hallucination / Strictly Deterministic**: No LLM or external generative model is used in summary synthesis. All statements derive directly and predictably from validated structured clinical facts.
+2. **Fixed Ten-Section Structure**: Every generated draft conforms to:
+   1. Patient Information
+   2. Chief Complaint
+   3. History of Present Illness
+   4. Relevant Medical History
+   5. Current Medications
+   6. Investigations / Laboratory Findings
+   7. Clinical Timeline
+   8. Safety Alerts
+   9. Potential Discrepancies
+   10. Unknown / Not Reported Information
+3. **Explicit Source Attribution (`EvidenceReference`)**: Every summary item retains provenance tracing back to its raw source (`patient_answer`, `normalized_fact`, `medical_fact`, `document`, `alert`, `discrepancy`, `timeline`).
+4. **Separation of Stages**:
+   - Machine Draft is immutable and never overwritten by manual edits.
+   - Doctor Working Draft (`reviewed_text`) can be reviewed, edited, and iteratively saved.
+   - Revisions are append-only in `summary_revisions` storing `actor_type` (`SYSTEM` vs `DOCTOR`), `actor_user_id`, `review_notes`, and structured/text snapshots.
+   - Draft regeneration requires explicit replacement confirmation (`confirm_replacement=True`) if manual edits exist, preventing accidental data loss.
+5. **Confirmation Locking**: Once confirmed, `confirmed_text` is saved with server-stamped `confirmed_by` and `confirmed_at`. The record is permanently locked against further edits or regeneration (HTTP 409 `CONFIRMED_IMMUTABLE`).
+6. **Non-Diagnostic Boundary**: UI and backend never declare a diagnosis, prescribe treatments, or alter medication regimens. AYUSH pathways display explicit demonstration and supportive documentation disclaimers. See [Phase 8 status](phase8-implementation-status.md).
+

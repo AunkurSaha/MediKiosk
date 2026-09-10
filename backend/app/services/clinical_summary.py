@@ -11,9 +11,8 @@ Strictly preserves unknowns. Generates zero hallucinations (no diagnosis, no
 prescriptions, no invented dates, no fabricated clinical conclusions).
 """
 
-from datetime import datetime, timezone
 import uuid
-from typing import Any
+from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
 
@@ -25,10 +24,14 @@ from app.schemas.clinical_summary import (
 )
 from app.services import (
     adaptive,
-    discrepancies as discrepancy_service,
     intake,
     medical_facts,
     red_flags,
+)
+from app.services import (
+    discrepancies as discrepancy_service,
+)
+from app.services import (
     timeline as timeline_service,
 )
 
@@ -376,8 +379,8 @@ class ClinicalSummaryService:
         lab_lines: list[str] = []
         lab_evidence: list[EvidenceReference] = []
         if facts.labs:
-            for l in facts.labs:
-                curr = l.current
+            for lab_item in facts.labs:
+                curr = lab_item.current
                 unit_str = f" {curr.unit}" if curr.unit else ""
                 ref_str = f" (Ref: {curr.reference_range})" if curr.reference_range else ""
                 flag_str = f" [Flag: {curr.flag}]" if curr.flag else ""
@@ -386,24 +389,24 @@ class ClinicalSummaryService:
                     if curr.observation_timestamp
                     else ""
                 )
-                doc_label = l.source.document_filename or "Document"
+                doc_label = lab_item.source.document_filename or "Document"
                 line = (
                     f"- {curr.test_name}: {curr.value}{unit_str}{ref_str}{flag_str}{obs_str} "
-                    f"[{doc_label}; Status: {l.verification_status}]"
+                    f"[{doc_label}; Status: {lab_item.verification_status}]"
                 )
                 lab_lines.append(line)
 
                 ev = EvidenceReference(
-                    statement_id=_statement_id("lab", l.id),
+                    statement_id=_statement_id("lab", lab_item.id),
                     section="investigations_labs",
                     statement_text=line,
                     source_type="medical_fact",
-                    source_id=l.id,
-                    source_text=l.source.raw_text or curr.test_name,
+                    source_id=lab_item.id,
+                    source_text=lab_item.source.raw_text or curr.test_name,
                     source_metadata={
-                        "document_id": l.source.document_id,
-                        "document_filename": l.source.document_filename,
-                        "verification_status": l.verification_status,
+                        "document_id": lab_item.source.document_id,
+                        "document_filename": lab_item.source.document_filename,
+                        "verification_status": lab_item.verification_status,
                         "flag": curr.flag,
                     },
                 )
@@ -612,8 +615,8 @@ class ClinicalSummaryService:
 
         for sec in sections:
             draft_parts.append(f"## {sec.title}")
-            for l in sec.content_lines:
-                draft_parts.append(l)
+            for line_text in sec.content_lines:
+                draft_parts.append(line_text)
             draft_parts.append("")  # blank line separator
 
         draft_text = "\n".join(draft_parts).strip()

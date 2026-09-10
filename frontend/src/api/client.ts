@@ -36,15 +36,69 @@ export interface Patient {
   name: string;
   demo_abha_id: string | null;
 }
+export interface EvidenceReference {
+  statement_id: string;
+  section: string;
+  statement_text: string;
+  source_type:
+    | 'patient_answer'
+    | 'normalized_fact'
+    | 'medical_fact'
+    | 'document'
+    | 'alert'
+    | 'discrepancy'
+    | 'timeline';
+  source_id: string;
+  source_text: string;
+  source_metadata: Record<string, unknown>;
+}
+
+export interface StructuredSummarySection {
+  section_key: string;
+  title: string;
+  content_lines: string[];
+  items: Record<string, unknown>[];
+  evidence: EvidenceReference[];
+}
+
+export interface StructuredClinicalSummary {
+  session_id: string;
+  generated_at: string;
+  draft_version: number;
+  draft_provider: string;
+  sections: StructuredSummarySection[];
+  evidence_references: EvidenceReference[];
+  disclaimer: string | null;
+}
+
+export interface SummaryRevisionRecord {
+  id: string;
+  summary_id: string;
+  version: number;
+  revision_type: 'initial_draft' | 'edit' | 'regenerate' | 'confirmed';
+  actor_type: 'SYSTEM' | 'DOCTOR';
+  actor_user_id: string | null;
+  actor_name: string | null;
+  reviewed_text: string;
+  review_notes: string | null;
+  structured_snapshot: Record<string, unknown> | null;
+  created_at: string;
+}
+
 export interface Summary {
   id: string;
   session_id?: string;
   generated_text: string;
   reviewed_text: string | null;
+  confirmed_text?: string | null;
   status: 'generated' | 'reviewed' | 'confirmed';
+  draft_provider?: string;
+  draft_version?: number;
   version: number;
   confirmed_by: string | null;
   confirmed_at: string | null;
+  structured_summary?: StructuredClinicalSummary | null;
+  evidence?: EvidenceReference[] | null;
 }
 import type { AlertItem } from './triage';
 
@@ -405,18 +459,55 @@ export const api = {
       { expected_version: expectedVersion, status, correction, notes },
       true,
     ),
-  saveSummary: (id: string, reviewed_text: string, expected_version: number) =>
+  getSummary: (id: string) =>
+    request<Summary>('/doctor/sessions/' + id + '/summary', 'GET', undefined, true),
+  saveSummary: (
+    id: string,
+    reviewed_text: string,
+    expected_version: number,
+    review_notes?: string,
+  ) =>
     request<Summary>(
       '/doctor/sessions/' + id + '/summary',
       'PUT',
-      { reviewed_text, expected_version },
+      { reviewed_text, expected_version, review_notes },
       true,
     ),
-  confirm: (id: string, expected_version: number) =>
+  confirm: (id: string, expected_version: number, review_notes?: string) =>
     request<Summary>(
       '/doctor/sessions/' + id + '/summary/confirm',
       'POST',
-      { expected_version },
+      { expected_version, review_notes },
+      true,
+    ),
+  regenerateSummary: (
+    id: string,
+    expected_version: number,
+    review_notes?: string,
+    confirm_replacement?: boolean,
+  ) =>
+    request<Summary>(
+      '/doctor/sessions/' + id + '/summary/regenerate',
+      'POST',
+      {
+        expected_version,
+        review_notes,
+        confirm_replacement: Boolean(confirm_replacement),
+      },
+      true,
+    ),
+  getSummaryRevisions: (id: string) =>
+    request<SummaryRevisionRecord[]>(
+      '/doctor/sessions/' + id + '/summary/revisions',
+      'GET',
+      undefined,
+      true,
+    ),
+  getSummaryEvidence: (id: string) =>
+    request<EvidenceReference[]>(
+      '/doctor/sessions/' + id + '/summary/evidence',
+      'GET',
+      undefined,
       true,
     ),
 };

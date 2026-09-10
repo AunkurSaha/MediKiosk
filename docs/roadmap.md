@@ -105,12 +105,17 @@ Delivered:
 
 ## Phase 8 — Draft summary
 
-Add:
-- summary provider;
-- summary from structured facts;
-- explicit unknowns;
-- generated draft preservation;
-- doctor editor improvements.
+Status: complete for deterministic prototype scope. Clinician-controlled clinical summary drafting, 10 fixed structured sections, explicit unknowns, evidence source attribution, doctor review/edit workspace, optimistic revision history, and immutable confirmation locking are implemented. No LLM or ungrounded generative AI is used. See [Phase 8 report](phase8-implementation-status.md).
+
+Delivered:
+- deterministic `ClinicalSummaryService` synthesizing intake answers, normalized facts, medication/lab medical facts, computed timeline, discrepancies, and red-flag alerts;
+- 10 fixed structured sections with strict preservation of unknown/unreported information;
+- source evidence attribution (`EvidenceReference`) mapping summary statements to underlying records;
+- strict 4-stage summary model: immutable machine draft, doctor working draft, append-only revision history (`summary_revisions`), and confirmed immutable summary;
+- optimistic locking (`expected_version`) and explicit conflict resolution on regeneration;
+- server-attributed confirmation locking (`confirmed_text`, `confirmed_by`, `confirmed_at`) rejecting subsequent edits/regeneration;
+- doctor Summary Workspace UI with multi-tab Editor, Evidence Attribution viewer, and Revision History feed;
+- zero diagnostic claims, zero treatment recommendations, zero medication modifications, and zero invented dates/facts.
 
 ## Phase 9 — Doctor verification hardening
 

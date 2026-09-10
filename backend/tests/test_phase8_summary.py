@@ -2,16 +2,12 @@
 Phase 8 Tests: Deterministic Clinical Summary Drafting, Doctor Review,
 Evidence Attribution, and Confirmation Locking.
 """
-import json
 import uuid
 from datetime import datetime, timezone
-import pytest
-from sqlalchemy import select
 
 from app import models
 from app.api.deps import DEMO_DOCTOR_ID
 from app.services.clinical_summary import ClinicalSummaryService
-from app.services import intake
 
 STAFF = {"X-Demo-Doctor": "true"}
 FIELDS = ("chief_complaint", "onset_duration", "medications", "allergies", "past_history")

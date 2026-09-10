@@ -317,4 +317,27 @@ Current totals are **331 backend tests** on each SQLite/PostgreSQL profile, **61
 
 Run the standard full commands at the top of this document. `scripts/verify-stabilization-migrations.py` now verifies the Phase 7 additive migration and current Alembic/model comparison. Full PostgreSQL process restart remains blocked by Windows Application Control; `-ApplicationOnly` is not database-restart acceptance.
 
+## Phase 8 acceptance
+
+Current totals are **335 backend tests** on each SQLite/PostgreSQL profile, **67 frontend component tests**, and all existing E2E regression journeys.
+
+1. **Backend Integration & Unit Tests (`backend/tests/test_phase8_summary.py`)**:
+   - `test_clinical_summary_service_deterministic_10_sections`: Verifies deterministic synthesis of all 10 required clinical summary sections from structured sources (raw answers, medical facts, timeline, discrepancies, and safety screening alerts) without LLM invocation. Confirms zero diagnostic claims or prescription assertions.
+   - `test_clinical_summary_ayush_banner`: Confirms prominent AYUSH demonstration disclaimers and supportive-documentation notices when AYUSH flows or answers are detected.
+   - `test_doctor_summary_api_workflow`: Validates full clinician workflow: GET summary with evidence mappings; PUT working draft review with optimistic locking and automatic revision logging; rejection of stale versions (HTTP 409 `VERSION_CONFLICT`); draft regeneration conflict handling (HTTP 409 `CONFIRM_REPLACEMENT_REQUIRED` when manual edits exist); successful regeneration with `confirm_replacement=True`; append-only revision history retrieval; evidence endpoint source attribution; final confirmation locking (`POST /confirm`); and permanent immutability enforcement preventing subsequent edits or regeneration (HTTP 409 `CONFIRMED_IMMUTABLE`).
+   - `test_doctor_summary_security_unauthorized`: Verifies that unauthorized callers without staff credentials are rejected (HTTP 401).
+
+2. **Database Migration Verification (`scripts/verify-phase8-migrations.py`)**:
+   - Migration `1915850a59d1_phase8_draft_summary.py` tested for clean empty database upgrades, Phase 7 → Phase 8 upgrades, and downgrade/re-upgrade cycles.
+   - Alembic comparison against active models reports zero schema drift.
+
+3. **Frontend Component Tests (`frontend/src/test/phase8.test.tsx`)**:
+   - `renders summary editor with draft content and metadata badges`: Verifies version tags, draft status, and disabled confirm button until reviewed.
+   - `allows editing working draft, inputting revision notes, and saving`: Verifies clinician edits, optional revision notes, and save review API interaction.
+   - `switches to evidence attribution view and displays source links`: Verifies statement-to-source traceability display for all evidence types.
+   - `switches to revision history view and loads revisions from API`: Verifies display of chronological revision feed, actors (`DOCTOR` vs `SYSTEM`), and revision notes.
+   - `handles draft regeneration and confirms replacement when manual edits exist`: Verifies 409 conflict handling and modal replacement confirmation.
+   - `locks editor and displays confirmed banner in read-only confirmed state`: Verifies read-only textarea and omission of mutating actions upon confirmation.
+
+
 

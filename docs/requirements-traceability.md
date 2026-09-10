@@ -23,7 +23,8 @@ Evidence must demonstrate behavior; a test count alone does not accept a feature
 | Source-linked medical facts and fact review history | medical_facts.py; medical_fact_revisions; test_phase7_complete.py; phase7.test.tsx | Synthetic typed fixtures only; no real OCR or clinical validation |
 | Deterministic timeline and explicit unknown dates | timeline.py; timeline API/UI; backend and browser ordering/unknown-date tests | Computed only from explicit dates; generic timeline table remains unused |
 | Conservative discrepancies | discrepancies.py; discrepancy API/UI; medication/allergy/lab unit and browser tests | Incomparable evidence emits nothing; output always requires clinician review |
-| AI summary, FHIR, ABDM | No Phase 8+ implementation | Deferred and not authorized |
+| Deterministic draft summary, evidence attribution, doctor review, revision history, and confirmed locking | ClinicalSummaryService; summary_revisions; test_phase8_summary.py; phase8.test.tsx | Deterministic template synthesis only; no LLM diagnosis/prescriptions/invented dates |
+| FHIR export, ABDM | No Phase 10+ implementation | Deferred and not authorized |
 
 
 ## Phase 7 completion evidence
@@ -35,3 +36,17 @@ Evidence must demonstrate behavior; a test count alone does not accept a feature
 | Timeline/discrepancies | Computed timeline service plus deterministic comparison service and doctor sections | Known/equal/unknown ordering, no invented dates/duplicates, explicit comparable evidence, stable IDs, source A/B, component and browser coverage |
 | Fact review | Staff-only typed PATCH routes and additive revisions | Authorization, forgery rejection, optimistic conflict, original/current separation, locked session and server reviewer coverage |
 | Migration integrity | Forward index repair plus additive review-history migration | PostgreSQL comparison/upgrades/fingerprints/downgrade-reupgrade; Phase 7 SQLite schema and preserved scaffold-row regression |
+
+
+## Phase 8 completion evidence
+
+| Scope | Implementation | Evidence / remaining gap |
+|---|---|---|
+| Deterministic clinical summary drafting | `ClinicalSummaryService` synthesizing intake answers, normalized facts, medication/lab medical facts, timeline, discrepancies, and red flags | 10 fixed sections, all 5 complaint families tested, AYUSH disclaimer, no LLM or invented facts |
+| Explicit unknown information preservation | `unknown_unreported` section capturing explicitly missing or unassessed clinical domains | Unknowns retained, no hallucinated defaults |
+| Source evidence attribution | `EvidenceReference` linking every summary statement to source type, source ID, and raw source text | `GET /api/doctor/sessions/{id}/summary/evidence`, component and backend attribution tests |
+| 4-stage lifecycle & immutable draft | `clinical_summaries` (`generated_text`, `reviewed_text`, `confirmed_text`), optimistic `draft_version` | Doctor edits never mutate `generated_text`; replacement confirmation modal on regenerate |
+| Append-only revision history | `summary_revisions` capturing `revision_type`, `actor_type` (DOCTOR vs SYSTEM), `review_notes`, snapshots | Complete chronological audit trail, server-stamped actor identity, optimistic locking |
+| Clinician confirmation locking | `POST /api/doctor/sessions/{id}/summary/confirm` locking summary with `confirmed_by`, `confirmed_at` | Subsequent PUT/regenerate rejected with 409 `CONFIRMED_IMMUTABLE`; audit log emitted |
+| Doctor Summary Workspace UI | `SummaryWorkspace` with Editor, Evidence attribution viewer, Revision feed, and Read-only confirmed view | 6 frontend component tests (`phase8.test.tsx`), lint, and build verified |
+

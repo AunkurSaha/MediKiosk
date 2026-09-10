@@ -6,15 +6,15 @@ import { copy, errorText } from '../../i18n';
 import NormalizationPanel from '../../components/doctor/NormalizationPanel';
 import DocumentViewer from '../../components/doctor/DocumentViewer';
 import ClinicalEvidencePanel from '../../components/doctor/ClinicalEvidencePanel';
+import SummaryWorkspace from '../../components/doctor/SummaryWorkspace';
 
 const t = copy.en;
 export default function Doctor() {
   const { sessionId } = useParams();
   const [list, setList] = useState<SessionList | null>(null);
   const [detail, setDetail] = useState<Detail | null>(null);
-  const [editor, setEditor] = useState('');
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
+  const [busy] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState('');
   const [attempt, setAttempt] = useState(0);
@@ -26,7 +26,6 @@ export default function Doctor() {
         .then((result) => {
           if (!active) return;
           setDetail(result);
-          setEditor(result.summary?.reviewed_text || result.summary?.generated_text || '');
           setLoading(false);
           setError(null);
         })
@@ -58,42 +57,11 @@ export default function Doctor() {
     };
   }, [sessionId, attempt]);
   function refresh() {
-    if (
-      detail?.summary &&
-      editor !== (detail.summary.reviewed_text || detail.summary.generated_text) &&
-      !window.confirm(t.conflict)
-    )
-      return;
     setLoading(true);
     setNotice('');
     setAttempt(attempt + 1);
   }
-  async function save(confirm: boolean) {
-    if (!detail?.summary) return;
-    if (confirm && !window.confirm(t.confirmPrompt)) return;
-    setBusy(true);
-    setError(null);
-    setNotice('');
-    try {
-      const summary = confirm
-        ? await api.confirm(detail.session.id, detail.summary.version)
-        : await api.saveSummary(detail.session.id, editor.trim(), detail.summary.version);
-      setDetail({
-        ...detail,
-        summary,
-        session: { ...detail.session, status: confirm ? 'confirmed' : 'under_review' },
-      });
-      setEditor(summary.reviewed_text || '');
-      setNotice(confirm ? t.confirmSuccess : t.savedReview);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setBusy(false);
-    }
-  }
   const summary = detail?.summary;
-  const confirmed = summary?.status === 'confirmed';
-  const dirty = editor.trim() !== (summary?.reviewed_text || '');
   return (
     <div className="doctor-workspace">
       <div className="page-heading">
@@ -245,57 +213,36 @@ export default function Doctor() {
                 </details>
               )}
             </section>
-            <section className="card editor">
-              <h2>{t.reviewed}</h2>
-              {!summary && <p>{t.notReady}</p>}
-              {summary && (
-                <>
-                  <p className="muted">{confirmed ? t.readOnly : t.editHelp}</p>
-                  <label htmlFor="review">{t.reviewed}</label>
-                  <textarea
-                    id="review"
-                    rows={15}
-                    value={editor}
-                    disabled={busy}
-                    readOnly={confirmed}
-                    maxLength={64000}
-                    onChange={(e) => {
-                      setEditor(e.target.value);
-                      setNotice('');
-                    }}
-                  />
-                  {!confirmed && (
-                    <>
-                      {dirty && <p className="muted">{t.saveFirst}</p>}
-                      <div className="actions stacked">
-                        <button disabled={busy || !editor.trim()} onClick={() => void save(false)}>
-                          {busy ? t.saving : t.save}
-                        </button>
-                        <button
-                          className="secondary"
-                          disabled={busy || dirty || summary.status !== 'reviewed'}
-                          onClick={() => void save(true)}
-                        >
-                          {t.confirm}
-                        </button>
-                      </div>
-                    </>
-                  )}
-                  {confirmed && (
-                    <div className="success">
-                      <strong>{t.confirmed}</strong>
-                      <p>
-                        {t.confirmedBy}: {summary.confirmed_by}
-                      </p>
-                      <p>
-                        {t.confirmedAt}:{' '}
-                        {summary.confirmed_at && new Date(summary.confirmed_at).toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                </>
-              )}
-            </section>
+            {summary ? (
+              <SummaryWorkspace
+                sessionId={detail.session.id}
+                initialSummary={summary}
+                onSummaryUpdated={(updatedSummary) => {
+                  setDetail((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          summary: updatedSummary,
+                          session: {
+                            ...prev.session,
+                            status:
+                              updatedSummary.status === 'confirmed'
+                                ? 'confirmed'
+                                : updatedSummary.status === 'reviewed'
+                                ? 'under_review'
+                                : prev.session.status,
+                          },
+                        }
+                      : prev,
+                  );
+                }}
+              />
+            ) : (
+              <section className="card editor">
+                <h2>{t.reviewed}</h2>
+                <p>{t.notReady}</p>
+              </section>
+            )}
           </div>
           <ClinicalEvidencePanel
             key={detail.session.id}

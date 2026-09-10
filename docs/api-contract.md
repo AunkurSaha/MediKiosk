@@ -218,3 +218,49 @@ All Phase 7 routes require the existing server-resolved doctor identity. They ar
 - `PATCH /doctor/sessions/{id}/medical-facts/labs/{fact_id}` accepts the analogous typed lab correction.
 
 Review `status` is `verified` or `rejected`. Correction plus rejection is invalid. The server owns reviewer identity/time, increments the version, appends immutable original/effective values, and returns the current record. Stale versions, anonymous/forged identity, rejected source extraction, and confirmed/cancelled sessions fail closed. Corrections do not overwrite extraction rows or raw source.
+
+## Phase 8 doctor clinical summary contract
+
+All Phase 8 summary drafting routes require staff authentication (`X-Demo-Doctor: true` in demo mode) and active sharing consent. They operate under `/api/doctor/sessions/{session_id}/summary`:
+
+- `GET /api/doctor/sessions/{session_id}/summary`:
+  Returns the complete clinical summary envelope:
+  - `generated_text`: Immutable rule-based deterministic draft text.
+  - `reviewed_text`: Current doctor working draft text (initially equal to generated draft).
+  - `confirmed_text`: Final confirmed text once locked (null in draft/reviewed stages).
+  - `status`: Lifecycle status (`"generated"` | `"reviewed"` | `"confirmed"`).
+  - `draft_provider`: Engine identifier (`"deterministic"`).
+  - `draft_version`: Generator version counter (increments upon regeneration).
+  - `version`: Optimistic concurrency lock version counter.
+  - `structured_summary`: Rich 10-section structured representation (`StructuredClinicalSummary`).
+  - `evidence`: Array of statement-to-source attribution mappings (`EvidenceReference`).
+
+- `PUT /api/doctor/sessions/{session_id}/summary`:
+  Saves clinician edits to the working draft:
+  - Payload: `{ "reviewed_text": string, "expected_version": int, "review_notes"?: string }`.
+  - Enforces optimistic locking (`expected_version`). Mismatch returns 409 `VERSION_CONFLICT`.
+  - Automatically appends a `SummaryRevision` entry with `actor_type="DOCTOR"`, server-stamped reviewer identity, and timestamp.
+  - Transitions `status` to `"reviewed"`.
+  - Returns updated `ClinicalSummary` with incremented `version`.
+
+- `POST /api/doctor/sessions/{session_id}/summary/regenerate`:
+  Regenerates the machine draft from the latest interview answers, medical facts, timeline, and alerts:
+  - Payload: `{ "expected_version": int, "review_notes"?: string, "confirm_replacement"?: bool }`.
+  - If manual edits exist (`reviewed_text != generated_text`) and `confirm_replacement` is false, returns 409 `CONFIRMED_REPLACEMENT_REQUIRED` to prevent silent data loss.
+  - When confirmed, resets `reviewed_text` to new `generated_text`, increments `draft_version`, increments `version`, and records a `SummaryRevision` entry (`revision_type="regenerate"`).
+
+- `POST /api/doctor/sessions/{session_id}/summary/confirm`:
+  Permanently locks the clinical summary upon clinician sign-off:
+  - Payload: `{ "expected_version": int, "review_notes"?: string }`.
+  - Sets `confirmed_text = reviewed_text`, `status = "confirmed"`, stamps `confirmed_by` from server identity, and sets `confirmed_at`.
+  - Records an append-only revision entry (`revision_type="confirmed"`).
+  - Once confirmed, subsequent `PUT` or `POST regenerate` requests return 409 `CONFIRMED_IMMUTABLE`.
+
+- `GET /api/doctor/sessions/{session_id}/summary/revisions`:
+  Returns the complete chronological array of `SummaryRevisionRecord` objects:
+  - `id`, `summary_id`, `version`, `revision_type`, `actor_type`, `actor_user_id`, `actor_name`, `reviewed_text`, `review_notes`, `structured_snapshot`, `created_at`.
+
+- `GET /api/doctor/sessions/{session_id}/summary/evidence`:
+  Returns the array of `EvidenceReference` objects linking summary statements to raw source entries:
+  - `statement_id`, `section`, `statement_text`, `source_type`, `source_id`, `source_text`, `source_metadata`.
+

@@ -400,3 +400,21 @@ Schema head `d12f4a7b9c31` extends the repaired Phase 7 tables additively.
 Current fact responses overlay the latest corrected JSON on immutable fact columns. Rejection changes workflow state but does not delete the source or revision history. Facts whose source extraction is rejected are excluded from current clinical views. No source page/region, date, flag, unit, range, or dose is synthesized when absent.
 
 Timeline and discrepancy records are computed response objects, not database tables. Their deterministic IDs are reproducible from source IDs/content. This design keeps persisted structured facts as the source of truth and avoids duplicate timeline materialization.
+
+## Implemented Phase 8 clinical summary schema
+
+Schema head `1915850a59d1` adds additive fields to `clinical_summaries` and `summary_revisions` to support the multi-stage, doctor-controlled drafting and audit workflow:
+
+| Table | Added / Enhanced Fields | Purpose |
+|---|---|---|
+| `clinical_summaries` | `confirmed_text` (Text, nullable) | Final clinician-confirmed text saved upon explicit sign-off; becomes permanently immutable. |
+| `clinical_summaries` | `draft_provider` (String, default `'deterministic'`) | Identifies the generator engine (`'deterministic'`). |
+| `clinical_summaries` | `draft_version` (Integer, default `1`) | Independent version counter for machine-draft generations. Increments on regeneration. |
+| `summary_revisions` | `revision_type` (String, default `'edit'`) | Categorizes the lifecycle event: `'initial_draft'`, `'edit'`, `'regenerate'`, `'confirmed'`. |
+| `summary_revisions` | `actor_type` (String, default `'DOCTOR'`) | Explicit provenance: `'SYSTEM'` for automated draft engine, `'DOCTOR'` for human clinician actions. |
+| `summary_revisions` | `actor_user_id` (String, nullable) | Made nullable to accommodate system-initiated revisions where no user FK exists. |
+| `summary_revisions` | `review_notes` (Text, nullable) | Clinician-entered notes explaining rationale for manual revisions or confirmation sign-off. |
+| `summary_revisions` | `structured_snapshot` (JSON, nullable) | Structured fact/section snapshot recorded at the time of revision creation. |
+
+All changes are strictly additive. Empty database migration, Phase 7 → Phase 8 upgrade, and downgrade/re-upgrade verification succeed cleanly.
+

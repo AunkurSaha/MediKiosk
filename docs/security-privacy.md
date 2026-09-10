@@ -25,3 +25,18 @@ Medical-fact, timeline, discrepancy, and fact-review APIs reuse the existing sta
 Original clinical values and raw source remain immutable. Corrections are additive revisions with optimistic versions; confirmed/cancelled sessions reject mutations. Audit metadata records only fact identifiers, type, status, and version—not corrected clinical values. Raw fact/source content is not intentionally written to application logs.
 
 This remains header-gated local demo authorization, not production authentication. Source-document links are still fetched through authorized backend routes. No production encryption, retention, tenant isolation, external identity, or clinical compliance claim follows from these controls.
+
+## Phase 8 summary drafting, revision audit, and clinical boundaries
+
+Summary drafting, review, regeneration, and confirmation endpoints reuse the existing server-resolved staff authorization and session sharing consent checks.
+
+1. **Server-Enforced Actor Provenance**: `confirmed_by`, reviewer identity, and `actor_user_id` are determined exclusively by the authenticated server session. Any client attempt to forge reviewer ID in request bodies is rejected (validation error 422).
+2. **Optimistic Concurrency Control**: All draft edit, regeneration, and confirmation requests require `expected_version`. Version conflicts return HTTP 409 `VERSION_CONFLICT` without modifying persisted data.
+3. **Confirmed Record Immutability**: Upon clinical sign-off (`POST /summary/confirm`), the summary transitions to `confirmed` status with `confirmed_text` locked. Any subsequent edit or regeneration attempt fails closed with HTTP 409 `CONFIRMED_IMMUTABLE`.
+4. **Append-Only Audit Trail**: Summary creation, clinician revisions, draft regenerations, and final confirmations append immutable `summary_revisions` records with explicit `actor_type` (`SYSTEM` vs `DOCTOR`), structured/text snapshots, and clinician review notes.
+5. **Non-Diagnostic Clinical Safety Boundary**:
+   - The deterministic summary drafting engine synthesizes only validated facts without diagnosing, prescribing, or inferring diseases.
+   - Unknown and unaddressed fields are explicitly documented as missing.
+   - AYUSH pathways are prominently badged with demonstration and supportive-documentation disclaimers.
+   - Raw medical text and sensitive clinical observations are excluded from unsafe system logs.
+
