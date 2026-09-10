@@ -8,7 +8,7 @@ Phase 1–3 intake, adaptive questioning, optional normalization, PostgreSQL per
 
 The draft is a deterministic rendering of saved answers. Back/edit preserves prior source answers; resume uses the pinned flow and cursor. Confirmed records are locked. Doctor review remains separate from machine output.
 
-Real OCR is not implemented. BHASHINI live ASR/TTS is not demonstrated. NVIDIA live evidence is mixed and does not establish reliable acceptance. Rules, question wording and translations are prototype content without clinical validation. See the [stabilization report](docs/stabilization-implementation-status.md) for each original finding, fix, regression, evidence and limitation. No Phase 7 work is authorized.
+Real OCR is not implemented. BHASHINI live ASR/TTS is not demonstrated. NVIDIA live evidence is mixed and does not establish reliable acceptance. Rules, question wording and translations are prototype content without clinical validation. See the [stabilization report](docs/stabilization-implementation-status.md) for each original finding, fix, regression, evidence and limitation. The user subsequently authorized review and repair of existing Phase 7 code. See the [Phase 7 report](docs/phase7-implementation-status.md): medication/lab materialization is repaired; timeline/discrepancy workflows remain missing.
 
 ## Run on this configured Windows machine
 

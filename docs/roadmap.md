@@ -4,7 +4,7 @@ Do not jump phases merely because later phases are more impressive.
 
 Each phase should leave the repository runnable.
 
-Current task: **stabilization and audit remediation only**. All roadmap advancement is paused. Phase 1–3 foundations remain; Phase 4–6 defects and final acceptance gates are tracked in [stabilization status](stabilization-implementation-status.md). No Phase 7 or new provider/database is authorized.
+Current task: **review and repair existing Phase 7 work**, explicitly authorized by the user. Missing roadmap workflows remain deferred. Phase 1–3 foundations remain; Phase 4–6 defects and final acceptance gates are tracked in [stabilization status](stabilization-implementation-status.md). No new provider/database or implementation of missing Phase 7 workflows is authorized by this repair request.
 
 The sections below describe historical or future scope, not current acceptance. Phase 3B and 4B live integrations remain unaccepted; Phase 6 has storage and explicit mock fixtures, not real OCR.
 
@@ -92,6 +92,8 @@ Implementation is under stabilization. Staff identity, WebSocket admission/deliv
 Local storage, content validation, typed parser fixtures and doctor review are implemented/remediated. Real OCR remains absent. No new OCR provider is authorized during stabilization.
 
 ## Phase 7 — Medical extraction + timeline + discrepancies
+
+Status: partial backend scaffold reviewed and repaired. Medication/lab fact materialization works from existing typed document fixtures. Timeline table exists; timeline API/UI, discrepancy engine and fact review workflow are missing. See [Phase 7 report](phase7-implementation-status.md). The list below is target scope, not completed work.
 
 Add:
 - medication/lab extraction;

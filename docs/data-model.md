@@ -384,3 +384,10 @@ No database schema migration is required between Phase 3A and Phase 3B because `
 Alembic head b72f516e3f42 adds non-null integer alerts.revision and document_extractions.review_version, default 0. Alert.created_at ORM nullability now agrees with its existing NOT NULL migration. Original source columns/rows are preserved; migrations and comparison are checked by verify-stabilization-migrations.py.
 
 Documents and document_extractions exist in PostgreSQL. Files live under .runtime/uploads by default. structured_json.observations is the canonical lab array; missing flags are null. Review transitions retain prior status/actor/time/notes in audit_logs. Voice candidate tokens are signed, transient client-held values; confirmed candidate IDs/provider/model/source-answer linkage are in audit_logs. No audio table is added. Proposed clinical_histories/medications/observations/timeline tables above are future concepts, not claims that those separate tables exist.
+
+
+## Existing Phase 7 scaffold after repair
+
+Current head is c83f627f4053, following the already-applied f27074ce1ef6 and merge 1dc135740d9c. It adds created_at indexes only. Actual tables use singular names: medication_fact, lab_fact, timeline_fact. The first two reference document_extractions and sessions; copied source_text retains the complete original extraction, with source_location unknown. New rows are unverified; no separate fact-review API currently exists. Lab observation timestamps and missing flags are not inferred.
+
+timeline_fact preserves its deployed generic source_type/source_id/source_field, fact_type/fact_data, timestamp/timestamp_precision/is_approximate schema. It has no current producer, timeline API or UI. Do not assume the previously mismatched event_description/event_date ORM represented a working feature. No historical rows were dropped or backfilled.

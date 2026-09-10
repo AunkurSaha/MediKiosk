@@ -1,3 +1,5 @@
+> Historical stabilization evidence: a later user request authorized repair of already-written Phase 7 code. See [Phase 7 report](phase7-implementation-status.md) for current schema and test results. The previously blocked full PostgreSQL restart remains unverified; an intervening Git commit does not establish that it passed.
+
 # Stabilization implementation status
 
 Updated 2026-09-10. **Remediation implemented; final acceptance is blocked on PostgreSQL restart and the subsequent Git checkpoint.** MediKiosk is a synthetic-data local prototype. This report does not establish production readiness, clinical validation, real OCR, or reliable live provider integration. Roadmap development remains frozen.

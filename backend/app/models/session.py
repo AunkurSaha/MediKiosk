@@ -1,6 +1,7 @@
 import uuid
 
 from sqlalchemy import Column, DateTime, ForeignKey, String, text
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -19,3 +20,8 @@ class Session(Base):
     completed_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     updated_at = Column(DateTime(timezone=True), onupdate=text("CURRENT_TIMESTAMP"))
+
+    # Relationships to extracted facts
+    medication_facts = relationship("MedicationFact", back_populates="session")
+    lab_facts = relationship("LabFact", back_populates="session")
+    timeline_facts = relationship("TimelineFact", back_populates="session")

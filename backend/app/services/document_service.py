@@ -137,6 +137,12 @@ async def ingest_document(
                 )
                 if raw_text and metadata.get("fixture_id"):
                     db.add(extraction)
+                    # Flush to get the extraction ID before extracting medical facts
+                    db.flush()
+                    # Extract medical facts from the document extraction
+                    from app.services.medical_extractor import extract_medical_facts
+
+                    extract_medical_facts(db, extraction)
 
             except Exception as e:
                 logger.warning(f"OCR processing failed for document {doc.id}: {type(e).__name__}")

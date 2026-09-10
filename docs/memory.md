@@ -1,6 +1,6 @@
-# Project memory — stabilization only
+# Project memory — existing Phase 7 review and repairs
 
-- Current task: complete the authoritative [2026-09-09 audit](current-project-review-2026-09-09.md), not a new phase. No Phase 7, providers, databases or Phase 1–3 redesign. Track remaining work in [stabilization status](stabilization-implementation-status.md).
+- Prior stabilization task: complete the authoritative [2026-09-09 audit](current-project-review-2026-09-09.md), not a new phase. No Phase 7, providers, databases or Phase 1–3 redesign. Track remaining work in [stabilization status](stabilization-implementation-status.md).
 - This is a local synthetic-data prototype; clinical content/translations are unvalidated. No diagnosis, prescribing, production-readiness or complete de-identification claims.
 - React/Vite/TypeScript frontend; FastAPI/Pydantic/SQLAlchemy/Alembic backend; existing PostgreSQL on 55432, app DB medikiosk and isolated medikiosk_test. Frontend 5175, API 8010. Use backend/.venv and scripts. Secrets/.runtime/uploads are ignored.
 - Preserve pinned deterministic flow snapshots, optimistic interview revisions, retry receipts, append-only answers, optional immutable normalization snapshots and immutable confirmed summaries.
@@ -16,3 +16,9 @@
 - Final Git checkpoint only after all required verification. Never commit .env, runtime data/logs/uploads, candidate tickets or provider credentials.
 
 - Latest verification (2026-09-10): 313 PostgreSQL + 313 SQLite backend tests, 55 frontend tests, 23 Playwright tests; Ruff/ESLint/Prettier/build and Alembic/migration/security checks pass. Application-only restart preserves seven API snapshots plus document hash. Full database restart still blocked (OS 4551), so no final Git checkpoint. Resume with the full restart verifier after Windows policy permits pg_ctl.exe, then browser resume checks and final checkpoint.
+
+- Latest user scope supersedes the earlier Phase 7 freeze only for reviewing/fixing code already written by another model. See docs/phase7-implementation-status.md. Do not infer permission to build missing timeline/discrepancy workflows.
+- Existing Phase 7 migration/merge was already applied, but plural ORM tables and incompatible timeline columns broke mapper setup and PostgreSQL uploads. Repaired models match singular medication_fact/lab_fact/timeline_fact; c83f627f4053 adds only missing created_at indexes, preserving original columns/data. Generic timeline scaffold has no producer/API/UI.
+- Medical fact materialization uses existing StructuredDocument validation, source consistency checks, an extraction-row lock/idempotent retry, and a savepoint. Preserve whole raw extraction text; leave unknown locations/observation dates/flags null. Facts remain unverified; no fact-level review API exists. No old document backfill.
+- Removed a local DB credential copied into tracked alembic.ini; runtime still uses environment configuration. Do not print secrets in diffs or assertion failures. Latest configured-secret scan found no remaining source/history matches.
+- Current tests: 320 SQLite, 320 PostgreSQL, 25 Playwright (two new Phase 7 upload/DB/source/UI checks). Ruff, ESLint, Prettier and TypeScript/build pass. Prior full database restart gate is still unverified. No commit made during this repair task.

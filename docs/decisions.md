@@ -296,3 +296,8 @@ Enforce the following architectural invariants:
 ## ADR-021 — Stabilization supersedes Phase 4–6 completion assumptions
 
 2026-09-10: Follow the independent audit. Preserve Phase 1–3; add no roadmap feature/provider/database. Reuse server demo identity on staff routes. Use single-use origin-checked socket tickets, versioned alert evidence/reviews and audit history. Restrict raw-language matching to explicit prototype phrases; do not invent clinical criteria. Separate canned document fixtures from arbitrary uploads and preserve null flags. Require signed ASR candidates and disclose multipart temporary-disk handling. This supersedes prior claims of guaranteed notification, memory-only multipart audio, live BHASHINI acceptance or completed real OCR. See stabilization status for evidence and remaining gates.
+
+
+## ADR-022 — Repair existing Phase 7 without expanding it
+
+2026-09-10: The user explicitly requested review and fixes for Phase 7 code written after stabilization. Its migrations were already applied. Preserve the deployed singular tables and generic timeline columns; align ORM models and add missing indexes through a forward migration. Materialize only the current typed medication/lab contract, validate before insertion, preserve source, isolate failures and make retry idempotent. Do not add unsupported timeline-note types, events, diagnoses or new providers. Dedicated timeline/discrepancy/fact-review workflows remain absent. This authorization does not establish completion of the earlier database-restart acceptance gate.
