@@ -75,3 +75,22 @@ Summary drafting, review, regeneration, and confirmation endpoints reuse the exi
    - No persistent PHI is duplicated into external FHIR databases or unverified caches.
    - Low-confidence extractions and unverified OCR facts retain their explicit provenance and unverified flags in generated FHIR resources.
 
+## Phase 11 ABDM & HIS interoperability security and privacy boundary
+
+1. **Staff Authorization & Access Control**:
+   - ABDM status inspection, session ABHA verification, care context linking, and HIS outbound dispatch routes (`/api/doctor/sessions/{id}/abdm/*`, `/api/doctor/sessions/{id}/his/*`) require authenticated clinical staff credentials (`X-Demo-Doctor: true`).
+   - Requests without authorized staff context fail closed with HTTP 401.
+   - Kiosk pre-registration verification (`POST /api/sessions/verify-abha`) is public but strictly rate-limited and returns only synthetic sandbox mock demographic data without access to prior patient histories or session records.
+2. **Explicit Consent Invariant for HIS Dispatch**:
+   - Outbound dispatch of clinical records and FHIR R4 bundles to hospital systems requires active patient sharing consent (`Consent.share_with_doctor == True`).
+   - Any attempt to dispatch or inspect clinical records without consent fails closed with HTTP 403 Forbidden.
+3. **Audit Logging on All Interoperability Operations**:
+   - Every interoperability action appends an immutable record to the session audit trail:
+     - `ABHA_VERIFIED`: Records verified ABHA address and formatted number without persisting raw demographic secrets.
+     - `ABDM_CARE_CONTEXT_LINKED`: Records care context reference, hospital token, and timestamp with clinician actor provenance.
+     - `HIS_DISPATCHED`: Records receipt reference, target system, entry count, and server actor provenance.
+4. **Sandbox Demonstration & Non-Production Disclaimers**:
+   - Prominent UI and API disclaimers state: *"ABDM Sandbox Demonstration (Non-Production / Synthetic Gateway). No real Aadhaar or production NHA gateway authentication claimed."*
+   - Default mode operates completely offline with deterministic mock fixtures, preventing accidental external transmission of synthetic health data.
+   - Clinical safety invariants remain strictly enforced: dispatched records and FHIR bundles never assert autonomous diagnoses or prescribe medications.
+

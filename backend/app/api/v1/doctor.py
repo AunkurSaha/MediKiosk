@@ -236,3 +236,82 @@ def validate_fhir(
     bundle = FHIRAdapterService.build_bundle(db, str(session_id), bundle_type=bundle_type)
     return FHIRAdapterService.validate_bundle(bundle)
 
+
+@router.get(
+    "/sessions/{session_id}/abdm/status",
+    response_model=schemas.ABDMStatusResponse,
+)
+def get_abdm_status(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.abdm import ABDMService
+
+    intake.detail(db, str(session_id), doctor=True)
+    return ABDMService.get_status(db, str(session_id))
+
+
+@router.post(
+    "/sessions/{session_id}/abdm/verify-abha",
+    response_model=schemas.ABDMVerificationResponse,
+)
+def verify_abha(
+    session_id: UUID,
+    req: schemas.ABDMVerifyRequest,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.abdm import ABDMService
+
+    intake.detail(db, str(session_id), doctor=True)
+    return ABDMService.verify_abha(
+        db, str(session_id), req.abha_input, auth_method=req.auth_method
+    )
+
+
+@router.post(
+    "/sessions/{session_id}/abdm/link-care-context",
+    response_model=schemas.ABDMCareContextLinkResponse,
+)
+def link_care_context(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.abdm import ABDMService
+
+    intake.detail(db, str(session_id), doctor=True)
+    return ABDMService.link_care_context(db, str(session_id), current_user_id=user.id)
+
+
+@router.post(
+    "/sessions/{session_id}/his/dispatch",
+    response_model=schemas.HISDispatchResponse,
+)
+def dispatch_to_his(
+    session_id: UUID,
+    req: schemas.HISDispatchRequest | None = None,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.his import HISService
+
+    intake.detail(db, str(session_id), doctor=True)
+    target_system = req.target_system if req else "default"
+    return HISService.dispatch_to_his(
+        db, str(session_id), current_user_id=user.id, target_system=target_system
+    )
+
+
+@router.get("/sessions/{session_id}/his/status")
+def get_his_status(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.his import HISService
+
+    intake.detail(db, str(session_id), doctor=True)
+    return HISService.get_status(db, str(session_id))
+

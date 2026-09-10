@@ -22,6 +22,9 @@ export default function Kiosk() {
   const [name, setName] = useState('');
   const [token, setToken] = useState('');
   const [abha, setAbha] = useState('');
+  const [abhaVerified, setAbhaVerified] = useState(false);
+  const [abhaChecking, setAbhaChecking] = useState(false);
+  const [abhaMessage, setAbhaMessage] = useState<string | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [voiceAgreed, setVoiceAgreed] = useState(false);
   const [docAgreed, setDocAgreed] = useState(false);
@@ -78,6 +81,9 @@ export default function Kiosk() {
     setName('');
     setToken('');
     setAbha('');
+    setAbhaVerified(false);
+    setAbhaChecking(false);
+    setAbhaMessage(null);
     setAgreed(false);
     setVoiceAgreed(false);
     setDocAgreed(false);
@@ -213,14 +219,65 @@ export default function Kiosk() {
               disabled={busy}
             />
             <label htmlFor="abha">{t.abha}</label>
-            <input
-              id="abha"
-              value={abha}
-              onChange={(e) => setAbha(e.target.value)}
-              maxLength={80}
-              autoComplete="off"
-              disabled={busy}
-            />
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <input
+                id="abha"
+                value={abha}
+                onChange={(e) => {
+                  setAbha(e.target.value);
+                  setAbhaVerified(false);
+                  setAbhaMessage(null);
+                }}
+                maxLength={80}
+                autoComplete="off"
+                disabled={busy}
+                placeholder="e.g. patient@abdm or 91-1234-5678-9012"
+                style={{ flex: 1 }}
+              />
+              <button
+                type="button"
+                className="secondary"
+                data-testid="kiosk-verify-abha-btn"
+                disabled={busy || !abha.trim() || abhaChecking}
+                onClick={async () => {
+                  if (!abha.trim()) return;
+                  setAbhaChecking(true);
+                  setAbhaMessage(null);
+                  try {
+                    const res = await api.verifyAbha(abha.trim());
+                    if (res.success && res.profile) {
+                      setAbhaVerified(true);
+                      setAbhaMessage(`✓ ABHA Verified (Sandbox): ${res.profile.name}`);
+                    } else {
+                      setAbhaVerified(false);
+                      setAbhaMessage(`⚠️ ${res.message}`);
+                    }
+                  } catch (err: unknown) {
+                    setAbhaVerified(false);
+                    setAbhaMessage(
+                      `Error: ${err instanceof Error ? err.message : 'Verification failed'}`
+                    );
+                  } finally {
+                    setAbhaChecking(false);
+                  }
+                }}
+                style={{ whiteSpace: 'nowrap', padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
+              >
+                {abhaChecking ? 'Verifying...' : 'Verify'}
+              </button>
+            </div>
+            {abhaMessage && (
+              <p
+                data-testid="kiosk-abha-message"
+                style={{
+                  fontSize: '0.8rem',
+                  marginTop: '4px',
+                  color: abhaVerified ? '#166534' : '#b91c1c',
+                }}
+              >
+                {abhaMessage}
+              </p>
+            )}
             <div className="actions">
               <button
                 type="button"

@@ -14,3 +14,7 @@ def demo_enabled():
 
 
 SPEECH_PROVIDER = os.getenv("SPEECH_PROVIDER", "mock")
+ABDM_ENV = os.getenv("ABDM_ENV", "mock")
+ABDM_CLIENT_ID = os.getenv("ABDM_CLIENT_ID", "")
+ABDM_CLIENT_SECRET = os.getenv("ABDM_CLIENT_SECRET", "")
+HIS_ENDPOINT_URL = os.getenv("HIS_ENDPOINT_URL", "")

@@ -451,4 +451,29 @@ Phase 10 adheres strictly to the non-negotiable architectural invariant: **inter
 | `ClinicalSummary` | `Composition` | LOINC `34105-7` Hospital Consultation note | `entry[0]` of Document Bundle. Includes structured sections linking to Chief Complaint, Questionnaire, Medications, Investigations, and Documents. Author is verified doctor (`Practitioner/{confirmed_by}`). |
 | Multi-Resource Package | `Bundle` | `type: "document"` or `"collection"` | Uniform `urn:uuid:...` internal addressing with reference integrity validation producing standard `OperationOutcome`. |
 
+## Implemented Phase 11 ABDM & HIS schema
+
+Schema head `8b4e9c2d1f73` adds the `abdm_records` table to track ABDM National Health Stack integration state (M1, M2, M3) and Hospital Information System (HIS / EMR) dispatch status:
+
+| Table | Field | Type | Constraints / Invariants | Description |
+|---|---|---|---|---|
+| `abdm_records` | `id` | String | Primary Key, UUID | Unique record identifier. |
+| `abdm_records` | `session_id` | String | FK `sessions.id`, UNIQUE, INDEX | Bound to exactly one clinical intake session. Cascades on session deletion. |
+| `abdm_records` | `patient_id` | String | FK `patients.id`, INDEX | Links to the patient entity. |
+| `abdm_records` | `abha_number` | String(32) | Nullable | Standard 14-digit ABHA ID formatted as `XX-XXXX-XXXX-XXXX`. |
+| `abdm_records` | `abha_address` | String(128) | Nullable | Patient ABHA PHR address (e.g. `patient@abdm` or `patient@sbx`). |
+| `abdm_records` | `abha_status` | String(32) | Default `'unverified'`, INDEX | Verification state: `'unverified'`, `'verified'`, `'mock_verified'`. |
+| `abdm_records` | `care_context_reference` | String(128) | Nullable | ABDM HIP Care Context reference (e.g. `medikiosk_ctx_<session_prefix>`). |
+| `abdm_records` | `care_context_display` | String(256) | Nullable | Human-readable care context label (e.g. `MediKiosk OPD Intake - Token <token>`). |
+| `abdm_records` | `care_context_status` | String(32) | Default `'unlinked'`, INDEX | ABDM M2 linking status: `'unlinked'`, `'linked'`. |
+| `abdm_records` | `care_context_linked_at` | DateTime(tz=True) | Nullable | Timestamp when care context linking was confirmed. |
+| `abdm_records` | `his_dispatch_status` | String(32) | Default `'not_dispatched'`, INDEX | Outbound HIS dispatch state: `'not_dispatched'`, `'pending'`, `'dispatched'`, `'failed'`. |
+| `abdm_records` | `his_dispatch_receipt` | Text | Nullable | JSON-encoded receipt metadata containing `receipt_id`, `target_system`, `endpoint`, and timestamp. |
+| `abdm_records` | `his_dispatched_at` | DateTime(tz=True) | Nullable | Timestamp of outbound transmission to hospital HIS gateway. |
+| `abdm_records` | `consent_artefact_id` | String(128) | Nullable | ABDM consent artefact identifier for electronic record sharing. |
+| `abdm_records` | `created_at` | DateTime(tz=True) | NOT NULL, server default | Record creation timestamp. |
+| `abdm_records` | `updated_at` | DateTime(tz=True) | Nullable, onupdate | Record modification timestamp. |
+
+The table is verified with zero model drift (`alembic check` clean) and full downgrade/upgrade migration coverage.
+
 

@@ -348,4 +348,100 @@ All Phase 10 endpoints require staff authentication (`X-Demo-Doctor: true` in de
   - Query parameter: `bundle_type="document"` (default) or `bundle_type="collection"`.
   - Response: `OperationOutcome` with validated status or specific conformance issues.
 
+## Phase 11 ABDM & HIS interoperability contract
+
+### Kiosk Pre-Registration Endpoint
+
+- `POST /api/sessions/verify-abha`:
+  Standalone format validation and sandbox mock verification for patient kiosk onboarding.
+  - Body: `{ "abha_input": "user@abdm" | "91-1234-5678-9012", "auth_method": "mock_otp" }`
+  - Response: `ABDMVerificationResponse`
+    ```json
+    {
+      "success": true,
+      "profile": {
+        "abha_number": "91-1234-5678-9012",
+        "abha_address": "user@abdm",
+        "name": "User Name",
+        "gender": "Male",
+        "dob": "1992-05-15",
+        "mobile_masked": "XXXXXX9012",
+        "status": "mock_verified"
+      },
+      "message": "ABHA verified via ABDM Sandbox mock gateway."
+    }
+    ```
+
+### Doctor Workspace ABDM & HIS Endpoints
+
+All endpoints require clinical staff credentials (`X-Demo-Doctor: true`) and patient sharing consent:
+
+- `GET /api/doctor/sessions/{session_id}/abdm/status`:
+  Retrieves current ABDM National Health Stack integration state and HIS dispatch status.
+  - Response: `ABDMStatusResponse`
+    ```json
+    {
+      "session_id": "uuid",
+      "patient_id": "uuid",
+      "abha_number": "91-1234-5678-9012",
+      "abha_address": "patient@abdm",
+      "abha_status": "mock_verified",
+      "care_context_reference": "medikiosk_ctx_12345678",
+      "care_context_display": "MediKiosk OPD Intake - Token T-101",
+      "care_context_status": "linked",
+      "care_context_linked_at": "ISO-8601 UTC timestamp",
+      "his_dispatch_status": "dispatched",
+      "his_dispatch_receipt": {
+        "status": "DELIVERED",
+        "receipt_id": "HIS-ACK-20260910-A1B2C3D4",
+        "target_system": "Central Hospital OPD HIS",
+        "endpoint": "http://local-his.hospital.internal/api/v1/opd-intake"
+      },
+      "his_dispatched_at": "ISO-8601 UTC timestamp",
+      "consent_artefact_id": null
+    }
+    ```
+
+- `POST /api/doctor/sessions/{session_id}/abdm/verify-abha`:
+  Verifies ABHA and associates it with the active patient and session.
+  - Body: `{ "abha_input": "patient@abdm", "auth_method": "mock_otp" }`
+  - Response: `ABDMVerificationResponse`
+  - Audit event: Records `ABHA_VERIFIED`.
+
+- `POST /api/doctor/sessions/{session_id}/abdm/link-care-context`:
+  Establishes ABDM Milestone 2 (M2) HIP Care Context Linking for the session encounter.
+  - Response: `ABDMCareContextLinkResponse`
+    ```json
+    {
+      "success": true,
+      "care_context_reference": "medikiosk_ctx_12345678",
+      "display": "MediKiosk OPD Intake - Token T-101",
+      "status": "linked",
+      "linked_at": "ISO-8601 UTC timestamp",
+      "message": "Care context successfully linked in ABDM Sandbox (M2)."
+    }
+    ```
+  - Audit event: Records `ABDM_CARE_CONTEXT_LINKED`.
+
+- `POST /api/doctor/sessions/{session_id}/his/dispatch`:
+  Dispatches clinical intake and attached Phase 10 HL7 FHIR R4 Document bundle to the hospital information system.
+  - Body: `{ "target_system": "Central Hospital OPD HIS" }` (optional)
+  - Response: `HISDispatchResponse`
+    ```json
+    {
+      "success": true,
+      "dispatch_id": "uuid",
+      "target_endpoint": "http://local-his.hospital.internal/api/v1/opd-intake",
+      "status": "dispatched",
+      "dispatched_at": "ISO-8601 UTC timestamp",
+      "receipt_reference": "HIS-ACK-20260910-A1B2C3D4",
+      "message": "Clinical intake and FHIR R4 bundle successfully dispatched to HIS.",
+      "attached_bundle_type": "document"
+    }
+    ```
+  - Audit event: Records `HIS_DISPATCHED`.
+
+- `GET /api/doctor/sessions/{session_id}/his/status`:
+  Retrieves current HIS dispatch status and receipt metadata.
+
 

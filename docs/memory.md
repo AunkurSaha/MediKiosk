@@ -1,4 +1,4 @@
-# Project memory — Phase 10 complete
+# Project memory — Phase 11 complete
 
 - Prior stabilization task: complete the authoritative [2026-09-09 audit](current-project-review-2026-09-09.md), not a new phase. No Phase 7, providers, databases or Phase 1–3 redesign. Track remaining work in [stabilization status](stabilization-implementation-status.md).
 - This is a local synthetic-data prototype; clinical content/translations are unvalidated. No diagnosis, prescribing, production-readiness or complete de-identification claims.
@@ -20,4 +20,5 @@
 - Phase 8 summary drafting, revision audit, and clinician confirmation implemented.
 - Phase 9 field verification hardening, clinical amendments with audit addenda, and cross-referencing implemented.
 - Phase 10 HL7 FHIR R4 export architecture implemented: decoupled on-demand adapter layer (`FHIRAdapterService`), pure Pydantic v2 schemas (`base.py`, `resources.py`, `bundle.py`), `document` (LOINC 34105-7 Composition at `entry[0]`) and `collection` bundles, non-diagnostic guardrails (`verificationStatus: provisional`), doctor UI export modal (`FHIRExportModal.tsx`), full test suites passing (345 backend, 79 frontend).
+- Phase 11 ABDM and HIS interoperability demonstration implemented: ABDM sandbox & mock gateway engine (`ABDMService`), M1 ABHA identity verification, M2 HIP Care Context Linking, M3 FHIR R4 Document bundle data exchange, outbound Hospital Information System dispatcher (`HISService`) with verifiable receipts, kiosk inline ABHA verification, doctor workspace `ABDMHISModal`, dedicated persistence (`abdm_records` table, migration `8b4e9c2d1f73`), and full test suites passing (350 backend, 84 frontend).
 

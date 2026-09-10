@@ -4,7 +4,7 @@ Do not jump phases merely because later phases are more impressive.
 
 Each phase should leave the repository runnable.
 
-Current status: **Phase 10 complete for the local synthetic-data prototype**. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md).
+Current status: **Phase 11 complete for the local synthetic-data prototype**. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md).
 
 The sections below describe historical or future scope, not current acceptance. Phase 3B and 4B live integrations remain unaccepted; Phase 6 has storage and explicit mock fixtures, not real OCR.
 
@@ -145,10 +145,18 @@ Delivered:
 
 ## Phase 11 — ABDM / HIS demonstration
 
-Add only after core flow works:
-- ABDM sandbox connector where credentials/onboarding allow;
-- otherwise a clearly labeled mock/sandbox integration demonstration;
-- architecture showing HIS interoperability.
+Status: complete for deterministic prototype scope. National Health Stack M1 ABHA verification, M2 care context linking, M3 FHIR document bundle data exchange, outbound hospital information system (HIS) dispatcher, kiosk inline ABHA verification, and doctor ABDM & HIS hub modal are implemented. See [Phase 11 report](phase11-implementation-status.md).
+
+Delivered:
+- ABDM sandbox & mock gateway engine (`ABDMService`) supporting format validation and simulated OTP/demographic auth for 14-digit ABHA numbers and ABHA handles;
+- M1 ABHA identity verification with persistent `Patient.demo_abha_id` sync and `ABDMRecord` tracking;
+- M2 HIP Care Context Linking engine (`link_care_context`) creating deterministic `medikiosk_ctx_<id>` references bound to hospital tokens;
+- M3 Health Information Exchange packaging Phase 10 HL7 FHIR R4 Document Bundles for downstream consumption;
+- outbound Hospital Information System (HIS / EMR) dispatcher (`HISService`) with configurable endpoint or local simulated gateway generating verifiable receipts (`HIS-ACK-...`);
+- kiosk onboarding step inline ABHA verification button (`Verify`) with live status feedback;
+- doctor workspace `ABDMHISModal` component providing unified M1 verification, M2 care context linking, and HIS dispatch controls;
+- dedicated database persistence (`abdm_records` table, Alembic migration `8b4e9c2d1f73`);
+- comprehensive automated test coverage (5 backend integration tests, 5 frontend component tests) with zero regressions across 350 backend tests and 84 frontend tests.
 
 ## Phase 12 — Demo polish
 

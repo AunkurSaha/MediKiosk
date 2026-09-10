@@ -275,7 +275,67 @@ Doctor UI / HIS / ABDM Connector (Phase 11)
    - Access to FHIR export endpoints requires verified doctor identity (`X-Demo-Doctor: true`).
    - Every export triggers durable audit events (`FHIR_EXPORTED`, `FHIR_BUNDLE_ACCESSED`).
 
-## 12. Failure behavior
+## 12. ABDM and Hospital Information System (HIS) Interoperability (Phase 11)
+
+MediKiosk integrates with the Ayushman Bharat Digital Mission (ABDM) National Digital Health ecosystem and hospital OPD information systems through a modular, decoupled architecture.
+
+### Interoperability Architecture Diagram
+
+```text
+┌────────────────────────────────────────────────────────┐
+│                   Patient Kiosk                        │
+│   • Step: Identify                                     │
+│   • ABHA Input + Inline "Verify" Action                │
+│   • Instant demographic mock verification (M1)         │
+└──────────────────────────┬─────────────────────────────┘
+                           │
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│             MediKiosk PostgreSQL Core                  │
+│   • Patient (`demo_abha_id`)                           │
+│   • Session & Clinical Intake                          │
+│   • ABDMRecord (`abdm_records` table)                  │
+└──────────────┬───────────────────────────┬─────────────┘
+               │                           │
+               ▼                           ▼
+┌─────────────────────────────┐ ┌────────────────────────┐
+│         ABDM Engine         │ │       HIS Engine       │
+│  • M1: ABHA Verification    │ │  • Phase 10 FHIR R4    │
+│    (OTP / demographic mock) │ │    Document Bundle     │
+│  • M2: Care Context Linking │ │  • OPD Intake Dispatch │
+│    (`medikiosk_ctx_<id>`)   │ │  • Receipt Generation  │
+│  • M3: FHIR Data Exchange   │ │    (`HIS-ACK-...`)     │
+└──────────────┬──────────────┘ └──────────┬─────────────┘
+               │                           │
+               └─────────────┬─────────────┘
+                             ▼
+┌────────────────────────────────────────────────────────┐
+│              Doctor Workspace Hub                      │
+│   • "🏥 ABDM & HIS" Modal Hub                          │
+│   • Live Verification & Linking Controls               │
+│   • One-Click Outbound Dispatch with Receipt Tracking  │
+│   • Prominent Sandbox Mock Disclaimers                 │
+└────────────────────────────────────────────────────────┘
+```
+
+### Key Architectural Invariants
+
+1. **National Health Stack Alignment (M1, M2, M3)**:
+   - **Milestone 1 (ABHA Verification)**: Validates standard 14-digit ABHA numbers (`91-XXXX-XXXX-XXXX`) and phr handles (`user@abdm`, `user@sbx`).
+   - **Milestone 2 (HIP Care Context Linking)**: Binds MediKiosk OPD intake encounters into standardized Care Contexts (`medikiosk_ctx_<session_prefix>`), associating them with hospital tokens and patient ABHAs.
+   - **Milestone 3 (Health Information Exchange)**: Seamlessly packages the Phase 10 HL7 FHIR R4 Document Bundle (LOINC `34105-7` Composition) for electronic health record transmission.
+2. **Dedicated Persistence & Audit Trail**:
+   - `ABDMRecord` model tracks verification state (`unverified`, `verified`, `mock_verified`), care context reference, linking timestamp, and HIS dispatch receipt.
+   - All state transitions append structured events to the session audit trail (`ABHA_VERIFIED`, `ABDM_CARE_CONTEXT_LINKED`, `HIS_DISPATCHED`).
+3. **Outbound HIS Dispatcher (`HISService`)**:
+   - Transmits clinical intake, patient demographics, triage alerts, and the full FHIR R4 Document bundle to configured hospital endpoints (`HIS_ENDPOINT_URL`).
+   - In synthetic/demo mode, provides a simulated gateway acknowledging receipts (`HIS-ACK-<date>-<hash>`).
+4. **Transparent Sandbox Demonstration Boundaries**:
+   - In accordance with ADR-010, the integration is an operational **ABDM Sandbox Demonstration**.
+   - No production NHA gateway credentials or live Aadhaar biometric/OTP verifications are claimed.
+   - Clinical safety invariants remain strictly preserved: zero autonomous diagnoses or treatment assertions are transmitted.
+
+## 13. Failure behavior
 
 External provider failure must degrade gracefully:
 

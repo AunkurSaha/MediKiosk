@@ -397,6 +397,53 @@ export interface FHIRExportResponse {
   validation: FHIROperationOutcome;
   bundle: FHIRBundle;
 }
+export interface ABDMProfile {
+  abha_number: string;
+  abha_address: string;
+  name: string;
+  gender: string;
+  dob: string;
+  mobile_masked: string;
+  status: string;
+}
+export interface ABDMVerificationResponse {
+  success: boolean;
+  profile: ABDMProfile | null;
+  message: string;
+}
+export interface ABDMCareContextLinkResponse {
+  success: boolean;
+  care_context_reference: string;
+  display: string;
+  status: string;
+  linked_at: string;
+  message: string;
+}
+export interface ABDMStatusResponse {
+  session_id: string;
+  patient_id: string;
+  abha_number: string | null;
+  abha_address: string | null;
+  abha_status: string;
+  care_context_reference: string | null;
+  care_context_display: string | null;
+  care_context_status: string;
+  care_context_linked_at: string | null;
+  his_dispatch_status: string;
+  his_dispatch_receipt: Record<string, unknown> | null;
+  his_dispatched_at: string | null;
+  consent_artefact_id: string | null;
+}
+export interface HISDispatchResponse {
+  success: boolean;
+  dispatch_id: string;
+  target_endpoint: string;
+  status: string;
+  dispatched_at: string;
+  receipt_reference: string;
+  message: string;
+  attached_bundle_type: string;
+}
 export class ApiError extends Error {
   code: string;
   status: number;
@@ -674,5 +721,40 @@ export const api = {
       undefined,
       true,
     ),
+  verifyAbha: (abhaInput: string, authMethod = 'mock_otp') =>
+    request<ABDMVerificationResponse>('/sessions/verify-abha', 'POST', {
+      abha_input: abhaInput,
+      auth_method: authMethod,
+    }),
+  getAbdmStatus: (id: string) =>
+    request<ABDMStatusResponse>('/doctor/sessions/' + id + '/abdm/status', 'GET', undefined, true),
+  verifyDoctorAbha: (id: string, abhaInput: string, authMethod = 'mock_otp') =>
+    request<ABDMVerificationResponse>(
+      '/doctor/sessions/' + id + '/abdm/verify-abha',
+      'POST',
+      { abha_input: abhaInput, auth_method: authMethod },
+      true,
+    ),
+  linkCareContext: (id: string) =>
+    request<ABDMCareContextLinkResponse>(
+      '/doctor/sessions/' + id + '/abdm/link-care-context',
+      'POST',
+      {},
+      true,
+    ),
+  dispatchHis: (id: string, targetSystem = 'default') =>
+    request<HISDispatchResponse>(
+      '/doctor/sessions/' + id + '/his/dispatch',
+      'POST',
+      { target_system: targetSystem },
+      true,
+    ),
+  getHisStatus: (id: string) =>
+    request<{
+      session_id: string;
+      his_dispatch_status: string;
+      his_dispatch_receipt: Record<string, unknown> | null;
+      his_dispatched_at: string | null;
+    }>('/doctor/sessions/' + id + '/his/status', 'GET', undefined, true),
 };
 

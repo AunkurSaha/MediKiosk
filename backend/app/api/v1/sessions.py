@@ -23,3 +23,10 @@ def read_session(session_id: UUID, db: Session = Depends(get_db)):
 @router.post("/{session_id}/complete", response_model=schemas.Session)
 def complete_session(session_id: UUID, db: Session = Depends(get_db)):
     return intake.complete(db, str(session_id))
+
+
+@router.post("/verify-abha", response_model=schemas.ABDMVerificationResponse)
+def verify_standalone_abha(req: schemas.ABDMVerifyRequest):
+    from app.services.abdm import ABDMService
+
+    return ABDMService.verify_standalone_abha(req.abha_input, auth_method=req.auth_method)

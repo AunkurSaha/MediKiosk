@@ -1,3 +1,4 @@
+from .abdm_record import ABDMRecord
 from .alert import Alert
 from .audit_log import AuditLog, SummaryRevision
 from .clinical_summary import ClinicalSummary
@@ -17,6 +18,7 @@ from .timeline_fact import TimelineFact
 from .user import User
 
 __all__ = [
+    "ABDMRecord",
     "Alert",
     "AuditLog",
     "SummaryRevision",
