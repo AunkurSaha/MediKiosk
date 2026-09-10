@@ -6,6 +6,8 @@ import type {
   SummaryRevisionRecord,
 } from '../../api/client';
 import { copy, errorText } from '../../i18n';
+import { FieldVerificationBadge } from './FieldVerificationBadge';
+import { SummaryAmendmentModal } from './SummaryAmendmentModal';
 
 interface SummaryWorkspaceProps {
   sessionId: string;
@@ -34,6 +36,7 @@ export default function SummaryWorkspace({
   const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState('');
   const [showRegenModal, setShowRegenModal] = useState(false);
+  const [showAmendModal, setShowAmendModal] = useState(false);
 
   const [prevSummaryKey, setPrevSummaryKey] = useState(
     `${initialSummary.id}-${initialSummary.version}-${initialSummary.status}`,
@@ -277,16 +280,82 @@ export default function SummaryWorkspace({
             </>
           )}
 
-          {isConfirmed && (
-            <div className="success" style={{ marginTop: '1rem' }}>
-              <strong>{t.confirmed}</strong>
-              <p>
-                {t.confirmedBy}: {summary.confirmed_by}
-              </p>
-              <p>
-                {t.confirmedAt}:{' '}
-                {summary.confirmed_at && new Date(summary.confirmed_at).toLocaleString()}
-              </p>
+          {(isConfirmed || summary.status === 'amended') && (
+            <div style={{ marginTop: '1rem' }}>
+              <div className="success">
+                <strong>{t.confirmed}</strong>
+                <p>
+                  {t.confirmedBy}: {summary.confirmed_by}
+                </p>
+                <p>
+                  {t.confirmedAt}:{' '}
+                  {summary.confirmed_at && new Date(summary.confirmed_at).toLocaleString()}
+                </p>
+              </div>
+
+              <div style={{ marginTop: '1rem' }}>
+                <button
+                  type="button"
+                  className="secondary"
+                  data-testid="file-amendment-button"
+                  onClick={() => setShowAmendModal(true)}
+                  style={{
+                    backgroundColor: '#2563eb',
+                    color: '#ffffff',
+                    border: 'none',
+                    padding: '8px 14px',
+                    borderRadius: '4px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  + File Clinical Amendment
+                </button>
+              </div>
+
+              {summary.amended_text && (
+                <div
+                  className="card amendment-display"
+                  data-testid="amendment-display"
+                  style={{
+                    marginTop: '1rem',
+                    borderLeft: '4px solid #2563eb',
+                    backgroundColor: '#f8fafc',
+                    padding: '1rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <h4 style={{ margin: 0, color: '#1e40af' }}>
+                      📋 Official Clinical Amendment / Addendum
+                    </h4>
+                    <span className="badge" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>
+                      Amended
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 0.5rem 0' }}>
+                    Amended by {summary.amended_by} at{' '}
+                    {summary.amended_at && new Date(summary.amended_at).toLocaleString()}
+                  </p>
+                  {summary.amendment_notes && (
+                    <p style={{ fontStyle: 'italic', fontSize: '0.85rem', color: '#334155', margin: '0 0 0.5rem 0' }}>
+                      Clinical Reason: "{summary.amendment_notes}"
+                    </p>
+                  )}
+                  <pre
+                    className="draft"
+                    style={{
+                      whiteSpace: 'pre-wrap',
+                      backgroundColor: '#ffffff',
+                      padding: '0.75rem',
+                      borderRadius: '4px',
+                      border: '1px solid #e2e8f0',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    {summary.amended_text}
+                  </pre>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -313,13 +382,20 @@ export default function SummaryWorkspace({
                     borderLeft: '4px solid #3b82f6',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
                     <span className="badge" style={{ backgroundColor: '#e0f2fe', color: '#0369a1' }}>
                       {ev.section.replace('_', ' ').toUpperCase()}
                     </span>
-                    <span className="badge" style={{ backgroundColor: '#f1f5f9', color: '#475569' }}>
-                      Source: {ev.source_type}
-                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span className="badge" style={{ backgroundColor: '#f1f5f9', color: '#475569' }}>
+                        Source: {ev.source_type}
+                      </span>
+                      <FieldVerificationBadge
+                        sessionId={sessionId}
+                        fieldType="summary_statement"
+                        fieldId={ev.statement_id}
+                      />
+                    </div>
                   </div>
                   <p style={{ margin: '0.25rem 0', fontWeight: 600 }}>
                     {ev.statement_text}
@@ -447,6 +523,19 @@ export default function SummaryWorkspace({
           </div>
         </div>
       )}
+
+      {/* AMENDMENT MODAL */}
+      <SummaryAmendmentModal
+        isOpen={showAmendModal}
+        onClose={() => setShowAmendModal(false)}
+        sessionId={sessionId}
+        confirmedText={summary.reviewed_text || summary.generated_text || ''}
+        onAmendmentSaved={(updated) => {
+          setSummary(updated);
+          setNotice('Clinical amendment filed successfully.');
+          onSummaryUpdated(updated);
+        }}
+      />
     </section>
   );
 }

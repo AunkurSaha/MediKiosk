@@ -5,9 +5,9 @@ Revises: 1915850a59d1
 Create Date: 2026-09-10 20:30:00.000000
 """
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 revision = "7a3e8b1c4f92"
 down_revision = "1915850a59d1"
@@ -19,7 +19,14 @@ def upgrade() -> None:
     # 1. Add amendment columns to clinical_summaries
     with op.batch_alter_table("clinical_summaries") as batch:
         batch.add_column(sa.Column("amended_text", sa.Text(), nullable=True))
-        batch.add_column(sa.Column("amended_by", sa.String(), sa.ForeignKey("users.id"), nullable=True))
+        batch.add_column(
+            sa.Column(
+                "amended_by",
+                sa.String(),
+                sa.ForeignKey("users.id", name="fk_clinical_summaries_amended_by_users"),
+                nullable=True,
+            )
+        )
         batch.add_column(sa.Column("amended_at", sa.DateTime(timezone=True), nullable=True))
         batch.add_column(sa.Column("amendment_notes", sa.Text(), nullable=True))
 

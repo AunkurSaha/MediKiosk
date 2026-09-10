@@ -4,7 +4,7 @@ Do not jump phases merely because later phases are more impressive.
 
 Each phase should leave the repository runnable.
 
-Current status: **Phase 7 complete for the local synthetic-data prototype**. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md). Phase 8 is not authorized or implemented.
+Current status: **Phase 9 complete for the local synthetic-data prototype**. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md).
 
 The sections below describe historical or future scope, not current acceptance. Phase 3B and 4B live integrations remain unaccepted; Phase 6 has storage and explicit mock fixtures, not real OCR.
 
@@ -119,11 +119,15 @@ Delivered:
 
 ## Phase 9 — Doctor verification hardening
 
-Add:
-- field-level verification where useful;
-- versioning/revisions;
-- better audit;
-- document/source cross-reference.
+Status: complete for deterministic prototype scope. Granular field-level verification, versioned confirmed-summary clinical amendments, append-only session audit trails, and bidirectional cross-referencing are implemented. See [Phase 9 report](phase9-implementation-status.md).
+
+Delivered:
+- field-level verification service and badge component supporting granular status tracking (`unverified`, `verified`, `flagged`) with optimistic locking and synchronization to interview answers;
+- append-only `field_verification_revisions` tracking clinician reviewer provenance;
+- confirmed summary amendment workflow (`POST /summary/amend`) preserving original confirmed records intact while attaching official versioned addenda with mandatory clinician justification;
+- comprehensive session audit trail service and viewer (`GET /audit-trail`) tracking patient, staff, and system actions with actor-based filtering;
+- bidirectional document and clinical fact cross-reference engine (`GET /cross-references`) displayed in DocumentViewer and SummaryWorkspace;
+- strict anti-forgery protection rejecting client-supplied reviewer identities.
 
 ## Phase 10 — FHIR export
 

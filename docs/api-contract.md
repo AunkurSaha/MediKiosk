@@ -264,3 +264,37 @@ All Phase 8 summary drafting routes require staff authentication (`X-Demo-Doctor
   Returns the array of `EvidenceReference` objects linking summary statements to raw source entries:
   - `statement_id`, `section`, `statement_text`, `source_type`, `source_id`, `source_text`, `source_metadata`.
 
+## Phase 9 doctor verification hardening and audit contract
+
+All Phase 9 endpoints require staff authentication (`X-Demo-Doctor: true` in demo mode) and active sharing consent:
+
+- `POST /api/doctor/sessions/{session_id}/summary/amend`:
+  Files an official clinical addendum/amendment to a confirmed summary:
+  - Payload: `{ "amended_text": string, "notes": string }`.
+  - Requirements: Summary must be in `"confirmed"` or `"amended"` state. Clinical justification `notes` must be non-empty (minimum 3 characters).
+  - Server sets `amended_text`, `amended_by` (authenticated clinician ID), `amended_at`, `amendment_notes`, increments `version`, and sets status to `"amended"`.
+  - Appends an immutable `SummaryRevision` record (`revision_type="amendment"`).
+  - Original `confirmed_text`, `confirmed_by`, and `confirmed_at` are permanently preserved.
+
+- `GET /api/doctor/sessions/{session_id}/field-verifications`:
+  Retrieves all field-level verifications for the session:
+  - Returns `{ "items": FieldVerificationRecord[] }` with `id`, `field_type`, `field_id`, `status`, `verified_by`, `verified_at`, `notes`, `version`, `revisions`.
+
+- `POST /api/doctor/sessions/{session_id}/field-verifications`:
+  Updates or creates a field-level verification:
+  - Payload: `{ "field_type": string, "field_id": string, "status": "unverified" | "verified" | "flagged", "notes"?: string, "expected_version"?: int }`.
+  - Enforces optimistic concurrency control if `expected_version` is supplied.
+  - Appends an immutable `FieldVerificationRevision` record.
+  - Automatically updates `interview_answers.verification_status` when verifying interview fields.
+  - Logs a `VERIFY_FIELD` audit log entry.
+
+- `GET /api/doctor/sessions/{session_id}/audit-trail`:
+  Retrieves the immutable session audit trail:
+  - Returns `{ "session_id": string, "total": int, "items": AuditTrailItem[] }`.
+  - Each item contains `id`, `timestamp`, `actor_type`, `actor_user_id`, `action`, `entity_type`, `entity_id`, and `metadata`.
+
+- `GET /api/doctor/sessions/{session_id}/cross-references`:
+  Retrieves bidirectional provenance and fact linkage across the session:
+  - Returns `{ "session_id": string, "documents": DocumentCrossReference[], "statement_cross_references": dict }`.
+  - Maps source documents to their linked medications, lab observations, discrepancies, and summary statements.
+

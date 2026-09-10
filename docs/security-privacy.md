@@ -40,3 +40,18 @@ Summary drafting, review, regeneration, and confirmation endpoints reuse the exi
    - AYUSH pathways are prominently badged with demonstration and supportive-documentation disclaimers.
    - Raw medical text and sensitive clinical observations are excluded from unsafe system logs.
 
+## Phase 9 verification hardening and amendment security boundary
+
+1. **Anti-Forgery on Amendments & Field Verifications**:
+   - `POST /summary/amend` and `POST /field-verifications` resolve clinician identity exclusively from server session credentials (`current_user.id`).
+   - Client-provided actor IDs or timestamps are disallowed and rejected.
+2. **Confirmed Record Immutability Preserved**:
+   - Filing an amendment (`POST /summary/amend`) never mutates or erases `confirmed_text`, `confirmed_by`, or `confirmed_at`.
+   - The original confirmed clinical record remains permanently preserved in place and in audit history.
+   - The amendment is stored in dedicated fields (`amended_text`, `amended_by`, `amended_at`, `amendment_notes`) and logged as a versioned addendum in `summary_revisions`.
+3. **Optimistic Locking on Field Verifications**:
+   - Field verification supports `expected_version` checks to prevent race conditions across multi-tab clinician reviews. Mismatches return HTTP 409 `VERSION_CONFLICT`.
+4. **Session Audit Trail Access Control**:
+   - `GET /audit-trail` is restricted to authorized staff (`X-Demo-Doctor: true`).
+   - Audit logs capture actor classification (`DOCTOR`, `PATIENT`, `SYSTEM`), actions, and structured metadata without exposing raw secrets, authentication tokens, or uncontrolled diagnostic claims.
+

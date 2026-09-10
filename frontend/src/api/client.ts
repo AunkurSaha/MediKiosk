@@ -75,7 +75,7 @@ export interface SummaryRevisionRecord {
   id: string;
   summary_id: string;
   version: number;
-  revision_type: 'initial_draft' | 'edit' | 'regenerate' | 'confirmed';
+  revision_type: 'initial_draft' | 'edit' | 'regenerate' | 'confirmed' | 'amendment';
   actor_type: 'SYSTEM' | 'DOCTOR';
   actor_user_id: string | null;
   actor_name: string | null;
@@ -91,7 +91,11 @@ export interface Summary {
   generated_text: string;
   reviewed_text: string | null;
   confirmed_text?: string | null;
-  status: 'generated' | 'reviewed' | 'confirmed';
+  amended_text?: string | null;
+  amended_by?: string | null;
+  amended_at?: string | null;
+  amendment_notes?: string | null;
+  status: 'generated' | 'reviewed' | 'confirmed' | 'amended';
   draft_provider?: string;
   draft_version?: number;
   version: number;
@@ -162,6 +166,82 @@ export interface DocumentRecord {
   created_at: string;
   updated_at: string | null;
   extractions: DocumentExtractionRecord[];
+}
+
+export type FieldVerificationStatus = 'unverified' | 'verified' | 'flagged';
+export type FieldVerificationType = 'interview_answer' | 'summary_statement';
+
+export interface FieldVerificationRevisionRecord {
+  id: string;
+  version: number;
+  status: string;
+  actor_user_id: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export interface FieldVerificationRecord {
+  id: string;
+  session_id: string;
+  field_type: FieldVerificationType;
+  field_id: string;
+  status: FieldVerificationStatus;
+  verified_by: string | null;
+  verified_at: string | null;
+  notes: string | null;
+  version: number;
+  created_at: string;
+  updated_at: string | null;
+  revisions: FieldVerificationRevisionRecord[];
+}
+
+export interface FieldVerificationRequest {
+  field_type: FieldVerificationType;
+  field_id: string;
+  status: FieldVerificationStatus;
+  notes?: string;
+  expected_version?: number;
+}
+
+export interface AuditTrailItem {
+  id: string;
+  timestamp: string;
+  actor_type: string;
+  actor_user_id: string | null;
+  action: string;
+  entity_type: string;
+  entity_id: string;
+  metadata: Record<string, unknown>;
+}
+
+export interface AuditTrailResponse {
+  session_id: string;
+  total: number;
+  items: AuditTrailItem[];
+}
+
+export interface DocumentFactLink {
+  fact_id: string;
+  fact_type: 'medication' | 'lab';
+  label: string;
+  verification_status: string;
+}
+
+export interface DocumentCrossReference {
+  document_id: string;
+  filename: string;
+  document_type: string;
+  created_at: string;
+  medications: DocumentFactLink[];
+  labs: DocumentFactLink[];
+  discrepancies: string[];
+  summary_statements: string[];
+}
+
+export interface CrossReferenceResponse {
+  session_id: string;
+  documents: DocumentCrossReference[];
+  statement_cross_references: Record<string, Record<string, unknown>>;
 }
 
 export interface Detail {
@@ -510,4 +590,40 @@ export const api = {
       undefined,
       true,
     ),
+  amendSummary: (id: string, amended_text: string, amendment_notes: string) =>
+    request<Summary>(
+      '/doctor/sessions/' + id + '/summary/amend',
+      'POST',
+      { amended_text, amendment_notes },
+      true,
+    ),
+  getFieldVerifications: (id: string) =>
+    request<{ items: FieldVerificationRecord[] }>(
+      '/doctor/sessions/' + id + '/field-verifications',
+      'GET',
+      undefined,
+      true,
+    ),
+  verifyField: (id: string, payload: FieldVerificationRequest) =>
+    request<FieldVerificationRecord>(
+      '/doctor/sessions/' + id + '/field-verifications',
+      'POST',
+      payload,
+      true,
+    ),
+  getAuditTrail: (id: string) =>
+    request<AuditTrailResponse>(
+      '/doctor/sessions/' + id + '/audit-trail',
+      'GET',
+      undefined,
+      true,
+    ),
+  getCrossReferences: (id: string) =>
+    request<CrossReferenceResponse>(
+      '/doctor/sessions/' + id + '/cross-references',
+      'GET',
+      undefined,
+      true,
+    ),
 };
+

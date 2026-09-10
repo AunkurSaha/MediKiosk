@@ -24,6 +24,7 @@ Evidence must demonstrate behavior; a test count alone does not accept a feature
 | Deterministic timeline and explicit unknown dates | timeline.py; timeline API/UI; backend and browser ordering/unknown-date tests | Computed only from explicit dates; generic timeline table remains unused |
 | Conservative discrepancies | discrepancies.py; discrepancy API/UI; medication/allergy/lab unit and browser tests | Incomparable evidence emits nothing; output always requires clinician review |
 | Deterministic draft summary, evidence attribution, doctor review, revision history, and confirmed locking | ClinicalSummaryService; summary_revisions; test_phase8_summary.py; phase8.test.tsx | Deterministic template synthesis only; no LLM diagnosis/prescriptions/invented dates |
+| Field-level verification, confirmed summary amendments, session audit trails, and cross-referencing | FieldVerificationService; IntakeService; CrossReferenceService; test_phase9_hardening.py; phase9.test.tsx | Synthetic prototype scope; demo staff identity; non-diagnostic verification |
 | FHIR export, ABDM | No Phase 10+ implementation | Deferred and not authorized |
 
 
@@ -49,4 +50,15 @@ Evidence must demonstrate behavior; a test count alone does not accept a feature
 | Append-only revision history | `summary_revisions` capturing `revision_type`, `actor_type` (DOCTOR vs SYSTEM), `review_notes`, snapshots | Complete chronological audit trail, server-stamped actor identity, optimistic locking |
 | Clinician confirmation locking | `POST /api/doctor/sessions/{id}/summary/confirm` locking summary with `confirmed_by`, `confirmed_at` | Subsequent PUT/regenerate rejected with 409 `CONFIRMED_IMMUTABLE`; audit log emitted |
 | Doctor Summary Workspace UI | `SummaryWorkspace` with Editor, Evidence attribution viewer, Revision feed, and Read-only confirmed view | 6 frontend component tests (`phase8.test.tsx`), lint, and build verified |
+
+
+## Phase 9 completion evidence
+
+| Scope | Implementation | Evidence / remaining gap |
+|---|---|---|
+| Field-level verification & provenance | `FieldVerificationService`, `field_verifications`, and `field_verification_revisions` | Granular states (`unverified`, `verified`, `flagged`), optimistic locking, auto-sync to `interview_answers.verification_status`, 5 backend tests, badge component tests |
+| Confirmed summary clinical amendments | `POST /summary/amend` preserving `confirmed_text` intact while appending versioned addenda | Mandatory clinical justification note, server-owned clinician identity, status transition to `"amended"`, modal & card display |
+| Comprehensive session audit trail | `IntakeService.get_audit_trail`, `GET /audit-trail`, `AuditTrailViewer` | Chronological session timeline of all patient, staff, and system events with actor-based filtering |
+| Bidirectional cross-referencing | `CrossReferenceService`, `GET /cross-references`, `DocumentViewer` | Tracing documents to extracted medications/labs and summary statements with provenance badge |
+| Anti-forgery & staff security | Server-derived `verified_by`/`amended_by` from `current_user.id` | Rejection of client-forged actor IDs, optimistic revision checks, unauthorized 401 handling |
 

@@ -70,6 +70,13 @@ beforeEach(() => {
   });
   vi.mocked(api.timeline).mockResolvedValue({ known_date: [], unknown_date: [] });
   vi.mocked(api.discrepancies).mockResolvedValue({ items: [] });
+  vi.mocked(api.getAuditTrail).mockResolvedValue({ session_id: id, total: 0, items: [] });
+  vi.mocked(api.getCrossReferences).mockResolvedValue({
+    session_id: id,
+    documents: [],
+    statement_cross_references: {},
+  });
+  vi.mocked(api.getFieldVerifications).mockResolvedValue({ items: [] });
 });
 describe('Patient intake', () => {
   it('records consent, saves all answers, completes and clears the kiosk', async () => {

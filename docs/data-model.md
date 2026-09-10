@@ -418,3 +418,18 @@ Schema head `1915850a59d1` adds additive fields to `clinical_summaries` and `sum
 
 All changes are strictly additive. Empty database migration, Phase 7 → Phase 8 upgrade, and downgrade/re-upgrade verification succeed cleanly.
 
+## Implemented Phase 9 verification hardening schema
+
+Schema head `7a3e8b1c4f92` adds additive amendment columns to `clinical_summaries` and introduces tables for granular field verification and revision history:
+
+| Table | Added / Enhanced Fields | Purpose |
+|---|---|---|
+| `clinical_summaries` | `amended_text` (Text, nullable) | Preserves clinician-authored post-confirmation amendments and addenda without altering confirmed text. |
+| `clinical_summaries` | `amended_by` (String, FK users.id, nullable) | Server-authenticated clinician ID who filed the official amendment. |
+| `clinical_summaries` | `amended_at` (DateTime(timezone=True), nullable) | Timestamp of amendment sign-off. |
+| `clinical_summaries` | `amendment_notes` (Text, nullable) | Required clinical justification for filing an amendment post-confirmation. |
+| `field_verifications` | `id`, `session_id`, `field_type`, `field_id`, `status`, `verified_by`, `verified_at`, `notes`, `version`, `created_at`, `updated_at` | Granular field-level verification state (`unverified`, `verified`, `flagged`) with optimistic concurrency control and unique constraint on `(session_id, field_type, field_id)`. |
+| `field_verification_revisions` | `id`, `verification_id`, `session_id`, `version`, `status`, `actor_user_id`, `notes`, `created_at` | Append-only revision trail for each field verification event, recording previous states and clinician provenance. |
+
+All migrations are tested on PostgreSQL and SQLite, including forward upgrades, rollbacks, and schema re-application.
+

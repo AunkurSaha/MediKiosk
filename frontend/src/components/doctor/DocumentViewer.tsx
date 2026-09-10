@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
-import type { DocumentExtractionRecord, DocumentRecord } from '../../api/client';
+import type {
+  DocumentCrossReference,
+  DocumentExtractionRecord,
+  DocumentRecord,
+} from '../../api/client';
 import { copy } from '../../i18n';
 
 interface DocumentViewerProps {
@@ -24,9 +28,27 @@ export default function DocumentViewer({
     sessionId: string;
     url: string;
   }>();
+  const [crossRefs, setCrossRefs] = useState<DocumentCrossReference[]>([]);
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const promise = api.getCrossReferences?.(sessionId);
+    if (promise && typeof promise.then === 'function') {
+      promise
+        .then((data) => {
+          if (active && data?.documents) {
+            setCrossRefs(data.documents);
+          }
+        })
+        .catch(() => {});
+    }
+    return () => {
+      active = false;
+    };
+  }, [sessionId]);
 
   const selectedDocumentId = documents[selectedIndex]?.id;
   const fileUrl =
@@ -177,6 +199,56 @@ export default function DocumentViewer({
                 🔍 {t.docViewOriginal}
               </a>
             </div>
+
+            {(() => {
+              const currentDocCrossRef = crossRefs.find((cr) => cr.document_id === currentDoc.id);
+              if (!currentDocCrossRef) return null;
+              return (
+                <div
+                  className="doc-cross-reference-box"
+                  data-testid={`doc-cross-ref-${currentDoc.id}`}
+                  style={{
+                    marginTop: '12px',
+                    padding: '10px 12px',
+                    backgroundColor: '#f0fdf4',
+                    border: '1px solid #bbf7d0',
+                    borderRadius: '6px',
+                    fontSize: '0.8rem',
+                  }}
+                >
+                  <h5 style={{ margin: '0 0 6px 0', color: '#166534', fontSize: '0.85rem' }}>
+                    🔗 Cross-Reference Provenance
+                  </h5>
+                  <div style={{ color: '#14532d', lineHeight: '1.4' }}>
+                    <div>
+                      Summary Referenced:{' '}
+                      <strong>
+                        {currentDocCrossRef.summary_statements &&
+                        currentDocCrossRef.summary_statements.length > 0
+                          ? '✓ Yes'
+                          : 'No'}
+                      </strong>
+                    </div>
+                    {currentDocCrossRef.medications.length > 0 && (
+                      <div style={{ marginTop: '4px' }}>
+                        Linked Medications:{' '}
+                        <strong>
+                          {currentDocCrossRef.medications.map((m) => m.label).join(', ')}
+                        </strong>
+                      </div>
+                    )}
+                    {currentDocCrossRef.labs.length > 0 && (
+                      <div style={{ marginTop: '4px' }}>
+                        Linked Labs:{' '}
+                        <strong>
+                          {currentDocCrossRef.labs.map((l) => l.label).join(', ')}
+                        </strong>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
 

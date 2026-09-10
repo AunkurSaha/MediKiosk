@@ -7,6 +7,8 @@ import NormalizationPanel from '../../components/doctor/NormalizationPanel';
 import DocumentViewer from '../../components/doctor/DocumentViewer';
 import ClinicalEvidencePanel from '../../components/doctor/ClinicalEvidencePanel';
 import SummaryWorkspace from '../../components/doctor/SummaryWorkspace';
+import { FieldVerificationBadge } from '../../components/doctor/FieldVerificationBadge';
+import { AuditTrailViewer } from '../../components/doctor/AuditTrailViewer';
 
 const t = copy.en;
 export default function Doctor() {
@@ -180,7 +182,15 @@ export default function Doctor() {
                         <dl>
                           {section.facts.map((fact) => (
                             <div key={fact.question_id}>
-                              <dt>{fact.label.en}</dt>
+                              <dt style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span>{fact.label.en}</span>
+                                <FieldVerificationBadge
+                                  sessionId={detail.session.id}
+                                  fieldType="interview_answer"
+                                  fieldId={fact.question_id}
+                                  disabled={detail.session.status === 'confirmed' || detail.session.status === 'cancelled'}
+                                />
+                              </dt>
                               <dd lang={fact.language}>{fact.raw_value}</dd>
                               <dd>
                                 <NormalizationPanel result={fact.normalization} />
@@ -199,7 +209,15 @@ export default function Doctor() {
                 <dl>
                   {detail.answers.map((answer) => (
                     <div key={answer.id}>
-                      <dt>{answer.field.replaceAll('_', ' ')}</dt>
+                      <dt style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span>{answer.field.replaceAll('_', ' ')}</span>
+                        <FieldVerificationBadge
+                          sessionId={detail.session.id}
+                          fieldType="interview_answer"
+                          fieldId={answer.field}
+                          disabled={detail.session.status === 'confirmed' || detail.session.status === 'cancelled'}
+                        />
+                      </dt>
                       <dd lang={answer.language}>{answer.raw_value}</dd>
                     </div>
                   ))}
@@ -272,6 +290,7 @@ export default function Doctor() {
               }}
             />
           )}
+          <AuditTrailViewer key={`audit-trail-${detail.session.id}`} sessionId={detail.session.id} />
         </>
       )}
     </div>

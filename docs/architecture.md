@@ -444,3 +444,35 @@ Key architectural guarantees:
 5. **Confirmation Locking**: Once confirmed, `confirmed_text` is saved with server-stamped `confirmed_by` and `confirmed_at`. The record is permanently locked against further edits or regeneration (HTTP 409 `CONFIRMED_IMMUTABLE`).
 6. **Non-Diagnostic Boundary**: UI and backend never declare a diagnosis, prescribe treatments, or alter medication regimens. AYUSH pathways display explicit demonstration and supportive documentation disclaimers. See [Phase 8 status](phase8-implementation-status.md).
 
+## Implemented Phase 9 boundary
+
+Phase 9 hardens clinician-controlled verification, post-confirmation clinical amendments, session audit trails, and bidirectional cross-referencing:
+
+```text
+Doctor Workspace
+├── Field-Level Verification (FieldVerificationService)
+│   ├── Granular review of interview answers & summary statements
+│   ├── Explicit states: unverified | verified | flagged
+│   ├── Optimistic locking + append-only FieldVerificationRevision history
+│   └── Automatic synchronization with interview_answers.verification_status
+├── Confirmed Summary Clinical Amendments (IntakeService)
+│   ├── Confirmed records remain strictly immutable (confirmed_text unchanged)
+│   ├── Official versioned addendum: amended_text, amended_by, amended_at, amendment_notes
+│   ├── Server-owned clinician identity (anti-forgery)
+│   └── Preserved in audit history and summary revision log
+├── Comprehensive Session Audit Trail (IntakeService)
+│   ├── Chronological timeline of all patient, staff, and system events
+│   ├── Captures actor_type, actor_user_id, action, entity_type, entity_id, metadata
+│   └── Dynamic actor filtering (All, Doctor, Patient, System)
+└── Bidirectional Cross-Referencing (CrossReferenceService)
+    ├── Maps documents to linked structured medications, observations, and discrepancies
+    ├── Traces summary statements back to source documents and extractions
+    └── Provenance displayed directly in doctor DocumentViewer and SummaryWorkspace
+```
+
+Key architectural guarantees:
+1. **Field-Level Provenance & Verification**: Doctors can independently verify or flag discrete patient-reported answers and summary statements without altering the patient's raw report. Each verification action increments version and generates an immutable revision entry.
+2. **Confirmed Record Immutability with Versioned Amendments**: Once confirmed, a clinical summary is never modified in place. Subsequent clinical updates are filed as official amendments with mandatory clinician justification, preserving both the original confirmed text and the timestamped addendum.
+3. **Server-Enforced Actor Provenance**: Client attempts to supply or forge `verified_by` or `amended_by` are rejected; identities are strictly resolved from authenticated session credentials.
+4. **Complete Auditability**: Every intake, verification, summary revision, amendment, and triage alert generates an immutable `AuditLog` entry accessible via dedicated staff APIs. See [Phase 9 status](phase9-implementation-status.md).
+

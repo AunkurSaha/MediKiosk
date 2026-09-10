@@ -339,5 +339,26 @@ Current totals are **335 backend tests** on each SQLite/PostgreSQL profile, **67
    - `handles draft regeneration and confirms replacement when manual edits exist`: Verifies 409 conflict handling and modal replacement confirmation.
    - `locks editor and displays confirmed banner in read-only confirmed state`: Verifies read-only textarea and omission of mutating actions upon confirmation.
 
+## Phase 9 acceptance
+
+Current totals are **340 backend tests** and **73 frontend component tests**.
+
+1. **Backend Tests (`backend/tests/test_phase9_hardening.py`)**:
+   - `test_field_verification_lifecycle`: Verifies creation, optimistic updates, conflict handling, revision history, and synchronization with `interview_answers.verification_status`.
+   - `test_confirmed_summary_amendment`: Verifies confirmed record immutability (`confirmed_text` strictly preserved), versioned clinical addendum creation, mandatory notes validation (min 3 chars), and status transition to `"amended"`.
+   - `test_audit_trail_endpoint`: Verifies retrieval of immutable chronological session events with actor classifications (`DOCTOR`, `PATIENT`, `SYSTEM`) and event metadata.
+   - `test_cross_references_endpoint`: Verifies bidirectional mapping connecting source documents, extractions, structured medications, observations, discrepancies, and summary statements.
+   - `test_phase9_security_and_forgery_rejection`: Verifies server-enforced identity provenance, rejection of forged client identity parameters, and unauthorized access rejection.
+
+2. **Database Migration Verification (`scripts/verify-phase9-migrations.py`)**:
+   - Migration `7a3e8b1c4f92_phase9_verification_hardening.py` tested for clean empty database upgrades, Phase 8 → Phase 9 upgrades, rollback/downgrades, and re-application across PostgreSQL and SQLite.
+   - `alembic check` confirms zero schema drift against active ORM models.
+
+3. **Frontend Component Tests (`frontend/src/test/phase9.test.tsx`)**:
+   - `FieldVerificationBadge`: Validates unverified initial rendering, popover interaction, clinician note input, optimistic status updates to `verified` or `flagged`.
+   - `SummaryAmendmentModal & SummaryWorkspace`: Validates modal launch from confirmed summaries, clinical justification requirement, amendment API interaction, and amendment card rendering.
+   - `AuditTrailViewer`: Validates chronological audit event list rendering and client-side actor filtering (`All`, `Doctor`, `Patient`, `System`).
+   - `DocumentViewer Cross-References`: Validates rendering of linked clinical facts and summary referenced indicator within the document preview card.
+
 
 
