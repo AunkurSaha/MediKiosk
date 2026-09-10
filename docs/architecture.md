@@ -362,139 +362,21 @@ If NVIDIA fails, times out, or returns invalid schema:
 - The interview continues deterministically without silent fallback to mock.
 - Offline development and CI remain default: `CLINICAL_NORMALIZATION_PROVIDER=mock` runs completely offline without an API key. See ADR-017 and [Phase 3B implementation status](phase3b-implementation-status.md).
 
-## Implemented Phase 4A provider-neutral voice input and TTS architecture
+## Stabilized Phase 4–6 boundaries
 
-Phase 4A introduces a provider-neutral speech architecture decoupling speech recognition (ASR) and text-to-speech (TTS) synthesis from vendor APIs:
+Staff HTTP routes require the existing active demo-doctor identity (`X-Demo-Doctor: true`, DEMO_MODE enabled outside production). Client-supplied reviewer/acknowledger names are rejected. This is a loopback synthetic demo boundary, not production login.
 
-```text
-PATIENT VOICE RECORDING:
-Browser microphone
-    ↓
-MediaRecorder API (WebM/Opus or browser default)
-    ↓
-POST /api/sessions/{session_id}/interview/speech/transcribe (multipart audio)
-    ├── Consent guard: requires voice_processing == true (HTTP 403 if false)
-    ├── Validation: MIME type, non-empty, 5MB file cap
-    ├── Ephemeral file: server-generated temp file unlinked in finally block
-    ↓
-SpeechService → MockSpeechProvider (or future BhashiniSpeechProvider)
-    ↓
-TranscriptionResult (candidate transcript, null confidence, provider metadata)
-    ↓
-Candidate Review Card ("You said: ...")
-    ├── [ Confirm ] → POST /api/sessions/{session_id}/interview/answers (source: 'voice')
-    ├── [ Edit ]    → inline editing → POST .../answers (source: 'typed')
-    ├── [ Record again ] / [ Cancel ]
-    ↓
-Standard Answer Persistence & History Update
-    ↓
-Phase 3 Clinical Normalization Pipeline (downstream only)
-    ↓
-InterviewEngine deterministically chooses next question
-
-QUESTION TEXT-TO-SPEECH (TTS):
-Patient presses [ Listen ] / [ শুনুন ] / [ सुनें ]
-    ↓
-POST /api/sessions/{session_id}/interview/speech/synthesize
-    ├── Pinned complaint flow snapshot provides EXACT localized question text
-    ├── Clinical history, prior answers, and doctor summaries are strictly excluded
-    ↓
-SpeechService → MockSpeechProvider (synthesizes deterministic audio payload)
-    ↓
-Browser Audio Playback
-```
-
-## 15. Implemented Phase 5 Boundaries — Deterministic Red-Flag Safety & Staff Triage Dashboard
-
-Phase 5 implements deterministic, rule-based clinical safety screening and real-time triage escalation without any LLM decision-making.
-
-```text
-PATIENT SUBMITS ANSWER:
-POST /api/sessions/{session_id}/interview/answers
-    ↓
-Answer persisted atomically & audit logged
-    ↓
-Phase 3 Clinical Normalization (optional短-text concepts)
-    ↓
-Pure Safety Engine Evaluation (backend/app/services/red_flags.py)
-    ├── Input: Active facts + normalized concepts (machine_normalized, polarity: present)
-    ├── Catalog: ai/safety_rules/red_flags_v1.json (11 deterministic rules)
-    │   ├── RF-CHEST-001/002/003 (Cardiovascular: emergency / urgent)
-    │   ├── RF-RESP-001/002     (Respiratory: emergency / urgent)
-    │   ├── RF-FEV-001/002      (Infectious: emergency / urgent)
-    │   ├── RF-HEAD-001/002     (Neurological: emergency / urgent)
-    │   └── RF-ABD-001/002      (Gastrointestinal: emergency / urgent)
-    ↓
-Database Persistence:
-    ├── Table: alerts (additive migration: f54c306d1e24_red_flag_alerts.py)
-    ├── Idempotency: Unique constraint uq_session_rule_alert(session_id, rule_id)
-    └── Resolution: Status automatically transitions to 'resolved' if answer changes
-    ↓
-Real-Time Escalation:
-    ├── Kiosk Response: InterviewState.red_flag_alert attached (highest active priority)
-    │   └── Kiosk UI displays calm, non-diagnostic safety advisory banner
-    └── WebSocket Broadcast: /api/triage/ws
-        ├── Event: alert_created / alert_acknowledged
-        └── Staff Triage Dashboard (/triage): Live counter & interactive alert cards
-            ├── Acknowledge action with staff ID and action note
-            └── Physician Workspace (/doctor/sessions/:id): Safety alerts highlighted
-```
-
-Key Phase 5 Invariants:
-1. **Zero LLM Safety Authority**: Large language models never evaluate red flags, assign priorities, or decide triage status. All rules are purely deterministic comparisons against structured data.
-2. **Calm Non-Diagnostic Patient Notice**: The kiosk advisory banner strictly follows `docs/design.md` Section 8: *"Potential emergency symptoms were detected. Medical staff should assess you promptly. Medical staff have been notified."* Diagnostic statements to patients are strictly forbidden.
-3. **Additive Persistence**: The `alerts` table is purely additive with zero impact on existing patient or session tables.
-4. **Staff Accountability**: Acknowledgement captures staff name/ID, timestamp, and action note, persisted with full audit logging.
-
-## 16. Implemented Phase 4B — BHASHINI (ULCA) Real Speech Provider Integration
-
-Phase 4B connects the Government of India's **BHASHINI (ULCA)** Speech Platform as a real speech-to-text (ASR) and text-to-speech (TTS) provider behind MediKiosk's existing Phase 4A provider-neutral speech boundary (`SpeechProvider` protocol).
-
-```text
-PATIENT SPOKEN INPUT (WebM/Opus / WAV):
-Browser MediaRecorder
-    ↓
-POST /api/sessions/{session_id}/interview/speech/transcribe (ephemeral bytes in memory)
-    ↓
-SpeechService → BhashiniSpeechProvider (backend/app/services/bhashini_speech.py)
-    ├── Input minimization: audio bytes + target language ('en', 'bn', 'hi')
-    ├── Pipeline Discovery (POST https://meity-auth.ulca.ai/ulca/apis/v0/model/getModelsPipeline)
-    │   └── In-memory cache for discovered callbackUrl & serviceId (1-hour TTL)
-    │   └── Alternatively: direct compute endpoint (BHASHINI_INFERENCE_URL)
-    ├── Compute Inference (POST callbackUrl with Authorization header)
-    │   └── Payload: base64-encoded audio, taskType: 'asr', audioFormat: 'webm' | 'wav' | 'ogg'
-    ↓
-Candidate TranscriptionResult (status: 'success' | 'unavailable', transcript: str, confidence: null)
-    ↓
-Candidate Confirmation Gate (Kiosk UI):
-    ├── [ Confirm ] → commits to PostgreSQL with source: 'voice'
-    ├── [ Edit ]    → inline editing → commits to PostgreSQL with source: 'typed'
-    └── [ Retry ] / [ Cancel ]
-    ↓
-Ephemeral Audio Cleanup: Audio bytes discarded immediately from memory; zero disk/DB retention.
-
-QUESTION TEXT-TO-SPEECH (TTS):
-Patient clicks [ Listen ] / [ শুনুন ] / [ सुनें ]
-    ↓
-POST /api/sessions/{session_id}/interview/speech/synthesize
-    ├── Pinned complaint flow snapshot provides EXACT localized question text
-    ↓
-SpeechService → BhashiniSpeechProvider
-    ├── Pipeline Discovery (taskType: 'tts', sourceLanguage)
-    ├── Compute Inference (inputData: localized text, gender: 'female')
-    ↓
-SpeechSynthesisResult (status: 'success', audio_base64: str, media_type: 'audio/wav')
-    ↓
-Browser Audio Playback
-```
-
-Key Phase 4B Invariants:
-1. **Candidate Confirmation Mandatory**: Transcripts returned by Bhashini ASR are strictly unconfirmed candidates. They never commit automatically to interview state or clinical history.
-2. **Zero Audio Retention**: Audio is never written to PostgreSQL, object storage, or permanent disk. Server-side memory buffers are released immediately upon completion.
-3. **Dual Pattern Support**: Operates seamlessly with standard Bhashini ULCA pipeline discovery or pre-configured direct inference gateways (e.g. AI4Bharat / Dhruva).
-4. **Secret Protection**: `BHASHINI_API_KEY`, `BHASHINI_USER_ID`, and `BHASHINI_INFERENCE_API_KEY` are wrapped in `SecretStr(exclude=True, repr=False)`.
-5. **Zero Database Migrations**: Relational schema remains identical; `answers.source` already supports `"voice"` and `"typed"`.
-6. **Offline Mock Independence**: The default `SPEECH_PROVIDER=mock` runs fully offline with zero secrets for local development and CI.
+- POST `/triage/ws-ticket`: authenticated, returns a one-use ticket valid 30 seconds. Connect `/triage/ws` with subprotocols `["medikiosk", ticket]` and an allowed browser Origin; server selects `medikiosk`. Tickets do not go in URLs.
+- GET `/triage/alerts`, `/triage/sessions/{id}/alerts`, `/sessions/{id}/alerts`: staff only. Items include `revision`, `trigger_active`, `acknowledgement_state`, source evidence and attribution. Status `resolved` can retain prior acknowledgement.
+- POST `/triage/alerts/{id}/acknowledge`: `{expected_revision, note?}`. Actor comes from server identity; stale evidence/resolved alerts return 409; repeated acknowledgement preserves the first actor/time/note.
+- Committed `alert_created`, `alert_updated`, `alert_resolved`, `alert_reactivated` events carry identifiers; authorized clients refresh authoritative records/counters. Acknowledgement events also prompt refresh. No human-delivery claim follows a transport write.
+- POST `/sessions/{id}/documents`: multipart `file` and optional enum `document_type` (prescription/lab_report/other); active intake and document/sharing consent required. Actual content must decode; up to 10 MiB, 20 PDF pages, 20 million image pixels. Unsupported types/invalid content return 422 before persistence. Explicit fixture output has `mock_fixture` status and null confidence; arbitrary valid files have `unavailable` status and no extraction.
+- GET document list/detail/file: staff only with sharing consent. Original previews use authenticated fetch and temporary browser object URLs. Public session detail excludes documents and staff alert payloads.
+- POST extraction `/verify`: `{status, expected_status, expected_version, notes?}`. Server owns actor/time; each successful review increments `review_version` and preserves previous review metadata in audit. Confirmed/cancelled sessions and stale reviews return 409.
+- Structured document data uses `observations` (typed lab rows) and `medications`. Missing lab flags are null, not Normal. Historical alias input is accepted by the schema; output uses observations.
+- POST `/sessions/{id}/interview/speech/transcribe`: multipart audio, current `question_id`, optional mock fixture_id. Requires voice/sharing consent, active intake and current free-text eligibility before provider invocation. Multipart may already have spooled to disk; the UploadFile closes in finally. Successful response adds `candidate_token`; transcription does not save an answer.
+- Adaptive answer with source voice requires `voice_candidate` signed token and exact candidate text, language, question, session and revision. Tokens expire after 10 minutes/restart. Editing uses source typed without a token. Confirmed provenance is audited in the answer transaction. Legacy answer endpoints only accept touch/typed.
+- Speech provider invocation has a 15-second overall deadline. BHASHINI live ASR rejects unchecked native browser formats and requires validated 16-kHz mono PCM WAV. This is a conservative adapter boundary, not live format acceptance.
 
 
-
+See the stabilization report for verification and remaining limits. Earlier conceptual diagrams describe planned scope where they exceed implemented boundaries.

@@ -15,7 +15,7 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
 
     await page.getByRole('checkbox', { name: /agree to store/i }).check();
-    await page.getByRole('button', { name: 'Start intake', exact: true }).click();
+    await page.getByRole('button', { name: 'Start the interview', exact: true }).click();
 
     // Select chest pain complaint flow
     await page.getByRole('button', { name: 'Chest pain', exact: true }).click();
@@ -46,10 +46,13 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
     await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
 
     // hpi.timing
+    await page.getByRole('button', { name: 'Unknown', exact: true }).click(); // associated details
     await page.getByLabel('Constant', { exact: true }).check();
     await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
 
     // hpi.severity -> 9 (triggers RF-CHEST-001: severity >= 8 AND radiation == true)
+    await page.getByRole('button', { name: 'Unknown', exact: true }).click(); // exacerbating
+    await page.getByRole('button', { name: 'Unknown', exact: true }).click(); // relieving
     await page.getByLabel('Your answer', { exact: true }).fill('9');
     await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
 
@@ -58,11 +61,13 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
     await expect(advisory).toBeVisible();
     await expect(advisory).toContainText('Staff Assessment Recommended');
     await expect(advisory).toContainText('Potential emergency symptoms were detected');
-    await expect(advisory).toContainText('Medical staff have been notified');
+    await expect(advisory).toContainText('Please contact medical staff directly');
 
     // 2. Staff Triage Dashboard Verification
     await page.goto('/triage');
-    await expect(page.getByRole('heading', { name: /Staff Triage & Safety Dashboard/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /Staff Triage & Safety Dashboard/i }),
+    ).toBeVisible();
 
     // Locate the alert card corresponding to our token
     const tokenBadge = page.locator('.patient-token-badge', { hasText: token });
@@ -77,9 +82,6 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
     // Staff Acknowledges the Alert
     await alertCard.getByRole('button', { name: 'Acknowledge Alert' }).click();
 
-    const staffInput = alertCard.locator('input[placeholder*="Staff member name"]');
-    await staffInput.fill('Nurse Station Alpha');
-
     const noteInput = alertCard.locator('input[placeholder*="Action taken note"]');
     await noteInput.fill('Patient moved to resuscitation bay for immediate ECG');
 
@@ -87,14 +89,17 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
 
     // Verify card updates to acknowledged
     await expect(alertCard.locator('.status-badge')).toContainText('Acknowledged');
-    await expect(alertCard).toContainText('Nurse Station Alpha');
+    await expect(alertCard).toContainText('00000000-0000-4000-8000-000000000001');
     await expect(alertCard).toContainText('Patient moved to resuscitation bay');
 
     // 3. Doctor Workspace Alert Visibility
-    await page.goto('/doctor');
-    const patientRow = page.getByRole('link', { name: new RegExp(token) });
-    await expect(patientRow).toBeVisible();
-    await patientRow.click();
+    const records = await page.request.get('/api/triage/alerts', {
+      headers: { 'X-Demo-Doctor': 'true' },
+    });
+    const record = (await records.json()).items.find(
+      (a: { hospital_token: string }) => a.hospital_token === token,
+    );
+    await page.goto(`/doctor/sessions/${record.session_id}`);
 
     // Check doctor alerts banner
     const docBanner = page.getByTestId('doctor-alerts-banner');
@@ -102,7 +107,7 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
     await expect(docBanner).toContainText('Safety Screening Alerts');
     await expect(docBanner).toContainText('EMERGENCY');
     await expect(docBanner).toContainText('RF-CHEST-001');
-    await expect(docBanner).toContainText('Nurse Station Alpha');
+    await expect(docBanner).toContainText('00000000-0000-4000-8000-000000000001');
   });
 
   test('non-emergency session does not display emergency advisory', async ({ page }) => {
@@ -116,7 +121,7 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
 
     await page.getByRole('checkbox', { name: /agree to store/i }).check();
-    await page.getByRole('button', { name: 'Start intake', exact: true }).click();
+    await page.getByRole('button', { name: 'Start the interview', exact: true }).click();
 
     await page.getByRole('button', { name: 'Chest pain', exact: true }).click();
 

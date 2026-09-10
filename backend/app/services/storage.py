@@ -1,7 +1,12 @@
 import hashlib
+import io
 import os
 import re
+import warnings
 from pathlib import Path
+
+from PIL import Image
+from pypdf import PdfReader
 
 from app.core.errors import WorkflowError
 
@@ -60,19 +65,41 @@ def validate_document_file(content_type: str | None, size_bytes: int) -> str:
     return media_type
 
 
+def validate_document_contents(data: bytes, media_type: str) -> None:
+    try:
+        if media_type == "application/pdf":
+            pdf = PdfReader(io.BytesIO(data), strict=True)
+            if pdf.is_encrypted or not 1 <= len(pdf.pages) <= 20:
+                raise ValueError("Unsupported PDF")
+            if any(key in pdf.trailer["/Root"] for key in ("/OpenAction", "/AA")):
+                raise ValueError("Active PDF")
+        else:
+            expected = {"image/jpeg": "JPEG", "image/jpg": "JPEG", "image/png": "PNG", "image/webp": "WEBP"}[media_type]
+            with warnings.catch_warnings():
+                warnings.simplefilter("error", Image.DecompressionBombWarning)
+                with Image.open(io.BytesIO(data)) as image:
+                    if image.format != expected or image.width * image.height > 20_000_000:
+                        raise ValueError("Invalid image")
+                    image.verify()
+                with Image.open(io.BytesIO(data)) as image:
+                    image.load()
+    except Exception:
+        raise WorkflowError("INVALID_FILE_CONTENT", "Upload a valid, supported image or PDF (up to 20 pages).", 422) from None
+
+
 def compute_sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
 class StorageService:
     def __init__(self, base_dir: Path | None = None):
-        self.base_dir = base_dir or get_upload_dir()
+        self.base_dir = (base_dir or get_upload_dir()).resolve()
 
     def _resolve_path(self, object_key: str) -> Path:
         # Prevent directory traversal attacks
-        cleaned_key = os.path.normpath(object_key).lstrip("\\/")
-        resolved = (self.base_dir / cleaned_key).resolve()
-        if not str(resolved).startswith(str(self.base_dir)):
+        key = Path(object_key)
+        resolved = (self.base_dir / key).resolve()
+        if key.is_absolute() or not resolved.is_relative_to(self.base_dir) or resolved == self.base_dir:
             raise WorkflowError("INVALID_OBJECT_KEY", "Access to path outside upload directory is forbidden.", 403)
         return resolved
 

@@ -1,4 +1,7 @@
+import hashlib
+import json
 import os
+from pathlib import Path
 from typing import Any, Protocol
 
 DEFAULT_MOCK_PRESCRIPTION = """Dr. R. K. Sharma, MBBS, MD
@@ -39,7 +42,7 @@ class OcrProvider(Protocol):
 
 class MockOcrProvider:
     name: str = "mock"
-    version: str = "mock-1.0"
+    version: str = "explicit-fixture-2.0"
 
     async def extract(
         self,
@@ -47,23 +50,12 @@ class MockOcrProvider:
         media_type: str,
         filename: str,
     ) -> tuple[str, float | None, dict[str, Any]]:
-        lower_name = filename.lower()
-        if any(k in lower_name for k in ("lab", "report", "blood", "test", "cbc")):
-            raw_text = DEFAULT_MOCK_LAB_REPORT
-            confidence = 0.95
-            doc_type = "lab_report"
-        else:
-            raw_text = DEFAULT_MOCK_PRESCRIPTION
-            confidence = 0.92
-            doc_type = "prescription"
+        catalog_path = Path(__file__).resolve().parents[3] / "ai/document_fixtures/catalog.json"
+        fixture = json.loads(catalog_path.read_text(encoding="utf-8")).get(hashlib.sha256(image_bytes).hexdigest())
+        if fixture is None:
+            return "", None, {"engine": self.name, "reason": "real_ocr_not_implemented"}
+        return fixture["raw_text"], None, {"engine": self.name, "fixture_id": fixture["fixture_id"]}
 
-        metadata = {
-            "inferred_type": doc_type,
-            "media_type": media_type,
-            "engine": self.name,
-            "file_size": len(image_bytes),
-        }
-        return raw_text, confidence, metadata
 
 
 class DisabledOcrProvider:

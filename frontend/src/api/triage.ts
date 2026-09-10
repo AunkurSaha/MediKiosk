@@ -21,6 +21,9 @@ export interface AlertItem {
   reason: string;
   triggering_facts: TriggeringFact[];
   status: AlertStatus;
+  revision?: number;
+  trigger_active?: boolean;
+  acknowledgement_state?: string;
   acknowledged_at: string | null;
   acknowledged_by: string | null;
   acknowledgement_note: string | null;
@@ -39,7 +42,7 @@ export interface AlertList {
 }
 
 export interface AlertAcknowledgeRequest {
-  acknowledged_by: string;
+  expected_revision?: number;
   note?: string | null;
 }
 
@@ -53,6 +56,7 @@ async function request<T>(path: string, method = 'GET', body?: unknown): Promise
       method,
       signal: controller.signal,
       headers: {
+        'X-Demo-Doctor': 'true',
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
       },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
@@ -82,8 +86,9 @@ export const triageApi = {
   acknowledgeAlert: (alertId: string, payload: AlertAcknowledgeRequest) =>
     request<AlertItem>(`/triage/alerts/${alertId}/acknowledge`, 'POST', payload),
 
-  getSessionAlerts: (sessionId: string) =>
-    request<AlertItem[]>(`/sessions/${sessionId}/alerts`),
+  getSessionAlerts: (sessionId: string) => request<AlertItem[]>(`/sessions/${sessionId}/alerts`),
+
+  websocketTicket: () => request<{ ticket: string }>('/triage/ws-ticket', 'POST'),
 
   getWebSocketUrl: () => {
     const loc = window.location;

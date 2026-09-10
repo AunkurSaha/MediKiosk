@@ -1,16 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { triageApi, type AlertItem, type AlertList, type AlertPriority, type AlertStatus } from '../../api/triage';
+import {
+  triageApi,
+  type AlertItem,
+  type AlertList,
+  type AlertPriority,
+  type AlertStatus,
+} from '../../api/triage';
 import AlertCard from '../../components/triage/AlertCard';
 import { getTriageCopy } from '../../i18n/triage';
 
 export default function Triage() {
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [stats, setStats] = useState({
-    total: 0,
-    emergency_count: 0,
-    urgent_count: 0,
-    acknowledged_count: 0,
-  });
+  const stats = {
+    total: alerts.filter((a) => a.status !== 'resolved').length,
+    emergency_count: alerts.filter((a) => a.status !== 'resolved' && a.priority === 'emergency')
+      .length,
+    urgent_count: alerts.filter((a) => a.status !== 'resolved' && a.priority === 'urgent').length,
+    acknowledged_count: alerts.filter((a) => a.status === 'acknowledged').length,
+  };
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [priorityFilter, setPriorityFilter] = useState<AlertPriority | 'all'>('all');
@@ -20,6 +27,7 @@ export default function Triage() {
   const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
+  const refreshGeneration = useRef(0);
   const t = getTriageCopy(language);
 
   const [reloadTrigger, setReloadTrigger] = useState(0);
@@ -28,64 +36,52 @@ export default function Triage() {
     let reconnectTimeout: number | undefined;
     let isComponentMounted = true;
 
-    triageApi
-      .getAlerts()
-      .then((res: AlertList) => {
-        if (!isComponentMounted) return;
-        setAlerts(res.items);
-        setStats({
-          total: res.total,
-          emergency_count: res.emergency_count,
-          urgent_count: res.urgent_count,
-          acknowledged_count: res.acknowledged_count,
+    function refreshAlerts() {
+      const generation = ++refreshGeneration.current;
+      return triageApi
+        .getAlerts()
+        .then((res: AlertList) => {
+          if (!isComponentMounted || generation !== refreshGeneration.current) return;
+          setAlerts(res.items);
+          setError(null);
+          setLoading(false);
+        })
+        .catch(() => {
+          if (!isComponentMounted || generation !== refreshGeneration.current) return;
+          setError('Failed to load triage alerts. Please retry.');
+          setLoading(false);
         });
-        setError(null);
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!isComponentMounted) return;
-        setError('Failed to load triage alerts. Please retry.');
-        setLoading(false);
-      });
+    }
+    void refreshAlerts();
 
-    function connectWs() {
+    async function connectWs() {
       try {
         const url = triageApi.getWebSocketUrl();
-        const ws = new WebSocket(url);
+        const { ticket } = await triageApi.websocketTicket();
+        if (!isComponentMounted) return;
+        const ws = new WebSocket(url, ['medikiosk', ticket]);
         wsRef.current = ws;
 
         ws.onopen = () => {
           if (!isComponentMounted) return;
           setWsConnected(true);
+          void refreshAlerts();
         };
 
         ws.onmessage = (event) => {
           if (!isComponentMounted) return;
           try {
             const data = JSON.parse(event.data);
-            if (data.type === 'alert_created') {
-              const newAlert = data.alert as AlertItem;
-              setAlerts((prev) => {
-                const filtered = prev.filter((a) => a.id !== newAlert.id);
-                return [newAlert, ...filtered];
-              });
-              setStats((prev) => ({
-                ...prev,
-                total: prev.total + 1,
-                emergency_count:
-                  newAlert.priority === 'emergency' ? prev.emergency_count + 1 : prev.emergency_count,
-                urgent_count:
-                  newAlert.priority === 'urgent' ? prev.urgent_count + 1 : prev.urgent_count,
-              }));
-            } else if (data.type === 'alert_acknowledged') {
-              const updatedAlert = data.alert as AlertItem;
-              setAlerts((prev) =>
-                prev.map((a) => (a.id === updatedAlert.id ? updatedAlert : a))
-              );
-              setStats((prev) => ({
-                ...prev,
-                acknowledged_count: prev.acknowledged_count + 1,
-              }));
+            if (
+              [
+                'alert_created',
+                'alert_updated',
+                'alert_resolved',
+                'alert_reactivated',
+                'alert_acknowledged',
+              ].includes(data.type)
+            ) {
+              void refreshAlerts();
             }
           } catch {
             // Ignore parse errors on ping/pong frames
@@ -117,18 +113,20 @@ export default function Triage() {
     };
   }, [reloadTrigger]);
 
-  async function handleAcknowledge(alertId: string, acknowledgedBy: string, note?: string) {
+  async function handleAcknowledge(alertId: string, note?: string) {
     setAcknowledgingId(alertId);
     try {
       const updated = await triageApi.acknowledgeAlert(alertId, {
-        acknowledged_by: acknowledgedBy,
         note,
+        expected_revision: alerts.find((a) => a.id === alertId)?.revision ?? 0,
       });
-      setAlerts((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
-      setStats((prev) => ({
-        ...prev,
-        acknowledged_count: prev.acknowledged_count + 1,
-      }));
+      refreshGeneration.current++;
+      setAlerts((prev) =>
+        prev.map((a) =>
+          a.id === updated.id && (updated.revision ?? 0) >= (a.revision ?? 0) ? updated : a,
+        ),
+      );
+      setReloadTrigger((value) => value + 1);
     } finally {
       setAcknowledgingId(null);
     }

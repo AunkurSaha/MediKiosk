@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { DocumentExtractionRecord, DocumentRecord } from '../../api/client';
 import { copy } from '../../i18n';
@@ -7,20 +7,51 @@ interface DocumentViewerProps {
   sessionId: string;
   documents: DocumentRecord[];
   onVerificationUpdate?: (updatedExtraction: DocumentExtractionRecord) => void;
+  locked?: boolean;
 }
 
 export default function DocumentViewer({
   sessionId,
   documents: initialDocuments,
   onVerificationUpdate,
+  locked = false,
 }: DocumentViewerProps) {
   const t = copy.en;
   const [documents, setDocuments] = useState<DocumentRecord[]>(initialDocuments);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [doctorName, setDoctorName] = useState('Dr. Demo Doctor');
+  const [loadedFile, setLoadedFile] = useState<{
+    documentId: string;
+    sessionId: string;
+    url: string;
+  }>();
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const selectedDocumentId = documents[selectedIndex]?.id;
+  const fileUrl =
+    loadedFile?.documentId === selectedDocumentId && loadedFile.sessionId === sessionId
+      ? loadedFile.url
+      : undefined;
+  useEffect(() => {
+    if (!selectedDocumentId) return;
+    const controller = new AbortController();
+    let objectUrl: string | undefined;
+    api
+      .documentFile(sessionId, selectedDocumentId, controller.signal)
+      .then((blob) => {
+        if (controller.signal.aborted) return;
+        objectUrl = URL.createObjectURL(blob);
+        setLoadedFile({ documentId: selectedDocumentId, sessionId, url: objectUrl });
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setError('Unable to load the original document.');
+      });
+    return () => {
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [sessionId, selectedDocumentId]);
 
   if (!documents || documents.length === 0) {
     return (
@@ -35,10 +66,6 @@ export default function DocumentViewer({
   const isImage = currentDoc.media_type.startsWith('image/');
 
   async function handleVerify(extractionId: string, status: 'verified' | 'rejected') {
-    if (!doctorName.trim()) {
-      setError('Please enter a doctor/clinician name.');
-      return;
-    }
     setBusy(true);
     setError(null);
     try {
@@ -47,7 +74,8 @@ export default function DocumentViewer({
         currentDoc.id,
         extractionId,
         status,
-        doctorName.trim(),
+        currentDoc.extractions.find((ext) => ext.id === extractionId)!.verification_status,
+        currentDoc.extractions.find((ext) => ext.id === extractionId)!.review_version,
         notes.trim() || undefined,
       );
 
@@ -74,8 +102,6 @@ export default function DocumentViewer({
       setBusy(false);
     }
   }
-
-  const fileUrl = api.documentFileUrl(sessionId, currentDoc.id);
 
   return (
     <section className="card document-viewer-panel" data-testid="document-viewer-panel">
@@ -161,7 +187,7 @@ export default function DocumentViewer({
           {currentDoc.extractions && currentDoc.extractions.length > 0 ? (
             currentDoc.extractions.map((ext) => {
               const meds = ext.structured_json.medications;
-              const labs = ext.structured_json.lab_observations;
+              const labs = ext.structured_json.observations;
               const isVerified = ext.verification_status === 'verified';
               const isRejected = ext.verification_status === 'rejected';
 
@@ -174,7 +200,13 @@ export default function DocumentViewer({
                   <div className="ext-header">
                     <div>
                       <strong>Extractor: {ext.extractor}</strong> ({ext.extractor_version})
-                      {ext.confidence !== null && (
+                      {ext.extractor === 'mock' && (
+                        <p role="note">
+                          Synthetic mock output, not OCR of arbitrary uploaded content. Compare with
+                          the original; historical mock output may not match it.
+                        </p>
+                      )}
+                      {ext.confidence !== null && ext.extractor !== 'mock' && (
                         <span className="muted" style={{ marginLeft: '8px' }}>
                           Confidence: {Math.round(ext.confidence * 100)}%
                         </span>
@@ -253,7 +285,12 @@ export default function DocumentViewer({
                         </thead>
                         <tbody>
                           {labs.map((l, idx) => (
-                            <tr key={idx} className={l.flag && l.flag !== 'normal' ? 'abnormal-row' : ''}>
+                            <tr
+                              key={idx}
+                              className={
+                                l.flag && l.flag.toLowerCase() !== 'normal' ? 'abnormal-row' : ''
+                              }
+                            >
                               <td>
                                 <b>{l.test_name}</b>
                               </td>
@@ -261,10 +298,12 @@ export default function DocumentViewer({
                               <td>{l.unit || '—'}</td>
                               <td>{l.reference_range || '—'}</td>
                               <td>
-                                {l.flag && l.flag !== 'normal' ? (
+                                {l.flag && l.flag.toLowerCase() !== 'normal' ? (
                                   <span className="badge-abnormal">{l.flag.toUpperCase()}</span>
-                                ) : (
+                                ) : l.flag ? (
                                   'Normal'
+                                ) : (
+                                  'Not reported'
                                 )}
                               </td>
                             </tr>
@@ -287,17 +326,7 @@ export default function DocumentViewer({
                   {/* Clinician Verification Controls */}
                   <div className="verification-controls-box">
                     <div className="clinician-inputs">
-                      <label htmlFor={`doc-name-${ext.id}`}>
-                        {t.docDoctorName}:
-                        <input
-                          id={`doc-name-${ext.id}`}
-                          type="text"
-                          value={doctorName}
-                          onChange={(e) => setDoctorName(e.target.value)}
-                          disabled={busy}
-                        />
-                      </label>
-
+                      <p>Reviewer identity comes from the signed-in demo doctor.</p>
                       <label htmlFor={`doc-notes-${ext.id}`}>
                         {t.docVerificationNotes}:
                         <input
@@ -314,7 +343,7 @@ export default function DocumentViewer({
                     <div className="actions" style={{ marginTop: '8px' }}>
                       <button
                         type="button"
-                        disabled={busy || isVerified}
+                        disabled={locked || busy || isVerified}
                         onClick={() => handleVerify(ext.id, 'verified')}
                         data-testid={`btn-verify-${ext.id}`}
                       >
@@ -323,7 +352,7 @@ export default function DocumentViewer({
                       <button
                         type="button"
                         className="secondary"
-                        disabled={busy || isRejected}
+                        disabled={locked || busy || isRejected}
                         onClick={() => handleVerify(ext.id, 'rejected')}
                         data-testid={`btn-reject-${ext.id}`}
                       >
@@ -335,7 +364,10 @@ export default function DocumentViewer({
               );
             })
           ) : (
-            <p className="muted">No extractions available for this document.</p>
+            <p className="muted">
+              No extraction is available. Real OCR is not implemented; the original upload is stored
+              for staff review.
+            </p>
           )}
         </div>
       </div>

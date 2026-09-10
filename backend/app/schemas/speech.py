@@ -8,9 +8,10 @@ from .common import APIModel, Language
 class TranscriptionResult(APIModel):
     model_config = ConfigDict(extra="forbid")
     status: Literal["success", "unavailable"]
-    transcript: str | None = None
+    transcript: str | None = Field(default=None, max_length=4000)
+    candidate_token: str | None = None
     language: Language
-    confidence: float | None = None
+    confidence: float | None = Field(default=None, ge=0, le=1, allow_inf_nan=False)
     provider: str
     model: str | None = None
     reason: str | None = None

@@ -230,6 +230,7 @@ def test_voice_answer_submission_and_normalization(client):
             "value": candidate,
             "raw_value": candidate,
             "source": "voice",
+            "voice_candidate": trans_res.json()["candidate_token"],
             "language": "en",
         },
     )
@@ -263,13 +264,13 @@ def test_voice_edited_answer_submission(client):
             "status": "answered",
             "value": edited_text,
             "raw_value": edited_text,
-            "source": "voice",
+            "source": "typed",
             "language": "bn",
         },
     )
     assert ans_res.status_code == 200
     answer_fact = ans_res.json()["active_answers"][0]
-    assert answer_fact["source"] == "voice"
+    assert answer_fact["source"] == "typed"
     assert answer_fact["raw_value"] == edited_text
 
 

@@ -134,7 +134,7 @@ def parse_lab_report(raw_text: str) -> dict[str, Any]:
                 "value": val.strip(),
                 "unit": unit.strip(),
                 "reference_range": ref_range.strip(),
-                "flag": flag.strip() if flag else "Normal",
+                "flag": flag.strip().lower() if flag else None,
             })
 
     return {

@@ -15,6 +15,8 @@ os.environ["DATABASE_URL"] = os.environ.get("TEST_DATABASE_URL", "sqlite://")
 os.environ["CLINICAL_NORMALIZATION_PROVIDER"] = "mock"
 os.environ["CLINICAL_NORMALIZATION_TIMEOUT_SECONDS"] = "0.5"
 os.environ["NVIDIA_API_KEY"] = ""
+os.environ["SPEECH_PROVIDER"] = "mock"
+os.environ["OCR_PROVIDER"] = "mock"
 
 from app import models  # noqa: E402
 from app.api.deps import DEMO_DOCTOR_ID  # noqa: E402
@@ -88,3 +90,13 @@ def client(database):
     with TestClient(app, raise_server_exceptions=False) as instance:
         yield instance
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+def isolated_document_storage(tmp_path, monkeypatch):
+    from app.api.v1 import documents
+    from app.services import document_service
+    from app.services.storage import StorageService
+    storage = StorageService(tmp_path / "uploads")
+    monkeypatch.setattr(document_service, "default_storage", storage)
+    monkeypatch.setattr(documents, "default_storage", storage)

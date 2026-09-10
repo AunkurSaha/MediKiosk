@@ -27,6 +27,7 @@ class Submission(APIModel):
     value: AnswerValue = None
     raw_value: str = Field(min_length=1, max_length=4000)
     source: Literal["typed", "touch", "voice"]
+    voice_candidate: str | None = Field(default=None, max_length=24000)
     language: Language
 
 

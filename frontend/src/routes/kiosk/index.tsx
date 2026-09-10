@@ -259,7 +259,10 @@ export default function Kiosk() {
               />
               {speechCopy[language].voiceConsentLabel}
             </label>
-            <p className="muted" style={{ fontSize: '0.85rem', margin: '0.25rem 0 0.5rem 1.75rem' }}>
+            <p
+              className="muted"
+              style={{ fontSize: '0.85rem', margin: '0.25rem 0 0.5rem 1.75rem' }}
+            >
               {speechCopy[language].voiceConsentNote}
             </p>
             <label className="check" style={{ marginTop: '0.75rem' }}>

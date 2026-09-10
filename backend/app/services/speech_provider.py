@@ -220,6 +220,9 @@ class DisabledSpeechProvider:
         )
 
 
+_bhashini_instance = None
+
+
 def get_speech_provider() -> SpeechProvider:
     provider_name = os.getenv("SPEECH_PROVIDER", "mock").strip().lower()
     if provider_name == "mock":
@@ -227,8 +230,12 @@ def get_speech_provider() -> SpeechProvider:
     if provider_name == "disabled":
         return DisabledSpeechProvider()
     if provider_name == "bhashini":
-        from app.services.bhashini_speech import BhashiniSpeechProvider
-        return BhashiniSpeechProvider()
+        global _bhashini_instance
+        from app.services.bhashini_speech import BhashiniSettings, BhashiniSpeechProvider
+        settings = BhashiniSettings.from_environment()
+        if _bhashini_instance is None or _bhashini_instance.settings != settings:
+            _bhashini_instance = BhashiniSpeechProvider(settings)
+        return _bhashini_instance
     raise RuntimeError(
         f"Unsupported SPEECH_PROVIDER: '{provider_name}'. "
         "Allowed: 'mock', 'disabled', 'bhashini'."
@@ -240,6 +247,8 @@ def validate_speech_configuration() -> None:
     if provider.name == "bhashini":
         from app.services.bhashini_speech import BhashiniSettings
         settings = BhashiniSettings.from_environment()
+        if settings.inference_url and (settings.inference_api_key and settings.inference_api_key.get_secret_value()):
+            return
         if not settings.api_key.get_secret_value() or not settings.user_id.get_secret_value():
             raise RuntimeError(
                 "BHASHINI_API_KEY and BHASHINI_USER_ID are required when SPEECH_PROVIDER=bhashini"

@@ -50,7 +50,8 @@ const en: TriageCopy = {
   patientAlertTitle: 'Staff Assessment Recommended',
   patientAlertMessage:
     'Potential emergency symptoms were detected. Medical staff should assess you promptly.',
-  patientAlertStaffNotified: 'Medical staff have been notified.',
+  patientAlertStaffNotified:
+    'Please contact medical staff directly; this prototype does not guarantee notification.',
 
   dashboardTitle: 'Staff Triage & Safety Dashboard',
   dashboardSubtitle: 'Deterministic red-flag safety screening & clinical queue escalation',
@@ -93,7 +94,8 @@ const bn: TriageCopy = {
   patientAlertTitle: 'স্বাস্থ্যকর্মীদের দ্বারা মূল্যায়ন জরুরি',
   patientAlertMessage:
     'জরুরি উপসর্গ সনাক্ত করা হয়েছে। অবিলম্বে স্বাস্থ্যকর্মীদের আপনাকে দেখা প্রয়োজন।',
-  patientAlertStaffNotified: 'স্বাস্থ্যকর্মীদের অবহিত করা হয়েছে।',
+  patientAlertStaffNotified:
+    'সরাসরি স্বাস্থ্যকর্মীদের জানান; এই প্রোটোটাইপে বিজ্ঞপ্তি পৌঁছানো নিশ্চিত নয়।',
 
   dashboardTitle: 'স্টাফ ট্রায়াজ ও সুরক্ষা ড্যাশবোর্ড',
   dashboardSubtitle: 'জরুরি বিপদচিহ্ন স্ক্রীনিং ও স্বাস্থ্যকর্মী অগ্রাধিকার পর্যবেক্ষণ',
@@ -136,7 +138,8 @@ const hi: TriageCopy = {
   patientAlertTitle: 'स्वास्थ्य कर्मियों द्वारा जांच की सलाह',
   patientAlertMessage:
     'संभावित आपातकालीन लक्षण पाए गए हैं। तुरंत स्वास्थ्य कर्मियों द्वारा आपकी जांच आवश्यक है।',
-  patientAlertStaffNotified: 'स्वास्थ्य कर्मियों को सूचित कर दिया गया है।',
+  patientAlertStaffNotified:
+    'स्वास्थ्य कर्मियों से सीधे संपर्क करें; इस प्रोटोटाइप में सूचना पहुँचना सुनिश्चित नहीं है।',
 
   dashboardTitle: 'स्टाफ ट्राइएज एवं सुरक्षा डैशबोर्ड',
   dashboardSubtitle: 'आपातकालीन रेड-फ्लैग स्क्रीनिंग एवं प्राथमिक क्लिनिकल प्राथमिकता',

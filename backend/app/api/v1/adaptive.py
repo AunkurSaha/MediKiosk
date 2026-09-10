@@ -2,6 +2,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from starlette.concurrency import run_in_threadpool
 
 from app.database import get_db
 from app.schemas.adaptive import InterviewState, Navigation, Selection, Submission
@@ -21,8 +22,14 @@ def select_flow(session_id: UUID, payload: Selection, db: Session = Depends(get_
 
 
 @router.post("/{session_id}/interview/answers", response_model=InterviewState)
-def answer(session_id: UUID, payload: Submission, db: Session = Depends(get_db)):
-    return adaptive.submit(db, str(session_id), payload)
+async def answer(session_id: UUID, payload: Submission, db: Session = Depends(get_db)):
+    from app.services.triage_notifier import notifier
+
+    db.info.pop("triage_events", None)
+    result = await run_in_threadpool(adaptive.submit, db, str(session_id), payload)
+    for event in db.info.pop("triage_events", []):
+        await notifier.broadcast(event)
+    return result
 
 
 @router.put("/{session_id}/interview/cursor", response_model=InterviewState)

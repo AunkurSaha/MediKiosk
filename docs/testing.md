@@ -14,18 +14,22 @@ npm test
 npm run build
 npm run test:e2e
 cd ..
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-restart.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-stabilization-restart.ps1
 ```
 
-Start the app with `scripts/start-dev.ps1` before browser/restart tests. Install the isolated browser once with `npx playwright install chromium` in `frontend/`.
+Start the app with `scripts/start-dev.ps1 -NormalizationProvider mock` before browser/restart tests. Install the isolated browser once with `npx playwright install chromium` in `frontend/`.
 
 The backend helper defaults to isolated SQLite tables and uses the dedicated `medikiosk_test` PostgreSQL database with `-Postgres`. Each PostgreSQL test rolls back its data using savepoints. The PostgreSQL suite applies migrations first and refuses a target whose database name does not end in `_test`.
 
 The browser tests create fictional records in the running local demo database. The restart checker stops/restarts only the recorded project services and local PostgreSQL, then verifies the last browser-test record is unchanged. Do not run it during another person's active demo.
 
-Current evidence: 159 backend tests on each database profile, 33 component tests, 7 browser tests, 2 post-restart browser resume checks, schema comparison, and real restart-persistence checks. See [implementation-status.md](implementation-status.md). The GitHub workflow runs PostgreSQL API tests and frontend checks; remote execution is not yet verified.
+Current evidence and pending gates are recorded in [stabilization-implementation-status.md](stabilization-implementation-status.md). Run browsers against explicit mock providers, sequentially. Mock adapter tests never establish live provider success.
 
-Future-phase expectations below remain the testing strategy as those features are added.
+Run `backend/.venv/Scripts/python.exe scripts/verify-stabilization-migrations.py` for isolated upgrades from prior phase revisions, downgrade/reupgrade, preserved original-column hashes and actual Alembic comparison. It creates unique schemas in the existing test database and never reuses a pre-existing schema. Older phase-specific helpers are historical evidence tools; use this current verifier for stabilization.
+
+`verify-stabilization-restart.ps1 -ApplicationOnly` verifies new backend/frontend process IDs and unchanged Phase 1–3, alert and document API state plus original document file hash, against the still-running PostgreSQL process. The same script without that switch requires actual PostgreSQL stop/start and a changed database PID. Windows Application Control currently prevents that full check; application-only success must not be reported as database restart acceptance.
+
+The remaining strategy below includes future expectations, not claims that timeline/FHIR or production security are implemented.
 
 ## 1. Philosophy
 
@@ -72,7 +76,7 @@ Cover:
 - doctor summary editor.
 
 ### End-to-end
-A Playwright suite now covers the implemented Phase 1/2 intake, review, mobile and resume paths. Extend it for later phases as those features become available.
+Playwright covers intake, source edits, normalization, speech confirmation/fallback, triage event delivery, document review, security rejections, mobile layouts and retained resume. Clinical validation and hosted provider acceptance are separate and unestablished.
 
 Critical flows:
 1. basic patient intake → doctor sees answers;
@@ -230,7 +234,7 @@ The five browser tests include adaptive branch entry/edit/removal/restoration, r
 After browser tests, from the project root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-restart.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-stabilization-restart.ps1
 ```
 
 The checker stops/restarts the actual backend and PostgreSQL, requires new PIDs, and compares legacy/Phase 2 confirmed records plus the unfinished Bengali interview (flow, cursor, revision, history and answers). Finally run `npm run test:e2e -- e2e/restart.spec.ts` from frontend to verify browser resume after the real restart.
@@ -249,7 +253,7 @@ From backend with local PostgreSQL running:
 
 This verifies empty, Phase 1 and Phase 2 upgrades in isolated test schemas, then the real app upgrade; all pre-existing rows are fingerprint-compared. Alembic must report no new upgrade operations. Existing tests/start commands above remain valid.
 
-After the full E2E suite, scripts/verify-restart.ps1 compares both confirmed and unfinished Phase 3A source/result/provenance snapshots across real backend and PostgreSQL process restarts. Run `npm run test:e2e -- e2e/restart.spec.ts` afterward for two browser resume checks. Artifacts are stored in ignored .runtime. See [Phase 3A report](phase3a-implementation-status.md) for the reviewed defects and final evidence.
+After the full E2E suite, scripts/verify-stabilization-restart.ps1 compares both confirmed and unfinished Phase 3A source/result/provenance snapshots across real backend and PostgreSQL process restarts. Run `npm run test:e2e -- e2e/restart.spec.ts` afterward for two browser resume checks. Artifacts are stored in ignored .runtime. See [Phase 3A report](phase3a-implementation-status.md) for the reviewed defects and final evidence.
 
 ## Phase 3B acceptance
 
@@ -301,6 +305,6 @@ New test coverage includes:
   - PostgreSQL regression: 231 passed in 14.67s.
   - Full frontend suite: 47 tests passed in 1.45s.
   - Full E2E suite: 12 tests across 5 spec files passed in 44.6s.
-  - Real service restart verification: `scripts/verify-restart.ps1` passed 100% across real backend and PostgreSQL processes.
+  - Real service restart verification: `scripts/verify-stabilization-restart.ps1` passed 100% across real backend and PostgreSQL processes.
 
 

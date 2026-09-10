@@ -13,6 +13,7 @@ export interface ResponseInput {
   status: AnswerStatus;
   raw_value: string;
   source: 'typed' | 'touch' | 'voice';
+  voice_candidate?: string;
 }
 export default function QuestionRenderer({
   question,
@@ -158,17 +159,18 @@ export default function QuestionRenderer({
                 language={language}
                 disabled={busy || blocked}
                 fixtureId={fixtureId}
-                onConfirmCandidate={(transcript) => {
+                onConfirmCandidate={(transcript, token) => {
                   onSave({
                     value: transcript,
                     raw_value: transcript,
                     status: 'answered',
                     source: 'voice',
+                    voice_candidate: token,
                   });
                 }}
                 onEditCandidate={(transcript) => {
                   setText(transcript);
-                  setAnswerSource('voice');
+                  setAnswerSource('typed');
                 }}
               />
             )}

@@ -4,11 +4,14 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from app import models
+from app.api.deps import get_current_user
 from app.database import get_db
 from app.schemas.document import (
     DocumentExtractionResponse,
     DocumentListResponse,
     DocumentResponse,
+    DocumentType,
     ExtractionVerifyRequest,
 )
 from app.services import document_service
@@ -21,7 +24,7 @@ router = APIRouter()
 async def upload_document(
     session_id: UUID,
     file: UploadFile = File(...),
-    document_type: str | None = Form(None),
+    document_type: DocumentType | None = Form(None),
     db: Session = Depends(get_db),
 ):
     doc = await document_service.ingest_document(
@@ -37,6 +40,7 @@ async def upload_document(
 def list_documents(
     session_id: UUID,
     db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
     docs = document_service.get_session_documents(db=db, session_id=str(session_id))
     return DocumentListResponse(documents=docs, total=len(docs))
@@ -47,6 +51,7 @@ def get_document_detail(
     session_id: UUID,
     document_id: str,
     db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
     return document_service.get_document(db=db, session_id=str(session_id), document_id=document_id)
 
@@ -56,6 +61,7 @@ def get_document_file(
     session_id: UUID,
     document_id: str,
     db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
     doc = document_service.get_document(db=db, session_id=str(session_id), document_id=document_id)
     file_path = default_storage.get_file_path(doc.object_key)
@@ -76,6 +82,7 @@ def verify_document_extraction(
     extraction_id: str,
     payload: ExtractionVerifyRequest,
     db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
     return document_service.verify_extraction(
         db=db,
@@ -83,6 +90,8 @@ def verify_document_extraction(
         document_id=document_id,
         extraction_id=extraction_id,
         status=payload.status,
-        verified_by=payload.verified_by,
+        user=user,
+        expected_status=payload.expected_status,
+        expected_version=payload.expected_version,
         notes=payload.notes,
     )

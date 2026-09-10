@@ -169,8 +169,11 @@ def check_revision(run, expected):
 def submit(db, session_id, payload):
     session = editable(db, session_id)
     flow, run = require_run(db, session_id)
+    hashed_payload = payload.model_dump(mode="json")
+    if hashed_payload["voice_candidate"] is None:
+        hashed_payload.pop("voice_candidate")  # Preserve historical request hashes.
     digest = hashlib.sha256(
-        json.dumps(payload.model_dump(mode="json"), sort_keys=True, ensure_ascii=False).encode()
+        json.dumps(hashed_payload, sort_keys=True, ensure_ascii=False).encode()
     ).hexdigest()
     receipt = db.get(models.InterviewRequest, (session_id, str(payload.request_id)))
     if receipt:
@@ -186,6 +189,12 @@ def submit(db, session_id, payload):
         raise WorkflowError("QUESTION_NOT_CURRENT", "Reload the current interview question.", 409)
     if payload.language != session.language:
         raise WorkflowError("INVALID_ANSWER", "Answer language must match the session.", 422)
+    candidate = None
+    if payload.source == "voice":
+        from app.services.voice_candidates import verify
+        candidate = verify(db, session_id, payload, current)
+    elif payload.voice_candidate is not None:
+        raise WorkflowError("INVALID_VOICE_CANDIDATE", "Edited answers must be submitted as typed text without a voice token.", 422)
     validate_answer(current, payload)
     value = payload.model_dump(mode="json")["value"]
     previous = engine.answers.get(payload.question_id)
@@ -215,6 +224,12 @@ def submit(db, session_id, payload):
             metadata={"field": current.field, "flow_version": flow.version},
         )
         db.flush()
+    if candidate is not None:
+        intake.audit(db, "voice_candidate_confirmed", session_id, metadata={
+            "candidate_id": candidate["id"], "provider": candidate["provider"], "model": candidate["model"],
+            "question_id": current.question_id, "language": payload.language,
+            "source_answer_id": saved_answer.id if saved_answer is not None else previous.answer_id,
+        })
     run.cursor = engine_for(db, session_id, flow).after(payload.question_id)
     run.revision += 1
     session.updated_at = intake.now()
@@ -226,7 +241,9 @@ def submit(db, session_id, payload):
     db.commit()
     if saved_answer is not None:
         normalization.persist_committed(db, saved_answer, current, flow, payload.status)
+    intake.get_session(db, session_id)
     active_engine = engine_for(db, session_id, flow)
+    db.info.pop("triage_events", None)
     red_flags.evaluate_and_persist(db, session_id, flow.flow_id, list(active_engine.active.values()))
     db.commit()
     return state(db, session_id)

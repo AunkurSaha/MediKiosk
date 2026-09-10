@@ -9,7 +9,7 @@ export interface VoiceRecorderProps {
   language: Language;
   disabled?: boolean;
   fixtureId?: string;
-  onConfirmCandidate: (transcript: string) => void;
+  onConfirmCandidate: (transcript: string, token: string) => void;
   onEditCandidate: (transcript: string) => void;
 }
 
@@ -27,16 +27,29 @@ export default function VoiceRecorder({
   const t = speechCopy[language];
   const [state, setState] = useState<RecordingState>('idle');
   const [candidateText, setCandidateText] = useState<string>('');
+  const [candidateProvider, setCandidateProvider] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [recordingSeconds, setRecordingSeconds] = useState<number>(0);
 
+  const candidateToken = useRef<string>('');
+  const generation = useRef(0);
+  const uploadController = useRef<AbortController | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
+    const activeGeneration = generation;
     return () => {
+      activeGeneration.current++;
+      uploadController.current?.abort();
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.onstop = null;
+        mediaRecorderRef.current.ondataavailable = null;
+      }
+      stopRecording();
+      chunksRef.current = [];
       stopTracks();
       if (timerRef.current) clearInterval(timerRef.current);
     };
@@ -66,6 +79,9 @@ export default function VoiceRecorder({
 
   async function startRecording() {
     if (disabled) return;
+    const currentGeneration = ++generation.current;
+    uploadController.current?.abort();
+    candidateToken.current = '';
     setErrorMessage(null);
     setCandidateText('');
     setRecordingSeconds(0);
@@ -79,6 +95,10 @@ export default function VoiceRecorder({
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (generation.current !== currentGeneration) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
 
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -95,7 +115,7 @@ export default function VoiceRecorder({
       mediaRecorderRef.current = recorder;
 
       recorder.ondataavailable = (event) => {
-        if (event.data && event.data.size > 0) {
+        if (generation.current === currentGeneration && event.data && event.data.size > 0) {
           chunksRef.current.push(event.data);
         }
       };
@@ -106,7 +126,7 @@ export default function VoiceRecorder({
           clearInterval(timerRef.current);
           timerRef.current = null;
         }
-        void handleAudioReady();
+        if (generation.current === currentGeneration) void handleAudioReady(currentGeneration);
       };
 
       recorder.start(250);
@@ -140,6 +160,9 @@ export default function VoiceRecorder({
   }
 
   function cancelRecording() {
+    generation.current++;
+    uploadController.current?.abort();
+    candidateToken.current = '';
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
     }
@@ -154,7 +177,7 @@ export default function VoiceRecorder({
     setCandidateText('');
   }
 
-  async function handleAudioReady() {
+  async function handleAudioReady(currentGeneration: number) {
     const chunks = chunksRef.current;
     chunksRef.current = [];
 
@@ -169,8 +192,18 @@ export default function VoiceRecorder({
 
     setState('transcribing');
     try {
-      const res = await api.transcribeSpeech(sessionId, audioBlob, questionId, fixtureId);
-      if (res.status === 'success' && res.transcript) {
+      uploadController.current = new AbortController();
+      const res = await api.transcribeSpeech(
+        sessionId,
+        audioBlob,
+        questionId,
+        fixtureId,
+        uploadController.current.signal,
+      );
+      if (generation.current !== currentGeneration) return;
+      if (res.status === 'success' && res.transcript && res.candidate_token) {
+        candidateToken.current = res.candidate_token;
+        setCandidateProvider(res.provider);
         setCandidateText(res.transcript);
         setState('candidate');
       } else {
@@ -178,6 +211,7 @@ export default function VoiceRecorder({
         setErrorMessage(t.voiceUnavailable);
       }
     } catch (err) {
+      if (generation.current !== currentGeneration) return;
       setState('error');
       if (err instanceof ApiError && err.code === 'VOICE_CONSENT_REQUIRED') {
         setErrorMessage(t.voiceUnavailable);
@@ -209,11 +243,7 @@ export default function VoiceRecorder({
             </span>
           </div>
           <div className="recording-actions">
-            <button
-              type="button"
-              className="primary stop-recording-button"
-              onClick={stopRecording}
-            >
+            <button type="button" className="primary stop-recording-button" onClick={stopRecording}>
               ⏹ {t.stop}
             </button>
             <button
@@ -237,6 +267,9 @@ export default function VoiceRecorder({
       {state === 'candidate' && (
         <div className="candidate-review-card" role="region" aria-label={t.candidateTitle}>
           <p className="candidate-heading">{t.candidateTitle}</p>
+          {candidateProvider === 'mock' && (
+            <p role="note">Mock speech fixture — not a transcription of your recording.</p>
+          )}
           <blockquote className="candidate-text" lang={language}>
             &ldquo;{candidateText}&rdquo;
           </blockquote>
@@ -244,7 +277,7 @@ export default function VoiceRecorder({
             <button
               type="button"
               className="primary confirm-candidate-button"
-              onClick={() => onConfirmCandidate(candidateText)}
+              onClick={() => onConfirmCandidate(candidateText, candidateToken.current)}
             >
               ✓ {t.confirmCandidate}
             </button>

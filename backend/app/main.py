@@ -17,6 +17,7 @@ from app.core.errors import WorkflowError
 from app.database import get_db
 from app.services.flow_registry import registry
 from app.services.normalization_provider import validate_configuration
+from app.services.red_flags import get_rule_catalog
 from app.services.speech_provider import validate_speech_configuration
 
 
@@ -26,6 +27,7 @@ async def lifespan(app):
     registry()
     validate_configuration()
     validate_speech_configuration()
+    get_rule_catalog()
     yield
 
 
@@ -89,7 +91,7 @@ logger = logging.getLogger(__name__)
 
 @app.exception_handler(Exception)
 async def unexpected_error(request: Request, exc: Exception):
-    logger.exception("Unhandled error occurred in %s %s: %s", request.method, request.url, exc)
+    logger.error("Unhandled application error: %s", type(exc).__name__)
     return error_response(500, "INTERNAL_ERROR", "An unexpected error occurred. Please retry.")
 
 
@@ -107,6 +109,7 @@ def public_config():
         "languages": ["en", "bn", "hi"],
         "normalization_provider": os.getenv("CLINICAL_NORMALIZATION_PROVIDER", "mock"),
         "speech_provider": os.getenv("SPEECH_PROVIDER", "mock"),
+        "ocr_provider": os.getenv("OCR_PROVIDER", "mock"),
     }
 
 

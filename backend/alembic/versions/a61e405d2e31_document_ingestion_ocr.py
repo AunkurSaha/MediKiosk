@@ -1,6 +1,7 @@
 """Create documents and document_extractions tables for Phase 6."""
 
 import sqlalchemy as sa
+
 from alembic import op
 
 revision = "a61e405d2e31"

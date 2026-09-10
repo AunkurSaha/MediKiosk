@@ -1,15 +1,15 @@
 {
   "schema_version": "1.0",
-  "rules_version": "1.0.0",
+  "rules_version": "1.0.1",
   "description": "Deterministic red-flag safety screening rules for pre-consultation clinical intake.",
   "rules": [
     {
       "rule_id": "RF-CHEST-001",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "chest_pain",
       "priority": "emergency",
       "category": "cardiovascular",
-      "reason": "Severe radiating chest pain (potential acute coronary syndrome).",
+      "reason": "Reported chest pain severity at least 8/10 with radiation.",
       "conditions": [
         {
           "field": "hpi.severity",
@@ -25,7 +25,7 @@
     },
     {
       "rule_id": "RF-CHEST-002",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "chest_pain",
       "priority": "urgent",
       "category": "cardiovascular",
@@ -40,7 +40,7 @@
     },
     {
       "rule_id": "RF-CHEST-003",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "chest_pain",
       "priority": "urgent",
       "category": "cardiovascular",
@@ -49,13 +49,16 @@
         {
           "field": "any_concept",
           "operator": "in",
-          "value": ["SWEATING", "DIZZINESS"]
+          "value": [
+            "SWEATING",
+            "DIZZINESS"
+          ]
         }
       ]
     },
     {
       "rule_id": "RF-RESP-001",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "cough_breathlessness",
       "priority": "emergency",
       "category": "respiratory",
@@ -64,7 +67,10 @@
         {
           "field": "hpi.symptom",
           "operator": "in",
-          "value": ["breathlessness", "both"]
+          "value": [
+            "breathlessness",
+            "both"
+          ]
         },
         {
           "field": "hpi.timing",
@@ -75,26 +81,33 @@
     },
     {
       "rule_id": "RF-RESP-002",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "cough_breathlessness",
       "priority": "urgent",
       "category": "respiratory",
-      "reason": "Reported hemoptysis (coughing blood) in respiratory intake.",
+      "reason": "Reported blood/red sputum wording; staff assessment recommended.",
       "conditions": [
         {
           "field": "hpi.sputum_details",
           "operator": "contains_any_word",
-          "value": ["blood", "bloody", "red", "hemoptysis", "রক্ত", "खून"]
+          "value": [
+            "blood",
+            "bloody",
+            "red",
+            "hemoptysis",
+            "রক্ত",
+            "खून"
+          ]
         }
       ]
     },
     {
       "rule_id": "RF-FEV-001",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "fever",
       "priority": "emergency",
       "category": "infectious",
-      "reason": "Hyperpyrexia (measured temperature ≥ 40.0°C / 104°F).",
+      "reason": "Reported measured temperature at least 40 degrees Celsius.",
       "conditions": [
         {
           "field": "hpi.temperature",
@@ -105,11 +118,11 @@
     },
     {
       "rule_id": "RF-FEV-002",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "fever",
       "priority": "urgent",
       "category": "infectious",
-      "reason": "Prolonged fever (onset ≥ 14 days) or fever with systemic chills.",
+      "reason": "Reported fever with chills.",
       "conditions": [
         {
           "field": "hpi.associated",
@@ -120,11 +133,11 @@
     },
     {
       "rule_id": "RF-HEAD-001",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "headache",
       "priority": "emergency",
       "category": "neurological",
-      "reason": "Thunderclap headache pattern (sudden onset with maximal severity ≥ 9).",
+      "reason": "Reported headache severity at least 9/10.",
       "conditions": [
         {
           "field": "hpi.severity",
@@ -135,7 +148,7 @@
     },
     {
       "rule_id": "RF-HEAD-002",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "headache",
       "priority": "urgent",
       "category": "neurological",
@@ -155,11 +168,11 @@
     },
     {
       "rule_id": "RF-ABD-001",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "abdominal_pain",
       "priority": "emergency",
       "category": "gastrointestinal",
-      "reason": "Severe constant acute abdominal pain (potential acute surgical abdomen).",
+      "reason": "Reported abdominal pain severity at least 8/10 with constant timing.",
       "conditions": [
         {
           "field": "hpi.severity",
@@ -175,11 +188,11 @@
     },
     {
       "rule_id": "RF-ABD-002",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "flow_id": "abdominal_pain",
       "priority": "urgent",
       "category": "gastrointestinal",
-      "reason": "Severe abdominal pain associated with persistent vomiting.",
+      "reason": "Reported abdominal pain with vomiting.",
       "conditions": [
         {
           "field": "concept:VOMITING",

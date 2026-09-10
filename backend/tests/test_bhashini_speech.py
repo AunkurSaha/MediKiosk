@@ -2,6 +2,7 @@ import base64
 import io
 import json
 import uuid
+import wave
 
 import httpx2 as httpx
 import pytest
@@ -15,6 +16,18 @@ from app.services.bhashini_speech import (
     BhashiniSpeechProvider,
 )
 from app.services.speech_provider import get_speech_provider, validate_speech_configuration
+
+
+def pcm_wav():
+    output = io.BytesIO()
+    with wave.open(output, "wb") as audio:
+        audio.setnchannels(1)
+        audio.setsampwidth(2)
+        audio.setframerate(16000)
+        audio.writeframes(b"\x00\x00" * 160)
+    return output.getvalue()
+
+
 
 # -----------------------------------------------------------------------------
 # Fixtures & Helpers
@@ -175,7 +188,7 @@ def test_bhashini_audio_format_mapping():
             user_id=SecretStr("u"),
         )
     )
-    assert provider._map_audio_format("audio/webm;codecs=opus") == "webm"
+    assert provider._map_audio_format("audio/webm") == "webm"
     assert provider._map_audio_format("audio/webm") == "webm"
     assert provider._map_audio_format("audio/wav") == "wav"
     assert provider._map_audio_format("audio/x-wav") == "wav"
@@ -208,10 +221,10 @@ async def test_bhashini_transcribe_en_success():
             assert body["pipelineTasks"][0]["taskType"] == "asr"
             assert body["pipelineTasks"][0]["config"]["language"]["sourceLanguage"] == "en"
             assert body["pipelineTasks"][0]["config"]["serviceId"] == "ai4bharat/conformer-en"
-            assert body["pipelineTasks"][0]["config"]["audioFormat"] == "webm"
+            assert body["pipelineTasks"][0]["config"]["audioFormat"] == "wav"
             # Verify base64 audio content
             raw_b64 = body["inputData"]["audio"][0]["audioContent"]
-            assert base64.b64decode(raw_b64) == b"fake-audio-payload"
+            assert base64.b64decode(raw_b64) == pcm_wav()
             return httpx.Response(200, json=_make_asr_compute_response("I have severe chest pain"))
         return httpx.Response(404)
 
@@ -223,9 +236,9 @@ async def test_bhashini_transcribe_en_success():
     provider = BhashiniSpeechProvider(settings=settings, transport=transport)
 
     result = await provider.transcribe(
-        audio=b"fake-audio-payload",
+        audio=pcm_wav(),
         language="en",
-        media_type="audio/webm;codecs=opus",
+        media_type="audio/wav",
     )
 
     assert isinstance(result, TranscriptionResult)
@@ -257,14 +270,14 @@ async def test_bhashini_transcribe_bn_and_cache():
     provider = BhashiniSpeechProvider(settings=settings, transport=transport)
 
     # First call - triggers discovery
-    res1 = await provider.transcribe(b"audio-1", "bn", "audio/wav")
+    res1 = await provider.transcribe(pcm_wav(), "bn", "audio/wav")
     assert res1.status == "success"
     assert res1.transcript == "আমার বুকে চাপ লাগছে"
     assert res1.language == "bn"
     assert discovery_count == 1
 
     # Second call for bn - uses cached pipeline task config!
-    res2 = await provider.transcribe(b"audio-2", "bn", "audio/wav")
+    res2 = await provider.transcribe(pcm_wav(), "bn", "audio/wav")
     assert res2.status == "success"
     assert res2.transcript == "আমার বুকে চাপ লাগছে"
     assert discovery_count == 1  # No second discovery!
@@ -284,7 +297,7 @@ async def test_bhashini_transcribe_hi():
     settings = BhashiniSettings(api_key=SecretStr("k"), user_id=SecretStr("u"))
     provider = BhashiniSpeechProvider(settings=settings, transport=transport)
 
-    res = await provider.transcribe(b"audio-hi", "hi", "audio/webm")
+    res = await provider.transcribe(pcm_wav(), "hi", "audio/wav")
     assert res.status == "success"
     assert res.transcript == "मुझे बहुत तेज सिरदर्द है"
     assert res.language == "hi"
@@ -312,7 +325,7 @@ async def test_bhashini_direct_inference_mode():
     )
     provider = BhashiniSpeechProvider(settings=settings, transport=transport)
 
-    res = await provider.transcribe(b"audio", "en", "audio/wav")
+    res = await provider.transcribe(pcm_wav(), "en", "audio/wav")
     assert res.status == "success"
     assert res.transcript == "direct inference text"
     # Discovery was bypassed
@@ -336,7 +349,7 @@ async def test_bhashini_synthesize_success():
             body = json.loads(request.content.decode("utf-8"))
             assert body["pipelineTasks"][0]["taskType"] == "tts"
             assert body["inputData"]["input"][0]["source"] == "আপনার বুকে ব্যথা কোথায় হচ্ছে?"
-            return httpx.Response(200, json=_make_tts_compute_response("mock-tts-wav-b64", "wav"))
+            return httpx.Response(200, json=_make_tts_compute_response(base64.b64encode(pcm_wav()).decode(), "wav"))
         return httpx.Response(404)
 
     transport = httpx.MockTransport(handler)
@@ -350,7 +363,7 @@ async def test_bhashini_synthesize_success():
 
     assert isinstance(result, SpeechSynthesisResult)
     assert result.status == "success"
-    assert result.audio_base64 == "mock-tts-wav-b64"
+    assert result.audio_base64 == base64.b64encode(pcm_wav()).decode()
     assert result.media_type == "audio/wav"
     assert result.language == "bn"
     assert result.text == "আপনার বুকে ব্যথা কোথায় হচ্ছে?"
@@ -376,7 +389,7 @@ async def test_bhashini_unsupported_language():
     provider = BhashiniSpeechProvider(
         settings=BhashiniSettings(api_key=SecretStr("k"), user_id=SecretStr("u"))
     )
-    res = await provider.transcribe(b"audio", "fr", "audio/wav")
+    res = await provider.transcribe(pcm_wav(), "fr", "audio/wav")
     assert res.status == "unavailable"
     assert res.reason == "unsupported_language"
 
@@ -402,7 +415,7 @@ async def test_bhashini_timeout_handling():
         transport=transport,
     )
 
-    res = await provider.transcribe(b"audio", "en", "audio/wav")
+    res = await provider.transcribe(pcm_wav(), "en", "audio/wav")
     assert res.status == "unavailable"
     assert res.reason == "timeout"
     assert res.transcript is None
@@ -419,7 +432,7 @@ async def test_bhashini_auth_error():
         transport=transport,
     )
 
-    res = await provider.transcribe(b"audio", "en", "audio/wav")
+    res = await provider.transcribe(pcm_wav(), "en", "audio/wav")
     assert res.status == "unavailable"
     assert res.reason == "authentication_failed"
 
@@ -435,7 +448,7 @@ async def test_bhashini_rate_limited():
         transport=transport,
     )
 
-    res = await provider.transcribe(b"audio", "en", "audio/wav")
+    res = await provider.transcribe(pcm_wav(), "en", "audio/wav")
     assert res.status == "unavailable"
     assert res.reason == "rate_limited"
 
@@ -451,7 +464,7 @@ async def test_bhashini_upstream_500_error():
         transport=transport,
     )
 
-    res = await provider.transcribe(b"audio", "en", "audio/wav")
+    res = await provider.transcribe(pcm_wav(), "en", "audio/wav")
     assert res.status == "unavailable"
     assert res.reason == "provider_error"
 
@@ -467,7 +480,7 @@ async def test_bhashini_invalid_json():
         transport=transport,
     )
 
-    res = await provider.transcribe(b"audio", "en", "audio/wav")
+    res = await provider.transcribe(pcm_wav(), "en", "audio/wav")
     assert res.status == "unavailable"
     assert res.reason == "invalid_response"
 
@@ -526,10 +539,10 @@ def test_transcribe_endpoint_with_bhashini_provider(client, monkeypatch):
     assert flow_res.status_code == 200
 
     # 2. Transcribe via Bhashini
-    fake_audio = io.BytesIO(b"RIFF\x24\x00\x00\x00WAVEfmt \x10\x00\x00\x00" + b"\x00" * 32)
+    fake_audio = io.BytesIO(pcm_wav())
     response = client.post(
         f"/api/sessions/{session_id}/interview/speech/transcribe",
-        files={"audio": ("audio.webm", fake_audio, "audio/webm")},
+        files={"audio": ("audio.webm", fake_audio, "audio/wav")},
         data={"question_id": "chief_complaint.description"},
     )
     assert response.status_code == 200

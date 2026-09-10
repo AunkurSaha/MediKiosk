@@ -1,4 +1,4 @@
-# MediKiosk API contract — through Phase 5
+# MediKiosk API contract — stabilization of Phase 4–6
 
 Base: `/api`. Local OpenAPI: http://127.0.0.1:8010/docs. All request schemas reject unknown fields. Identity/review text is trimmed; adaptive raw wording is retained exactly. Timestamps have explicit UTC offsets.
 
@@ -191,164 +191,18 @@ No additional public endpoint or changed answer-submission payload. The contract
     `"timeout"` | `"network_error"` | `"authentication_failed"` | `"rate_limited"` | `"server_error"` | `"invalid_result"`.
   - No silent fallback to mock provider occurs.
 
-## Phase 4A Speech and Text-to-Speech (TTS) contract
+## Stabilized Phase 4–6 contracts (supersede previous phase contracts)
 
-### Speech-to-Text (ASR) Candidate Transcription
+Staff HTTP routes require the existing active demo-doctor identity (`X-Demo-Doctor: true`, DEMO_MODE enabled outside production). Client-supplied reviewer/acknowledger names are rejected. This is a loopback synthetic demo boundary, not production login.
 
-`POST /api/sessions/{session_id}/interview/speech/transcribe`
-
-Accepts multipart form upload:
-- `audio`: binary audio file (supported types: `audio/webm`, `audio/ogg`, `audio/wav`, `audio/mp4`, `audio/mpeg`). Capped at 5MB (`5 * 1024 * 1024` bytes). Empty uploads rejected.
-- `language`: optional language string (`en`, `bn`, `hi`). If provided, must match session language.
-
-Preconditions enforced:
-1. Session exists and is editable (`ready_for_review == false`, `is_confirmed == false`).
-2. Sharing consent (`share_with_doctor == true`) is granted.
-3. Voice consent (`voice_processing == true`) is explicitly granted (HTTP 403 `VOICE_CONSENT_REQUIRED` if false).
-4. Audio size <= 5MB (HTTP 413 `FILE_TOO_LARGE` if exceeded).
-5. Audio content is non-empty (HTTP 422 `EMPTY_AUDIO` if empty).
-6. Audio MIME type is supported (HTTP 415 `UNSUPPORTED_MEDIA_TYPE` if unsupported).
-
-Processing & Privacy:
-- Raw audio is streamed to an ephemeral server-side temporary file with a random UUID name.
-- Temporary file is strictly unlinked in a `finally` block on success, provider error, validation error, or timeout.
-- Zero raw audio is saved to PostgreSQL, object storage, or filesystem.
-- Transcription output is strictly a **candidate transcript** and is NEVER persisted as an interview answer automatically.
-
-Response:
-```json
-{
-  "transcript": "I have chest pain",
-  "language": "en",
-  "confidence": null,
-  "provider": "mock",
-  "model": "deterministic-mock",
-  "status": "success",
-  "reason": null
-}
-```
-
-On provider failure:
-```json
-{
-  "transcript": null,
-  "language": "en",
-  "confidence": null,
-  "provider": "mock",
-  "model": "deterministic-mock",
-  "status": "unavailable",
-  "reason": "timeout"
-}
-```
-
-### Text-to-Speech (TTS) Question Synthesis
-
-`POST /api/sessions/{session_id}/interview/speech/synthesize`
-
-Request:
-```json
-{
-  "question_id": "chief_complaint.description"
-}
-```
-
-Preconditions enforced:
-1. Session exists.
-2. Sharing consent (`share_with_doctor == true`) is granted.
-3. `question_id` must match a question defined in the session's pinned flow snapshot (HTTP 404 `QUESTION_NOT_FOUND` if invalid).
-
-Processing & Safety:
-- Text is extracted strictly from the localized text field of the pinned complaint flow snapshot for the session's active language.
-- Patient-reported answers, clinical histories, and doctor summaries are never passed to TTS.
-- Returns synthesized audio bytes or mock audio representation.
-
-Response:
-```json
-{
-  "audio_base64": "UklGRj4AAABXQVZFZm10IBAAAA...",
-  "mime_type": "audio/wav",
-  "language": "en",
-  "text_synthesized": "Describe your main concern in your own words.",
-  "provider": "mock",
-  "status": "success",
-  "reason": null
-}
-```
-
-## Phase 5: Staff Triage & Safety Screening Endpoints
-
-### List Triage Alerts
-
-`GET /api/triage/alerts`
-
-Query parameters:
-- `status`: Optional filter (`"new"`, `"acknowledged"`, `"resolved"`).
-- `priority`: Optional filter (`"emergency"`, `"urgent"`).
-
-Response (`AlertList`):
-```json
-{
-  "items": [
-    {
-      "id": "alert-uuid",
-      "session_id": "session-uuid",
-      "rule_id": "RF-CHEST-001",
-      "rule_version": "1.0.0",
-      "priority": "emergency",
-      "category": "cardiovascular",
-      "reason": "Severe radiating chest pain (potential acute coronary syndrome).",
-      "triggering_facts": [
-        {
-          "question_id": "hpi_severity",
-          "field": "hpi.severity",
-          "value": 9,
-          "raw_value": "9",
-          "label": "Severity"
-        }
-      ],
-      "status": "new",
-      "acknowledged_at": null,
-      "acknowledged_by": null,
-      "acknowledgement_note": null,
-      "created_at": "2026-09-09T12:00:00Z",
-      "updated_at": null,
-      "hospital_token": "DEMO-104",
-      "patient_name": "Synthetic Patient"
-    }
-  ],
-  "total": 1,
-  "emergency_count": 1,
-  "urgent_count": 0,
-  "acknowledged_count": 0
-}
-```
-
-### Acknowledge Alert
-
-`POST /api/triage/alerts/{alert_id}/acknowledge`
-
-Request (`AlertAcknowledgeRequest`):
-```json
-{
-  "acknowledged_by": "Nurse Ratched",
-  "note": "Patient moved to resuscitation bay for immediate ECG"
-}
-```
-
-Response (`AlertItem`): returns the updated alert record with `status: "acknowledged"`, `acknowledged_at` timestamp, and `acknowledged_by` staff name. Emits an `alert_acknowledged` event over the WebSocket feed.
-
-### Session Alerts
-
-`GET /api/sessions/{session_id}/alerts` or `GET /api/triage/sessions/{session_id}/alerts`
-
-Returns `list[AlertItem]` for the specified session, ordered by emergency priority first, then creation timestamp.
-
-### Live Triage WebSocket Feed
-
-`WebSocket /api/triage/ws`
-
-Connected staff clients receive real-time JSON frames:
-- `{"type": "alert_created", "alert": {...}}`
-- `{"type": "alert_acknowledged", "alert": {...}}`
-
-
+- POST `/triage/ws-ticket`: authenticated, returns a one-use ticket valid 30 seconds. Connect `/triage/ws` with subprotocols `["medikiosk", ticket]` and an allowed browser Origin; server selects `medikiosk`. Tickets do not go in URLs.
+- GET `/triage/alerts`, `/triage/sessions/{id}/alerts`, `/sessions/{id}/alerts`: staff only. Items include `revision`, `trigger_active`, `acknowledgement_state`, source evidence and attribution. Status `resolved` can retain prior acknowledgement.
+- POST `/triage/alerts/{id}/acknowledge`: `{expected_revision, note?}`. Actor comes from server identity; stale evidence/resolved alerts return 409; repeated acknowledgement preserves the first actor/time/note.
+- Committed `alert_created`, `alert_updated`, `alert_resolved`, `alert_reactivated` events carry identifiers; authorized clients refresh authoritative records/counters. Acknowledgement events also prompt refresh. No human-delivery claim follows a transport write.
+- POST `/sessions/{id}/documents`: multipart `file` and optional enum `document_type` (prescription/lab_report/other); active intake and document/sharing consent required. Actual content must decode; up to 10 MiB, 20 PDF pages, 20 million image pixels. Unsupported types/invalid content return 422 before persistence. Explicit fixture output has `mock_fixture` status and null confidence; arbitrary valid files have `unavailable` status and no extraction.
+- GET document list/detail/file: staff only with sharing consent. Original previews use authenticated fetch and temporary browser object URLs. Public session detail excludes documents and staff alert payloads.
+- POST extraction `/verify`: `{status, expected_status, expected_version, notes?}`. Server owns actor/time; each successful review increments `review_version` and preserves previous review metadata in audit. Confirmed/cancelled sessions and stale reviews return 409.
+- Structured document data uses `observations` (typed lab rows) and `medications`. Missing lab flags are null, not Normal. Historical alias input is accepted by the schema; output uses observations.
+- POST `/sessions/{id}/interview/speech/transcribe`: multipart audio, current `question_id`, optional mock fixture_id. Requires voice/sharing consent, active intake and current free-text eligibility before provider invocation. Multipart may already have spooled to disk; the UploadFile closes in finally. Successful response adds `candidate_token`; transcription does not save an answer.
+- Adaptive answer with source voice requires `voice_candidate` signed token and exact candidate text, language, question, session and revision. Tokens expire after 10 minutes/restart. Editing uses source typed without a token. Confirmed provenance is audited in the answer transaction. Legacy answer endpoints only accept touch/typed.
+- Speech provider invocation has a 15-second overall deadline. BHASHINI live ASR rejects unchecked native browser formats and requires validated 16-kHz mono PCM WAV. This is a conservative adapter boundary, not live format acceptance.

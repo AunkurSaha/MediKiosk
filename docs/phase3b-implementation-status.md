@@ -1,3 +1,5 @@
+> Historical milestone report. Current acceptance and known limitations are governed by [stabilization status](stabilization-implementation-status.md). Old test counts and recommendations do not authorize new phase work.
+
 # Phase 3B Implementation and Verification Report — 2026-09-09
 
 ## Executive Summary
@@ -6,7 +8,7 @@ Phase 3B integrates NVIDIA Build / NVIDIA NIM hosted inference (`google/gemma-4-
 
 The integration strictly preserves the core architectural principle: **The deterministic InterviewEngine remains authoritative.** Gemma-4-31B never selects questions, branches, detects red flags, diagnoses, or prescribes; it performs constrained clinical language normalization only.
 
-All automated acceptance criteria (backend tests on PostgreSQL and SQLite, frontend component tests, ESLint/Prettier/TypeScript checks, database migration continuity, secret audit, process restart persistence) pass completely. Empirical live diagnostics against `https://integrate.api.nvidia.com/v1` were conducted, analyzed, and documented honestly.
+Historical offline checks are recorded below; they do not establish live acceptance or acceptance of later phases. Retained live evaluation has 3/26 domain passes and 23 timeouts, plus a separate 0/5 smoke run. JSON-schema/object capability probes timed out, leaving support unknown. Current acceptance is tracked by the stabilization report.
 
 ---
 
@@ -103,8 +105,8 @@ Key validation rules:
 ## 5. Privacy & Data Minimization
 
 - **Input Minimization**: Only `text`, `language`, and `canonical_field` are transmitted.
-- **Excluded Context**: Patient name, demo ABHA ID, hospital token, doctor identity, session history, and database IDs are completely stripped.
-- **Secret Protection**: `NVIDIA_API_KEY` is wrapped in Pydantic `SecretStr`. It is never serialized, logged, returned by `/api/config` or any other route, or committed.
+- **Excluded Context**: Separate identifying metadata (patient name, demo ABHA ID, hospital token, doctor identity, session history and database IDs) is omitted from the provider payload. Identifiers embedded in free text are not automatically removed.
+- **Secret Protection**: `NVIDIA_API_KEY` is wrapped in Pydantic `SecretStr`. It is excluded from settings serialization and public configuration. Configured-value audits found no matches in the scanned files/history; this is not a guarantee against all leakage.
 - **Audit Verification**: `python .runtime/audit-phase3b-secrets.py` scanned all 156 code, test, documentation, and log files in the repository and confirmed **0 key matches**.
 
 ---
@@ -159,10 +161,10 @@ An opt-in evaluation script (`scripts/evaluate-nvidia-normalization.py`) was exe
 
 ## 9. Known Limitations
 
-1. **Upstream Hosted NIM Latency**: The hosted `google/gemma-4-31b-it` model on `integrate.api.nvidia.com` intermittently experiences severe upstream latency or cold-start timeouts (>30s). The application handles this fault-tolerantly by design.
+1. **Upstream Hosted NIM Latency**: Retained calls timed out frequently. The precise upstream cause was not established; do not infer a cold start or reliable service availability. The application records unavailable normalization and preserves intake.
 2. **Prototype Clinical Scope**: Normalization maps directly stated symptoms to 13 canonical concepts across English, Bengali, and Hindi. Broad NLP, general translation, medication extraction, and autonomous diagnosis remain excluded.
 3. **No Automatic Backfill**: Historical or confirmed records are never reprocessed when provider configuration changes.
-4. **Deferred Roadmap Features**: Voice (ASR/TTS), red flags, document OCR, FHIR export, and production authentication remain scheduled for later phases.
+4. **Deferred Roadmap Features**: At this historical milestone voice/triage/documents were future work. They now exist as Phase 4–6 implementations under stabilization; real OCR, FHIR and production authentication remain absent.
 
 ---
 

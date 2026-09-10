@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import JSON, Column, DateTime, Float, ForeignKey, String, Text, text
+from sqlalchemy import JSON, Column, DateTime, Float, ForeignKey, Integer, String, Text, text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -18,6 +18,7 @@ class DocumentExtraction(Base):
     structured_json = Column(JSON, nullable=False)
     confidence = Column(Float, nullable=True)
     verification_status = Column(String, nullable=False, server_default="unverified", index=True)
+    review_version = Column(Integer, nullable=False, server_default="0")
     verified_by = Column(String, nullable=True)
     verified_at = Column(DateTime(timezone=True), nullable=True)
     verification_notes = Column(String, nullable=True)

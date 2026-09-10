@@ -1,6 +1,6 @@
 from typing import Any, Literal
 
-from pydantic import Field
+from pydantic import Field, computed_field
 
 from .common import APIModel, UTCDate
 
@@ -35,6 +35,17 @@ class AlertItem(APIModel):
     reason: str
     triggering_facts: list[TriggeringFact]
     status: AlertStatus
+    revision: int = 0
+
+    @computed_field
+    @property
+    def trigger_active(self) -> bool:
+        return self.status != "resolved"
+
+    @computed_field
+    @property
+    def acknowledgement_state(self) -> str:
+        return "acknowledged" if self.acknowledged_at else "unacknowledged"
     acknowledged_at: UTCDate | None = None
     acknowledged_by: str | None = None
     acknowledgement_note: str | None = None
@@ -53,5 +64,5 @@ class AlertList(APIModel):
 
 
 class AlertAcknowledgeRequest(APIModel):
-    acknowledged_by: str = Field(min_length=1, max_length=100)
+    expected_revision: int = Field(default=0, ge=0)
     note: str | None = Field(default=None, max_length=500)

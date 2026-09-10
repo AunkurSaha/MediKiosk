@@ -1,5 +1,13 @@
 import io
 import uuid
+from pathlib import Path
+
+from app.api.deps import DEMO_DOCTOR_ID
+
+STAFF = {"X-Demo-Doctor": "true"}
+
+def fixture(name="prescription"):
+    return (Path(__file__).resolve().parents[2] / "ai/document_fixtures" / (name + ".png")).read_bytes()
 
 
 def _setup_session(client, lang="en", doc_consent=True):
@@ -36,25 +44,25 @@ def _setup_session(client, lang="en", doc_consent=True):
 def test_upload_prescription_success(client):
     session_id = _setup_session(client, doc_consent=True)
 
-    fake_image = io.BytesIO(b"\xff\xd8\xff\xe0\x00\x10JFIF" + b"\x00" * 64)
+    fake_image = io.BytesIO(fixture())
     res = client.post(
         f"/api/sessions/{session_id}/documents",
-        files={"file": ("rx_prescription.jpg", fake_image, "image/jpeg")},
+        files={"file": ("rx_prescription.png", fake_image, "image/png")},
         data={"document_type": "prescription"},
     )
     assert res.status_code == 201
     data = res.json()
     assert data["session_id"] == session_id
-    assert data["original_filename"] == "rx_prescription.jpg"
-    assert data["media_type"] == "image/jpeg"
+    assert data["original_filename"] == "rx_prescription.png"
+    assert data["media_type"] == "image/png"
     assert data["document_type"] == "prescription"
-    assert data["processing_status"] == "completed"
+    assert data["processing_status"] == "mock_fixture"
     assert len(data["sha256_hash"]) == 64
     assert len(data["extractions"]) == 1
 
     ext = data["extractions"][0]
     assert ext["verification_status"] == "unverified"
-    assert ext["confidence"] is not None
+    assert ext["confidence"] is None
     assert "medications" in ext["structured_json"]
     meds = ext["structured_json"]["medications"]
     assert len(meds) > 0
@@ -66,7 +74,7 @@ def test_upload_prescription_success(client):
 def test_upload_lab_report_success(client):
     session_id = _setup_session(client, doc_consent=True)
 
-    fake_png = io.BytesIO(b"\x89PNG\r\n\x1a\n" + b"\x00" * 64)
+    fake_png = io.BytesIO(fixture("lab_report"))
     res = client.post(
         f"/api/sessions/{session_id}/documents",
         files={"file": ("blood_test_report.png", fake_png, "image/png")},
@@ -89,10 +97,10 @@ def test_upload_lab_report_success(client):
 def test_upload_requires_document_consent(client):
     session_id = _setup_session(client, doc_consent=False)
 
-    fake_image = io.BytesIO(b"\xff\xd8\xff\xe0" + b"\x00" * 32)
+    fake_image = io.BytesIO(fixture())
     res = client.post(
         f"/api/sessions/{session_id}/documents",
-        files={"file": ("rx.jpg", fake_image, "image/jpeg")},
+        files={"file": ("rx.jpg", fake_image, "image/png")},
     )
     assert res.status_code == 403
     data = res.json()
@@ -105,7 +113,7 @@ def test_upload_rejects_empty_file(client):
     empty = io.BytesIO(b"")
     res = client.post(
         f"/api/sessions/{session_id}/documents",
-        files={"file": ("empty.jpg", empty, "image/jpeg")},
+        files={"file": ("empty.jpg", empty, "image/png")},
     )
     assert res.status_code == 422
     assert res.json()["error"]["code"] == "EMPTY_FILE"
@@ -130,7 +138,7 @@ def test_upload_rejects_oversized_file(client):
     oversized = io.BytesIO(b"\xff\xd8" + b"\x00" * (11 * 1024 * 1024))
     res = client.post(
         f"/api/sessions/{session_id}/documents",
-        files={"file": ("huge.jpg", oversized, "image/jpeg")},
+        files={"file": ("huge.jpg", oversized, "image/png")},
     )
     assert res.status_code == 422
     assert res.json()["error"]["code"] == "FILE_TOO_LARGE"
@@ -142,21 +150,21 @@ def test_list_and_get_documents(client):
     # Upload 2 documents
     client.post(
         f"/api/sessions/{session_id}/documents",
-        files={"file": ("doc1.png", io.BytesIO(b"\x89PNG\r\n\x1a\n" + b"\x00" * 32), "image/png")},
+        files={"file": ("doc1.png", io.BytesIO(fixture()), "image/png")},
     )
     client.post(
         f"/api/sessions/{session_id}/documents",
-        files={"file": ("doc2.jpg", io.BytesIO(b"\xff\xd8" + b"\x00" * 32), "image/jpeg")},
+        files={"file": ("doc2.jpg", io.BytesIO(fixture()), "image/png")},
     )
 
-    list_res = client.get(f"/api/sessions/{session_id}/documents")
+    list_res = client.get(f"/api/sessions/{session_id}/documents", headers=STAFF)
     assert list_res.status_code == 200
     list_data = list_res.json()
     assert list_data["total"] == 2
     assert len(list_data["documents"]) == 2
 
     doc_id = list_data["documents"][0]["id"]
-    detail_res = client.get(f"/api/sessions/{session_id}/documents/{doc_id}")
+    detail_res = client.get(f"/api/sessions/{session_id}/documents/{doc_id}", headers=STAFF)
     assert detail_res.status_code == 200
     assert detail_res.json()["id"] == doc_id
 
@@ -164,7 +172,7 @@ def test_list_and_get_documents(client):
 def test_document_file_retrieval_endpoint(client):
     session_id = _setup_session(client, doc_consent=True)
 
-    sample_bytes = b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR" + b"\x00" * 16
+    sample_bytes = fixture()
     up_res = client.post(
         f"/api/sessions/{session_id}/documents",
         files={"file": ("prescription.png", io.BytesIO(sample_bytes), "image/png")},
@@ -172,7 +180,7 @@ def test_document_file_retrieval_endpoint(client):
     assert up_res.status_code == 201
     doc_id = up_res.json()["id"]
 
-    file_res = client.get(f"/api/sessions/{session_id}/documents/{doc_id}/file")
+    file_res = client.get(f"/api/sessions/{session_id}/documents/{doc_id}/file", headers=STAFF)
     assert file_res.status_code == 200
     assert file_res.headers["content-type"] == "image/png"
     assert file_res.content == sample_bytes
@@ -183,7 +191,7 @@ def test_doctor_verify_document_extraction(client):
 
     up_res = client.post(
         f"/api/sessions/{session_id}/documents",
-        files={"file": ("rx.jpg", io.BytesIO(b"\xff\xd8\xff\xe0" + b"\x00" * 32), "image/jpeg")},
+        files={"file": ("rx.jpg", io.BytesIO(fixture()), "image/png")},
     )
     assert up_res.status_code == 201
     doc_id = up_res.json()["id"]
@@ -194,7 +202,6 @@ def test_doctor_verify_document_extraction(client):
         f"/api/sessions/{session_id}/documents/{doc_id}/extractions/{ext_id}/verify",
         json={
             "status": "verified",
-            "verified_by": "Dr. Ananya Sen",
             "notes": "Confirmed current medications against physical prescription.",
         },
         headers={"X-Demo-Doctor": "true"},
@@ -202,7 +209,7 @@ def test_doctor_verify_document_extraction(client):
     assert verify_res.status_code == 200
     v_data = verify_res.json()
     assert v_data["verification_status"] == "verified"
-    assert v_data["verified_by"] == "Dr. Ananya Sen"
+    assert v_data["verified_by"] == DEMO_DOCTOR_ID
     assert v_data["verified_at"] is not None
 
     # Check Doctor session detail includes the verified document
@@ -220,17 +227,17 @@ def test_document_facts_do_not_mutate_interview_answers(client):
     session_id = _setup_session(client, doc_consent=True)
 
     # 1. Check initial interview state has zero answers
-    initial_state = client.get(f"/api/sessions/{session_id}/interview").json()
+    initial_state = client.get(f"/api/sessions/{session_id}/interview", headers=STAFF).json()
     assert len(initial_state["active_answers"]) == 0
     current_q = initial_state["question"]["question_id"]
 
     # 2. Upload document with multiple extracted medications
     client.post(
         f"/api/sessions/{session_id}/documents",
-        files={"file": ("rx.jpg", io.BytesIO(b"\xff\xd8\xff\xe0" + b"\x00" * 32), "image/jpeg")},
+        files={"file": ("rx.jpg", io.BytesIO(fixture()), "image/png")},
     )
 
     # 3. Clinical Invariant Check: interview answers must remain unchanged!
-    post_upload_state = client.get(f"/api/sessions/{session_id}/interview").json()
+    post_upload_state = client.get(f"/api/sessions/{session_id}/interview", headers=STAFF).json()
     assert len(post_upload_state["active_answers"]) == 0
     assert post_upload_state["question"]["question_id"] == current_q

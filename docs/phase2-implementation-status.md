@@ -1,3 +1,5 @@
+> Historical milestone report. Current acceptance and known limitations are governed by [stabilization status](stabilization-implementation-status.md). Old test counts and recommendations do not authorize new phase work.
+
 # Phase 2 implementation status — 2026-09-09
 
 ## 1. Delivered behavior

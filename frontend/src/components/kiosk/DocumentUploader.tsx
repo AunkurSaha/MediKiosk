@@ -170,12 +170,18 @@ export default function DocumentUploader({
                 <div className="doc-extractions-summary">
                   {doc.extractions.map((ext) => {
                     const meds = ext.structured_json.medications;
-                    const labs = ext.structured_json.lab_observations;
+                    const labs = ext.structured_json.observations;
                     return (
                       <div key={ext.id} className="extraction-content">
+                        {ext.extractor === 'mock' && (
+                          <p role="note">
+                            Synthetic mock output. This is fixture data and may not describe the
+                            uploaded record.
+                          </p>
+                        )}
                         <div className="extraction-meta">
                           <span className="badge-unverified">{t.docPendingVerification}</span>
-                          {ext.confidence !== null && (
+                          {ext.extractor !== 'mock' && ext.confidence !== null && (
                             <span className="muted">
                               Confidence: {Math.round(ext.confidence * 100)}%
                             </span>
@@ -205,8 +211,10 @@ export default function DocumentUploader({
                                 <li key={idx}>
                                   <b>{l.test_name}</b>: {l.value} {l.unit || ''}{' '}
                                   {l.reference_range ? `(${l.reference_range})` : ''}{' '}
-                                  {l.flag && l.flag !== 'normal' ? (
+                                  {l.flag && l.flag.toLowerCase() !== 'normal' ? (
                                     <span className="badge-abnormal">{l.flag.toUpperCase()}</span>
+                                  ) : !l.flag ? (
+                                    <span className="muted">Not reported</span>
                                   ) : null}
                                 </li>
                               ))}

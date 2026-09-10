@@ -1,4 +1,4 @@
-param([ValidateSet('mock', 'nvidia', 'disabled')][string]$NormalizationProvider)
+param([ValidateSet('mock', 'nvidia', 'disabled')][string]$NormalizationProvider, [switch]$UseRunningDatabase)
 
 $ErrorActionPreference = 'Stop'
 if ($NormalizationProvider) {
@@ -8,7 +8,9 @@ if ($NormalizationProvider) {
 }
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $runtimeRoot = Join-Path $projectRoot '.runtime'
-& (Join-Path $PSScriptRoot 'setup-postgres.ps1')
+if (-not $UseRunningDatabase) { & (Join-Path $PSScriptRoot 'setup-postgres.ps1') }
+# UseRunningDatabase only skips cluster control; Alembic below must connect to
+# the existing configured database successfully. It does not start PostgreSQL.
 $pythonPath = Join-Path $projectRoot 'backend\.venv\Scripts\python.exe'
 Push-Location (Join-Path $projectRoot 'backend')
 try {

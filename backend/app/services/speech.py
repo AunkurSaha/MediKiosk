@@ -1,3 +1,5 @@
+import asyncio
+import base64
 import logging
 from typing import Any
 
@@ -13,6 +15,7 @@ from app.services.speech_provider import get_speech_provider
 logger = logging.getLogger(__name__)
 
 MAX_AUDIO_BYTES = 5 * 1024 * 1024  # 5 MB
+SPEECH_TIMEOUT_SECONDS = 15.0
 
 ALLOWED_MIME_PREFIXES = (
     "audio/webm",
@@ -34,7 +37,7 @@ def _validate_media_type(content_type: str | None) -> str:
     normalized = content_type.strip().lower()
     base_mime = normalized.split(";")[0].strip()
 
-    if not any(base_mime == allowed or base_mime.startswith(allowed) for allowed in ALLOWED_MIME_PREFIXES):
+    if not any(base_mime == allowed for allowed in ALLOWED_MIME_PREFIXES):
         raise WorkflowError(
             "INVALID_MEDIA_TYPE",
             f"Unsupported audio format '{content_type}'. Supported formats: WebM, WAV, OGG, MP4/M4A, MP3.",
@@ -52,7 +55,7 @@ async def transcribe_audio(
 ) -> TranscriptionResult:
     """Validate voice consent, bounds, and audio format, then transcribe via SpeechProvider.
 
-    Privacy Invariant: Audio is ephemeral. It is never saved to the database, object storage, or disk.
+    Privacy Invariant: Multipart audio may spool to temporary disk; the route closes it on every outcome. No permanent audio retention.
     Interview Invariant: Transcribe produces only a candidate transcript. It NEVER persists an answer.
     """
     session = db.get(models.Session, session_id)
@@ -60,7 +63,9 @@ async def transcribe_audio(
         raise WorkflowError("SESSION_NOT_FOUND", "Session not found.", 404)
 
     if session.status != "intake":
-        raise WorkflowError("SESSION_LOCKED", "Voice input is only allowed during active intake.", 409)
+        raise WorkflowError(
+            "SESSION_LOCKED", "Voice input is only allowed during active intake.", 409
+        )
 
     consent = db.scalar(select(models.Consent).where(models.Consent.session_id == session_id))
     if not consent or not consent.share_with_doctor:
@@ -73,6 +78,15 @@ async def transcribe_audio(
             403,
         )
 
+    from app.services import adaptive
+
+    flow, run = adaptive.require_run(db, session_id)
+    question = adaptive.engine_for(db, session_id, flow).state(run.cursor).question
+    if question is None or question.question_id != question_id or question.type != "short_text":
+        raise WorkflowError(
+            "QUESTION_NOT_CURRENT", "Voice input requires the current free-text question.", 409
+        )
+    revision = run.revision
     media_type = _validate_media_type(audio_file.content_type)
 
     # Stream bounded bytes into memory with size check
@@ -99,12 +113,30 @@ async def transcribe_audio(
         metadata["fixture_id"] = fixture_id
 
     try:
-        result = await provider.transcribe(
-            audio=bytes(audio_bytes),
-            language=session.language,
-            media_type=media_type,
-            metadata=metadata,
+        result = await asyncio.wait_for(
+            provider.transcribe(
+                audio=bytes(audio_bytes),
+                language=session.language,
+                media_type=media_type,
+                metadata=metadata,
+            ),
+            timeout=SPEECH_TIMEOUT_SECONDS,
         )
+        result = TranscriptionResult.model_validate(result.model_dump())
+        if (
+            result.language != session.language
+            or (result.status == "success" and (not result.transcript or result.reason))
+            or (result.status == "unavailable" and result.transcript is not None)
+        ):
+            raise ValueError("Invalid provider result")
+        result.provider = provider.name
+        result.model = result.model or provider.version
+        result.confidence = None  # Neither shipped adapter exposes calibrated confidence.
+        result.candidate_token = None
+        if result.status == "success":
+            from app.services.voice_candidates import issue
+
+            result.candidate_token = issue(session_id, question_id, revision, result)
         return result
     except Exception as e:
         logger.warning(f"Speech transcription error: {type(e).__name__}")
@@ -138,7 +170,9 @@ async def synthesize_question(
 
     run = db.get(models.InterviewRun, session_id)
     if not run or not run.flow_snapshot:
-        raise WorkflowError("FLOW_SELECTION_REQUIRED", "Interview flow has not been selected yet.", 409)
+        raise WorkflowError(
+            "FLOW_SELECTION_REQUIRED", "Interview flow has not been selected yet.", 409
+        )
 
     target_q = None
     for section in run.flow_snapshot.get("sections", []):
@@ -150,7 +184,9 @@ async def synthesize_question(
             break
 
     if not target_q:
-        raise WorkflowError("QUESTION_NOT_FOUND", f"Question '{question_id}' not found in pinned flow.", 404)
+        raise WorkflowError(
+            "QUESTION_NOT_FOUND", f"Question '{question_id}' not found in pinned flow.", 404
+        )
 
     text_obj = target_q.get("text", {})
     localized_text = text_obj.get(session.language) or text_obj.get("en", "")
@@ -159,7 +195,23 @@ async def synthesize_question(
 
     provider = get_speech_provider()
     try:
-        result = await provider.synthesize(text=localized_text, language=session.language)
+        result = await asyncio.wait_for(
+            provider.synthesize(text=localized_text, language=session.language),
+            timeout=SPEECH_TIMEOUT_SECONDS,
+        )
+        result = SpeechSynthesisResult.model_validate(result.model_dump())
+        if result.language != session.language or result.text != localized_text:
+            raise ValueError("Invalid synthesis source")
+        if result.status == "success":
+            if (
+                result.media_type not in ("audio/wav", "audio/mpeg", "audio/mp3", "audio/ogg")
+                or not result.audio_base64
+                or len(result.audio_base64) > 8 * 1024 * 1024
+            ):
+                raise ValueError("Invalid synthesis audio")
+            base64.b64decode(result.audio_base64, validate=True)
+        elif result.audio_base64 is not None:
+            raise ValueError("Invalid unavailable synthesis")
         return result
     except Exception as e:
         logger.warning(f"Speech synthesis error: {type(e).__name__}")

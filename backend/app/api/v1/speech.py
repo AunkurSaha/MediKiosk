@@ -18,13 +18,16 @@ async def transcribe(
     fixture_id: str | None = Form(None),
     db: Session = Depends(get_db),
 ):
-    return await speech.transcribe_audio(
-        db=db,
-        session_id=str(session_id),
-        audio_file=audio,
-        question_id=question_id,
-        fixture_id=fixture_id,
-    )
+    try:
+        return await speech.transcribe_audio(
+            db=db,
+            session_id=str(session_id),
+            audio_file=audio,
+            question_id=question_id,
+            fixture_id=fixture_id,
+        )
+    finally:
+        await audio.close()
 
 
 @router.post("/{session_id}/interview/speech/synthesize", response_model=SpeechSynthesisResult)

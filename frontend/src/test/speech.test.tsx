@@ -81,15 +81,21 @@ describe('Speech and TTS Component Tests', () => {
   describe('QuestionAudioPlayer (TTS)', () => {
     it('renders localized Listen button in English, Bengali, and Hindi', () => {
       const { rerender } = render(
-        <QuestionAudioPlayer sessionId="sess-1" questionId="q1" language="en" />
+        <QuestionAudioPlayer sessionId="sess-1" questionId="q1" language="en" />,
       );
-      expect(screen.getByRole('button', { name: new RegExp(speechCopy.en.listen, 'i') })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.listen, 'i') }),
+      ).toBeInTheDocument();
 
       rerender(<QuestionAudioPlayer sessionId="sess-1" questionId="q1" language="bn" />);
-      expect(screen.getByRole('button', { name: new RegExp(speechCopy.bn.listen, 'i') })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: new RegExp(speechCopy.bn.listen, 'i') }),
+      ).toBeInTheDocument();
 
       rerender(<QuestionAudioPlayer sessionId="sess-1" questionId="q1" language="hi" />);
-      expect(screen.getByRole('button', { name: new RegExp(speechCopy.hi.listen, 'i') })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: new RegExp(speechCopy.hi.listen, 'i') }),
+      ).toBeInTheDocument();
     });
 
     it('requests synthesis and triggers audio playback', async () => {
@@ -121,11 +127,33 @@ describe('Speech and TTS Component Tests', () => {
       await waitFor(() => {
         expect(screen.getByText(speechCopy.en.ttsError)).toBeInTheDocument();
       });
-      expect(screen.getByRole('button', { name: new RegExp(speechCopy.en.listen, 'i') })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.listen, 'i') }),
+      ).toBeInTheDocument();
     });
   });
 
   describe('VoiceRecorder', () => {
+    it('cancelling recording discards stop events without sending audio', async () => {
+      render(
+        <VoiceRecorder
+          sessionId="sess-1"
+          questionId="q1"
+          language="en"
+          onConfirmCandidate={vi.fn()}
+          onEditCandidate={vi.fn()}
+        />,
+      );
+      fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.speak) }));
+      await screen.findByRole('region', { name: speechCopy.en.listening });
+      fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.cancelVoice) }));
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('region', { name: speechCopy.en.listening }),
+        ).not.toBeInTheDocument(),
+      );
+      expect(api.transcribeSpeech).not.toHaveBeenCalled();
+    });
     it('shows fallback if MediaRecorder is not supported in the browser', () => {
       delete (window as unknown as { MediaRecorder?: unknown }).MediaRecorder;
       delete (globalThis as unknown as { MediaRecorder?: unknown }).MediaRecorder;
@@ -138,7 +166,7 @@ describe('Speech and TTS Component Tests', () => {
           disabled={false}
           onConfirmCandidate={vi.fn()}
           onEditCandidate={vi.fn()}
-        />
+        />,
       );
 
       expect(screen.getByText(speechCopy.en.voiceUnavailable)).toBeInTheDocument();
@@ -147,7 +175,9 @@ describe('Speech and TTS Component Tests', () => {
     it('handles permission denied error gracefully', async () => {
       Object.defineProperty(navigator, 'mediaDevices', {
         value: {
-          getUserMedia: vi.fn().mockRejectedValue(new DOMException('Permission denied', 'NotAllowedError')),
+          getUserMedia: vi
+            .fn()
+            .mockRejectedValue(new DOMException('Permission denied', 'NotAllowedError')),
         },
         configurable: true,
         writable: true,
@@ -161,7 +191,7 @@ describe('Speech and TTS Component Tests', () => {
           disabled={false}
           onConfirmCandidate={vi.fn()}
           onEditCandidate={vi.fn()}
-        />
+        />,
       );
 
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') }));
@@ -177,6 +207,7 @@ describe('Speech and TTS Component Tests', () => {
 
       vi.mocked(api.transcribeSpeech).mockResolvedValue({
         transcript: 'I have severe chest pain',
+        candidate_token: 'synthetic-candidate',
         language: 'en',
         confidence: null,
         provider: 'mock',
@@ -193,7 +224,7 @@ describe('Speech and TTS Component Tests', () => {
           disabled={false}
           onConfirmCandidate={onConfirm}
           onEditCandidate={onEdit}
-        />
+        />,
       );
 
       // Start recording
@@ -201,7 +232,9 @@ describe('Speech and TTS Component Tests', () => {
 
       // Shows recording state
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }),
+        ).toBeInTheDocument();
       });
 
       // Stop recording
@@ -214,10 +247,12 @@ describe('Speech and TTS Component Tests', () => {
       });
 
       // Confirm candidate
-      const confirmBtn = screen.getByRole('button', { name: new RegExp(speechCopy.en.confirmCandidate, 'i') });
+      const confirmBtn = screen.getByRole('button', {
+        name: new RegExp(speechCopy.en.confirmCandidate, 'i'),
+      });
       fireEvent.click(confirmBtn);
 
-      expect(onConfirm).toHaveBeenCalledWith('I have severe chest pain');
+      expect(onConfirm).toHaveBeenCalledWith('I have severe chest pain', 'synthetic-candidate');
     });
 
     it('allows patient to edit candidate transcript before submitting', async () => {
@@ -226,6 +261,7 @@ describe('Speech and TTS Component Tests', () => {
 
       vi.mocked(api.transcribeSpeech).mockResolvedValue({
         transcript: 'আমার বুকে ব্যথা হচ্ছে',
+        candidate_token: 'synthetic-candidate',
         language: 'bn',
         confidence: null,
         provider: 'mock',
@@ -242,13 +278,15 @@ describe('Speech and TTS Component Tests', () => {
           disabled={false}
           onConfirmCandidate={onConfirm}
           onEditCandidate={onEdit}
-        />
+        />,
       );
 
       // Start recording
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.bn.speak, 'i') }));
       await waitFor(() => {
-        expect(screen.getByRole('button', { name: new RegExp(speechCopy.bn.stop, 'i') })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: new RegExp(speechCopy.bn.stop, 'i') }),
+        ).toBeInTheDocument();
       });
       // Stop recording
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.bn.stop, 'i') }));
@@ -260,7 +298,9 @@ describe('Speech and TTS Component Tests', () => {
       });
 
       // Click Edit
-      fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.bn.editCandidate, 'i') }));
+      fireEvent.click(
+        screen.getByRole('button', { name: new RegExp(speechCopy.bn.editCandidate, 'i') }),
+      );
 
       expect(onEdit).toHaveBeenCalledWith('আমার বুকে ব্যথা হচ্ছে');
       // Candidate card is dismissed
@@ -270,6 +310,7 @@ describe('Speech and TTS Component Tests', () => {
     it('allows patient to record again / retry from candidate review card', async () => {
       vi.mocked(api.transcribeSpeech).mockResolvedValue({
         transcript: 'Candidate 1',
+        candidate_token: 'synthetic-candidate',
         language: 'en',
         confidence: null,
         provider: 'mock',
@@ -286,11 +327,13 @@ describe('Speech and TTS Component Tests', () => {
           disabled={false}
           onConfirmCandidate={vi.fn()}
           onEditCandidate={vi.fn()}
-        />
+        />,
       );
 
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') }));
-      await waitFor(() => screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }));
+      await waitFor(() =>
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }),
+      );
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }));
 
       await waitFor(() => {
@@ -298,12 +341,16 @@ describe('Speech and TTS Component Tests', () => {
       });
 
       // Click Record again
-      fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.recordAgain, 'i') }));
+      fireEvent.click(
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.recordAgain, 'i') }),
+      );
 
       // Resets candidate card, ready to speak again
       await waitFor(() => {
         expect(screen.queryByText(/Candidate 1/)).not.toBeInTheDocument();
-        expect(screen.getByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') })).toBeInTheDocument();
+        expect(
+          screen.getByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') }),
+        ).toBeInTheDocument();
       });
     });
   });
@@ -319,10 +366,12 @@ describe('Speech and TTS Component Tests', () => {
           sessionId="sess-1"
           voiceConsent={false}
           onSave={vi.fn()}
-        />
+        />,
       );
 
-      expect(screen.queryByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') }),
+      ).not.toBeInTheDocument();
       expect(screen.getByLabelText('Your answer')).toBeInTheDocument();
     });
 
@@ -330,6 +379,7 @@ describe('Speech and TTS Component Tests', () => {
       const onSave = vi.fn();
       vi.mocked(api.transcribeSpeech).mockResolvedValue({
         transcript: 'I have chest pain',
+        candidate_token: 'synthetic-candidate',
         language: 'en',
         confidence: null,
         provider: 'mock',
@@ -347,20 +397,28 @@ describe('Speech and TTS Component Tests', () => {
           sessionId="sess-1"
           voiceConsent={true}
           onSave={onSave}
-        />
+        />,
       );
 
       // Voice recorder button is present
-      expect(screen.getByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') }),
+      ).toBeInTheDocument();
 
       // Record speech
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') }));
-      await waitFor(() => screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }));
+      await waitFor(() =>
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }),
+      );
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }));
 
       // Confirm candidate
-      await waitFor(() => screen.getByRole('button', { name: new RegExp(speechCopy.en.confirmCandidate, 'i') }));
-      fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.confirmCandidate, 'i') }));
+      await waitFor(() =>
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.confirmCandidate, 'i') }),
+      );
+      fireEvent.click(
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.confirmCandidate, 'i') }),
+      );
 
       // Saved with source = 'voice'
       expect(onSave).toHaveBeenCalledWith({
@@ -368,6 +426,7 @@ describe('Speech and TTS Component Tests', () => {
         raw_value: 'I have chest pain',
         status: 'answered',
         source: 'voice',
+        voice_candidate: 'synthetic-candidate',
       });
     });
 
@@ -375,6 +434,7 @@ describe('Speech and TTS Component Tests', () => {
       const onSave = vi.fn();
       vi.mocked(api.transcribeSpeech).mockResolvedValue({
         transcript: 'I have chest pain',
+        candidate_token: 'synthetic-candidate',
         language: 'en',
         confidence: null,
         provider: 'mock',
@@ -392,17 +452,23 @@ describe('Speech and TTS Component Tests', () => {
           sessionId="sess-1"
           voiceConsent={true}
           onSave={onSave}
-        />
+        />,
       );
 
       // Record speech
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.speak, 'i') }));
-      await waitFor(() => screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }));
+      await waitFor(() =>
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }),
+      );
       fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.stop, 'i') }));
 
       // Click Edit
-      await waitFor(() => screen.getByRole('button', { name: new RegExp(speechCopy.en.editCandidate, 'i') }));
-      fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.editCandidate, 'i') }));
+      await waitFor(() =>
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.editCandidate, 'i') }),
+      );
+      fireEvent.click(
+        screen.getByRole('button', { name: new RegExp(speechCopy.en.editCandidate, 'i') }),
+      );
 
       // Text input has value 'I have chest pain'
       const input = screen.getByLabelText('Your answer') as HTMLInputElement;

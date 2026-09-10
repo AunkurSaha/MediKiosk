@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import JSON, Column, DateTime, ForeignKey, String, UniqueConstraint, text
+from sqlalchemy import JSON, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint, text
 
 from app.database import Base
 
@@ -18,10 +18,11 @@ class Alert(Base):
     reason = Column(String, nullable=False)
     triggering_facts_json = Column(JSON, nullable=False)
     status = Column(String, nullable=False, default="new", index=True)
+    revision = Column(Integer, nullable=False, server_default="0")
     acknowledged_at = Column(DateTime(timezone=True), nullable=True)
     acknowledged_by = Column(String, nullable=True)
     acknowledgement_note = Column(String, nullable=True)
     created_at = Column(
-        DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP"), index=True
+        DateTime(timezone=True), server_default=text("CURRENT_TIMESTAMP"), index=True, nullable=False
     )
     updated_at = Column(DateTime(timezone=True), nullable=True)

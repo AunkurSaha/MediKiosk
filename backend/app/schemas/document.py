@@ -1,12 +1,12 @@
 from datetime import datetime
-from typing import Any, Literal
+from typing import Literal
 
-from pydantic import ConfigDict, Field
+from pydantic import AliasChoices, ConfigDict, Field
 
 from .common import APIModel
 
 DocumentType = Literal["prescription", "lab_report", "other"]
-ProcessingStatus = Literal["pending", "processing", "completed", "failed"]
+ProcessingStatus = Literal["pending", "processing", "completed", "failed", "unavailable", "mock_fixture"]
 VerificationStatus = Literal["unverified", "verified", "rejected"]
 
 
@@ -16,6 +16,7 @@ class MedicationFact(APIModel):
     frequency: str | None = None
     route: str | None = None
     duration: str | None = None
+    instructions: str | None = None
 
 
 class LabObservationFact(APIModel):
@@ -26,6 +27,17 @@ class LabObservationFact(APIModel):
     flag: str | None = None  # "normal", "high", "low", "abnormal"
 
 
+class StructuredDocument(APIModel):
+    document_type: DocumentType | None = None
+    document_date: str | None = None
+    doctor_header: str | None = None
+    raw_excerpt: str | None = None
+    medications: list[MedicationFact] = Field(default_factory=list)
+    observations: list[LabObservationFact] = Field(
+        default_factory=list, validation_alias=AliasChoices("observations", "lab_observations")
+    )
+
+
 class DocumentExtractionResponse(APIModel):
     id: str
     document_id: str
@@ -33,9 +45,10 @@ class DocumentExtractionResponse(APIModel):
     extractor: str
     extractor_version: str
     raw_text: str | None = None
-    structured_json: dict[str, Any]
+    structured_json: StructuredDocument
     confidence: float | None = None
     verification_status: VerificationStatus
+    review_version: int = 0
     verified_by: str | None = None
     verified_at: datetime | None = None
     verification_notes: str | None = None
@@ -67,5 +80,6 @@ class DocumentListResponse(APIModel):
 class ExtractionVerifyRequest(APIModel):
     model_config = ConfigDict(extra="forbid")
     status: Literal["verified", "rejected"]
-    verified_by: str = Field(min_length=1, max_length=120)
+    expected_status: VerificationStatus = "unverified"
+    expected_version: int = Field(default=0, ge=0)
     notes: str | None = None

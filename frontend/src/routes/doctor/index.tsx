@@ -298,6 +298,9 @@ export default function Doctor() {
           </div>
           {detail.documents && detail.documents.length > 0 && (
             <DocumentViewer
+              locked={
+                detail.session.status === 'confirmed' || detail.session.status === 'cancelled'
+              }
               sessionId={detail.session.id}
               documents={detail.documents}
               onVerificationUpdate={(updatedExtraction) => {

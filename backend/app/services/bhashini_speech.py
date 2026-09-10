@@ -2,17 +2,19 @@
 
 Complies with MediKiosk Phase 4A/4B invariants:
 1. Zero LLM or ASR authority over clinical interview state.
-2. Ephemeral audio: raw audio is never written to disk, database, or object storage.
+2. Ephemeral audio: this adapter retains no audio; multipart uploads may use temporary disk before the adapter.
 3. Candidate transcription only: transcripts require explicit patient confirmation.
-4. Zero secret leakage: all credentials wrapped in Pydantic SecretStr.
+4. Credentials use Pydantic SecretStr and provider errors avoid raw payload logging.
 5. Graceful failure: provider timeouts or errors return status="unavailable" without crashing intake.
 """
 
 import base64
+import io
 import json
 import logging
 import os
 import time
+import wave
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -148,7 +150,18 @@ class BhashiniSpeechProvider:
         return httpx.AsyncClient(
             transport=self._transport,
             timeout=httpx.Timeout(self.settings.timeout),
+            follow_redirects=False,
+            trust_env=False,
         )
+
+    async def _post(self, client, url, **kwargs):
+        async with client.stream("POST", url, **kwargs) as response:
+            content = bytearray()
+            async for chunk in response.aiter_bytes():
+                content.extend(chunk)
+                if len(content) > 8 * 1024 * 1024:
+                    raise ValueError("response_too_large")
+            return httpx.Response(response.status_code, content=bytes(content))
 
     def _map_audio_format(self, media_type: str) -> str:
         normalized = media_type.strip().lower()
@@ -205,7 +218,7 @@ class BhashiniSpeechProvider:
             "Content-Type": "application/json",
         }
 
-        resp = await client.post(discovery_url, json=payload, headers=headers)
+        resp = await self._post(client, discovery_url, json=payload, headers=headers)
         if resp.status_code in (401, 403):
             raise PermissionError("authentication_failed")
         if resp.status_code == 429:
@@ -233,6 +246,11 @@ class BhashiniSpeechProvider:
 
         if not callback_url:
             raise ValueError("missing_callback_url")
+        parsed_callback = urlsplit(callback_url)
+        if (parsed_callback.scheme != "https" or parsed_callback.hostname != "dhruva-api.bhashini.gov.in"
+                or parsed_callback.username or parsed_callback.password or parsed_callback.query or parsed_callback.fragment
+                or parsed_callback.port not in (None, 443) or header_name.lower() != "authorization"):
+            raise ValueError("untrusted_callback")
 
         # Cache config for 1 hour (3600 seconds)
         config = PipelineTaskConfig(
@@ -275,7 +293,21 @@ class BhashiniSpeechProvider:
                 reason="empty_audio",
             )
 
-        audio_format = self._map_audio_format(media_type)
+        # Only decoded PCM WAV is supported until native browser formats are
+        # evaluated/transcoded explicitly. Never label arbitrary WebM as 16 kHz.
+        try:
+            if media_type.split(";")[0] not in ("audio/wav", "audio/x-wav"):
+                raise ValueError()
+            with wave.open(io.BytesIO(audio), "rb") as source:
+                rate = source.getframerate()
+                if source.getnchannels() != 1 or source.getsampwidth() != 2 or rate != 16000 or source.getnframes() == 0:
+                    raise ValueError()
+                if len(source.readframes(source.getnframes())) != source.getnframes() * 2:
+                    raise ValueError()
+        except (ValueError, wave.Error, EOFError):
+            return TranscriptionResult(status="unavailable", language=safe_lang, provider=self.name,
+                                       model=self.version, reason="unsupported_audio_format")
+        audio_format = "wav"
         audio_b64 = base64.b64encode(audio).decode("ascii")
 
         try:
@@ -291,7 +323,7 @@ class BhashiniSpeechProvider:
                                     "sourceLanguage": language,
                                 },
                                 "audioFormat": audio_format,
-                                "samplingRate": 16000,
+                                "samplingRate": rate,
                             },
                         }
                     ],
@@ -311,7 +343,7 @@ class BhashiniSpeechProvider:
                     "Content-Type": "application/json",
                 }
 
-                resp = await client.post(
+                resp = await self._post(client,
                     task_cfg.callback_url,
                     json=compute_payload,
                     headers=headers,
@@ -522,7 +554,7 @@ class BhashiniSpeechProvider:
                     "Content-Type": "application/json",
                 }
 
-                resp = await client.post(
+                resp = await self._post(client,
                     task_cfg.callback_url,
                     json=compute_payload,
                     headers=headers,
@@ -609,6 +641,9 @@ class BhashiniSpeechProvider:
                         reason="empty_audio",
                     )
 
+                if audio_format not in ("wav", "mp3", "ogg") or len(audio_content) > 8 * 1024 * 1024:
+                    raise ValueError("invalid_audio")
+                base64.b64decode(audio_content, validate=True)
                 return SpeechSynthesisResult(
                     status="success",
                     audio_base64=audio_content,

@@ -378,3 +378,9 @@ The `result_json` column stores the rich Schema 1.1 provenance envelope:
 
 No database schema migration is required between Phase 3A and Phase 3B because `result_json` safely encapsulates the additive model provenance attributes. Existing Phase 1, Phase 2, and Phase 3A records remain 100% intact across upgrades and process restarts.
 
+
+## Stabilization schema and actual storage
+
+Alembic head b72f516e3f42 adds non-null integer alerts.revision and document_extractions.review_version, default 0. Alert.created_at ORM nullability now agrees with its existing NOT NULL migration. Original source columns/rows are preserved; migrations and comparison are checked by verify-stabilization-migrations.py.
+
+Documents and document_extractions exist in PostgreSQL. Files live under .runtime/uploads by default. structured_json.observations is the canonical lab array; missing flags are null. Review transitions retain prior status/actor/time/notes in audit_logs. Voice candidate tokens are signed, transient client-held values; confirmed candidate IDs/provider/model/source-answer linkage are in audit_logs. No audio table is added. Proposed clinical_histories/medications/observations/timeline tables above are future concepts, not claims that those separate tables exist.

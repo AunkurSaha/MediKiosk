@@ -1,43 +1,17 @@
-# Implementation status — 2026-09-09
+# Implementation status — stabilization in progress (2026-09-10)
 
-> Current audit: code and the app database now include Phase 6 scaffolding. The fresh review found open authorization, safety-alert, voice and document defects, 2 failing browser tests, schema drift and lint/format failures. Completion claims below are prior milestone reports, not current acceptance. See [current project review](current-project-review-2026-09-09.md) for the verified state and repair priorities.
+MediKiosk is a **synthetic-data local prototype**. Phase 7 and all new roadmap work are paused. The [independent review](current-project-review-2026-09-09.md) is the authoritative original audit; the [stabilization report](stabilization-implementation-status.md) tracks remediation and acceptance.
 
-**Phases 1, 2, 3A, 3B, 4A, and 5 are implemented and verified for the local synthetic-data demo.**
+Phase 1–3 architecture remains: pinned deterministic interviews, append-only source answers, optional provider-neutral normalization, and doctor-controlled summary confirmation. Phase 4–6 code exists, with remediation implemented for staff access, voice provenance, alert interpretation/delivery/reconciliation and document correctness. The remaining acceptance gate is recorded below.
 
-Phase 5 delivers the complete **Deterministic Red-Flag Safety Screening and Staff Triage Dashboard**. Deterministic clinical rules (`ai/safety_rules/red_flags_v1.json`, 11 rules across 5 complaint families) screen patient answers and machine-normalized concepts without any LLM decision-making. Additive PostgreSQL persistence (`alerts` table with `uq_session_rule_alert` unique constraint) prevents duplicates and automatically reconciles when patient answers change. Real-time WebSocket feed (`/api/triage/ws`) powers the Staff Triage Dashboard (`/triage`) with live counters, priority filters, and audit-logged staff acknowledgement. Kiosk displays a calm, non-diagnostic patient advisory banner, and active alerts are surfaced to the physician workspace.
+Current verification: 313 backend tests on each SQLite and PostgreSQL profile, 55 frontend tests and 23 Playwright tests pass. Ruff, ESLint, Prettier, TypeScript/build, migration/data-preservation/Alembic checks and dependency/configured-secret audits pass. Application restart preserves seven API snapshots and the original document hash. Full PostgreSQL restart and the subsequent Git checkpoint remain blocked; stabilization is not yet accepted as complete.
 
-Read the [full Phase 5 verification report](phase5-implementation-status.md) for architecture, schemas, rule catalog, WebSocket feed, tests, and Phase 6 recommendations. Prior reports: [Phase 1](phase1-implementation-status.md), [Phase 2](phase2-implementation-status.md), [Phase 3A](phase3a-implementation-status.md), [Phase 3B](phase3b-implementation-status.md), and [Phase 4A](phase4a-implementation-status.md).
+The actual open-dashboard browser test now receives created, resolved and reactivated alert events. The document browser test renders lab rows, loads the authenticated original preview, attributes verification to the server doctor and rejects changes after summary confirmation. Browser regressions also reject missing/reused WebSocket admission tickets and display missing source lab flags as Not reported.
 
-## Final verification
+Windows Application Control currently blocks `pg_ctl.exe`. The existing PostgreSQL process remains available, but the required full database stop/restart verification is blocked pending the owner's Windows policy resolution. `start-dev.ps1 -UseRunningDatabase -NormalizationProvider mock` starts app services against that existing database without invoking cluster control.
 
-| Check | Result |
-|---|---|
-| Backend SQLite profile | **250 passed** (232 regressions + 18 Phase 5 red-flag tests) |
-| Backend PostgreSQL profile | **250 passed** |
-| Frontend components | **52 passed** (47 regressions + 5 Phase 5 triage/alert tests) |
-| Ruff linter | Passed clean (0 errors) |
-| ESLint / TypeScript build | Passed clean (`tsc -b && vite build`, 0 warnings) |
-| Database schema migrations | `f54c306d1e24_red_flag_alerts.py` applied; verified fresh & upgrade on PostgreSQL |
-| Actual local app database | All pre-existing table row counts and historical sessions preserved |
-| Real backend + PostgreSQL restart | Verified cleanly with persistent tables and daemon management |
+NVIDIA adapter: offline tests pass; retained live evidence is 3/26 domain passes and 23 timeouts, plus a separate 0/5 smoke run. Reliable live acceptance remains open. BHASHINI: mocked adapter tests only; no demonstrated live ASR/TTS. Real OCR is not implemented. Mock OCR only recognizes content-addressed synthetic fixtures; arbitrary valid uploads are stored with extraction unavailable.
 
-The backend retains one upstream Starlette/AnyIO deprecation warning per suite. Playwright prints a console-color environment warning. Remote CI was not run. Scripts and artifacts are documented in [testing](testing.md); screenshots, migration fingerprints, secret audit logs, and restart references live in ignored .runtime.
+App: http://127.0.0.1:5175 · API: http://127.0.0.1:8010/docs · PostgreSQL: 127.0.0.1:55432 / medikiosk / public. Use backend/.venv. Credentials remain in ignored local files. New schema revision: b72f516e3f42 (alert evidence revision and document review version).
 
-## Running app and database
-
-- App: http://127.0.0.1:5175
-- Doctor workspace: http://127.0.0.1:5175/doctor
-- OpenAPI: http://127.0.0.1:8010/docs
-- PostgreSQL: 127.0.0.1:55432, database medikiosk, schema public.
-- Start: `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-dev.ps1`.
-- Inspect confirmed answers in `interview_answers`; voice answers are recorded with `source = 'voice'`, edited answers with `source = 'typed'`.
-
-Default speech provider is `mock`; explicit `disabled` mode is supported. Offline mock mode works completely without external credentials or microphone hardware. Clinical wording, fixtures, and translations are unvalidated prototype content. This is not diagnosis, treatment, broad language understanding, or safety monitoring. Production authentication and later roadmap features remain deferred.
-
-## Current status and next task
-
-Phases 1, 2, 3A, 3B, 4A, 4B, and 5 are fully implemented and verified locally.
-- Phase 4B Authoritative Report: [phase4b-implementation-status.md](phase4b-implementation-status.md) (BHASHINI real speech provider integration for ASR and TTS).
-- Phase 5 Authoritative Report: [phase5-implementation-status.md](phase5-implementation-status.md) (Deterministic red-flag engine + staff triage dashboard).
-
-Next task: Phase 6 — Document Ingestion + OCR Pipeline (Prescription and lab report upload, local object storage, PaddleOCR structured extraction, and physician verification interface).
+No production readiness, clinical validation, complete PII removal or live provider acceptance is claimed. Git already exists; the requested clean stabilization checkpoint must wait until the required remediation and verification are complete.

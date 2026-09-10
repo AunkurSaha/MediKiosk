@@ -1,0 +1,17 @@
+{
+  "9340ad075c9b6ed3fe8f2ef84102835ffdc2b6653eb0fea5524f23f75787bfb0": {
+    "fixture_id": "lab_report",
+    "raw_text": "SYNTHETIC MOCK FIXTURE - NOT A PATIENT RECORD\nMETROPOLIS DIAGNOSTICS & LABS\nComplete Blood Count & Biochemistry\nDate: 2026-08-20\n\nTest Name                 Result      Unit         Reference Range\nHemoglobin                10.5        g/dL         12.0 - 15.5      (Low)\nFasting Blood Glucose     142         mg/dL        70 - 100         (High)\nSerum Creatinine          1.1         mg/dL        0.6 - 1.2        (Normal)\nTotal Cholesterol         210         mg/dL        < 200            (High)\n",
+    "document_type": "lab_report"
+  },
+  "ab15664d86d9869cc52b93adb1b0b0de17b08eeb852750a8051cd9d1d2b061cd": {
+    "fixture_id": "prescription",
+    "raw_text": "SYNTHETIC MOCK FIXTURE - NOT A PATIENT RECORD\nDr. R. K. Sharma, MBBS, MD\nCity Health Clinic & Diagnostic Centre\nDate: 2026-08-15\nPatient Name: Patient\n\nRx:\n1. Tab Paracetamol 500mg - 1 tablet TDS after food x 5 days\n2. Cap Amoxicillin 250mg - 1 capsule BD x 7 days\n3. Tab Pantoprazole 40mg - 1 tablet OD before food x 14 days\n4. Syp Cetirizine 5mg/5ml - 5ml HS as needed\n",
+    "document_type": "prescription"
+  },
+  "83bdc46c9b81f627264e4f3558401152dc99012cb747d8e4888c6cc9839513dc": {
+    "fixture_id": "lab_missing_flag",
+    "raw_text": "SYNTHETIC MOCK FIXTURE - NOT A PATIENT RECORD\nLab report - missing source flag demonstration\nDate: 2026-09-10\n\nTest Name                 Result      Unit         Reference Range\nHemoglobin                10.5        g/dL         12.0 - 15.5\n",
+    "document_type": "lab_report"
+  }
+}

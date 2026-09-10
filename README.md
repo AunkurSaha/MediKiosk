@@ -4,18 +4,18 @@ MediKiosk is a local SIH prototype for pre-consultation intake. The patient supp
 
 ## Current working scope
 
-Through Phase 3A: English/Bengali/Hindi identification and consent → explicit complaint selection → deterministic adaptive questions → PostgreSQL persistence → grouped doctor history and review/confirmation → audit trail.
+Phase 1–3 intake, adaptive questioning, optional normalization, PostgreSQL persistence, doctor review and confirmation remain implemented. Phase 4–6 adds mock speech, a BHASHINI adapter, deterministic demo alerts/triage and document storage with explicit synthetic extraction fixtures. These later phases are undergoing audit remediation; advancement is frozen.
 
-The draft is a deterministic rendering of active saved answers, not AI output. Back/edit recalculates branches while preserving prior answers; an interrupted interview resumes from its pinned flow and saved cursor. Confirmed records are read-only. The original draft and review revisions remain stored.
+The draft is a deterministic rendering of saved answers. Back/edit preserves prior source answers; resume uses the pinned flow and cursor. Confirmed records are locked. Doctor review remains separate from machine output.
 
-Five complaint families and a separate AYUSH demonstration are available. Question wording and translations are prototype content awaiting clinical review. A deterministic local mock now normalizes eligible free text using explicit English/Bengali/Hindi fixtures. The doctor sees original wording and machine concepts separately; failures leave intake working. Live AI providers, voice, OCR, red flags/triage, timelines, FHIR, and ABDM remain later phases. The triage page explicitly identifies its unavailable functionality.
+Real OCR is not implemented. BHASHINI live ASR/TTS is not demonstrated. NVIDIA live evidence is mixed and does not establish reliable acceptance. Rules, question wording and translations are prototype content without clinical validation. See the [stabilization report](docs/stabilization-implementation-status.md) for each original finding, fix, regression, evidence and limitation. No Phase 7 work is authorized.
 
 ## Run on this configured Windows machine
 
 From PowerShell in the project root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-dev.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-dev.ps1 -NormalizationProvider mock
 ```
 
 - App: http://127.0.0.1:5175
@@ -39,7 +39,9 @@ Stop the app and database, retaining all data:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-dev.ps1 -Database
 ```
 
-See the [Phase 3A verification report](docs/phase3a-implementation-status.md) for corrected gaps, exact test evidence and the next task.
+Windows Application Control currently blocks this machine's PostgreSQL control executable. While the existing database is running, use `scripts/start-dev.ps1 -NormalizationProvider mock -UseRunningDatabase` to start only the application services. Full database restart acceptance remains pending resolution through Windows security policy.
+
+Structured data is in PostgreSQL database `medikiosk`, schema `public`: `patients`, `sessions`, `consents`, interview/answer and normalization tables, `alerts`, `documents`, `document_extractions`, summaries and audit records. Uploaded file bytes are in the configured local upload directory; PostgreSQL stores their object keys, hashes and metadata. Database files are under ignored `.runtime/pgdata`; inspect records through SQL or a database client rather than editing those files.
 
 See [setup](docs/setup.md) for fresh installation and manual commands, [testing](docs/testing.md) for acceptance checks, and [implementation status](docs/implementation-status.md) for results and next work.
 

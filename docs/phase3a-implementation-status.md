@@ -1,3 +1,5 @@
+> Historical milestone report. Current acceptance and known limitations are governed by [stabilization status](stabilization-implementation-status.md). Old test counts and recommendations do not authorize new phase work.
+
 # Phase 3A verification and implementation report — 2026-09-09
 
 ## Review of the previous completion claim

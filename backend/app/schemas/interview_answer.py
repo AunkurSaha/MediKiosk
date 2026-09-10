@@ -11,7 +11,7 @@ class InterviewAnswerCreate(APIModel):
     field: FieldName
     value: str = Field(min_length=1, max_length=4000)
     raw_value: str = Field(min_length=1, max_length=4000)
-    source: Literal["touch", "typed", "voice"]
+    source: Literal["touch", "typed"]
     language: Language
 
 

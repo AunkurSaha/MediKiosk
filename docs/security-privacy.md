@@ -1,153 +1,19 @@
-# Security & Privacy — MediKiosk
+# Security and privacy — synthetic local prototype
 
-This is an SIH prototype security baseline, not a claim of production compliance certification.
+No production security, clinical validation or regulatory compliance is claimed. Use synthetic data and loopback interfaces. The existing demo identity requires a server-side active doctor record and explicit DEMO_MODE outside production. Header-based demo access is not production authentication. Original Phase 1 patient routes retain UUID-based access; real patient authentication and access tokens remain required before external deployment.
 
-## 1. Data minimization
+Staff document reads/reviews, triage data and acknowledgements are authorized on the server. Actor identity is server-owned. WebSockets use authenticated, one-use 30-second admission tickets, an Origin allowlist and a negotiated medikiosk subprotocol. Tickets are process-local and sent in the subprotocol, not URLs. Deployment identity/session revocation and multi-worker messaging remain outside this prototype.
 
-Collect only what the prototype needs.
+Voice consent is checked before invoking ASR and again when accepting source voice. Candidates are signed and bound to exact text, session, question, language and revision. They expire after 10 minutes or backend restart. Confirmation stores source/provider provenance; editing records typed wording. Candidates/audio are not stored as clinical answers before confirmation.
 
-Do not collect Aadhaar details or real ABHA credentials just to make the demo look realistic.
+FastAPI/Starlette multipart parsing may spool uploads above its threshold to temporary disk before the service checks consent. Routes close uploaded files on success, failure and rejection. No audio is deliberately saved to PostgreSQL or object storage. Abrupt termination, OS temporary-file policy, memory zeroization and upstream provider retention are not covered by a claim of guaranteed erasure. Browser cancellation stops tracks and discards late callbacks/uploads.
 
-Prefer synthetic patient data in development/demo.
+Documents validate type, size and decoded content before database persistence. Local storage resolves paths and enforces containment; database failures trigger file cleanup. There is no atomic transaction spanning filesystem and SQL across process/power loss. Original document reads require staff authorization. Mock extraction is content-addressed synthetic fixture behavior, not OCR of arbitrary uploads; no confidence is invented.
 
-## 2. Consent
+NVIDIA sends only eligible text/language/field context, omitting identifying metadata. Identifiers embedded in free text or voice are **not automatically redacted**. Neither metadata minimization nor SecretStr constitutes complete de-identification. Provider keys remain in environment/local ignored files, are excluded from public configuration, and must never be logged or committed. BHASHINI callback targets are constrained, redirects/environment proxies disabled, payloads bounded and service calls deadline-limited. Live provider acceptance remains separate from mocked tests.
 
-Consent precedes clinical processing.
+Unexpected errors log only exception class, not exception messages, submitted values, query strings or stack-local payloads. Audit events retain server actor/version/source linkage and review history in the database. Do not log raw audio, OCR text, answers, credentials or admission tokens.
 
-Store consent:
-- per session;
-- with individual processing purposes;
-- with timestamp;
-- with version if consent text changes later.
+Alert delivery uses bounded writes to authorized sockets and browser resynchronization. A successful write does not establish human receipt; patient copy asks for direct staff contact. Current trigger state and acknowledgement history are separate. Rule content is prototype/unvalidated; unknown language is not evidence of absence.
 
-## 3. Authentication and authorization
-
-When staff auth is introduced:
-- server-side role enforcement;
-- doctor and triage permissions separated where relevant;
-- password hashes only;
-- never trust role claims from frontend without backend verification.
-
-JWT/session strategy can be decided during auth implementation.
-
-## 4. Secrets
-
-Secrets belong in environment variables or deployment secret stores.
-
-Never commit:
-- DB passwords;
-- JWT signing secrets;
-- LLM keys;
-- BHASHINI credentials;
-- object-storage secret keys;
-- ABDM credentials.
-
-Provide names only in `.env.example`.
-
-## 5. Logging
-
-Application logs should default to:
-- request IDs;
-- route;
-- status;
-- timing;
-- technical error details.
-
-Avoid logging:
-- full patient answers;
-- full OCR text;
-- document contents;
-- credentials;
-- tokens.
-
-## 6. Documents
-
-- Validate media type and size.
-- Generate server-side object keys.
-- Do not trust original filename as path.
-- Do not expose bucket credentials.
-- Prefer authorized download endpoints/presigned access when implemented.
-- Preserve original source for clinician verification.
-
-## 7. Kiosk privacy
-
-At session end:
-- clear local patient state;
-- clear temporary audio references;
-- revoke object URLs;
-- navigate to a clean welcome screen.
-
-Avoid storing clinical data in long-lived browser storage unless explicitly needed and secured.
-
-## 8. Audio Privacy & Ephemeral Processing (Phase 4A)
-
-- **Zero Raw Audio Storage**: Raw audio is NEVER permanently stored. There is no `audio` table in PostgreSQL, no raw audio sent to object storage (MinIO/S3), and no permanent filesystem retention.
-- **Ephemeral Backend Processing**: Temporary files created on the backend for provider communication use server-generated UUID filenames (`uuid.uuid4()`) in the system temp directory (never trusting client filenames). Files are context-managed and deleted immediately in a guaranteed `finally` block (`os.unlink()`) on success, provider failure, validation rejection, or timeout.
-- **Ephemeral Browser State**: Audio chunks recorded via `MediaRecorder` reside in volatile browser RAM only during the recording session. Memory references and object URLs are revoked/garbage-collected immediately upon submission or cancellation. Blobs are never persisted to `localStorage`, `sessionStorage`, or `IndexedDB`.
-- **Mandatory Voice Consent**: Voice processing is strictly gated behind explicit opt-in consent (`voice_processing: true`). The backend verifies this before processing any audio, returning HTTP 403 `VOICE_CONSENT_REQUIRED` if consent is not granted.
-- **Upload Resource & Size Limits**:
-  - Maximum upload size: 5MB (`5 * 1024 * 1024` bytes). Oversized payloads receive HTTP 413 `FILE_TOO_LARGE`.
-  - Empty uploads (0 bytes) are rejected with HTTP 422 `EMPTY_AUDIO`.
-  - Allowed MIME types: `audio/webm`, `audio/ogg`, `audio/wav`, `audio/mp4`, `audio/mpeg`. Unsupported types receive HTTP 415 `UNSUPPORTED_MEDIA_TYPE`.
-- **Candidate Transcription Isolation**: Raw ASR transcript is treated strictly as an unconfirmed candidate. It is never automatically committed to clinical state or clinical history. Only the patient's explicitly confirmed (or edited) text is persisted.
-- **TTS Question Minimization**: Text-to-speech synthesizes strictly the static, localized question text from the pinned complaint flow snapshot. Patient answers, clinical history, PII, and doctor summaries are never sent to TTS.
-
-
-## 9. AI providers
-
-Do not send patient data to an external AI provider until:
-- provider is configured intentionally;
-- data sent is minimized;
-- project owner understands provider handling;
-- a mock/local mode exists for normal development.
-
-The code should make the provider boundary visible.
-
-### Phase 3B NVIDIA NIM Provider Privacy & Secret Controls:
-- **Input Minimization**: Only `text`, `language`, and `canonical_field` are transmitted. Context parameters (`flow_id`, `question_id`, `patient_name`, `session_id`, `demo_abha_id`, `hospital_token`) are strictly excluded before transmission.
-- **Key Safety**: `NVIDIA_API_KEY` is loaded from backend environment configuration into a Pydantic `SecretStr(exclude=True, repr=False)`. It is never returned in API responses, serialized into configuration dumps, or printed to stdout/logs.
-- **No Secret/PHI Logging**: Technical logs record latency, HTTP status, and token counts only. Request bodies, authorization headers, and raw model responses containing patient text are never logged.
-- **Value-Based Audit**: Regular automated audits verify that the configured API key does not appear anywhere in repository code, tests, documentation, or log files (`audit-phase3b-secrets.py`).
-
-
-## 10. Database
-
-Use separate DB user/password for the app.
-
-Production deployment should use encrypted transport and restricted network access.
-
-## 11. Web/API
-
-- CORS allowlist in non-local deployments.
-- Request validation via Pydantic.
-- upload limits.
-- CSRF strategy if cookie-based auth is chosen.
-- rate limiting can be added for exposed deployments.
-- no stack traces in user responses.
-
-## 12. Audit
-
-Audit meaningful actions:
-- viewing clinical detail if required;
-- editing reviewed summary;
-- confirming summary;
-- acknowledging safety alert;
-- exporting/sharing data.
-
-Audit logs should record event metadata, not duplicate full PHI.
-
-## 13. Demo safety
-
-Use fictional patient scenarios.
-
-Clearly label integration screens as:
-- demo;
-- mock;
-- sandbox;
-when they are not connected to real systems.
-
-## 14. Compliance posture
-
-The project is designed with consent, access control, provenance, and auditability in mind.
-
-Do not make legal/regulatory compliance claims in code/UI unless separately verified for the actual deployment.
+Security verification and outstanding acceptance gates are recorded in [stabilization status](stabilization-implementation-status.md). Full production authorization, encrypted deployment, consent revocation across active sessions, retention operations and crash-recovery controls require separate scope and review.

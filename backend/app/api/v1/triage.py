@@ -5,8 +5,10 @@ from sqlalchemy import case, select
 from sqlalchemy.orm import Session
 
 from app import models, schemas
+from app.api.deps import get_current_user
 from app.database import get_db
 from app.services import intake, triage_notifier
+from app.services.staff_tickets import admit_websocket, issue_ticket
 
 router = APIRouter()
 
@@ -31,6 +33,7 @@ def _to_alert_item(
         reason=alert.reason,
         triggering_facts=triggering_facts,
         status=alert.status,
+        revision=alert.revision,
         acknowledged_at=alert.acknowledged_at,
         acknowledged_by=alert.acknowledged_by,
         acknowledgement_note=alert.acknowledgement_note,
@@ -46,6 +49,7 @@ def list_alerts(
     status: Literal["new", "acknowledged", "resolved"] | None = Query(default=None),
     priority: Literal["emergency", "urgent", "priority"] | None = Query(default=None),
     db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
     query = (
         select(models.Alert, models.Session.hospital_token, models.Patient.name)
@@ -92,6 +96,7 @@ async def acknowledge_alert(
     alert_id: str,
     payload: schemas.AlertAcknowledgeRequest,
     db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
     alert_row = db.execute(
         select(models.Alert, models.Session.hospital_token, models.Patient.name)
@@ -104,9 +109,17 @@ async def acknowledge_alert(
         raise HTTPException(status_code=404, detail="Alert not found.")
 
     alert, token, name = alert_row
+    intake.get_session(db, alert.session_id)  # serialize against reconciliation
+    db.refresh(alert)
+    if payload.expected_revision != alert.revision:
+        raise HTTPException(status_code=409, detail="Alert evidence changed; reload before acknowledging.")
+    if alert.status == "resolved":
+        raise HTTPException(status_code=409, detail="The alert is resolved.")
+    if alert.acknowledged_at is not None:
+        return _to_alert_item(alert, token, name)
     alert.status = "acknowledged"
     alert.acknowledged_at = intake.now()
-    alert.acknowledged_by = payload.acknowledged_by
+    alert.acknowledged_by = user.id
     alert.acknowledgement_note = payload.note
     alert.updated_at = intake.now()
 
@@ -114,10 +127,11 @@ async def acknowledge_alert(
         db,
         "alert_acknowledged",
         alert.session_id,
+        user=user,
         metadata={
             "alert_id": alert_id,
             "rule_id": alert.rule_id,
-            "acknowledged_by": payload.acknowledged_by,
+            "acknowledged_by": user.id,
             "note": payload.note,
         },
     )
@@ -142,14 +156,16 @@ session_router = APIRouter()
 def get_session_alerts_endpoint(
     session_id: str,
     db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
-    return get_session_alerts(session_id, db)
+    return get_session_alerts(session_id, db, user)
 
 
 @router.get("/sessions/{session_id}/alerts", response_model=list[schemas.AlertItem])
 def get_session_alerts(
     session_id: str,
     db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
 ):
     rows = db.execute(
         select(models.Alert, models.Session.hospital_token, models.Patient.name)
@@ -166,8 +182,15 @@ def get_session_alerts(
     return [_to_alert_item(alert, token, name) for alert, token, name in rows]
 
 
+@router.post("/ws-ticket")
+def websocket_ticket(user: models.User = Depends(get_current_user)):
+    return {"ticket": issue_ticket(user.id)}
+
+
 @router.websocket("/ws")
-async def triage_websocket_feed(websocket: WebSocket):
+async def triage_websocket_feed(websocket: WebSocket, db: Session = Depends(get_db)):
+    if not await admit_websocket(websocket, db):
+        return
     await triage_notifier.notifier.connect(websocket)
     try:
         while True:

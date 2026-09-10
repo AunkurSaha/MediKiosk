@@ -35,7 +35,8 @@ const en: SpeechCopy = {
   ttsError: 'Audio playback unavailable.',
   micDenied: 'Microphone permission denied. Please allow microphone access or type your answer.',
   voiceConsentLabel: 'Allow microphone use for speaking your answers (optional)',
-  voiceConsentNote: 'Spoken audio is converted to text and deleted immediately. Raw audio is never stored.',
+  voiceConsentNote:
+    'Spoken audio is converted to text and deleted immediately. Raw audio is never stored.',
 };
 
 const bn: SpeechCopy = {
@@ -54,7 +55,8 @@ const bn: SpeechCopy = {
   ttsError: 'অডিও প্লেব্যাক উপলব্ধ নেই।',
   micDenied: 'মাইক্রোফোনের অনুমতি পাওয়া যায়নি। মাইক্রোফোন চালু করুন অথবা টাইপ করুন।',
   voiceConsentLabel: 'উত্তর মুখে বলার জন্য মাইক্রোফোন ব্যবহারের অনুমতি দিন (ঐচ্ছিক)',
-  voiceConsentNote: 'কথা বলা অডিও লেখায় রূপান্তর করে সাথে সাথে মুছে ফেলা হয়। অডিও কখনো সংরক্ষণ করা হয় না।',
+  voiceConsentNote:
+    'কথা বলা অডিও লেখায় রূপান্তর করে সাথে সাথে মুছে ফেলা হয়। অডিও কখনো সংরক্ষণ করা হয় না।',
 };
 
 const hi: SpeechCopy = {
@@ -73,7 +75,8 @@ const hi: SpeechCopy = {
   ttsError: 'ऑडियो प्लेबैक उपलब्ध नहीं है।',
   micDenied: 'माइक्रोफ़ोन की अनुमति अस्वीकृत। कृपया माइक्रोफ़ोन चालू करें या टाइप करें।',
   voiceConsentLabel: 'उत्तर बोलने के लिए माइक्रोफ़ोन के उपयोग की अनुमति दें (वैकल्पिक)',
-  voiceConsentNote: 'बोली गई आवाज़ को पाठ में बदलकर तुरंत हटा दिया जाता है। कच्ची आवाज़ कभी संग्रहीत नहीं की जाती।',
+  voiceConsentNote:
+    'बोली गई आवाज़ को पाठ में बदलकर तुरंत हटा दिया जाता है। कच्ची आवाज़ कभी संग्रहीत नहीं की जाती।',
 };
 
 export const speechCopy: Record<Language, SpeechCopy> = { en, bn, hi };

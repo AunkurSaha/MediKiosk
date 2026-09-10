@@ -75,11 +75,12 @@ export interface DocumentExtractionRecord {
     document_type?: string;
     document_date?: string | null;
     medications?: MedicationFact[];
-    lab_observations?: LabObservationFact[];
+    observations?: LabObservationFact[];
     [key: string]: unknown;
   };
   confidence: number | null;
   verification_status: 'unverified' | 'verified' | 'rejected';
+  review_version: number;
   verified_by: string | null;
   verified_at: string | null;
   verification_notes: string | null;
@@ -97,7 +98,8 @@ export interface DocumentRecord {
   sha256_hash: string;
   document_type: 'prescription' | 'lab_report' | 'other';
   document_date: string | null;
-  processing_status: 'pending' | 'processing' | 'completed' | 'failed';
+  processing_status:
+    'pending' | 'processing' | 'completed' | 'failed' | 'unavailable' | 'mock_fixture';
   created_at: string;
   updated_at: string | null;
   extractions: DocumentExtractionRecord[];
@@ -136,6 +138,7 @@ async function request<T>(
   method = 'GET',
   body?: unknown,
   doctor = false,
+  externalSignal?: AbortSignal,
 ): Promise<T> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 15000);
@@ -143,7 +146,9 @@ async function request<T>(
   try {
     const response = await fetch(base + path, {
       method,
-      signal: controller.signal,
+      signal: externalSignal
+        ? AbortSignal.any([controller.signal, externalSignal])
+        : controller.signal,
       headers: {
         ...(body === undefined || isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...(doctor ? { 'X-Demo-Doctor': 'true' } : {}),
@@ -171,12 +176,7 @@ export const api = {
     language: Language;
   }) => request<Session>('/sessions', 'POST', body),
   session: (id: string) => request<Detail>('/sessions/' + id),
-  consent: (
-    id: string,
-    agreed: boolean,
-    voiceProcessing = false,
-    documentProcessing = false,
-  ) =>
+  consent: (id: string, agreed: boolean, voiceProcessing = false, documentProcessing = false) =>
     request<Detail['consent']>('/sessions/' + id + '/consent', 'PUT', {
       voice_processing: voiceProcessing,
       document_processing: documentProcessing,
@@ -189,31 +189,55 @@ export const api = {
     return request<DocumentRecord>(`/sessions/${id}/documents`, 'POST', data);
   },
   documents: (id: string) =>
-    request<{ documents: DocumentRecord[]; total: number }>(`/sessions/${id}/documents`),
+    request<{ documents: DocumentRecord[]; total: number }>(
+      `/sessions/${id}/documents`,
+      'GET',
+      undefined,
+      true,
+    ),
   documentDetail: (id: string, documentId: string) =>
-    request<DocumentRecord>(`/sessions/${id}/documents/${documentId}`),
-  documentFileUrl: (id: string, documentId: string) =>
-    `${base}/sessions/${id}/documents/${documentId}/file`,
+    request<DocumentRecord>(`/sessions/${id}/documents/${documentId}`, 'GET', undefined, true),
+  documentFile: async (id: string, documentId: string, signal: AbortSignal) => {
+    const response = await fetch(`${base}/sessions/${id}/documents/${documentId}/file`, {
+      headers: { 'X-Demo-Doctor': 'true' },
+      signal,
+    });
+    if (!response.ok) throw new ApiError('DOCUMENT_DOWNLOAD_FAILED', response.status);
+    return response.blob();
+  },
   verifyExtraction: (
     id: string,
     documentId: string,
     extractionId: string,
     status: 'verified' | 'rejected',
-    verifiedBy: string,
+    expectedStatus: DocumentExtractionRecord['verification_status'],
+    expectedVersion: number,
     notes?: string,
   ) =>
     request<DocumentExtractionRecord>(
       `/sessions/${id}/documents/${documentId}/extractions/${extractionId}/verify`,
       'POST',
-      { status, verified_by: verifiedBy, notes },
+      { status, expected_status: expectedStatus, expected_version: expectedVersion, notes },
       true,
     ),
-  transcribeSpeech: (id: string, audioBlob: Blob, questionId: string, fixtureId?: string) => {
+  transcribeSpeech: (
+    id: string,
+    audioBlob: Blob,
+    questionId: string,
+    fixtureId?: string,
+    signal?: AbortSignal,
+  ) => {
     const data = new FormData();
     data.append('audio', audioBlob, 'recording.webm');
     data.append('question_id', questionId);
     if (fixtureId) data.append('fixture_id', fixtureId);
-    return request<TranscriptionResponse>(`/sessions/${id}/interview/speech/transcribe`, 'POST', data);
+    return request<TranscriptionResponse>(
+      `/sessions/${id}/interview/speech/transcribe`,
+      'POST',
+      data,
+      false,
+      signal,
+    );
   },
   synthesizeSpeech: (id: string, questionId: string) =>
     request<SpeechSynthesisResponse>(`/sessions/${id}/interview/speech/synthesize`, 'POST', {

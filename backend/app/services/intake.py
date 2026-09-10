@@ -103,7 +103,7 @@ def detail(db, session_id, doctor=False):
     if doctor:
         require_consent(db, session_id)
     patient = db.get(models.Patient, session.patient_id)
-    alerts = red_flags.get_session_alerts(db, session_id)
+    alerts = red_flags.get_session_alerts(db, session_id) if doctor else []
     alert_items = [
         schemas.AlertItem(
             id=a.id,
@@ -118,6 +118,7 @@ def detail(db, session_id, doctor=False):
                 for tf in (a.triggering_facts_json or [])
             ],
             status=a.status,
+            revision=a.revision,
             acknowledged_at=a.acknowledged_at,
             acknowledged_by=a.acknowledged_by,
             acknowledgement_note=a.acknowledgement_note,
@@ -129,7 +130,7 @@ def detail(db, session_id, doctor=False):
         for a in alerts
     ]
     from app.services import document_service
-    docs = document_service.get_session_documents(db, session_id)
+    docs = document_service.get_session_documents(db, session_id) if doctor else []
     doc_items = [
         schemas.DocumentResponse(
             id=d.id,
@@ -155,6 +156,7 @@ def detail(db, session_id, doctor=False):
                     structured_json=e.structured_json,
                     confidence=e.confidence,
                     verification_status=e.verification_status,
+                    review_version=e.review_version,
                     verified_by=e.verified_by,
                     verified_at=e.verified_at,
                     verification_notes=e.verification_notes,

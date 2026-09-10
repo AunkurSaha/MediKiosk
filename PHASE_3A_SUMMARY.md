@@ -1,3 +1,5 @@
+> Historical phase summary. Current implementation and acceptance are governed by [stabilization status](docs/stabilization-implementation-status.md); later audit findings supersede prior completion claims. NVIDIA retained live evidence: 3/26 domain passes, 23 timeouts, separate 0/5 smoke. BHASHINI live success is not demonstrated.
+
 # Phase 3A — verified summary
 
 The earlier completion claim was incomplete. Verification found an unapplied/missing persistence path, ignored timeout/provider configuration, overly broad eligibility, unused strict output validation, missing durable failure results, transaction-isolation gaps and unsupported mock confidence. These have been corrected; no existing patient data was deleted.

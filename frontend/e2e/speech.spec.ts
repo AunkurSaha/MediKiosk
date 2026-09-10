@@ -26,9 +26,12 @@ async function injectMockMediaRecorder(page: Page) {
         this.state = 'inactive';
         if (this.ondataavailable) {
           this.ondataavailable({
-            data: new Blob(['RIFF....WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00data\x00\x00\x00\x00'], {
-              type: 'audio/webm',
-            }),
+            data: new Blob(
+              ['RIFF....WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00data\x00\x00\x00\x00'],
+              {
+                type: 'audio/webm',
+              },
+            ),
           });
         }
         if (this.onstop) {
@@ -131,7 +134,10 @@ test.describe('Phase 4A Speech and TTS E2E', () => {
     expect(voiceAnswer?.normalization?.facts[0].normalized_concept).toBe('CHEST_PAIN');
 
     await mkdir('../.runtime/screenshots', { recursive: true });
-    await page.screenshot({ path: '../.runtime/screenshots/speech-en-confirmed.png', fullPage: true });
+    await page.screenshot({
+      path: '../.runtime/screenshots/speech-en-confirmed.png',
+      fullPage: true,
+    });
   });
 
   test('Bengali voice intake journey records, confirms, persists source=voice and triggers normalization', async ({
@@ -258,7 +264,9 @@ test.describe('Phase 4A Speech and TTS E2E', () => {
     expect((await answerPromise).ok()).toBeTruthy();
 
     const state = await current(page, id);
-    const editedAnswer = state.active_answers.find((a) => a.field === 'chief_complaint.description');
+    const editedAnswer = state.active_answers.find(
+      (a) => a.field === 'chief_complaint.description',
+    );
     expect(editedAnswer?.source).toBe('typed');
     expect(editedAnswer?.raw_value).toBe('chest pain since yesterday evening');
   });

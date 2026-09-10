@@ -154,7 +154,7 @@ Use:
 **“Potential emergency symptoms were detected. Medical staff should assess you promptly.”**
 
 If the demo supports staff alert delivery:
-**“Medical staff have been notified.”**
+**“Please contact medical staff directly; this prototype does not guarantee notification.”**
 
 Only show the latter after backend acknowledgement that the alert was created/delivered to the alert system.
 

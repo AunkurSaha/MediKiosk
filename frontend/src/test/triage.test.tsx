@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AlertItem } from '../api/triage';
 import AlertCard from '../components/triage/AlertCard';
@@ -17,6 +17,7 @@ vi.mock('../api/triage', async (original) => {
       acknowledgeAlert: vi.fn(),
       getSessionAlerts: vi.fn(),
       getWebSocketUrl: vi.fn(() => 'ws://localhost/mock-ws'),
+      websocketTicket: vi.fn().mockResolvedValue({ ticket: 'synthetic-ticket' }),
     },
   };
 });
@@ -79,7 +80,7 @@ describe('AlertCard', () => {
     expect(screen.getByText('Fatima Begum')).toBeInTheDocument();
     expect(screen.getByText('RF-CHEST-001')).toBeInTheDocument();
     expect(
-      screen.getByText('Severe radiating chest pain (potential acute coronary syndrome).')
+      screen.getByText('Severe radiating chest pain (potential acute coronary syndrome).'),
     ).toBeInTheDocument();
     expect(screen.getByText('hpi.severity:')).toBeInTheDocument();
     expect(screen.getByText('Acknowledge Alert')).toBeInTheDocument();
@@ -92,20 +93,15 @@ describe('AlertCard', () => {
     // Click acknowledge button to show form
     fireEvent.click(screen.getByText('Acknowledge Alert'));
 
-    const nameInput = screen.getByPlaceholderText(/Staff member name/i);
+    expect(screen.queryByPlaceholderText(/Staff member name/i)).not.toBeInTheDocument();
     const noteInput = screen.getByPlaceholderText(/Action taken note/i);
 
-    fireEvent.change(nameInput, { target: { value: 'Nurse Joy' } });
     fireEvent.change(noteInput, { target: { value: 'Patient taken to triage bay' } });
 
     fireEvent.click(screen.getByText('Confirm Acknowledgement'));
 
     await waitFor(() => {
-      expect(onAcknowledge).toHaveBeenCalledWith(
-        'alert-123',
-        'Nurse Joy',
-        'Patient taken to triage bay'
-      );
+      expect(onAcknowledge).toHaveBeenCalledWith('alert-123', 'Patient taken to triage bay');
     });
   });
 
@@ -128,6 +124,50 @@ describe('AlertCard', () => {
 describe('Triage Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('does not restore stale active alerts when an older refresh finishes last', async () => {
+    let finishOld!: (value: Awaited<ReturnType<typeof triageApi.getAlerts>>) => void;
+    const old = new Promise<Awaited<ReturnType<typeof triageApi.getAlerts>>>((resolve) => {
+      finishOld = resolve;
+    });
+    const result = {
+      items: [{ ...mockAlert, status: 'resolved' as const, revision: 1 }],
+      total: 0,
+      emergency_count: 0,
+      urgent_count: 0,
+      acknowledged_count: 0,
+    };
+    vi.mocked(triageApi.getAlerts).mockReturnValueOnce(old).mockResolvedValue(result);
+    const sockets: { onopen?: () => void }[] = [];
+    class TestSocket {
+      onopen?: () => void;
+      constructor() {
+        sockets.push(this);
+      }
+      close() {}
+    }
+    vi.stubGlobal('WebSocket', TestSocket);
+    try {
+      render(<Triage />);
+      await waitFor(() => expect(sockets[0]).toBeDefined());
+      await act(async () => {
+        sockets[0].onopen?.();
+      });
+      await waitFor(() =>
+        expect(
+          screen.getByTestId('alert-card-alert-123').querySelector('.status-badge'),
+        ).toHaveTextContent('Resolved'),
+      );
+      await act(async () => {
+        finishOld({ ...result, items: [mockAlert] });
+      });
+      expect(
+        screen.getByTestId('alert-card-alert-123').querySelector('.status-badge'),
+      ).toHaveTextContent('Resolved');
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('loads and displays alerts and metrics', async () => {
@@ -189,22 +229,18 @@ describe('Kiosk Safety Advisory in Interview', () => {
 
     vi.mocked(api.interview).mockResolvedValue(stateWithAlert);
 
-    render(
-      <Interview
-        sessionId="sess-1"
-        language="en"
-        onComplete={vi.fn()}
-      />
-    );
+    render(<Interview sessionId="sess-1" language="en" onComplete={vi.fn()} />);
 
     await waitFor(() => {
       const advisory = screen.getByTestId('kiosk-safety-advisory');
       expect(advisory).toBeInTheDocument();
       expect(screen.getByText('Staff Assessment Recommended')).toBeInTheDocument();
       expect(
-        screen.getByText('Potential emergency symptoms were detected. Medical staff should assess you promptly.')
+        screen.getByText(
+          'Potential emergency symptoms were detected. Medical staff should assess you promptly.',
+        ),
       ).toBeInTheDocument();
-      expect(screen.getByText('Medical staff have been notified.')).toBeInTheDocument();
+      expect(screen.getByText(/Please contact medical staff directly/)).toBeInTheDocument();
     });
   });
 });

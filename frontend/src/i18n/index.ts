@@ -87,7 +87,8 @@ const en = {
   cancelled: 'Cancelled',
   docConsentAgreement:
     'I consent to uploading medical documents (prescriptions, lab reports) for text extraction and doctor review.',
-  docConsentNote: 'Optional: Upload existing physical prescriptions or test reports to assist the clinician.',
+  docConsentNote:
+    'Optional: Upload existing physical prescriptions or test reports to assist the clinician.',
   docUploadTitle: 'Medical Documents',
   docUploadSubtitle: 'Upload prescriptions or lab reports (Optional, max 10MB, JPG/PNG/WebP/PDF)',
   docUploadBtn: 'Choose File',
@@ -268,8 +269,10 @@ export function errorText(error: unknown, lang: Language = 'en') {
   if (code === 'VERSION_CONFLICT') return copy[lang].conflict;
   if (code === 'SESSION_LOCKED' || code === 'CONFIRMED_IMMUTABLE') return copy[lang].locked;
   if (code === 'AUTH_REQUIRED' || code === 'DEMO_NOT_SEEDED') return copy[lang].auth;
-  if (code === 'CONSENT_REQUIRED' || code === 'DOCUMENT_CONSENT_REQUIRED') return copy[lang].noConsent;
+  if (code === 'CONSENT_REQUIRED' || code === 'DOCUMENT_CONSENT_REQUIRED')
+    return copy[lang].noConsent;
   if (code === 'FILE_TOO_LARGE') return 'Document exceeds the maximum 10MB limit.';
-  if (code === 'INVALID_MEDIA_TYPE') return 'Unsupported document format. Allowed: JPEG, PNG, WebP, PDF.';
+  if (code === 'INVALID_MEDIA_TYPE')
+    return 'Unsupported document format. Allowed: JPEG, PNG, WebP, PDF.';
   return copy[lang].error;
 }

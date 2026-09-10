@@ -4,7 +4,7 @@ import { getTriageCopy } from '../../i18n/triage';
 
 interface AlertCardProps {
   alert: AlertItem;
-  onAcknowledge: (alertId: string, acknowledgedBy: string, note?: string) => Promise<void>;
+  onAcknowledge: (alertId: string, note?: string) => Promise<void>;
   isAcknowledging?: boolean;
   language?: string;
 }
@@ -16,7 +16,6 @@ export default function AlertCard({
   language = 'en',
 }: AlertCardProps) {
   const [showForm, setShowForm] = useState(false);
-  const [staffName, setStaffName] = useState('');
   const [note, setNote] = useState('');
   const [error, setError] = useState<string | null>(null);
 
@@ -27,13 +26,9 @@ export default function AlertCard({
 
   async function handleConfirm(e: React.FormEvent) {
     e.preventDefault();
-    if (!staffName.trim()) {
-      setError('Staff member name or ID is required.');
-      return;
-    }
     setError(null);
     try {
-      await onAcknowledge(alert.id, staffName.trim(), note.trim() || undefined);
+      await onAcknowledge(alert.id, note.trim() || undefined);
       setShowForm(false);
     } catch {
       setError('Failed to acknowledge alert. Please retry.');
@@ -131,18 +126,7 @@ export default function AlertCard({
         <form className="acknowledge-form" onSubmit={handleConfirm}>
           <h4>{t.actionAcknowledge}</h4>
           {error && <p className="form-error">{error}</p>}
-          <div className="form-group">
-            <input
-              type="text"
-              id={`staff-name-${alert.id}`}
-              placeholder={t.staffNamePlaceholder}
-              value={staffName}
-              onChange={(e) => setStaffName(e.target.value)}
-              disabled={isAcknowledging}
-              required
-              autoFocus
-            />
-          </div>
+          <p>Acknowledgement is attributed to the signed-in demo doctor.</p>
           <div className="form-group">
             <input
               type="text"
@@ -154,11 +138,7 @@ export default function AlertCard({
             />
           </div>
           <div className="form-buttons">
-            <button
-              type="submit"
-              className="btn-confirm"
-              disabled={isAcknowledging || !staffName.trim()}
-            >
+            <button type="submit" className="btn-confirm" disabled={isAcknowledging}>
               {isAcknowledging ? t.acknowledging : t.confirmAcknowledge}
             </button>
             <button

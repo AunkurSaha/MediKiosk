@@ -102,7 +102,7 @@ def test_rf_chest_001_boundary_and_negative():
 # 2. RF-CHEST-002: concept:DYSPNEA (urgent)
 def test_rf_chest_002_trigger():
     facts = [
-        _make_fact("hpi.associated", ["shortness of breath"], normalized_concepts=["DYSPNEA"])
+        _make_fact("hpi.associated_details", "shortness of breath", normalized_concepts=["DYSPNEA"])
     ]
     triggered = evaluate_rules("chest_pain", facts)
     matched = [r for r, _ in triggered if r.rule_id == "RF-CHEST-002"]
@@ -113,7 +113,7 @@ def test_rf_chest_002_trigger():
 # 3. RF-CHEST-003: any_concept in SWEATING, DIZZINESS (urgent)
 def test_rf_chest_003_trigger():
     facts = [
-        _make_fact("hpi.associated", ["sweating"], normalized_concepts=["SWEATING"])
+        _make_fact("hpi.associated_details", "sweating", normalized_concepts=["SWEATING"])
     ]
     triggered = evaluate_rules("chest_pain", facts)
     matched = [r for r, _ in triggered if r.rule_id == "RF-CHEST-003"]
@@ -226,7 +226,7 @@ def test_rf_abd_001_trigger():
 # 11. RF-ABD-002: abdominal pain with persistent vomiting (urgent)
 def test_rf_abd_002_trigger():
     facts = [
-        _make_fact("hpi.associated", ["vomiting"], normalized_concepts=["VOMITING"])
+        _make_fact("hpi.associated_details", "vomiting", normalized_concepts=["VOMITING"])
     ]
     assert any(r.rule_id == "RF-ABD-002" for r, _ in evaluate_rules("abdominal_pain", facts))
 
@@ -318,7 +318,7 @@ def test_interview_submission_triggers_red_flag_in_state(client):
     assert state["red_flag_alert"] is not None
     assert state["red_flag_alert"]["priority"] == "emergency"
     assert state["red_flag_alert"]["rule_id"] == "RF-CHEST-001"
-    assert "potential acute coronary syndrome" in state["red_flag_alert"]["reason"].lower()
+    assert "severity at least 8/10 with radiation" in state["red_flag_alert"]["reason"].lower()
 
 
 def test_triage_api_list_and_acknowledge(client):
@@ -331,7 +331,7 @@ def test_triage_api_list_and_acknowledge(client):
     assert state["red_flag_alert"]["rule_id"] == "RF-HEAD-001"
 
     # 1. List alerts via GET /api/triage/alerts
-    list_res = client.get("/api/triage/alerts")
+    list_res = client.get("/api/triage/alerts", headers=DOCTOR)
     assert list_res.status_code == 200
     data = list_res.json()
     assert data["total"] >= 1
@@ -344,24 +344,25 @@ def test_triage_api_list_and_acknowledge(client):
     assert alert["patient_name"] == "Synthetic Patient"
 
     # Filter by priority
-    emer_res = client.get("/api/triage/alerts?priority=emergency")
+    emer_res = client.get("/api/triage/alerts?priority=emergency", headers=DOCTOR)
     assert emer_res.status_code == 200
     assert any(a["id"] == alert["id"] for a in emer_res.json()["items"])
 
     # 2. Acknowledge alert via POST /api/triage/alerts/{id}/acknowledge
     ack_res = client.post(
         f"/api/triage/alerts/{alert['id']}/acknowledge",
-        json={"acknowledged_by": "Nurse Ratched", "note": "Patient moved to resuscitation bay."},
+        headers=DOCTOR,
+        json={"note": "Patient moved to resuscitation bay."},
     )
     assert ack_res.status_code == 200
     ack_data = ack_res.json()
     assert ack_data["status"] == "acknowledged"
-    assert ack_data["acknowledged_by"] == "Nurse Ratched"
+    assert ack_data["acknowledged_by"] == "00000000-0000-4000-8000-000000000001"
     assert ack_data["acknowledgement_note"] == "Patient moved to resuscitation bay."
     assert ack_data["acknowledged_at"] is not None
 
     # 3. Verify session alerts endpoint
-    session_alerts = client.get(f"/api/sessions/{session_id}/alerts")
+    session_alerts = client.get(f"/api/sessions/{session_id}/alerts", headers=DOCTOR)
     assert session_alerts.status_code == 200
     assert len(session_alerts.json()) == 1
     assert session_alerts.json()[0]["id"] == alert["id"]
@@ -379,17 +380,21 @@ def test_triage_api_list_and_acknowledge(client):
 
 
 def test_triage_websocket_feed(client):
-    with client.websocket_connect("/api/triage/ws") as ws:
+    ticket = client.post("/api/triage/ws-ticket", headers=DOCTOR).json()["ticket"]
+    with client.websocket_connect("/api/triage/ws", subprotocols=["medikiosk", ticket], headers={"Origin": "http://127.0.0.1:5175"}) as ws:
         session_id, state = selected(client, "headache")
         state = until(client, session_id, state, "hpi.severity")
         state = submit(client, session_id, state, value=9, status="answered")
 
-        alerts = client.get("/api/triage/alerts").json()["items"]
+        created = ws.receive_json()
+        assert created["type"] == "alert_created"
+        alerts = client.get("/api/triage/alerts", headers=DOCTOR).json()["items"]
         alert = next(a for a in alerts if a["session_id"] == session_id)
 
         client.post(
             f"/api/triage/alerts/{alert['id']}/acknowledge",
-            json={"acknowledged_by": "Dr. House", "note": "Priority confirmed."},
+            headers=DOCTOR,
+            json={"note": "Priority confirmed."},
         )
         msg = ws.receive_json()
         assert msg["type"] == "alert_acknowledged"

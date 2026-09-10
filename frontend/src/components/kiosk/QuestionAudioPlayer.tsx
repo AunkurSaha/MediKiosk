@@ -97,13 +97,7 @@ export default function QuestionAudioPlayer({
         <span aria-hidden="true" className="speaker-icon">
           {status === 'playing' ? '⏹' : '🔊'}
         </span>
-        <span>
-          {status === 'loading'
-            ? '...'
-            : status === 'playing'
-              ? t.playing
-              : t.listen}
-        </span>
+        <span>{status === 'loading' ? '...' : status === 'playing' ? t.playing : t.listen}</span>
       </button>
       {Boolean(errorMsg) && (
         <span className="audio-error" role="alert">

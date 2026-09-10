@@ -120,12 +120,14 @@ export interface Submission {
   status: AnswerStatus;
   raw_value: string;
   source: 'typed' | 'touch' | 'voice';
+  voice_candidate?: string;
   language: Language;
 }
 
 export interface TranscriptionResponse {
   status: 'success' | 'unavailable';
   transcript: string | null;
+  candidate_token?: string | null;
   language: Language;
   confidence: number | null;
   provider: string;
