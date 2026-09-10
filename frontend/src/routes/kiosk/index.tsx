@@ -62,6 +62,58 @@ export default function Kiosk() {
     };
   }, [attempt, resumeId]);
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [fullscreenError, setFullscreenError] = useState('');
+
+  useEffect(() => {
+    const syncFullscreenState = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener('fullscreenchange', syncFullscreenState);
+    return () => document.removeEventListener('fullscreenchange', syncFullscreenState);
+  }, []);
+
+  async function toggleFullscreen() {
+    if (typeof document === 'undefined') return;
+    setFullscreenError('');
+    try {
+      if (!document.fullscreenElement) {
+        if (!document.documentElement.requestFullscreen) {
+          setFullscreenError('Fullscreen is not supported by this browser.');
+          return;
+        }
+        await document.documentElement.requestFullscreen();
+      } else {
+        if (!document.exitFullscreen) {
+          setFullscreenError('Fullscreen cannot be exited from this browser.');
+          return;
+        }
+        await document.exitFullscreen();
+      }
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    } catch {
+      setFullscreenError('Fullscreen could not be changed. Try the browser controls instead.');
+    }
+  }
+
+  async function loadShowcase() {
+    await action(async () => {
+      const res = await api.seedShowcase();
+      sessionStorage.setItem(sessionKey, res.session_id);
+      pendingId.current = res.session_id;
+      setResumeId(res.session_id);
+      setLanguage('bn');
+      setName(res.patient_name);
+      setToken(res.hospital_token);
+      setAbha('patient@abdm');
+      setAbhaVerified(true);
+      const detail = await api.session(res.session_id);
+      setRecord(detail);
+      setAgreed(Boolean(detail.consent?.share_with_doctor));
+      setVoiceAgreed(Boolean(detail.consent?.voice_processing));
+      setDocAgreed(Boolean(detail.consent?.document_processing));
+      navigate('/kiosk/complete', { replace: true });
+    });
+  }
+
   async function action(work: () => Promise<void>) {
     setBusy(true);
     setError(null);
@@ -156,6 +208,37 @@ export default function Kiosk() {
 
   return (
     <div lang={language} className="kiosk">
+      <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-200">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            data-testid="kiosk-load-showcase-btn"
+            onClick={() => void loadShowcase()}
+            disabled={busy}
+            className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-semibold px-3 py-1 rounded shadow-sm transition-colors flex items-center gap-1"
+            title="Pre-populate canonical Bengali showcase patient"
+          >
+            <span>🌟</span>
+            <span>Showcase: সুমিতা শর্মা (BN)</span>
+          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            data-testid="kiosk-fullscreen-btn"
+            onClick={() => void toggleFullscreen()}
+            className="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-2.5 py-1 rounded shadow-sm transition-colors flex items-center gap-1"
+            title="Toggle Fullscreen"
+          >
+            <span>{isFullscreen ? '⤦ Exit Fullscreen' : '⛶ Fullscreen'}</span>
+          </button>
+        </div>
+      </div>
+      {fullscreenError && (
+        <p className="error" role="alert">
+          {fullscreenError}
+        </p>
+      )}
       <div className="stepper" aria-label={t.kiosk}>
         {['language', 'identify', 'consent', 'interview', 'complete'].map((s, i) => (
           <span key={s} aria-current={s === step ? 'step' : undefined}>
@@ -255,7 +338,7 @@ export default function Kiosk() {
                   } catch (err: unknown) {
                     setAbhaVerified(false);
                     setAbhaMessage(
-                      `Error: ${err instanceof Error ? err.message : 'Verification failed'}`
+                      `Error: ${err instanceof Error ? err.message : 'Verification failed'}`,
                     );
                   } finally {
                     setAbhaChecking(false);

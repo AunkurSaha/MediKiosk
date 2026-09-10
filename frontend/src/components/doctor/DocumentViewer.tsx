@@ -240,9 +240,7 @@ export default function DocumentViewer({
                     {currentDocCrossRef.labs.length > 0 && (
                       <div style={{ marginTop: '4px' }}>
                         Linked Labs:{' '}
-                        <strong>
-                          {currentDocCrossRef.labs.map((l) => l.label).join(', ')}
-                        </strong>
+                        <strong>{currentDocCrossRef.labs.map((l) => l.label).join(', ')}</strong>
                       </div>
                     )}
                   </div>

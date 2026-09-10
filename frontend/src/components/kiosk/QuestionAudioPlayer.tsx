@@ -19,7 +19,9 @@ export default function QuestionAudioPlayer({
   const t = speechCopy[language];
   const [status, setStatus] = useState<'idle' | 'loading' | 'playing' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [usingBrowserVoice, setUsingBrowserVoice] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const [prevId, setPrevId] = useState(questionId);
   const [prevLang, setPrevLang] = useState(language);
@@ -29,6 +31,7 @@ export default function QuestionAudioPlayer({
     setPrevLang(language);
     setStatus('idle');
     setErrorMsg(null);
+    setUsingBrowserVoice(false);
   }
 
   useEffect(() => {
@@ -37,15 +40,21 @@ export default function QuestionAudioPlayer({
         audioRef.current.pause();
         audioRef.current = null;
       }
+      if (utteranceRef.current) {
+        window.speechSynthesis?.cancel();
+        utteranceRef.current = null;
+      }
     };
   }, [questionId, language]);
 
   async function handlePlay() {
     if (disabled || status === 'loading') return;
 
-    if (status === 'playing' && audioRef.current) {
-      audioRef.current.pause();
+    if (status === 'playing') {
+      audioRef.current?.pause();
       audioRef.current = null;
+      if (utteranceRef.current) window.speechSynthesis.cancel();
+      utteranceRef.current = null;
       setStatus('idle');
       return;
     }
@@ -55,12 +64,31 @@ export default function QuestionAudioPlayer({
 
     try {
       const res = await api.synthesizeSpeech(sessionId, questionId);
-      if (res.status !== 'success' || !res.audio_base64) {
-        setStatus('error');
-        setErrorMsg(t.ttsError);
+      if (res.provider === 'mock' || res.status !== 'success' || !res.audio_base64) {
+        if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+          setStatus('error');
+          setErrorMsg(t.ttsError);
+          return;
+        }
+        const utterance = new SpeechSynthesisUtterance(res.text);
+        utterance.lang = { en: 'en-IN', bn: 'bn-IN', hi: 'hi-IN' }[language];
+        utterance.onend = () => {
+          utteranceRef.current = null;
+          setStatus('idle');
+        };
+        utterance.onerror = () => {
+          utteranceRef.current = null;
+          setStatus('error');
+          setErrorMsg(t.ttsError);
+        };
+        utteranceRef.current = utterance;
+        setUsingBrowserVoice(true);
+        window.speechSynthesis.speak(utterance);
+        setStatus('playing');
         return;
       }
 
+      setUsingBrowserVoice(false);
       const audioUri = `data:${res.media_type || 'audio/wav'};base64,${res.audio_base64}`;
       const audio = new Audio(audioUri);
       audioRef.current = audio;
@@ -102,6 +130,11 @@ export default function QuestionAudioPlayer({
       {Boolean(errorMsg) && (
         <span className="audio-error" role="alert">
           {errorMsg}
+        </span>
+      )}
+      {usingBrowserVoice && !errorMsg && (
+        <span className="muted" role="note">
+          {t.browserTtsFallback}
         </span>
       )}
     </div>

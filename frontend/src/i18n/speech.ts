@@ -14,6 +14,7 @@ export interface SpeechCopy {
   listen: string;
   playing: string;
   ttsError: string;
+  browserTtsFallback: string;
   micDenied: string;
   voiceConsentLabel: string;
   voiceConsentNote: string;
@@ -33,6 +34,7 @@ const en: SpeechCopy = {
   listen: 'Listen',
   playing: 'Playing…',
   ttsError: 'Audio playback unavailable.',
+  browserTtsFallback: 'Using this browser’s built-in voice; not provider-generated audio.',
   micDenied: 'Microphone permission denied. Please allow microphone access or type your answer.',
   voiceConsentLabel: 'Allow microphone use for speaking your answers (optional)',
   voiceConsentNote:
@@ -53,6 +55,7 @@ const bn: SpeechCopy = {
   listen: 'শুনুন',
   playing: 'বাজছে…',
   ttsError: 'অডিও প্লেব্যাক উপলব্ধ নেই।',
+  browserTtsFallback: 'ব্রাউজারের নিজস্ব কণ্ঠ ব্যবহার হচ্ছে; এটি প্রদানকারীর তৈরি অডিও নয়।',
   micDenied: 'মাইক্রোফোনের অনুমতি পাওয়া যায়নি। মাইক্রোফোন চালু করুন অথবা টাইপ করুন।',
   voiceConsentLabel: 'উত্তর মুখে বলার জন্য মাইক্রোফোন ব্যবহারের অনুমতি দিন (ঐচ্ছিক)',
   voiceConsentNote:
@@ -73,6 +76,7 @@ const hi: SpeechCopy = {
   listen: 'सुनें',
   playing: 'चल रहा है…',
   ttsError: 'ऑडियो प्लेबैक उपलब्ध नहीं है।',
+  browserTtsFallback: 'ब्राउज़र की अंतर्निहित आवाज़ उपयोग हो रही है; यह प्रदाता ऑडियो नहीं है।',
   micDenied: 'माइक्रोफ़ोन की अनुमति अस्वीकृत। कृपया माइक्रोफ़ोन चालू करें या टाइप करें।',
   voiceConsentLabel: 'उत्तर बोलने के लिए माइक्रोफ़ोन के उपयोग की अनुमति दें (वैकल्पिक)',
   voiceConsentNote:

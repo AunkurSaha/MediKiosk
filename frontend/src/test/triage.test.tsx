@@ -43,7 +43,7 @@ const mockAlert: AlertItem = {
   rule_version: '1.0.0',
   priority: 'emergency',
   category: 'cardiovascular',
-  reason: 'Severe radiating chest pain (potential acute coronary syndrome).',
+  reason: 'Reported chest pain severity at least 8/10 with radiation.',
   triggering_facts: [
     {
       question_id: 'hpi_severity',
@@ -80,7 +80,7 @@ describe('AlertCard', () => {
     expect(screen.getByText('Fatima Begum')).toBeInTheDocument();
     expect(screen.getByText('RF-CHEST-001')).toBeInTheDocument();
     expect(
-      screen.getByText('Severe radiating chest pain (potential acute coronary syndrome).'),
+      screen.getByText('Reported chest pain severity at least 8/10 with radiation.'),
     ).toBeInTheDocument();
     expect(screen.getByText('hpi.severity:')).toBeInTheDocument();
     expect(screen.getByText('Acknowledge Alert')).toBeInTheDocument();
@@ -186,6 +186,41 @@ describe('Triage Dashboard', () => {
       expect(screen.getByText('Fatima Begum')).toBeInTheDocument();
       expect(screen.getAllByText('1').length).toBeGreaterThanOrEqual(1);
     });
+  });
+
+  it('renders both canonical showcase priorities from the initial API response', async () => {
+    vi.mocked(triageApi.getAlerts).mockResolvedValue({
+      items: [
+        { ...mockAlert, patient_name: 'Sunita Sharma (সুমিতা শর্মা)' },
+        {
+          ...mockAlert,
+          id: 'alert-urgent',
+          rule_id: 'RF-CHEST-002',
+          priority: 'urgent',
+          reason: 'Chest pain associated with shortness of breath (dyspnea).',
+          triggering_facts: [
+            {
+              question_id: 'hpi.associated_details',
+              field: 'hpi.associated_details',
+              value: 'DYSPNEA',
+              raw_value: 'শ্বাসকষ্ট',
+            },
+          ],
+          patient_name: 'Sunita Sharma (সুমিতা শর্মা)',
+        },
+      ],
+      total: 2,
+      emergency_count: 1,
+      urgent_count: 1,
+      acknowledged_count: 0,
+    });
+
+    render(<Triage />);
+
+    expect(await screen.findByTestId('alert-card-alert-123')).toHaveTextContent('EMERGENCY');
+    expect(screen.getByTestId('alert-card-alert-urgent')).toHaveTextContent('URGENT');
+    expect(screen.getByTestId('alert-card-alert-123')).toHaveTextContent('RF-CHEST-001');
+    expect(screen.getByTestId('alert-card-alert-urgent')).toHaveTextContent('RF-CHEST-002');
   });
 });
 

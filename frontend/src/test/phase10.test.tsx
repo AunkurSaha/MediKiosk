@@ -66,7 +66,7 @@ describe('Phase 10 FHIR R4 Export Architecture Components', () => {
           sessionId={sessionId}
           patientName="Sunita Sharma"
           hospitalToken="HOSP-101"
-        />
+        />,
       );
 
       expect(screen.getByText('HL7 FHIR R4 Bundle Export')).toBeInTheDocument();
@@ -101,7 +101,7 @@ describe('Phase 10 FHIR R4 Export Architecture Components', () => {
           sessionId={sessionId}
           patientName="Sunita Sharma"
           hospitalToken="HOSP-101"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -130,7 +130,7 @@ describe('Phase 10 FHIR R4 Export Architecture Components', () => {
           sessionId={sessionId}
           patientName="Sunita Sharma"
           hospitalToken="HOSP-101"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -141,9 +141,7 @@ describe('Phase 10 FHIR R4 Export Architecture Components', () => {
       fireEvent.click(copyBtn);
 
       await waitFor(() => {
-        expect(writeTextMock).toHaveBeenCalledWith(
-          JSON.stringify(mockExportData.bundle, null, 2)
-        );
+        expect(writeTextMock).toHaveBeenCalledWith(JSON.stringify(mockExportData.bundle, null, 2));
         expect(screen.getByText('✓ Copied!')).toBeInTheDocument();
       });
     });
@@ -162,7 +160,7 @@ describe('Phase 10 FHIR R4 Export Architecture Components', () => {
           sessionId={sessionId}
           patientName="Sunita Sharma"
           hospitalToken="HOSP-101"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -177,7 +175,9 @@ describe('Phase 10 FHIR R4 Export Architecture Components', () => {
     });
 
     it('displays error message when export fails', async () => {
-      vi.spyOn(api, 'getFhirExport').mockRejectedValueOnce(new Error('Network error loading bundle'));
+      vi.spyOn(api, 'getFhirExport').mockRejectedValueOnce(
+        new Error('Network error loading bundle'),
+      );
 
       render(
         <FHIRExportModal
@@ -186,7 +186,7 @@ describe('Phase 10 FHIR R4 Export Architecture Components', () => {
           sessionId={sessionId}
           patientName="Sunita Sharma"
           hospitalToken="HOSP-101"
-        />
+        />,
       );
 
       await waitFor(() => {
@@ -203,7 +203,7 @@ describe('Phase 10 FHIR R4 Export Architecture Components', () => {
           sessionId={sessionId}
           patientName="Sunita Sharma"
           hospitalToken="HOSP-101"
-        />
+        />,
       );
 
       const closeButtons = screen.getAllByRole('button', { name: /close/i });

@@ -29,7 +29,7 @@ Run `backend/.venv/Scripts/python.exe scripts/verify-stabilization-migrations.py
 
 `verify-stabilization-restart.ps1 -ApplicationOnly` verifies new backend/frontend process IDs and unchanged Phase 1–3, alert and document API state plus original document file hash, against the still-running PostgreSQL process. The same script without that switch requires actual PostgreSQL stop/start and a changed database PID. Windows Application Control currently prevents that full check; application-only success must not be reported as database restart acceptance.
 
-The remaining strategy below includes future expectations, not claims that timeline/FHIR or production security are implemented.
+The remaining strategy includes both retained historical expectations and current checks. The implementation-status and phase reports govern current claims; production security is not implemented.
 
 ## 1. Philosophy
 
@@ -309,7 +309,7 @@ New test coverage includes:
 
 ## Phase 7 acceptance
 
-Current totals are **331 backend tests** on each SQLite/PostgreSQL profile, **61 frontend component tests**, and **27 Chromium E2E tests**.
+Current verified totals are **356 backend tests on SQLite**, **98 frontend component tests**, and **29 Chromium E2E tests** against the migrated local SQLite acceptance database. The suite includes browser recording conversion/TTS fallback coverage and a real fixture upload-to-extraction/timeline/preview journey. The PostgreSQL profile is not currently verified because the Windows PostgreSQL service is disabled and stopped.
 
 `backend/tests/test_phase7_repairs.py` retains materialization, idempotence, atomicity, schema-alignment, provenance, null, and logging regressions. `backend/tests/test_phase7_complete.py` adds staff authorization, source exclusion, stable retrieval, verify/reject/correct review, forged identity, optimistic conflict, original/revision preservation, confirmed-state lock, timeline ordering/unknown dates/determinism/no duplicates, and conservative medication/allergy/lab discrepancy coverage.
 

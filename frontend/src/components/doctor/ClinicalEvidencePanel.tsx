@@ -292,12 +292,27 @@ function LabFactCard({
   );
 }
 
+function timelineIcon(eventType: string) {
+  const t = eventType.toLowerCase();
+  if (t.includes('medication')) return '💊';
+  if (t.includes('lab')) return '🧪';
+  if (t.includes('interview') || t.includes('patient')) return '🗣️';
+  if (t.includes('vital')) return '💓';
+  return '📋';
+}
+
 function TimelineList({ entries }: { entries: TimelineEntry[] }) {
   return (
     <ol className="timeline-list">
       {entries.map((entry) => (
         <li key={entry.id}>
-          <div className="timeline-marker" aria-hidden="true" />
+          <div
+            className="timeline-marker"
+            aria-hidden="true"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <span style={{ fontSize: '10px' }}>{timelineIcon(entry.event_type)}</span>
+          </div>
           <div>
             <div className="fact-heading">
               <strong>{entry.canonical_label}</strong>
@@ -305,9 +320,19 @@ function TimelineList({ entries }: { entries: TimelineEntry[] }) {
             </div>
             <p className="muted">
               {entry.event_timestamp
-                ? new Date(entry.event_timestamp).toLocaleString()
+                ? new Date(entry.event_timestamp).toLocaleDateString(undefined, {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
                 : 'Date not reported'}{' '}
-              · {entry.event_type.replaceAll('_', ' ')} · {statusLabel(entry.verification_status)}
+              ·{' '}
+              <span style={{ textTransform: 'capitalize' }}>
+                {entry.event_type.replaceAll('_', ' ')}
+              </span>{' '}
+              · Status: {statusLabel(entry.verification_status)}
             </p>
             {entry.source.raw_text && (
               <details>

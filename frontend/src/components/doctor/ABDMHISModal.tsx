@@ -102,7 +102,9 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
         setLinkMessage(`⚠️ ${res.message}`);
       }
     } catch (err: unknown) {
-      setLinkMessage(`Error: ${err instanceof Error ? err.message : 'Care context linking failed'}`);
+      setLinkMessage(
+        `Error: ${err instanceof Error ? err.message : 'Care context linking failed'}`,
+      );
     } finally {
       setLinkLoading(false);
     }
@@ -128,7 +130,8 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
     }
   };
 
-  const isVerified = statusData?.abha_status === 'mock_verified' || statusData?.abha_status === 'verified';
+  const isVerified =
+    statusData?.abha_status === 'mock_verified' || statusData?.abha_status === 'verified';
   const isLinked = statusData?.care_context_status === 'linked';
   const isDispatched = statusData?.his_dispatch_status === 'dispatched';
 
@@ -197,7 +200,8 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
               </span>
             </div>
             <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#64748b' }}>
-              Patient: <strong>{patientName}</strong> · Token: <strong>{hospitalToken}</strong> · Session: <code>{sessionId.slice(0, 8)}</code>
+              Patient: <strong>{patientName}</strong> · Token: <strong>{hospitalToken}</strong> ·
+              Session: <code>{sessionId.slice(0, 8)}</code>
             </p>
           </div>
           <button
@@ -236,7 +240,9 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
           >
             <span style={{ fontSize: '1.1rem' }}>ℹ️</span>
             <div>
-              <strong>ABDM Sandbox & Simulated HIS Gateway:</strong> Synthetic local demonstration of National Health Stack M1, M2 & OPD HIS dispatch. No real Aadhaar or production NHA gateway authentication claimed.
+              <strong>ABDM Sandbox & Simulated HIS Gateway:</strong> Synthetic local demonstration
+              of National Health Stack M1, M2 & OPD HIS dispatch. No real Aadhaar or production NHA
+              gateway authentication claimed.
             </div>
           </div>
 
@@ -245,8 +251,18 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
               <p>Loading ABDM and HIS integration status...</p>
             </div>
           ) : error ? (
-            <div style={{ padding: '1rem', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.5rem', color: '#b91c1c' }}>
-              <p><strong>Error loading status:</strong> {error}</p>
+            <div
+              style={{
+                padding: '1rem',
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                borderRadius: '0.5rem',
+                color: '#b91c1c',
+              }}
+            >
+              <p>
+                <strong>Error loading status:</strong> {error}
+              </p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -259,10 +275,19 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                   backgroundColor: '#ffffff',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.75rem',
+                  }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '1.2rem' }}>🪪</span>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: '#1e293b' }}>
+                    <h3
+                      style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: '#1e293b' }}
+                    >
                       Milestone 1 (M1): ABHA Identity & Verification
                     </h3>
                   </div>
@@ -291,7 +316,10 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                 </div>
 
                 {/* Inline verification form */}
-                <form onSubmit={handleVerifyAbha} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <form
+                  onSubmit={handleVerifyAbha}
+                  style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}
+                >
                   <input
                     type="text"
                     value={abhaInput}
@@ -378,10 +406,19 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                   backgroundColor: '#ffffff',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.75rem',
+                  }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '1.2rem' }}>🔗</span>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: '#1e293b' }}>
+                    <h3
+                      style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: '#1e293b' }}
+                    >
                       Milestone 2 (M2): Care Context Linking
                     </h3>
                   </div>
@@ -402,14 +439,18 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
 
                 <div style={{ fontSize: '0.9rem', color: '#475569', marginBottom: '1rem' }}>
                   <p style={{ margin: '0.25rem 0' }}>
-                    <strong>Reference ID:</strong> <code>{statusData?.care_context_reference || 'Not generated'}</code>
+                    <strong>Reference ID:</strong>{' '}
+                    <code>{statusData?.care_context_reference || 'Not generated'}</code>
                   </p>
                   <p style={{ margin: '0.25rem 0' }}>
-                    <strong>Display Name:</strong> {statusData?.care_context_display || `MediKiosk OPD Intake - Token ${hospitalToken}`}
+                    <strong>Display Name:</strong>{' '}
+                    {statusData?.care_context_display ||
+                      `MediKiosk OPD Intake - Token ${hospitalToken}`}
                   </p>
                   {statusData?.care_context_linked_at && (
                     <p style={{ margin: '0.25rem 0' }}>
-                      <strong>Linked At:</strong> {new Date(statusData.care_context_linked_at).toLocaleString()}
+                      <strong>Linked At:</strong>{' '}
+                      {new Date(statusData.care_context_linked_at).toLocaleString()}
                     </p>
                   )}
                 </div>
@@ -431,7 +472,11 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                       cursor: linkLoading ? 'not-allowed' : 'pointer',
                     }}
                   >
-                    {linkLoading ? 'Linking...' : isLinked ? 'Re-link Care Context (M2)' : '🔗 Link Care Context (M2)'}
+                    {linkLoading
+                      ? 'Linking...'
+                      : isLinked
+                        ? 'Re-link Care Context (M2)'
+                        : '🔗 Link Care Context (M2)'}
                   </button>
                   <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
                     Registers MediKiosk OPD encounter to patient health record under ABDM.
@@ -461,10 +506,19 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                   backgroundColor: '#ffffff',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.75rem',
+                  }}
+                >
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '1.2rem' }}>📤</span>
-                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: '#1e293b' }}>
+                    <h3
+                      style={{ margin: 0, fontSize: '1.05rem', fontWeight: 600, color: '#1e293b' }}
+                    >
                       Hospital Information System (HIS / EMR) Interoperability
                     </h3>
                   </div>
@@ -485,7 +539,8 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
 
                 <div style={{ fontSize: '0.9rem', color: '#475569', marginBottom: '1rem' }}>
                   <p style={{ margin: '0.25rem 0' }}>
-                    <strong>Attached Payload:</strong> Phase 10 HL7 FHIR R4 Document Bundle (LOINC <code>34105-7</code>)
+                    <strong>Attached Payload:</strong> Phase 10 HL7 FHIR R4 Document Bundle (LOINC{' '}
+                    <code>34105-7</code>)
                   </p>
                   {statusData?.his_dispatch_receipt && (
                     <div
@@ -498,9 +553,18 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                         fontSize: '0.85rem',
                       }}
                     >
-                      <div><strong>Receipt ID:</strong> <code>{String(statusData.his_dispatch_receipt.receipt_id || '')}</code></div>
-                      <div><strong>Target System:</strong> {String(statusData.his_dispatch_receipt.target_system || '')}</div>
-                      <div><strong>Status:</strong> {String(statusData.his_dispatch_receipt.status || '')}</div>
+                      <div>
+                        <strong>Receipt ID:</strong>{' '}
+                        <code>{String(statusData.his_dispatch_receipt.receipt_id || '')}</code>
+                      </div>
+                      <div>
+                        <strong>Target System:</strong>{' '}
+                        {String(statusData.his_dispatch_receipt.target_system || '')}
+                      </div>
+                      <div>
+                        <strong>Status:</strong>{' '}
+                        {String(statusData.his_dispatch_receipt.status || '')}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -535,7 +599,11 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                       cursor: dispatchLoading ? 'not-allowed' : 'pointer',
                     }}
                   >
-                    {dispatchLoading ? 'Dispatching...' : isDispatched ? 'Re-dispatch to HIS' : '📤 Dispatch to Hospital HIS'}
+                    {dispatchLoading
+                      ? 'Dispatching...'
+                      : isDispatched
+                        ? 'Re-dispatch to HIS'
+                        : '📤 Dispatch to Hospital HIS'}
                   </button>
                 </div>
 
@@ -548,7 +616,8 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                       color: '#166534',
                     }}
                   >
-                    {dispatchMessage || (dispatchResponse && `✓ Receipt: ${dispatchResponse.receipt_reference}`)}
+                    {dispatchMessage ||
+                      (dispatchResponse && `✓ Receipt: ${dispatchResponse.receipt_reference}`)}
                   </p>
                 )}
               </div>

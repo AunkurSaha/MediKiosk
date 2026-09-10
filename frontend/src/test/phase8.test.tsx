@@ -69,8 +69,10 @@ describe('Phase 8 SummaryWorkspace Component', () => {
   const initialSummary: Summary = {
     id: 'sum-1',
     session_id: sessionId,
-    generated_text: '## 1. Patient Information\nPatient Name: Rajesh Kumar\n\n## 2. Chief Complaint\nChest pain',
-    reviewed_text: '## 1. Patient Information\nPatient Name: Rajesh Kumar\n\n## 2. Chief Complaint\nChest pain',
+    generated_text:
+      '## 1. Patient Information\nPatient Name: Rajesh Kumar\n\n## 2. Chief Complaint\nChest pain',
+    reviewed_text:
+      '## 1. Patient Information\nPatient Name: Rajesh Kumar\n\n## 2. Chief Complaint\nChest pain',
     status: 'generated',
     draft_provider: 'deterministic',
     draft_version: 1,
@@ -215,12 +217,7 @@ describe('Phase 8 SummaryWorkspace Component', () => {
     fireEvent.click(replaceBtn);
 
     await waitFor(() => {
-      expect(api.regenerateSummary).toHaveBeenCalledWith(
-        sessionId,
-        1,
-        undefined,
-        true,
-      );
+      expect(api.regenerateSummary).toHaveBeenCalledWith(sessionId, 1, undefined, true);
       expect(screen.getByText('Draft regenerated from latest clinical facts.')).toBeInTheDocument();
     });
   });

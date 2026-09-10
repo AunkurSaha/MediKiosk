@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
@@ -16,6 +18,10 @@ if DATABASE_URL.startswith("sqlite"):
     @event.listens_for(engine, "connect")
     def enable_foreign_keys(connection, _):
         connection.execute("PRAGMA foreign_keys=ON")
+        # Historical Alembic revisions use PostgreSQL's now() server default.
+        # Test-mode SQLite runs the same migrations, so provide the compatible
+        # zero-argument function instead of maintaining a divergent schema path.
+        connection.create_function("now", 0, lambda: datetime.now(timezone.utc).isoformat())
 
 
 SessionLocal = sessionmaker(bind=engine, autoflush=False)

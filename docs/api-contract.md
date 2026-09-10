@@ -6,7 +6,7 @@ Base: `/api`. Local OpenAPI: http://127.0.0.1:8010/docs. All request schemas rej
 
 Errors have `{ "error": { "code": "...", "message": "...", "details": null } }`. Validation details contain field/type names without echoing patient values. Status codes: 404 missing resource, 422 invalid input, 409 workflow/revision conflict, 401 missing demo doctor identity, 403 missing consent/forbidden role, 503 database unavailable.
 
-`GET /health` checks the database and returns `{"status":"ok"}`. `GET /config` returns demo mode, `phase: "5"`, `languages: ["en","bn","hi"]`, `speech_provider: "mock"`, and `normalization_provider`, without secrets.
+`GET /health` checks the database and returns `{"status":"ok"}`. `GET /config` returns demo mode, `phase: "12"`, `languages: ["en","bn","hi"]`, and the active normalization, speech, and OCR provider names without secrets.
 
 ## Session identity and consent
 
@@ -31,7 +31,7 @@ Retain the client UUID before sending. Repeating the same ID/details returns the
 {"voice_processing":false,"document_processing":false,"share_with_doctor":true}
 ```
 
-Voice processing consent can now be set to `true` or `false`. If `voice_processing` is `false`, microphone input is disabled in UI and any transcription attempt returns HTTP 403 `VOICE_CONSENT_REQUIRED`. Document processing flag must remain false. Clinical answers, adaptive state/selection/navigation, completion and doctor detail require sharing consent. Consent cannot change after completion.
+Voice and document processing consent can be set independently. If `voice_processing` is `false`, microphone input is disabled in UI and any transcription attempt returns HTTP 403 `VOICE_CONSENT_REQUIRED`; document upload similarly requires document consent. Clinical answers, adaptive state/selection/navigation, completion and doctor detail require sharing consent. Consent cannot change after completion.
 
 ## Adaptive interview state and selection
 
@@ -149,7 +149,7 @@ Each normalization exposes id, source_answer_id, source_question_id, canonical_f
 
 Strict provider output only accepts the supplied field/language, schema 1.0, allowed symptom/qualitative concepts, valid confidence/certainty and source evidence. Diagnosis/treatment/extra fields fail closed. Trusted display/value and all provenance are service-owned. No provider credentials or internal exceptions are returned.
 
-Results are immutable per source answer and reused on retry/branch reactivation. Source edits generate a new result; only current active-source results appear in history. Historical and confirmed records are not backfilled/reprocessed. Summary confirmation never promotes machine facts. Original generated text/JSON remain preserved. This Phase 3B contract introduced `normalization_provider`; the current `/api/config` phase label is `"7"`.
+Results are immutable per source answer and reused on retry/branch reactivation. Source edits generate a new result; only current active-source results appear in history. Historical and confirmed records are not backfilled/reprocessed. Summary confirmation never promotes machine facts. Original generated text/JSON remain preserved. This Phase 3B contract introduced `normalization_provider`; the current `/api/config` phase label is `"12"`.
 
 ## Phase 3B additive normalization contract & Schema 1.1
 
@@ -159,9 +159,11 @@ No additional public endpoint or changed answer-submission payload. The contract
   ```json
   {
     "demo_mode": true,
-    "phase": "7",
+    "phase": "12",
     "languages": ["en", "bn", "hi"],
-    "normalization_provider": "nvidia"
+    "normalization_provider": "mock",
+    "speech_provider": "mock",
+    "ocr_provider": "mock"
   }
   ```
 - Configuration via environment:
@@ -205,7 +207,8 @@ Staff HTTP routes require the existing active demo-doctor identity (`X-Demo-Doct
 - Structured document data uses `observations` (typed lab rows) and `medications`. Missing lab flags are null, not Normal. Historical alias input is accepted by the schema; output uses observations.
 - POST `/sessions/{id}/interview/speech/transcribe`: multipart audio, current `question_id`, optional mock fixture_id. Requires voice/sharing consent, active intake and current free-text eligibility before provider invocation. Multipart may already have spooled to disk; the UploadFile closes in finally. Successful response adds `candidate_token`; transcription does not save an answer.
 - Adaptive answer with source voice requires `voice_candidate` signed token and exact candidate text, language, question, session and revision. Tokens expire after 10 minutes/restart. Editing uses source typed without a token. Confirmed provenance is audited in the answer transaction. Legacy answer endpoints only accept touch/typed.
-- Speech provider invocation has a 15-second overall deadline. BHASHINI live ASR rejects unchecked native browser formats and requires validated 16-kHz mono PCM WAV. This is a conservative adapter boundary, not live format acceptance.
+- Before upload, the browser decodes its MediaRecorder output, downmixes it, resamples it, and encodes 16-kHz mono 16-bit PCM WAV. Speech provider invocation then has a 15-second overall deadline. This format boundary is tested but is not evidence of live BHASHINI acceptance.
+- Mock TTS audio is never presented as genuine speech. For mock or unavailable provider output, supported browsers use a visibly labelled native `speechSynthesis` fallback; successful live-provider audio retains the backend-generated playback path.
 
 ## Phase 7 staff medical-evidence contract
 
@@ -443,5 +446,12 @@ All endpoints require clinical staff credentials (`X-Demo-Doctor: true`) and pat
 
 - `GET /api/doctor/sessions/{session_id}/his/status`:
   Retrieves current HIS dispatch status and receipt metadata.
+
+## Phase 12 demo-management contract
+
+These routes require the configured demo doctor and are disabled unless `DEMO_MODE=true` outside production:
+
+- `POST /api/doctor/demo/seed-showcase`: idempotently creates the canonical synthetic Bengali showcase record and returns a typed `ShowcaseSeedResponse` containing the session, patient, token, language, status, summary ID, and message.
+- `POST /api/doctor/demo/reset`: removes synthetic patient/session data and associated stored document files while preserving user accounts. It returns `DemoResetResponse`; `success=false` explicitly reports any file-cleanup failure.
 
 

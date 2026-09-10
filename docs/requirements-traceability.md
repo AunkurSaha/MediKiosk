@@ -25,7 +25,9 @@ Evidence must demonstrate behavior; a test count alone does not accept a feature
 | Conservative discrepancies | discrepancies.py; discrepancy API/UI; medication/allergy/lab unit and browser tests | Incomparable evidence emits nothing; output always requires clinician review |
 | Deterministic draft summary, evidence attribution, doctor review, revision history, and confirmed locking | ClinicalSummaryService; summary_revisions; test_phase8_summary.py; phase8.test.tsx | Deterministic template synthesis only; no LLM diagnosis/prescriptions/invented dates |
 | Field-level verification, confirmed summary amendments, session audit trails, and cross-referencing | FieldVerificationService; IntakeService; CrossReferenceService; test_phase9_hardening.py; phase9.test.tsx | Synthetic prototype scope; demo staff identity; non-diagnostic verification |
-| FHIR export, ABDM | No Phase 10+ implementation | Deferred and not authorized |
+| FHIR R4 export | fhir.py; Pydantic FHIR schemas; test_fhir_export.py; phase10.test.tsx | On-demand prototype mapping; not a certified interoperability implementation |
+| ABDM/HIS demonstration | abdm.py; his.py; test_abdm_his.py; phase11.test.tsx | Mock/sandbox behavior only; no live national or hospital integration acceptance |
+| Phase 12 showcase integrity | showcase.py; test_demo_polish.py; phase12.test.tsx | Synthetic fixtures and pre-reviewed demo state only; no clinical validation |
 
 
 ## Phase 7 completion evidence

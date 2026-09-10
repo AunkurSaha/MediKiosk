@@ -4,7 +4,7 @@ Do not jump phases merely because later phases are more impressive.
 
 Each phase should leave the repository runnable.
 
-Current status: **Phase 11 complete for the local synthetic-data prototype**. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md).
+Current status: **Phase 12 complete for the local synthetic-data prototype**. All roadmap phases are implemented. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md).
 
 The sections below describe historical or future scope, not current acceptance. Phase 3B and 4B live integrations remain unaccepted; Phase 6 has storage and explicit mock fixtures, not real OCR.
 
@@ -160,15 +160,17 @@ Delivered:
 
 ## Phase 12 — Demo polish
 
-Add:
-- seeded showcase patient;
-- Bengali chest-pain scenario;
-- realistic loading states;
-- kiosk full-screen polish;
-- judge-friendly triage alert;
-- timeline visuals;
-- FHIR export preview;
-- reset demo command.
+Status: complete for deterministic prototype scope. Canonical Bengali chest-pain showcase patient seeding, demo management CLI and API endpoints, kiosk full-screen toggle, judge-friendly emergency triage alert presentation, and doctor workspace demo tools are implemented. See [Phase 12 report](phase12-implementation-status.md).
+
+Delivered:
+- canonical Bengali (bn) chest-pain showcase patient with all 26 applicable flow answers, 2 deterministic emergency/urgent safety alerts, 2 previewable mock-fixture documents with source-linked facts, ABDM M1/M2/HIS mock state, and a revisioned 10-section clinical summary;
+- `ShowcaseService` with idempotent transactional seeding and database reset plus document-file cleanup;
+- `seed.py` CLI: `--showcase` and `--reset` flags;
+- demo management API endpoints (`POST /demo/seed-showcase`, `POST /demo/reset`) gated by `DEMO_MODE` and doctor auth;
+- kiosk full-screen toggle button and one-click showcase loader;
+- doctor workspace seed/reset quick actions with confirmation and feedback;
+- enhanced emergency triage alert banners with high-visibility badges;
+- comprehensive automated test coverage (6 backend integration tests, 8 frontend component tests, and a dedicated browser showcase journey) with zero regressions across 356 SQLite backend tests, 98 frontend component tests, and 29 Chromium E2E journeys.
 
 ## Priority rule
 

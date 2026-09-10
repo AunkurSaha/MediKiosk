@@ -1,6 +1,6 @@
 # Architecture — MediKiosk
 
-Current implementation is Phase 8; see the implemented boundaries at the end and [status](phase8-implementation-status.md). The broader module/deployment diagrams describe the target roadmap, including unimplemented future integrations.
+Current implementation is Phase 12; see the implemented boundaries below and the [current status](implementation-status.md). Broader deployment diagrams remain target architecture where they exceed the local synthetic prototype.
 
 ## 1. Architectural style
 
@@ -379,7 +379,7 @@ Module boundaries are chosen so high-load components can be separated later if r
 
 ## Implemented Phase 2 boundary
 
-This historical Phase 2 subsection described the runnable boundary at that milestone. Later sections below supersede it for normalization, voice, alerts, documents, WebSockets, and Phase 7 medical evidence. FHIR and deployment remain future work.
+This historical Phase 2 subsection described the runnable boundary at that milestone. Later sections below supersede it for normalization, voice, alerts, documents, WebSockets, Phase 7 medical evidence, and Phase 10 FHIR export. Production deployment remains future work.
 
 The active path is:
 
@@ -458,7 +458,8 @@ Staff HTTP routes require the existing active demo-doctor identity (`X-Demo-Doct
 - Structured document data uses `observations` (typed lab rows) and `medications`. Missing lab flags are null, not Normal. Historical alias input is accepted by the schema; output uses observations.
 - POST `/sessions/{id}/interview/speech/transcribe`: multipart audio, current `question_id`, optional mock fixture_id. Requires voice/sharing consent, active intake and current free-text eligibility before provider invocation. Multipart may already have spooled to disk; the UploadFile closes in finally. Successful response adds `candidate_token`; transcription does not save an answer.
 - Adaptive answer with source voice requires `voice_candidate` signed token and exact candidate text, language, question, session and revision. Tokens expire after 10 minutes/restart. Editing uses source typed without a token. Confirmed provenance is audited in the answer transaction. Legacy answer endpoints only accept touch/typed.
-- Speech provider invocation has a 15-second overall deadline. BHASHINI live ASR rejects unchecked native browser formats and requires validated 16-kHz mono PCM WAV. This is a conservative adapter boundary, not live format acceptance.
+- The browser decodes its MediaRecorder result, downmixes it, resamples it, and encodes 16-kHz mono 16-bit PCM WAV before upload. The backend retains the strict WAV validation and 15-second provider deadline. This tested conversion boundary does not establish live BHASHINI acceptance.
+- Mock or unavailable TTS results use a visibly labelled browser-native `speechSynthesis` fallback when supported. Successful live-provider audio continues through the backend-generated audio path; patient answers are never sent to TTS.
 
 
 See the stabilization report for verification and remaining limits. Earlier conceptual diagrams describe planned scope where they exceed implemented boundaries.
@@ -557,4 +558,8 @@ Key architectural guarantees:
 2. **Confirmed Record Immutability with Versioned Amendments**: Once confirmed, a clinical summary is never modified in place. Subsequent clinical updates are filed as official amendments with mandatory clinician justification, preserving both the original confirmed text and the timestamped addendum.
 3. **Server-Enforced Actor Provenance**: Client attempts to supply or forge `verified_by` or `amended_by` are rejected; identities are strictly resolved from authenticated session credentials.
 4. **Complete Auditability**: Every intake, verification, summary revision, amendment, and triage alert generates an immutable `AuditLog` entry accessible via dedicated staff APIs. See [Phase 9 status](phase9-implementation-status.md).
+
+## Implemented Phase 10–12 boundary
+
+Phase 10 maps the internal relational source of truth into on-demand Pydantic FHIR R4 document or collection bundles; FHIR is not the persistence model. Phase 11 adds mock/sandbox ABDM identity and care-context state plus a simulated HIS dispatcher, all behind the staff boundary and patient sharing consent. Phase 12 adds no schema: it assembles a deterministic synthetic showcase record through existing models and services, stores content-addressed repository document fixtures in local storage, evaluates the versioned red-flag rules, and generates a clinician-reviewable summary. See the [Phase 10](phase10-implementation-status.md), [Phase 11](phase11-implementation-status.md), and [Phase 12](phase12-implementation-status.md) reports.
 

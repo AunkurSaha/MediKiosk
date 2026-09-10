@@ -66,9 +66,13 @@ Application runtime and migrations use the same configuration. SQLite is permitt
 - `APP_ENV=development`: local development.
 - `DEMO_MODE=true`: enables explicitly labeled demo-doctor access after seeding.
 - `CORS_ORIGINS`: comma-separated permitted frontend origins, defaulting to local port 5175.
+- `CLINICAL_NORMALIZATION_PROVIDER`: `mock`, `disabled`, or `nvidia`; the optional launcher switch overrides it for that process only.
+- `SPEECH_PROVIDER`: `mock`, `disabled`, or `bhashini`. BHASHINI credential names and optional endpoint overrides are listed in `backend/.env.example`.
+- `OCR_PROVIDER`: `mock` or `disabled`; real OCR is not implemented.
+- `ABDM_ENV`, `ABDM_CLIENT_ID`, `ABDM_CLIENT_SECRET`, `HIS_ENDPOINT_URL`: reserved integration configuration; the shipped demonstration remains mock/simulated.
 - `VITE_API_BASE_URL`: optional frontend variable, default `/api`; never put backend credentials in it.
 
-The frontend development server proxies `/api` to port 8010. No AI, speech, OCR, or ABDM API keys are used. `APP_ENV=production` disables demo doctor access; production authentication is separate future work.
+The frontend development server proxies `/api` to port 8010. Credentials remain backend-only. The launcher uses `backend/.env` unless an explicit process override is supplied and restarts a project-owned backend when its active normalization provider is stale. `APP_ENV=production` disables demo doctor access; production authentication is separate future work.
 
 ## Stop and restart
 
@@ -81,4 +85,3 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-dev.ps1
 Stop commands retain all data. App process IDs are recorded in `.runtime/dev-processes.json` and verified before stopping them. PostgreSQL does not start automatically after Windows restarts; run the launcher.
 
 Logs are under `.runtime/`. If a launcher reports a port conflict, inspect the logs and existing process before stopping anything. Do not delete database folders as a troubleshooting shortcut.
-

@@ -8,8 +8,7 @@ try {
     } else {
         & .\.venv\Scripts\python.exe -m pytest -q
     }
-    if ($LASTEXITCODE -ne 0) { throw 'Backend tests failed.' }
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
     & .\.venv\Scripts\ruff.exe check app tests alembic
-    if ($LASTEXITCODE -ne 0) { throw 'Backend lint failed.' }
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 } finally { Pop-Location }
-

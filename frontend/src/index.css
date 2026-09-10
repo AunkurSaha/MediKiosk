@@ -356,6 +356,14 @@ progress::-webkit-progress-value {
   align-items: start;
   gap: 24px;
 }
+.doctor-header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
 .session-list {
   display: grid;
   gap: 14px;
@@ -432,6 +440,9 @@ progress::-webkit-progress-value {
   grid-template-columns: 1fr 1.12fr;
   gap: 22px;
   align-items: start;
+}
+.review-grid > * {
+  min-width: 0;
 }
 .review-grid .card {
   padding: 28px;
@@ -547,8 +558,18 @@ details .muted {
     display: none;
   }
   .page-heading {
-    align-items: center;
+    align-items: flex-start;
+    flex-direction: column;
     gap: 12px;
+  }
+  .patient-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .doctor-header-actions {
+    justify-content: flex-start;
+    width: 100%;
   }
   .page-heading button {
     padding: 10px;

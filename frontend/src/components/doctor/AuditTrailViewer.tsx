@@ -53,7 +53,11 @@ export const AuditTrailViewer: FC<Props> = ({ sessionId }) => {
   };
 
   return (
-    <section className="card audit-trail-section" data-testid="audit-trail-viewer" style={{ marginTop: '20px' }}>
+    <section
+      className="card audit-trail-section"
+      data-testid="audit-trail-viewer"
+      style={{ marginTop: '20px' }}
+    >
       <div
         style={{
           display: 'flex',
@@ -74,7 +78,9 @@ export const AuditTrailViewer: FC<Props> = ({ sessionId }) => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <label htmlFor="audit-filter-select" style={{ fontSize: '0.8rem', color: '#475569' }}>Filter Actor:</label>
+          <label htmlFor="audit-filter-select" style={{ fontSize: '0.8rem', color: '#475569' }}>
+            Filter Actor:
+          </label>
           <select
             id="audit-filter-select"
             value={filterActor}
@@ -102,7 +108,10 @@ export const AuditTrailViewer: FC<Props> = ({ sessionId }) => {
       )}
 
       {!loading && !error && filteredEvents.length > 0 && (
-        <div className="audit-timeline-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div
+          className="audit-timeline-list"
+          style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+        >
           {filteredEvents.map((ev) => {
             const actorStyle = getActorBadgeColor(ev.actor_type);
             return (
@@ -115,13 +124,23 @@ export const AuditTrailViewer: FC<Props> = ({ sessionId }) => {
                   border: '1px solid #e2e8f0',
                   backgroundColor: '#ffffff',
                   display: 'flex',
+                  flexWrap: 'wrap',
                   justifyContent: 'space-between',
                   alignItems: 'flex-start',
+                  gap: '8px',
                   fontSize: '0.85rem',
                 }}
               >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <div style={{ flex: '1 1 220px', minWidth: 0 }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
+                      gap: '8px',
+                      marginBottom: '4px',
+                    }}
+                  >
                     <span
                       style={{
                         padding: '2px 6px',
@@ -151,6 +170,8 @@ export const AuditTrailViewer: FC<Props> = ({ sessionId }) => {
                         borderRadius: '4px',
                         marginTop: '4px',
                         display: 'inline-block',
+                        maxWidth: '100%',
+                        overflowWrap: 'anywhere',
                       }}
                     >
                       {Object.entries(ev.metadata).map(([k, v]) => (
@@ -163,7 +184,14 @@ export const AuditTrailViewer: FC<Props> = ({ sessionId }) => {
                   )}
                 </div>
 
-                <div style={{ fontSize: '0.75rem', color: '#94a3b8', whiteSpace: 'nowrap', marginLeft: '12px' }}>
+                <div
+                  style={{
+                    fontSize: '0.75rem',
+                    color: '#94a3b8',
+                    whiteSpace: 'nowrap',
+                    marginLeft: 'auto',
+                  }}
+                >
                   {new Date(ev.timestamp).toLocaleString()}
                 </div>
               </div>

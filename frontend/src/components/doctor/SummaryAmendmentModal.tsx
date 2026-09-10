@@ -19,7 +19,7 @@ export const SummaryAmendmentModal: FC<Props> = ({
   onAmendmentSaved,
 }) => {
   const [amendedText, setAmendedText] = useState(
-    confirmedText ? `${confirmedText}\n\n## Clinical Addendum\n` : ''
+    confirmedText ? `${confirmedText}\n\n## Clinical Addendum\n` : '',
   );
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
@@ -108,7 +108,10 @@ export const SummaryAmendmentModal: FC<Props> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+        >
           <div style={{ padding: '16px 20px', overflowY: 'auto', maxHeight: 'calc(90vh - 140px)' }}>
             <div
               style={{
@@ -121,8 +124,9 @@ export const SummaryAmendmentModal: FC<Props> = ({
                 color: '#1e40af',
               }}
             >
-              <strong>Notice:</strong> The original confirmed record remains permanently preserved in audit history.
-              The amendment is attached as an official clinical addendum with server-authenticated clinician provenance.
+              <strong>Notice:</strong> The original confirmed record remains permanently preserved
+              in audit history. The amendment is attached as an official clinical addendum with
+              server-authenticated clinician provenance.
             </div>
 
             {error && (
@@ -144,7 +148,13 @@ export const SummaryAmendmentModal: FC<Props> = ({
             <div style={{ marginBottom: '14px' }}>
               <label
                 htmlFor="amendment-notes-input"
-                style={{ display: 'block', fontWeight: 600, fontSize: '0.85rem', marginBottom: '4px', color: '#334155' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  marginBottom: '4px',
+                  color: '#334155',
+                }}
               >
                 Clinical Justification Notes (required):
               </label>
@@ -168,7 +178,13 @@ export const SummaryAmendmentModal: FC<Props> = ({
             <div>
               <label
                 htmlFor="amended-text-textarea"
-                style={{ display: 'block', fontWeight: 600, fontSize: '0.85rem', marginBottom: '4px', color: '#334155' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  fontSize: '0.85rem',
+                  marginBottom: '4px',
+                  color: '#334155',
+                }}
               >
                 Amended Summary / Addendum Content:
               </label>

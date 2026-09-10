@@ -490,7 +490,15 @@ async function request<T>(
   }
 }
 export const api = {
-  config: () => request<{ demo_mode: boolean }>('/config'),
+  config: () =>
+    request<{
+      demo_mode: boolean;
+      phase: string;
+      languages: Language[];
+      normalization_provider: string;
+      speech_provider: string;
+      ocr_provider: string;
+    }>('/config'),
   create: (body: {
     id: string;
     patient: { name: string; demo_abha_id: string | null };
@@ -550,7 +558,7 @@ export const api = {
     signal?: AbortSignal,
   ) => {
     const data = new FormData();
-    data.append('audio', audioBlob, 'recording.webm');
+    data.append('audio', audioBlob, audioBlob.type === 'audio/wav' ? 'recording.wav' : 'recording');
     data.append('question_id', questionId);
     if (fixtureId) data.append('fixture_id', fixtureId);
     return request<TranscriptionResponse>(
@@ -694,12 +702,7 @@ export const api = {
       true,
     ),
   getAuditTrail: (id: string) =>
-    request<AuditTrailResponse>(
-      '/doctor/sessions/' + id + '/audit-trail',
-      'GET',
-      undefined,
-      true,
-    ),
+    request<AuditTrailResponse>('/doctor/sessions/' + id + '/audit-trail', 'GET', undefined, true),
   getCrossReferences: (id: string) =>
     request<CrossReferenceResponse>(
       '/doctor/sessions/' + id + '/cross-references',
@@ -756,5 +759,19 @@ export const api = {
       his_dispatch_receipt: Record<string, unknown> | null;
       his_dispatched_at: string | null;
     }>('/doctor/sessions/' + id + '/his/status', 'GET', undefined, true),
+  seedShowcase: () =>
+    request<{
+      session_id: string;
+      patient_name: string;
+      hospital_token: string;
+      language: string;
+      status: string;
+      summary_id: string | null;
+      message: string;
+    }>('/doctor/demo/seed-showcase', 'POST', {}, true),
+  resetDemo: () =>
+    request<{
+      success: boolean;
+      message: string;
+    }>('/doctor/demo/reset', 'POST', {}, true),
 };
-

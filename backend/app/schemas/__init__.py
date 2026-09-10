@@ -62,6 +62,7 @@ from .medical_fact import (
 )
 from .patient import Patient, PatientCreate
 from .session import Session, SessionCreate, SessionDetail, SessionList, SessionListItem
+from .showcase import DemoResetResponse, ShowcaseSeedResponse
 from .user import User
 
 __all__ = [
@@ -125,6 +126,7 @@ __all__ = [
     "ABDMStatusResponse",
     "HISDispatchRequest",
     "HISDispatchResponse",
+    "ShowcaseSeedResponse",
+    "DemoResetResponse",
     "User",
 ]
-

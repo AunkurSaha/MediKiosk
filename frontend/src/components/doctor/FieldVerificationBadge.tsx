@@ -74,7 +74,10 @@ export const FieldVerificationBadge: React.FC<Props> = ({
   };
 
   return (
-    <div className="field-verification-container" style={{ display: 'inline-block', position: 'relative' }}>
+    <div
+      className="field-verification-container"
+      style={{ display: 'inline-block', position: 'relative' }}
+    >
       <button
         type="button"
         className={`field-verification-badge ${getBadgeClass()}`}
@@ -88,7 +91,8 @@ export const FieldVerificationBadge: React.FC<Props> = ({
           padding: '2px 6px',
           fontSize: '0.75rem',
           fontWeight: 600,
-          background: status === 'verified' ? '#dcfce7' : status === 'flagged' ? '#fef3c7' : '#f1f5f9',
+          background:
+            status === 'verified' ? '#dcfce7' : status === 'flagged' ? '#fef3c7' : '#f1f5f9',
           color: status === 'verified' ? '#166534' : status === 'flagged' ? '#92400e' : '#475569',
         }}
       >
@@ -112,16 +116,27 @@ export const FieldVerificationBadge: React.FC<Props> = ({
             marginTop: '4px',
           }}
         >
-          <div style={{ fontWeight: 600, fontSize: '0.8rem', marginBottom: '8px', color: '#1e293b' }}>
+          <div
+            style={{ fontWeight: 600, fontSize: '0.8rem', marginBottom: '8px', color: '#1e293b' }}
+          >
             Clinician Verification
           </div>
 
           {error && (
-            <div style={{ color: '#dc2626', fontSize: '0.75rem', marginBottom: '6px' }}>{error}</div>
+            <div style={{ color: '#dc2626', fontSize: '0.75rem', marginBottom: '6px' }}>
+              {error}
+            </div>
           )}
 
           <div style={{ marginBottom: '8px' }}>
-            <label style={{ display: 'block', fontSize: '0.7rem', color: '#64748b', marginBottom: '2px' }}>
+            <label
+              style={{
+                display: 'block',
+                fontSize: '0.7rem',
+                color: '#64748b',
+                marginBottom: '2px',
+              }}
+            >
               Clinician Note (optional):
             </label>
             <input

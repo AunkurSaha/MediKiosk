@@ -1,6 +1,6 @@
 # MediKiosk frontend
 
-React, Vite, TypeScript, and Tailwind. The current Phase 1 app includes patient intake and doctor review.
+React, Vite, TypeScript, and Tailwind. The current Phase 12 prototype includes patient intake, staff triage, doctor evidence/summary review, FHIR preview, mock ABDM/HIS controls, and synthetic showcase tools.
 
 From this directory:
 
@@ -23,4 +23,3 @@ npm run test:e2e
 ```
 
 These use a fresh headless browser and synthetic data against the running local app. They do not use your signed-in browser. See [setup](../docs/setup.md) and [implementation status](../docs/implementation-status.md).
-

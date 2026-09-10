@@ -109,6 +109,20 @@ test('Bengali source edit, mock normalization, unavailable text and doctor confi
     .first()
     .screenshot({ path: '../.runtime/screenshots/phase3a-normalization.png' });
   await page.setViewportSize({ width: 390, height: 844 });
+  const overflowers = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLElement>('body *')]
+      .filter((element) => element.getBoundingClientRect().right > document.documentElement.clientWidth)
+      .map((element) => ({
+        tag: element.tagName,
+        className: element.className,
+        parentClassName: element.parentElement?.className ?? '',
+        text: element.textContent?.trim().slice(0, 60) ?? '',
+        right: Math.round(element.getBoundingClientRect().right),
+        width: Math.round(element.getBoundingClientRect().width),
+      }))
+      .slice(0, 20),
+  );
+  expect(overflowers, JSON.stringify(overflowers, null, 2)).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   await writeFile(
     '../.runtime/last-phase3a-e2e.json',

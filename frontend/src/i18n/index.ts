@@ -79,8 +79,9 @@ const en = {
   demoDoctor: 'Demo doctor access · no real staff authentication',
   notReady: 'This intake is not ready for review.',
   allSessions: 'All intakes',
-  triageTitle: 'Triage is a later phase',
-  triageNote: 'Automatic safety alerts are not implemented. This screen does not monitor patients.',
+  triageTitle: 'Staff triage and safety dashboard',
+  triageNote:
+    'Deterministic prototype alerts require direct clinical follow-up; delivery is not guaranteed.',
   intake: 'In progress',
   ready_for_review: 'Awaiting review',
   under_review: 'Under review',

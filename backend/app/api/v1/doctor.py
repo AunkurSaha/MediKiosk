@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -265,9 +265,7 @@ def verify_abha(
     from app.services.abdm import ABDMService
 
     intake.detail(db, str(session_id), doctor=True)
-    return ABDMService.verify_abha(
-        db, str(session_id), req.abha_input, auth_method=req.auth_method
-    )
+    return ABDMService.verify_abha(db, str(session_id), req.abha_input, auth_method=req.auth_method)
 
 
 @router.post(
@@ -312,6 +310,30 @@ def get_his_status(
 ):
     from app.services.his import HISService
 
-    intake.detail(db, str(session_id), doctor=True)
     return HISService.get_status(db, str(session_id))
 
+
+@router.post("/demo/seed-showcase", response_model=schemas.ShowcaseSeedResponse)
+def seed_showcase(
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.core.config import demo_enabled
+    from app.services.showcase import ShowcaseService
+
+    if not demo_enabled():
+        raise HTTPException(status_code=403, detail="Demo endpoints disabled in this environment.")
+    return ShowcaseService.seed_showcase_patient(db, actor_user_id=user.id)
+
+
+@router.post("/demo/reset", response_model=schemas.DemoResetResponse)
+def reset_demo(
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.core.config import demo_enabled
+    from app.services.showcase import ShowcaseService
+
+    if not demo_enabled():
+        raise HTTPException(status_code=403, detail="Demo endpoints disabled in this environment.")
+    return ShowcaseService.reset_demo_data(db)

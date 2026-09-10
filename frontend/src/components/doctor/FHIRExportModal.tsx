@@ -76,10 +76,10 @@ export const FHIRExportModal: FC<Props> = ({
   };
 
   const validationErrors = (exportData?.validation?.issue || []).filter(
-    (i) => i.severity === 'error' || i.severity === 'fatal'
+    (i) => i.severity === 'error' || i.severity === 'fatal',
   );
   const validationWarnings = (exportData?.validation?.issue || []).filter(
-    (i) => i.severity === 'warning'
+    (i) => i.severity === 'warning',
   );
 
   return (
@@ -130,8 +130,8 @@ export const FHIRExportModal: FC<Props> = ({
               </h3>
             </div>
             <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#64748b' }}>
-              Standardized clinical data package for{' '}
-              <strong>{patientName || 'Patient'}</strong> ({hospitalToken || sessionId.slice(0, 8)})
+              Standardized clinical data package for <strong>{patientName || 'Patient'}</strong> (
+              {hospitalToken || sessionId.slice(0, 8)})
             </p>
           </div>
           <button
@@ -153,7 +153,16 @@ export const FHIRExportModal: FC<Props> = ({
         </div>
 
         {/* Modal Body */}
-        <div style={{ padding: '16px 20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div
+          style={{
+            padding: '16px 20px',
+            overflowY: 'auto',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px',
+          }}
+        >
           {error && (
             <div
               style={{
@@ -184,7 +193,9 @@ export const FHIRExportModal: FC<Props> = ({
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>Bundle Format:</span>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: '#334155' }}>
+                Bundle Format:
+              </span>
               <button
                 type="button"
                 className={`btn btn-sm ${bundleType === 'document' ? 'btn-primary' : 'btn-secondary'}`}
@@ -276,14 +287,17 @@ export const FHIRExportModal: FC<Props> = ({
                 <span style={{ fontSize: '14px' }}>
                   {validationErrors.length > 0 ? '❌' : '✅'}
                 </span>
-                <span style={{ fontWeight: 600, color: validationErrors.length > 0 ? '#991b1b' : '#166534' }}>
+                <span
+                  style={{
+                    fontWeight: 600,
+                    color: validationErrors.length > 0 ? '#991b1b' : '#166534',
+                  }}
+                >
                   {validationErrors.length > 0
                     ? `${validationErrors.length} Conformance Issues Found`
                     : 'HL7 FHIR R4 Conformance Validated'}
                 </span>
-                <span style={{ color: '#64748b' }}>
-                  ({exportData.compliance_profile})
-                </span>
+                <span style={{ color: '#64748b' }}>({exportData.compliance_profile})</span>
               </div>
               <span style={{ color: '#475569', fontSize: '11px' }}>
                 Total Entries: <strong>{exportData.bundle.entry.length}</strong>
@@ -293,8 +307,19 @@ export const FHIRExportModal: FC<Props> = ({
 
           {/* Validation Warnings/Errors List if any */}
           {validationErrors.length > 0 && (
-            <div style={{ backgroundColor: '#fff1f2', padding: '8px 12px', borderRadius: '6px', border: '1px solid #fecdd3' }}>
-              <div style={{ fontWeight: 600, fontSize: '12px', color: '#9f1239', marginBottom: '4px' }}>Issues:</div>
+            <div
+              style={{
+                backgroundColor: '#fff1f2',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                border: '1px solid #fecdd3',
+              }}
+            >
+              <div
+                style={{ fontWeight: 600, fontSize: '12px', color: '#9f1239', marginBottom: '4px' }}
+              >
+                Issues:
+              </div>
               <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '12px', color: '#be123c' }}>
                 {validationErrors.map((issue, idx) => (
                   <li key={idx}>
@@ -305,8 +330,19 @@ export const FHIRExportModal: FC<Props> = ({
             </div>
           )}
           {validationWarnings.length > 0 && (
-            <div style={{ backgroundColor: '#fffbeb', padding: '8px 12px', borderRadius: '6px', border: '1px solid #fef3c7' }}>
-              <div style={{ fontWeight: 600, fontSize: '12px', color: '#92400e', marginBottom: '4px' }}>Warnings:</div>
+            <div
+              style={{
+                backgroundColor: '#fffbeb',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                border: '1px solid #fef3c7',
+              }}
+            >
+              <div
+                style={{ fontWeight: 600, fontSize: '12px', color: '#92400e', marginBottom: '4px' }}
+              >
+                Warnings:
+              </div>
               <ul style={{ margin: 0, paddingLeft: '16px', fontSize: '12px', color: '#b45309' }}>
                 {validationWarnings.map((issue, idx) => (
                   <li key={idx}>
@@ -320,7 +356,9 @@ export const FHIRExportModal: FC<Props> = ({
           {/* Resource Breakdown Badges */}
           {exportData && (
             <div>
-              <div style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}>
+              <div
+                style={{ fontSize: '12px', fontWeight: 600, color: '#475569', marginBottom: '6px' }}
+              >
                 Resource Inventory:
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
@@ -350,8 +388,17 @@ export const FHIRExportModal: FC<Props> = ({
 
           {/* JSON Preview Container */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>Bundle JSON:</span>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '4px',
+              }}
+            >
+              <span style={{ fontSize: '12px', fontWeight: 600, color: '#475569' }}>
+                Bundle JSON:
+              </span>
               <span style={{ fontSize: '11px', color: '#94a3b8' }}>
                 MIME: <code>application/fhir+json</code>
               </span>
@@ -388,7 +435,9 @@ export const FHIRExportModal: FC<Props> = ({
                   fontFamily: 'Consolas, Monaco, "Courier New", monospace',
                 }}
               >
-                {exportData?.bundle ? JSON.stringify(exportData.bundle, null, 2) : '// No bundle generated'}
+                {exportData?.bundle
+                  ? JSON.stringify(exportData.bundle, null, 2)
+                  : '// No bundle generated'}
               </pre>
             )}
           </div>
@@ -405,7 +454,10 @@ export const FHIRExportModal: FC<Props> = ({
               lineHeight: 1.4,
             }}
           >
-            🛡 <strong>Non-Diagnostic Boundary:</strong> Condition resources contained in this bundle represent provisional, patient-reported intake symptoms only. This export does not constitute an autonomous diagnosis or treatment prescription. Clinician review required before clinical decision making.
+            🛡 <strong>Non-Diagnostic Boundary:</strong> Condition resources contained in this bundle
+            represent provisional, patient-reported intake symptoms only. This export does not
+            constitute an autonomous diagnosis or treatment prescription. Clinician review required
+            before clinical decision making.
           </div>
         </div>
 

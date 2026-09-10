@@ -6,7 +6,12 @@ import { AuditTrailViewer } from '../components/doctor/AuditTrailViewer';
 import SummaryWorkspace from '../components/doctor/SummaryWorkspace';
 import DocumentViewer from '../components/doctor/DocumentViewer';
 import { api } from '../api/client';
-import type { Summary, AuditTrailResponse, CrossReferenceResponse, DocumentRecord } from '../api/client';
+import type {
+  Summary,
+  AuditTrailResponse,
+  CrossReferenceResponse,
+  DocumentRecord,
+} from '../api/client';
 
 describe('Phase 9 Verification Hardening Components', () => {
   const sessionId = 'session-phase9-001';
@@ -40,7 +45,7 @@ describe('Phase 9 Verification Hardening Components', () => {
           fieldType="interview_answer"
           fieldId="chest_pain_onset"
           onVerificationChanged={onVerificationChanged}
-        />
+        />,
       );
 
       const badge = screen.getByRole('button', { name: /unverified/i });
@@ -91,7 +96,7 @@ describe('Phase 9 Verification Hardening Components', () => {
           sessionId={sessionId}
           fieldType="interview_answer"
           fieldId="duration"
-        />
+        />,
       );
 
       fireEvent.click(screen.getByRole('button', { name: /unverified/i }));
@@ -128,7 +133,8 @@ describe('Phase 9 Verification Hardening Components', () => {
         ...confirmedSummary,
         status: 'amended',
         version: 3,
-        amended_text: 'Confirmed clinical summary text\n\n## Clinical Addendum\nFollow-up ECG normal.',
+        amended_text:
+          'Confirmed clinical summary text\n\n## Clinical Addendum\nFollow-up ECG normal.',
         amended_by: 'Dr. Demo',
         amended_at: '2026-09-10T12:30:00Z',
         amendment_notes: 'Added post-consultation ECG observation',
@@ -145,14 +151,16 @@ describe('Phase 9 Verification Hardening Components', () => {
           sessionId={sessionId}
           confirmedText={confirmedSummary.reviewed_text!}
           onAmendmentSaved={onAmendmentSaved}
-        />
+        />,
       );
 
       expect(screen.getByText('File Clinical Summary Amendment')).toBeInTheDocument();
 
       // Enter required notes
       const notesInput = screen.getByLabelText(/clinical justification notes/i);
-      fireEvent.change(notesInput, { target: { value: 'Added post-consultation ECG observation' } });
+      fireEvent.change(notesInput, {
+        target: { value: 'Added post-consultation ECG observation' },
+      });
 
       // Click save
       const submitBtn = screen.getByRole('button', { name: /save clinical amendment/i });
@@ -162,7 +170,7 @@ describe('Phase 9 Verification Hardening Components', () => {
         expect(api.amendSummary).toHaveBeenCalledWith(
           sessionId,
           expect.stringContaining('Clinical Addendum'),
-          'Added post-consultation ECG observation'
+          'Added post-consultation ECG observation',
         );
         expect(onAmendmentSaved).toHaveBeenCalledWith(amendedSummary);
         expect(onClose).toHaveBeenCalled();
@@ -192,15 +200,19 @@ describe('Phase 9 Verification Hardening Components', () => {
           sessionId={sessionId}
           initialSummary={amendedSummary}
           onSummaryUpdated={vi.fn()}
-        />
+        />,
       );
 
       expect(screen.getByTestId('file-amendment-button')).toBeInTheDocument();
       expect(screen.getByTestId('amendment-display')).toBeInTheDocument();
       expect(screen.getByText(/Official Clinical Amendment \/ Addendum/i)).toBeInTheDocument();
       expect(screen.getByText(/Amended by Dr. Specialist/i)).toBeInTheDocument();
-      expect(screen.getByText(/Clinical Reason: "Second clinician review addendum"/i)).toBeInTheDocument();
-      expect(screen.getByText(/Confirmed summary text with official addendum note/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Clinical Reason: "Second clinician review addendum"/i),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Confirmed summary text with official addendum note/i),
+      ).toBeInTheDocument();
     });
   });
 
@@ -315,14 +327,11 @@ describe('Phase 9 Verification Hardening Components', () => {
       };
 
       vi.spyOn(api, 'getCrossReferences').mockResolvedValueOnce(mockCrossReferenceData);
-      vi.spyOn(api, 'documentFile').mockResolvedValueOnce(new Blob(['fake'], { type: 'image/jpeg' }));
-
-      render(
-        <DocumentViewer
-          sessionId={sessionId}
-          documents={[mockDoc]}
-        />
+      vi.spyOn(api, 'documentFile').mockResolvedValueOnce(
+        new Blob(['fake'], { type: 'image/jpeg' }),
       );
+
+      render(<DocumentViewer sessionId={sessionId} documents={[mockDoc]} />);
 
       await waitFor(() => {
         expect(screen.getByTestId('doc-cross-ref-doc-123')).toBeInTheDocument();

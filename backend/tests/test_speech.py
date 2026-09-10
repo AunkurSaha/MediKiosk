@@ -344,5 +344,5 @@ def test_public_config_reports_speech_provider(client):
     response = client.get("/api/config")
     assert response.status_code == 200
     data = response.json()
-    assert data["phase"] in ("5", "6", "7", "8")
+    assert data["phase"] == "12"
     assert data["speech_provider"] == "mock"

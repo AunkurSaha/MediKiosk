@@ -45,7 +45,9 @@ describe('Phase 11 ABDM & HIS Interoperability Components', () => {
       expect(screen.getByText('Sandbox Demonstration')).toBeInTheDocument();
 
       await waitFor(() => {
-        expect(screen.getByTestId('abha-status-badge')).toHaveTextContent('✓ Verified (Sandbox Mock)');
+        expect(screen.getByTestId('abha-status-badge')).toHaveTextContent(
+          '✓ Verified (Sandbox Mock)',
+        );
         expect(screen.getByTestId('care-context-badge')).toHaveTextContent('Unlinked');
         expect(screen.getByTestId('his-status-badge')).toHaveTextContent('Not Dispatched');
       });
@@ -87,7 +89,9 @@ describe('Phase 11 ABDM & HIS Interoperability Components', () => {
 
       await waitFor(() => {
         expect(api.verifyDoctorAbha).toHaveBeenCalledWith(sessionId, 'sunita@abdm');
-        expect(screen.getByTestId('verify-message')).toHaveTextContent('✓ ABHA verified: Sunita Sharma (91-1234-5678-9012)');
+        expect(screen.getByTestId('verify-message')).toHaveTextContent(
+          '✓ ABHA verified: Sunita Sharma (91-1234-5678-9012)',
+        );
       });
     });
 
@@ -121,7 +125,9 @@ describe('Phase 11 ABDM & HIS Interoperability Components', () => {
 
       await waitFor(() => {
         expect(api.linkCareContext).toHaveBeenCalledWith(sessionId);
-        expect(screen.getByTestId('link-message')).toHaveTextContent('✓ Linked care context: medikiosk_ctx_test123');
+        expect(screen.getByTestId('link-message')).toHaveTextContent(
+          '✓ Linked care context: medikiosk_ctx_test123',
+        );
       });
     });
 
@@ -157,7 +163,9 @@ describe('Phase 11 ABDM & HIS Interoperability Components', () => {
 
       await waitFor(() => {
         expect(api.dispatchHis).toHaveBeenCalledWith(sessionId, 'Central Hospital OPD HIS');
-        expect(screen.getByTestId('dispatch-message')).toHaveTextContent('HIS-ACK-20260910-ABCD1234');
+        expect(screen.getByTestId('dispatch-message')).toHaveTextContent(
+          'HIS-ACK-20260910-ABCD1234',
+        );
       });
     });
 

@@ -13,6 +13,17 @@ import { FHIRExportModal } from '../../components/doctor/FHIRExportModal';
 import { ABDMHISModal } from '../../components/doctor/ABDMHISModal';
 
 const t = copy.en;
+
+function alertStatusText(alert: NonNullable<Detail['alerts']>[number]) {
+  if (alert.status === 'acknowledged') {
+    return `✓ Acknowledged by ${alert.acknowledged_by ?? 'clinical staff'}`;
+  }
+  if (alert.status === 'resolved') {
+    return 'Resolved · retained in the audit history';
+  }
+  return '⚠️ Potential emergency symptoms detected · immediate clinical assessment recommended';
+}
+
 export default function Doctor() {
   const { sessionId } = useParams();
   const [list, setList] = useState<SessionList | null>(null);
@@ -67,6 +78,43 @@ export default function Doctor() {
     setNotice('');
     setAttempt(attempt + 1);
   }
+
+  async function handleSeedShowcase() {
+    setLoading(true);
+    setError(null);
+    setNotice('');
+    try {
+      const res = await api.seedShowcase();
+      setNotice(
+        `Showcase patient ${res.patient_name} (${res.hospital_token}) seeded successfully!`,
+      );
+      setAttempt((a) => a + 1);
+    } catch (err) {
+      setError(err);
+      setLoading(false);
+    }
+  }
+
+  async function handleResetDemo() {
+    if (
+      typeof window !== 'undefined' &&
+      !window.confirm('Reset all demo patient intake records? Doctor accounts will be preserved.')
+    ) {
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setNotice('');
+    try {
+      const res = await api.resetDemo();
+      setNotice(res.message || 'Demo data reset successfully.');
+      setAttempt((a) => a + 1);
+    } catch (err) {
+      setError(err);
+      setLoading(false);
+    }
+  }
+
   const summary = detail?.summary;
   return (
     <div className="doctor-workspace">
@@ -76,9 +124,33 @@ export default function Doctor() {
           <h1>{sessionId ? t.detailTitle : t.doctorTitle}</h1>
           <p className="muted">{t.doctorIntro}</p>
         </div>
-        <button className="secondary" onClick={refresh} disabled={busy || loading}>
-          {t.refresh}
-        </button>
+        <div className="doctor-header-actions">
+          <button
+            type="button"
+            className="secondary"
+            data-testid="seed-showcase-btn"
+            onClick={() => void handleSeedShowcase()}
+            disabled={busy || loading}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+            title="Seed canonical Bengali chest-pain showcase patient"
+          >
+            <span>🌟</span> Seed Showcase
+          </button>
+          <button
+            type="button"
+            className="secondary"
+            data-testid="reset-demo-btn"
+            onClick={() => void handleResetDemo()}
+            disabled={busy || loading}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#b91c1c' }}
+            title="Reset all demo intake data while preserving doctor user accounts"
+          >
+            <span>🔄</span> Reset Demo
+          </button>
+          <button className="secondary" onClick={refresh} disabled={busy || loading}>
+            {t.refresh}
+          </button>
+        </div>
       </div>
       <p className="notice">{t.demoDoctor}</p>
       {Boolean(error) && (
@@ -133,7 +205,7 @@ export default function Doctor() {
                 {detail.session.hospital_token} · {detail.session.language.toUpperCase()}
               </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="doctor-header-actions">
               <button
                 type="button"
                 className="btn btn-secondary"
@@ -190,20 +262,53 @@ export default function Doctor() {
               </div>
               <div className="alerts-banner-list">
                 {detail.alerts.map((alert) => (
-                  <div key={alert.id} className={`doctor-alert-item ${alert.priority}`}>
+                  <div
+                    key={alert.id}
+                    className={`doctor-alert-item ${alert.priority} ${
+                      alert.priority === 'emergency' ? 'emergency-pulse-border' : ''
+                    }`}
+                    style={
+                      alert.priority === 'emergency'
+                        ? {
+                            border: '2px solid #ef4444',
+                            backgroundColor: '#fef2f2',
+                            boxShadow: '0 0 12px rgba(239, 68, 68, 0.25)',
+                          }
+                        : undefined
+                    }
+                  >
                     <div className="alert-meta">
-                      <span className={`priority-tag ${alert.priority}`}>
-                        {alert.priority.toUpperCase()}
+                      <span
+                        className={`priority-tag ${alert.priority}`}
+                        style={
+                          alert.priority === 'emergency'
+                            ? {
+                                backgroundColor: '#dc2626',
+                                color: '#ffffff',
+                                fontWeight: 700,
+                              }
+                            : undefined
+                        }
+                      >
+                        {alert.priority === 'emergency'
+                          ? '🚨 EMERGENCY'
+                          : alert.priority.toUpperCase()}
                       </span>
                       <span className="rule-tag">{alert.rule_id}</span>
                       <span className="category-tag">{alert.category}</span>
                       <span className={`status-tag status-${alert.status}`}>
-                        {alert.status === 'acknowledged'
-                          ? `✓ Acknowledged by ${alert.acknowledged_by}`
-                          : '⚠️ Active / Unacknowledged'}
+                        {alertStatusText(alert)}
                       </span>
                     </div>
-                    <p className="alert-reason-text">{alert.reason}</p>
+                    <p
+                      className="alert-reason-text"
+                      style={{
+                        fontWeight: 500,
+                        color: alert.priority === 'emergency' ? '#991b1b' : undefined,
+                      }}
+                    >
+                      {alert.reason}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -230,13 +335,22 @@ export default function Doctor() {
                         <dl>
                           {section.facts.map((fact) => (
                             <div key={fact.question_id}>
-                              <dt style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <dt
+                                style={{
+                                  display: 'flex',
+                                  justifyContent: 'space-between',
+                                  alignItems: 'center',
+                                }}
+                              >
                                 <span>{fact.label.en}</span>
                                 <FieldVerificationBadge
                                   sessionId={detail.session.id}
                                   fieldType="interview_answer"
                                   fieldId={fact.question_id}
-                                  disabled={detail.session.status === 'confirmed' || detail.session.status === 'cancelled'}
+                                  disabled={
+                                    detail.session.status === 'confirmed' ||
+                                    detail.session.status === 'cancelled'
+                                  }
                                 />
                               </dt>
                               <dd lang={fact.language}>{fact.raw_value}</dd>
@@ -257,13 +371,22 @@ export default function Doctor() {
                 <dl>
                   {detail.answers.map((answer) => (
                     <div key={answer.id}>
-                      <dt style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <dt
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                        }}
+                      >
                         <span>{answer.field.replaceAll('_', ' ')}</span>
                         <FieldVerificationBadge
                           sessionId={detail.session.id}
                           fieldType="interview_answer"
                           fieldId={answer.field}
-                          disabled={detail.session.status === 'confirmed' || detail.session.status === 'cancelled'}
+                          disabled={
+                            detail.session.status === 'confirmed' ||
+                            detail.session.status === 'cancelled'
+                          }
                         />
                       </dt>
                       <dd lang={answer.language}>{answer.raw_value}</dd>
@@ -295,8 +418,8 @@ export default function Doctor() {
                               updatedSummary.status === 'confirmed'
                                 ? 'confirmed'
                                 : updatedSummary.status === 'reviewed'
-                                ? 'under_review'
-                                : prev.session.status,
+                                  ? 'under_review'
+                                  : prev.session.status,
                           },
                         }
                       : prev,
@@ -338,7 +461,10 @@ export default function Doctor() {
               }}
             />
           )}
-          <AuditTrailViewer key={`audit-trail-${detail.session.id}`} sessionId={detail.session.id} />
+          <AuditTrailViewer
+            key={`audit-trail-${detail.session.id}`}
+            sessionId={detail.session.id}
+          />
           <FHIRExportModal
             isOpen={fhirModalOpen}
             onClose={() => setFhirModalOpen(false)}

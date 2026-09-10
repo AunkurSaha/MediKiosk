@@ -96,7 +96,11 @@ def client(database):
 def isolated_document_storage(tmp_path, monkeypatch):
     from app.api.v1 import documents
     from app.services import document_service
+    from app.services import storage as storage_module
     from app.services.storage import StorageService
+
     storage = StorageService(tmp_path / "uploads")
     monkeypatch.setattr(document_service, "default_storage", storage)
     monkeypatch.setattr(documents, "default_storage", storage)
+    monkeypatch.setattr(storage_module, "default_storage", storage)
+    return storage

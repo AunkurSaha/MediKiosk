@@ -25,13 +25,28 @@ async function injectMockMediaRecorder(page: Page) {
       stop() {
         this.state = 'inactive';
         if (this.ondataavailable) {
+          const sampleCount = 4_800;
+          const wav = new ArrayBuffer(44 + sampleCount * 2);
+          const view = new DataView(wav);
+          const text = (offset: number, value: string) => {
+            for (let index = 0; index < value.length; index++)
+              view.setUint8(offset + index, value.charCodeAt(index));
+          };
+          text(0, 'RIFF');
+          view.setUint32(4, 36 + sampleCount * 2, true);
+          text(8, 'WAVE');
+          text(12, 'fmt ');
+          view.setUint32(16, 16, true);
+          view.setUint16(20, 1, true);
+          view.setUint16(22, 1, true);
+          view.setUint32(24, 48_000, true);
+          view.setUint32(28, 96_000, true);
+          view.setUint16(32, 2, true);
+          view.setUint16(34, 16, true);
+          text(36, 'data');
+          view.setUint32(40, sampleCount * 2, true);
           this.ondataavailable({
-            data: new Blob(
-              ['RIFF....WAVEfmt \x10\x00\x00\x00\x01\x00\x01\x00data\x00\x00\x00\x00'],
-              {
-                type: 'audio/webm',
-              },
-            ),
+            data: new Blob([wav], { type: 'audio/webm' }),
           });
         }
         if (this.onstop) {
@@ -49,6 +64,19 @@ async function injectMockMediaRecorder(page: Page) {
         getTracks: () => [{ stop: () => {} }],
       };
     };
+    class TestUtterance {
+      text: string;
+      lang = '';
+      onend: (() => void) | null = null;
+      onerror: (() => void) | null = null;
+      constructor(text: string) {
+        this.text = text;
+      }
+    }
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', { value: TestUtterance });
+    Object.defineProperty(window, 'speechSynthesis', {
+      value: { speak: () => {}, cancel: () => {} },
+    });
   });
 }
 
@@ -297,6 +325,7 @@ test.describe('Phase 4A Speech and TTS E2E', () => {
     expect(synthBody.media_type).toBe('audio/wav');
     expect(synthBody.provider).toBe('mock');
     expect(synthBody.audio_base64).toBeTruthy();
+    await expect(page.getByText(/browser’s built-in voice/)).toBeVisible();
 
     // Question remains interactive
     await expect(page.getByLabel('Your answer')).toBeVisible();

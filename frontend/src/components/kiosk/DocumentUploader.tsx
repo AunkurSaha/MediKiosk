@@ -226,6 +226,18 @@ export default function DocumentUploader({
                   })}
                 </div>
               )}
+              {doc.processing_status === 'unavailable' && doc.extractions.length === 0 && (
+                <p className="muted" role="status">
+                  The original file is stored, but extraction is unavailable. This prototype only
+                  extracts its explicitly identified synthetic fixtures; real OCR is not enabled.
+                </p>
+              )}
+              {doc.processing_status === 'failed' && (
+                <p className="error" role="alert">
+                  The original file was stored, but document processing failed. Clinical facts were
+                  not created.
+                </p>
+              )}
             </div>
           ))}
         </div>

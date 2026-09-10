@@ -345,6 +345,41 @@ test('voice consent and forged candidate bypass fail through real API and kiosk 
   await expect(page.getByTestId('voice-recorder')).not.toBeVisible();
   await page.getByLabel('Your answer', { exact: true }).fill('typed synthetic answer');
   await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
-  const saved = await (await request.get(`/api/sessions/${id}/interview`)).json();
-  expect(saved.active_answers[0].source).toBe('typed');
+  await expect
+    .poll(async () => {
+      const saved = await (await request.get(`/api/sessions/${id}/interview`)).json();
+      return saved.active_answers[0]?.source;
+    })
+    .toBe('typed');
+});
+
+test('fixture uploads visibly flow from kiosk extraction to doctor facts timeline and preview', async ({
+  page,
+  request,
+}) => {
+  const { id, state: initial } = await create(request);
+  let state = initial;
+  for (let index = 0; index < 80 && state.question; index++) {
+    state = await submit(request, id, state);
+  }
+  expect(state.is_complete).toBe(true);
+  await openIntake(page, id);
+
+  const input = page.getByTestId('document-file-input');
+  await input.setInputFiles('../ai/document_fixtures/prescription.png');
+  await expect(page.getByTestId('uploaded-documents-list')).toContainText('Tab Paracetamol');
+  await page.getByLabel('Document Type').selectOption('lab_report');
+  await input.setInputFiles('../ai/document_fixtures/lab_report.png');
+  await expect(page.getByTestId('uploaded-documents-list')).toContainText('Hemoglobin');
+  await expect(page.getByTestId('uploaded-documents-list')).toContainText('mock_fixture');
+
+  await page.getByRole('button', { name: 'Finish intake', exact: true }).click();
+  await expect(page).toHaveURL(/\/kiosk\/complete$/);
+  await page.goto(`/doctor/sessions/${id}`);
+  await expect(page.getByRole('heading', { name: 'Timeline' })).toBeVisible();
+  await expect(page.getByText('Medication: Tab Paracetamol', { exact: true })).toBeVisible();
+  await expect(page.getByText('Lab: Hemoglobin', { exact: true })).toBeVisible();
+  await expect(page.getByTestId('document-viewer-panel')).toBeVisible();
+  await expect(page.getByTestId('document-image-preview')).toBeVisible();
+  await expect(page.getByTestId('summary-workspace')).toBeVisible();
 });

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { Language } from '../../api/client';
 import { speechCopy } from '../../i18n/speech';
+import { convertRecordedAudioToWav } from '../../utils/audioWav';
 
 export interface VoiceRecorderProps {
   sessionId: string;
@@ -193,9 +194,10 @@ export default function VoiceRecorder({
     setState('transcribing');
     try {
       uploadController.current = new AbortController();
+      const wavBlob = await convertRecordedAudioToWav(audioBlob, uploadController.current.signal);
       const res = await api.transcribeSpeech(
         sessionId,
-        audioBlob,
+        wavBlob,
         questionId,
         fixtureId,
         uploadController.current.signal,

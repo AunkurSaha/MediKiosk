@@ -6,11 +6,16 @@ import QuestionAudioPlayer from '../components/kiosk/QuestionAudioPlayer';
 import QuestionRenderer from '../components/kiosk/QuestionRenderer';
 import VoiceRecorder from '../components/kiosk/VoiceRecorder';
 import { speechCopy } from '../i18n/speech';
+import { convertRecordedAudioToWav } from '../utils/audioWav';
 
 vi.mock('../api/client', async (original) => {
   const actual = await original<typeof import('../api/client')>();
   return { ...actual, api: Object.fromEntries(Object.keys(actual.api).map((k) => [k, vi.fn()])) };
 });
+
+vi.mock('../utils/audioWav', () => ({
+  convertRecordedAudioToWav: vi.fn(async () => new Blob(['wav'], { type: 'audio/wav' })),
+}));
 
 class MockMediaRecorder {
   state: 'inactive' | 'recording' = 'inactive';
@@ -33,15 +38,30 @@ class MockMediaRecorder {
   }
 }
 
+const mockAudioPlay = vi.fn().mockResolvedValue(undefined);
+
 class MockAudio {
   src = '';
   onended: (() => void) | null = null;
   onerror: (() => void) | null = null;
-  play = vi.fn().mockImplementation(() => {
-    return Promise.resolve();
-  });
+  play = mockAudioPlay;
   pause = vi.fn();
 }
+
+class MockSpeechSynthesisUtterance {
+  text: string;
+  lang = '';
+  onend: (() => void) | null = null;
+  onerror: (() => void) | null = null;
+  constructor(text: string) {
+    this.text = text;
+  }
+}
+
+const mockSpeechSynthesis = {
+  speak: vi.fn(),
+  cancel: vi.fn(),
+};
 
 const mockQuestion: Question = {
   question_id: 'chief_complaint',
@@ -67,6 +87,9 @@ describe('Speech and TTS Component Tests', () => {
     (globalThis as unknown as { MediaRecorder: unknown }).MediaRecorder = MockMediaRecorder;
     (window as unknown as { Audio: unknown }).Audio = MockAudio;
     (globalThis as unknown as { Audio: unknown }).Audio = MockAudio;
+    (window as unknown as { speechSynthesis: unknown }).speechSynthesis = mockSpeechSynthesis;
+    (globalThis as unknown as { SpeechSynthesisUtterance: unknown }).SpeechSynthesisUtterance =
+      MockSpeechSynthesisUtterance;
     Object.defineProperty(navigator, 'mediaDevices', {
       value: {
         getUserMedia: vi.fn().mockResolvedValue({
@@ -98,7 +121,7 @@ describe('Speech and TTS Component Tests', () => {
       ).toBeInTheDocument();
     });
 
-    it('requests synthesis and triggers audio playback', async () => {
+    it('uses a visibly labelled browser voice instead of silent mock audio', async () => {
       vi.mocked(api.synthesizeSpeech).mockResolvedValue({
         audio_base64: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
         media_type: 'audio/wav',
@@ -115,7 +138,27 @@ describe('Speech and TTS Component Tests', () => {
 
       await waitFor(() => {
         expect(api.synthesizeSpeech).toHaveBeenCalledWith('sess-1', 'q1');
+        expect(mockSpeechSynthesis.speak).toHaveBeenCalledTimes(1);
       });
+      expect(screen.getByRole('note')).toHaveTextContent('browser’s built-in voice');
+    });
+
+    it('keeps provider-generated audio playback for a successful live provider response', async () => {
+      vi.mocked(api.synthesizeSpeech).mockResolvedValue({
+        audio_base64: 'UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
+        media_type: 'audio/wav',
+        text: 'What is your primary symptom?',
+        language: 'en',
+        provider: 'bhashini',
+        status: 'success',
+        reason: null,
+      });
+
+      render(<QuestionAudioPlayer sessionId="sess-1" questionId="q1" language="en" />);
+      fireEvent.click(screen.getByRole('button', { name: new RegExp(speechCopy.en.listen, 'i') }));
+
+      await waitFor(() => expect(mockAudioPlay).toHaveBeenCalledTimes(1));
+      expect(mockSpeechSynthesis.speak).not.toHaveBeenCalled();
     });
 
     it('handles TTS error without breaking the interface', async () => {
@@ -245,6 +288,8 @@ describe('Speech and TTS Component Tests', () => {
         expect(screen.getByText(speechCopy.en.candidateTitle)).toBeInTheDocument();
         expect(screen.getByText(/I have severe chest pain/)).toBeInTheDocument();
       });
+      expect(convertRecordedAudioToWav).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(api.transcribeSpeech).mock.calls[0][1].type).toBe('audio/wav');
 
       // Confirm candidate
       const confirmBtn = screen.getByRole('button', {
