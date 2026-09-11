@@ -21,6 +21,15 @@ function getInitialUser(): AuthUser | null {
   const isLoggedOut = sessionStorage.getItem('medikiosk.logged_out') === 'true';
   if (isLoggedOut) return null;
 
+  const stored = sessionStorage.getItem('medikiosk.auth_user');
+  if (stored) {
+    try {
+      return JSON.parse(stored) as AuthUser;
+    } catch {
+      // ignore JSON parse error
+    }
+  }
+
   // In development / demo environment, provide route-matched default identity unless explicitly logged out
   const path = window.location.pathname;
   if (path === '/login' || path.startsWith('/login')) {
@@ -56,6 +65,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (me) {
           setUser(me);
           setError(null);
+          if (typeof sessionStorage !== 'undefined') {
+            sessionStorage.setItem('medikiosk.auth_user', JSON.stringify(me));
+          }
           return;
         }
       }
@@ -65,6 +77,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         sessionStorage.getItem('medikiosk.logged_out') === 'true';
       if (isLoggedOut) {
         setUser(null);
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.removeItem('medikiosk.auth_user');
+        }
       }
     } finally {
       setLoading(false);
@@ -82,6 +97,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               if (active && me) {
                 setUser(me);
                 setError(null);
+                if (typeof sessionStorage !== 'undefined') {
+                  sessionStorage.setItem('medikiosk.auth_user', JSON.stringify(me));
+                }
               }
             })
             .catch(() => {
@@ -91,6 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   sessionStorage.getItem('medikiosk.logged_out') === 'true';
                 if (isLoggedOut) {
                   setUser(null);
+                  if (typeof sessionStorage !== 'undefined') {
+                    sessionStorage.removeItem('medikiosk.auth_user');
+                  }
                 }
               }
             })
@@ -119,6 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(result.user);
       if (typeof sessionStorage !== 'undefined') {
         sessionStorage.removeItem('medikiosk.logged_out');
+        sessionStorage.setItem('medikiosk.auth_user', JSON.stringify(result.user));
       }
       if (result.token) {
         setAuthToken(result.token);
@@ -134,6 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(result.user);
       if (typeof sessionStorage !== 'undefined') {
         sessionStorage.removeItem('medikiosk.logged_out');
+        sessionStorage.setItem('medikiosk.auth_user', JSON.stringify(result.user));
       }
       if (result.token) {
         setAuthToken(result.token);
@@ -152,6 +175,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(null);
       if (typeof sessionStorage !== 'undefined') {
         sessionStorage.setItem('medikiosk.logged_out', 'true');
+        sessionStorage.removeItem('medikiosk.auth_user');
       }
     }
   };

@@ -880,8 +880,7 @@ export const api = {
     request<LoginResult>('/auth/otp/verify', 'POST', { phone_number: phone, otp }),
   logout: () => request<LogoutResult>('/auth/logout', 'POST'),
   getMe: () => request<AuthUser>('/auth/me'),
-  demoLogin: (role = 'patient') =>
-    request<LoginResult>('/auth/demo-login', 'POST', { role }),
+  demoLogin: (role = 'patient') => request<LoginResult>('/auth/demo-login', 'POST', { role }),
   getDevLastOtp: (phone: string) =>
     request<{ phone_number: string; otp: string }>(
       `/auth/dev/last-otp?phone_number=${encodeURIComponent(phone)}`,

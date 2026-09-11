@@ -65,8 +65,9 @@ def engine_for(db, session_id, flow):
     return InterviewEngine(flow, facts)
 
 
-def state(db, session_id):
-    intake.get_session(db, session_id)
+def state(db, session_id, user=None):
+    session = intake.get_session(db, session_id)
+    intake.verify_session_access(db, session, user)
     intake.require_consent(db, session_id)
     flow, run = flow_for(db, session_id)
     if flow is None:
@@ -101,16 +102,17 @@ def state(db, session_id):
     return res
 
 
-def editable(db, session_id):
+def editable(db, session_id, user=None):
     session = intake.get_session(db, session_id)
+    intake.verify_session_access(db, session, user)
     intake.require_consent(db, session_id)
     if session.status != "intake":
         raise WorkflowError("SESSION_LOCKED", "Completed answers cannot be changed.")
     return session
 
 
-def select_flow(db, session_id, payload):
-    editable(db, session_id)
+def select_flow(db, session_id, payload, user=None):
+    editable(db, session_id, user=user)
     flow, run = flow_for(db, session_id)
     if flow is not None:
         if flow.flow_id != payload.flow_id:
@@ -166,8 +168,8 @@ def check_revision(run, expected):
         )
 
 
-def submit(db, session_id, payload):
-    session = editable(db, session_id)
+def submit(db, session_id, payload, user=None):
+    session = editable(db, session_id, user=user)
     flow, run = require_run(db, session_id)
     hashed_payload = payload.model_dump(mode="json")
     if hashed_payload["voice_candidate"] is None:
@@ -181,7 +183,7 @@ def submit(db, session_id, payload):
             raise WorkflowError(
                 "ID_CONFLICT", "This request ID was already used for another answer."
             )
-        return state(db, session_id)
+        return state(db, session_id, user=user)
     check_revision(run, payload.expected_revision)
     engine = engine_for(db, session_id, flow)
     current = engine.state(run.cursor).question
@@ -221,11 +223,12 @@ def submit(db, session_id, payload):
             db,
             "answer_recorded",
             session_id,
+            user=user,
             metadata={"field": current.field, "flow_version": flow.version},
         )
         db.flush()
     if candidate is not None:
-        intake.audit(db, "voice_candidate_confirmed", session_id, metadata={
+        intake.audit(db, "voice_candidate_confirmed", session_id, user=user, metadata={
             "candidate_id": candidate["id"], "provider": candidate["provider"], "model": candidate["model"],
             "question_id": current.question_id, "language": payload.language,
             "source_answer_id": saved_answer.id if saved_answer is not None else previous.answer_id,
@@ -246,11 +249,11 @@ def submit(db, session_id, payload):
     db.info.pop("triage_events", None)
     red_flags.evaluate_and_persist(db, session_id, flow.flow_id, list(active_engine.active.values()))
     db.commit()
-    return state(db, session_id)
+    return state(db, session_id, user=user)
 
 
-def navigate(db, session_id, payload):
-    editable(db, session_id)
+def navigate(db, session_id, payload, user=None):
+    editable(db, session_id, user=user)
     flow, run = require_run(db, session_id)
     check_revision(run, payload.expected_revision)
     engine = engine_for(db, session_id, flow)
@@ -264,9 +267,11 @@ def navigate(db, session_id, payload):
     run.cursor = payload.question_id
     run.revision += 1
     db.commit()
-    return state(db, session_id)
+    return state(db, session_id, user=user)
 
 
-def history(db, session_id):
+def history(db, session_id, user=None):
+    session = intake.get_session(db, session_id)
+    intake.verify_session_access(db, session, user)
     flow, _ = flow_for(db, session_id)
     return engine_for(db, session_id, flow).history() if flow else None

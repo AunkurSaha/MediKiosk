@@ -3,6 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlalchemy.orm import Session
 
+from app import models
+from app.api.deps import get_optional_auth_user
 from app.database import get_db
 from app.schemas.speech import SpeechSynthesisRequest, SpeechSynthesisResult, TranscriptionResult
 from app.services import speech
@@ -17,6 +19,7 @@ async def transcribe(
     question_id: str = Form(...),
     fixture_id: str | None = Form(None),
     db: Session = Depends(get_db),
+    user: models.User | None = Depends(get_optional_auth_user),
 ):
     try:
         return await speech.transcribe_audio(
@@ -25,6 +28,7 @@ async def transcribe(
             audio_file=audio,
             question_id=question_id,
             fixture_id=fixture_id,
+            user=user,
         )
     finally:
         await audio.close()
@@ -35,9 +39,11 @@ async def synthesize(
     session_id: UUID,
     payload: SpeechSynthesisRequest,
     db: Session = Depends(get_db),
+    user: models.User | None = Depends(get_optional_auth_user),
 ):
     return await speech.synthesize_question(
         db=db,
         session_id=str(session_id),
         question_id=payload.question_id,
+        user=user,
     )

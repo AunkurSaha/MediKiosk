@@ -5,7 +5,7 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app import models
-from app.api.deps import get_current_user
+from app.api.deps import get_current_auth_user, get_current_user, get_optional_auth_user
 from app.database import get_db
 from app.schemas.document import (
     DocumentExtractionResponse,
@@ -14,7 +14,7 @@ from app.schemas.document import (
     DocumentType,
     ExtractionVerifyRequest,
 )
-from app.services import document_service
+from app.services import document_service, intake
 from app.services.storage import default_storage
 
 router = APIRouter()
@@ -26,7 +26,10 @@ async def upload_document(
     file: UploadFile = File(...),
     document_type: DocumentType | None = Form(None),
     db: Session = Depends(get_db),
+    user: models.User | None = Depends(get_optional_auth_user),
 ):
+    session = intake.get_session(db, str(session_id))
+    intake.verify_session_access(db, session, user)
     doc = await document_service.ingest_document(
         db=db,
         session_id=str(session_id),
@@ -40,8 +43,10 @@ async def upload_document(
 def list_documents(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(get_current_auth_user),
 ):
+    session = intake.get_session(db, str(session_id))
+    intake.verify_session_access(db, session, user)
     docs = document_service.get_session_documents(db=db, session_id=str(session_id))
     return DocumentListResponse(documents=docs, total=len(docs))
 
@@ -51,8 +56,10 @@ def get_document_detail(
     session_id: UUID,
     document_id: str,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(get_current_auth_user),
 ):
+    session = intake.get_session(db, str(session_id))
+    intake.verify_session_access(db, session, user)
     return document_service.get_document(db=db, session_id=str(session_id), document_id=document_id)
 
 
@@ -61,8 +68,10 @@ def get_document_file(
     session_id: UUID,
     document_id: str,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(get_current_auth_user),
 ):
+    session = intake.get_session(db, str(session_id))
+    intake.verify_session_access(db, session, user)
     doc = document_service.get_document(db=db, session_id=str(session_id), document_id=document_id)
     file_path = default_storage.get_file_path(doc.object_key)
     return FileResponse(
@@ -84,6 +93,8 @@ def verify_document_extraction(
     db: Session = Depends(get_db),
     user: models.User = Depends(get_current_user),
 ):
+    session = intake.get_session(db, str(session_id))
+    intake.verify_session_access(db, session, user)
     return document_service.verify_extraction(
         db=db,
         session_id=str(session_id),

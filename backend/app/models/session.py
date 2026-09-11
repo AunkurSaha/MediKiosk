@@ -11,6 +11,7 @@ class Session(Base):
 
     id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
     patient_id = Column(String, ForeignKey("patients.id"), nullable=False, index=True)
+    user_id = Column(String, ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True)
     hospital_token = Column(String, nullable=False)
     language = Column(String, nullable=False)  # e.g., 'en', 'bn', 'hi'
     status = Column(

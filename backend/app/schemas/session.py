@@ -29,6 +29,7 @@ class Session(APIModel):
     completed_at: UTCDate | None = None
     created_at: UTCDate
     updated_at: UTCDate | None = None
+    user_id: str | None = None
 
 
 class SessionListItem(Session):

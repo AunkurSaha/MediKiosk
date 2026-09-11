@@ -80,8 +80,9 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
             fontSize: '0.92rem',
           }}
         >
-          This clinical workspace requires verified staff authorization. Your current account role is{' '}
-          <strong>{user.role}</strong>. A patient mobile verification cannot grant doctor privileges.
+          This clinical workspace requires verified staff authorization. Your current account role
+          is <strong>{user.role}</strong>. A patient mobile verification cannot grant doctor
+          privileges.
         </div>
         <p className="muted" style={{ marginBottom: '24px' }}>
           Please sign in with staff credentials or return to your patient intake.
@@ -98,10 +99,18 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
               {switching ? 'Switching…' : 'Sign in as Demo Doctor'}
             </button>
           )}
-          <a href="/kiosk/language" className="btn secondary" style={{ textDecoration: 'none', padding: '10px 18px' }}>
+          <a
+            href="/kiosk/language"
+            className="btn secondary"
+            style={{ textDecoration: 'none', padding: '10px 18px' }}
+          >
             Go to Patient Intake
           </a>
-          <a href="/login" className="btn secondary" style={{ textDecoration: 'none', padding: '10px 18px' }}>
+          <a
+            href="/login"
+            className="btn secondary"
+            style={{ textDecoration: 'none', padding: '10px 18px' }}
+          >
             Switch Account
           </a>
         </div>

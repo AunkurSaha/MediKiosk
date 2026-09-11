@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.core.errors import WorkflowError
 from app.schemas.speech import SpeechSynthesisResult, TranscriptionResult
+from app.services import intake
 from app.services.speech_provider import get_speech_provider
 
 logger = logging.getLogger(__name__)
@@ -52,6 +53,7 @@ async def transcribe_audio(
     audio_file: UploadFile,
     question_id: str,
     fixture_id: str | None = None,
+    user: models.User | None = None,
 ) -> TranscriptionResult:
     """Validate voice consent, bounds, and audio format, then transcribe via SpeechProvider.
 
@@ -61,6 +63,7 @@ async def transcribe_audio(
     session = db.get(models.Session, session_id)
     if not session:
         raise WorkflowError("SESSION_NOT_FOUND", "Session not found.", 404)
+    intake.verify_session_access(db, session, user)
 
     if session.status != "intake":
         raise WorkflowError(
@@ -155,6 +158,7 @@ async def synthesize_question(
     db: Session,
     session_id: str,
     question_id: str,
+    user: models.User | None = None,
 ) -> SpeechSynthesisResult:
     """Synthesize audio for the exact localized question text from the session's pinned flow snapshot.
 
@@ -163,6 +167,7 @@ async def synthesize_question(
     session = db.get(models.Session, session_id)
     if not session:
         raise WorkflowError("SESSION_NOT_FOUND", "Session not found.", 404)
+    intake.verify_session_access(db, session, user)
 
     consent = db.scalar(select(models.Consent).where(models.Consent.session_id == session_id))
     if not consent or not consent.share_with_doctor:

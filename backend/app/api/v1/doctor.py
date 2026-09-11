@@ -43,7 +43,7 @@ def read_session_detail(
     db: Session = Depends(get_db),
     user: models.User = Depends(get_current_user),
 ):
-    result = intake.detail(db, str(session_id), doctor=True)
+    result = intake.detail(db, str(session_id), doctor=True, user=user)
     intake.audit(db, "session_viewed", str(session_id), user)
     db.commit()
     return result
@@ -210,7 +210,7 @@ def get_fhir_bundle(
 
     from app.services.fhir import FHIRAdapterService
 
-    intake.detail(db, str(session_id), doctor=True)
+    intake.detail(db, str(session_id), doctor=True, user=user)
     bundle = FHIRAdapterService.build_bundle(db, str(session_id), bundle_type=bundle_type)
     intake.audit(db, "FHIR_BUNDLE_ACCESSED", str(session_id), user, {"bundle_type": bundle_type})
     db.commit()
@@ -232,7 +232,7 @@ def validate_fhir(
 ):
     from app.services.fhir import FHIRAdapterService
 
-    intake.detail(db, str(session_id), doctor=True)
+    intake.detail(db, str(session_id), doctor=True, user=user)
     bundle = FHIRAdapterService.build_bundle(db, str(session_id), bundle_type=bundle_type)
     return FHIRAdapterService.validate_bundle(bundle)
 
@@ -248,7 +248,7 @@ def get_abdm_status(
 ):
     from app.services.abdm import ABDMService
 
-    intake.detail(db, str(session_id), doctor=True)
+    intake.detail(db, str(session_id), doctor=True, user=user)
     return ABDMService.get_status(db, str(session_id))
 
 
@@ -264,7 +264,7 @@ def verify_abha(
 ):
     from app.services.abdm import ABDMService
 
-    intake.detail(db, str(session_id), doctor=True)
+    intake.detail(db, str(session_id), doctor=True, user=user)
     return ABDMService.verify_abha(db, str(session_id), req.abha_input, auth_method=req.auth_method)
 
 
@@ -279,7 +279,7 @@ def link_care_context(
 ):
     from app.services.abdm import ABDMService
 
-    intake.detail(db, str(session_id), doctor=True)
+    intake.detail(db, str(session_id), doctor=True, user=user)
     return ABDMService.link_care_context(db, str(session_id), current_user_id=user.id)
 
 
@@ -295,7 +295,7 @@ def dispatch_to_his(
 ):
     from app.services.his import HISService
 
-    intake.detail(db, str(session_id), doctor=True)
+    intake.detail(db, str(session_id), doctor=True, user=user)
     target_system = req.target_system if req else "default"
     return HISService.dispatch_to_his(
         db, str(session_id), current_user_id=user.id, target_system=target_system

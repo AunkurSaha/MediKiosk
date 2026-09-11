@@ -11,13 +11,13 @@ SESSION_COOKIE_NAME = "medikiosk_session"
 
 
 def extract_token(request: Request) -> str | None:
-    """Extract session token from cookie or Authorization header."""
-    token = request.cookies.get(SESSION_COOKIE_NAME)
-    if token:
-        return token
+    """Extract session token from Authorization header or cookie."""
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Bearer "):
         return auth_header[7:].strip()
+    token = request.cookies.get(SESSION_COOKIE_NAME)
+    if token:
+        return token
     return None
 
 

@@ -1,4 +1,12 @@
-import { BrowserRouter, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import {
+  BrowserRouter,
+  NavLink,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 import Doctor from './routes/doctor';
 import Kiosk from './routes/kiosk';
 import Login from './routes/login';
@@ -50,7 +58,12 @@ function Shell() {
                 type="button"
                 className="text-button"
                 onClick={handleLogout}
-                style={{ fontSize: '0.85rem', padding: '4px 8px', minHeight: 'auto', cursor: 'pointer' }}
+                style={{
+                  fontSize: '0.85rem',
+                  padding: '4px 8px',
+                  minHeight: 'auto',
+                  cursor: 'pointer',
+                }}
               >
                 {t.logout}
               </button>

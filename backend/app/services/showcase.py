@@ -233,13 +233,19 @@ class ShowcaseService:
 
     @classmethod
     def seed_showcase_patient(
-        cls, db: DBSession, actor_user_id: str = DEMO_DOCTOR_ID
+        cls,
+        db: DBSession,
+        actor_user_id: str = DEMO_DOCTOR_ID,
+        patient_user_id: str | None = None,
     ) -> dict:
         now = datetime.now(timezone.utc)
         existing_session = db.scalar(
             select(models.Session).where(models.Session.hospital_token == SHOWCASE_TOKEN)
         )
         if existing_session:
+            if patient_user_id and existing_session.user_id != patient_user_id:
+                existing_session.user_id = patient_user_id
+                db.commit()
             summary_id = db.scalar(
                 select(models.ClinicalSummary.id).where(
                     models.ClinicalSummary.session_id == existing_session.id
@@ -274,6 +280,7 @@ class ShowcaseService:
                 hospital_token=SHOWCASE_TOKEN,
                 language="bn",
                 status="intake",
+                user_id=patient_user_id,
                 started_at=now - timedelta(hours=2),
                 created_at=now - timedelta(hours=2),
             )

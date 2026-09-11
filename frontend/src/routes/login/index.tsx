@@ -23,12 +23,16 @@ export default function Login() {
 
   const digitInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const redirectTarget = searchParams.get('redirect') || '/kiosk/language';
+  const reason = searchParams.get('reason');
 
   // Check config for demo mode
   useEffect(() => {
-    api.config().then((cfg) => {
-      setDemoMode(Boolean(cfg.demo_mode));
-    }).catch(() => {});
+    api
+      .config()
+      .then((cfg) => {
+        setDemoMode(Boolean(cfg.demo_mode));
+      })
+      .catch(() => {});
   }, []);
 
   // Countdown timer for resend
@@ -211,6 +215,23 @@ export default function Login() {
           </p>
         </div>
 
+        {reason === 'session_expired' && !error && (
+          <div
+            role="status"
+            style={{
+              background: '#fefce8',
+              border: '1px solid #fef08a',
+              color: '#854d0e',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+              marginBottom: '20px',
+            }}
+          >
+            Your session has expired. Please log in again with your mobile number.
+          </div>
+        )}
+
         {error && (
           <div
             role="alert"
@@ -271,7 +292,12 @@ export default function Login() {
             <div style={{ marginBottom: '24px' }}>
               <label
                 htmlFor="mobile-input"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '8px', fontSize: '0.9rem' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '8px',
+                  fontSize: '0.9rem',
+                }}
               >
                 {t.mobileNumber}
               </label>
@@ -334,7 +360,9 @@ export default function Login() {
               <p className="muted" style={{ margin: '0 0 6px' }}>
                 {t.otpSentTo}
               </p>
-              <p style={{ fontSize: '1.2rem', fontWeight: 700, margin: '0 0 8px', color: '#17685c' }}>
+              <p
+                style={{ fontSize: '1.2rem', fontWeight: 700, margin: '0 0 8px', color: '#17685c' }}
+              >
                 {maskedPhone}
               </p>
               <button

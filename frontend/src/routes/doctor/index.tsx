@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../api/client';
-import type { Detail, SessionList, TranslationResult, TransliterationResult } from '../../api/client';
+import type {
+  Detail,
+  SessionList,
+  TranslationResult,
+  TransliterationResult,
+} from '../../api/client';
 import { copy, errorText } from '../../i18n';
 import NormalizationPanel from '../../components/doctor/NormalizationPanel';
 import DocumentViewer from '../../components/doctor/DocumentViewer';
@@ -36,7 +41,9 @@ export default function Doctor() {
   const [fhirModalOpen, setFhirModalOpen] = useState(false);
   const [abdmModalOpen, setAbdmModalOpen] = useState(false);
   const [translations, setTranslations] = useState<Record<string, TranslationResult>>({});
-  const [transliterations, setTransliterations] = useState<Record<string, TransliterationResult>>({});
+  const [transliterations, setTransliterations] = useState<Record<string, TransliterationResult>>(
+    {},
+  );
   const [translatingFieldId, setTranslatingFieldId] = useState<string | null>(null);
 
   async function handleTranslate(fieldId: string, text: string, sourceLang: string) {
@@ -386,8 +393,17 @@ export default function Doctor() {
                                   }
                                 />
                               </dt>
-                              <dd lang={fact.language} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <dd
+                                lang={fact.language}
+                                style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
+                              >
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                  }}
+                                >
                                   <span lang={fact.language}>{fact.raw_value}</span>
 
                                   {fact.language !== 'en' && (
@@ -396,7 +412,13 @@ export default function Doctor() {
                                         type="button"
                                         data-testid={`translate-btn-${fact.question_id}`}
                                         disabled={translatingFieldId === fact.question_id}
-                                        onClick={() => handleTranslate(fact.question_id, fact.raw_value, fact.language)}
+                                        onClick={() =>
+                                          handleTranslate(
+                                            fact.question_id,
+                                            fact.raw_value,
+                                            fact.language,
+                                          )
+                                        }
                                         style={{
                                           fontSize: '0.75rem',
                                           padding: '2px 6px',
@@ -407,12 +429,20 @@ export default function Doctor() {
                                           cursor: 'pointer',
                                         }}
                                       >
-                                        {translatingFieldId === fact.question_id ? '...' : '🌐 Translate'}
+                                        {translatingFieldId === fact.question_id
+                                          ? '...'
+                                          : '🌐 Translate'}
                                       </button>
                                       <button
                                         type="button"
                                         data-testid={`transliterate-btn-${fact.question_id}`}
-                                        onClick={() => handleTransliterate(fact.question_id, fact.raw_value, fact.language)}
+                                        onClick={() =>
+                                          handleTransliterate(
+                                            fact.question_id,
+                                            fact.raw_value,
+                                            fact.language,
+                                          )
+                                        }
                                         style={{
                                           fontSize: '0.75rem',
                                           padding: '2px 6px',
@@ -440,10 +470,16 @@ export default function Doctor() {
                                     }}
                                   >
                                     <span style={{ fontWeight: 600, color: '#1e40af' }}>
-                                      🌐 Translation ({translations[fact.question_id].provider} · {translations[fact.question_id].model}):
+                                      🌐 Translation ({translations[fact.question_id].provider} ·{' '}
+                                      {translations[fact.question_id].model}):
                                     </span>{' '}
-                                    <span>&ldquo;{translations[fact.question_id].translated_text}&rdquo;</span>
-                                    <p className="muted" style={{ fontSize: '0.72rem', margin: '2px 0 0 0' }}>
+                                    <span>
+                                      &ldquo;{translations[fact.question_id].translated_text}&rdquo;
+                                    </span>
+                                    <p
+                                      className="muted"
+                                      style={{ fontSize: '0.72rem', margin: '2px 0 0 0' }}
+                                    >
                                       {translations[fact.question_id].provenance_note}
                                     </p>
                                   </div>
@@ -459,7 +495,9 @@ export default function Doctor() {
                                       fontSize: '0.82rem',
                                     }}
                                   >
-                                    <span style={{ fontWeight: 600, color: '#334155' }}>🔤 Latin Transliteration:</span>{' '}
+                                    <span style={{ fontWeight: 600, color: '#334155' }}>
+                                      🔤 Latin Transliteration:
+                                    </span>{' '}
                                     <span style={{ fontStyle: 'italic' }}>
                                       {transliterations[fact.question_id].transliterated_text}
                                     </span>
@@ -501,8 +539,17 @@ export default function Doctor() {
                           }
                         />
                       </dt>
-                      <dd lang={answer.language} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <dd
+                        lang={answer.language}
+                        style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}
+                      >
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                          }}
+                        >
                           <span lang={answer.language}>{answer.raw_value}</span>
 
                           {answer.language !== 'en' && (
@@ -511,7 +558,9 @@ export default function Doctor() {
                                 type="button"
                                 data-testid={`translate-btn-${answer.field}`}
                                 disabled={translatingFieldId === answer.field}
-                                onClick={() => handleTranslate(answer.field, answer.raw_value, answer.language)}
+                                onClick={() =>
+                                  handleTranslate(answer.field, answer.raw_value, answer.language)
+                                }
                                 style={{
                                   fontSize: '0.75rem',
                                   padding: '2px 6px',
@@ -542,7 +591,10 @@ export default function Doctor() {
                               🌐 Translation ({translations[answer.field].provider}):
                             </span>{' '}
                             <span>&ldquo;{translations[answer.field].translated_text}&rdquo;</span>
-                            <p className="muted" style={{ fontSize: '0.72rem', margin: '2px 0 0 0' }}>
+                            <p
+                              className="muted"
+                              style={{ fontSize: '0.72rem', margin: '2px 0 0 0' }}
+                            >
                               {translations[answer.field].provenance_note}
                             </p>
                           </div>

@@ -37,6 +37,39 @@ def get_session(db: Session, session_id: str):
     return session
 
 
+def verify_session_access(db: Session, session: models.Session, user: models.User | None) -> None:
+    """Enforce server-side authorization on clinical intake session.
+
+    - Doctor role: permitted (doctor endpoints verify clinical consent separately).
+    - Patient role:
+      - If session has an owner (session.user_id), it MUST match user.id.
+        If it belongs to a different user -> 403 FORBIDDEN.
+      - If session has no owner (legacy demo session) and demo_enabled(), access is permitted.
+    - Unauthenticated (user is None):
+      - If session has an owner (session.user_id is not None) -> 401 AUTH_REQUIRED.
+      - If session has no owner (legacy demo session) and demo_enabled() -> access is permitted.
+      - Otherwise -> 401 AUTH_REQUIRED.
+    """
+    from app.core.config import demo_enabled
+
+    if user and user.role == "doctor":
+        return
+
+    if user and user.role == "patient":
+        if session.user_id and session.user_id != user.id:
+            raise WorkflowError(
+                "FORBIDDEN", "You do not have permission to access this intake session.", 403
+            )
+        return
+
+    # Unauthenticated caller
+    if session.user_id is not None:
+        raise WorkflowError("AUTH_REQUIRED", "Authentication is required to access this session.", 401)
+
+    if not demo_enabled():
+        raise WorkflowError("AUTH_REQUIRED", "Authentication is required.", 401)
+
+
 def consent_for(db, session_id):
     return db.scalar(select(models.Consent).where(models.Consent.session_id == session_id))
 
@@ -139,10 +172,11 @@ def enrich_summary_schema(summary: models.ClinicalSummary | None, db: Session | 
     )
 
 
-def detail(db, session_id, doctor=False):
+def detail(db, session_id, doctor=False, user=None):
     from app.services import adaptive, red_flags
 
     session = get_session(db, session_id)
+    verify_session_access(db, session, user)
     if doctor:
         require_consent(db, session_id)
     patient = db.get(models.Patient, session.patient_id)
@@ -217,17 +251,18 @@ def detail(db, session_id, doctor=False):
         consent=consent_for(db, session_id),
         answers=latest_answers(db, session_id),
         summary=enrich_summary_schema(summary_for(db, session_id)),
-        history=adaptive.history(db, session_id),
+        history=adaptive.history(db, session_id, user=user),
         alerts=alert_items,
         documents=doc_items,
     )
 
 
 
-def create_session(db, payload):
+def create_session(db, payload, user=None):
     session_id = str(payload.id)
     existing = db.get(models.Session, session_id)
     if existing:
+        verify_session_access(db, existing, user)
         patient = db.get(models.Patient, existing.patient_id)
         if (
             existing.hospital_token != payload.hospital_token
@@ -240,22 +275,25 @@ def create_session(db, payload):
     patient = models.Patient(**payload.patient.model_dump())
     db.add(patient)
     db.flush()
+    owner_id = user.id if user and user.role == "patient" else None
     session = models.Session(
         id=session_id,
         patient_id=patient.id,
+        user_id=owner_id,
         hospital_token=payload.hospital_token,
         language=payload.language,
         status="intake",
     )
     db.add(session)
-    audit(db, "session_created", session_id)
+    audit(db, "session_created", session_id, user=user)
     db.commit()
     db.refresh(session)
     return session
 
 
-def save_consent(db, session_id, payload):
+def save_consent(db, session_id, payload, user=None):
     session = get_session(db, session_id)
+    verify_session_access(db, session, user)
     if session.status != "intake":
         raise WorkflowError("SESSION_LOCKED", "This intake is no longer editable.")
     consent = consent_for(db, session_id)
@@ -269,6 +307,7 @@ def save_consent(db, session_id, payload):
         db,
         "consent_recorded",
         session_id,
+        user=user,
         metadata={"share_with_doctor": payload.share_with_doctor, "text_version": 1},
     )
     db.commit()
@@ -276,8 +315,9 @@ def save_consent(db, session_id, payload):
     return consent
 
 
-def save_answer(db, session_id, payload):
+def save_answer(db, session_id, payload, user=None):
     session = get_session(db, session_id)
+    verify_session_access(db, session, user)
     require_consent(db, session_id)
     if db.get(models.InterviewRun, session_id):
         raise WorkflowError("ADAPTIVE_API_REQUIRED", "Use the versioned interview answer endpoint.")
@@ -306,7 +346,7 @@ def save_answer(db, session_id, payload):
     db.add(answer)
     # Corrections append a new answer; the earlier patient wording is retained.
     session.updated_at = now()
-    audit(db, "answer_recorded", session_id, metadata={"field": payload.field})
+    audit(db, "answer_recorded", session_id, user=user, metadata={"field": payload.field})
     db.flush()
     from app.services import normalization
     from app.services.flow_registry import registry
@@ -319,8 +359,9 @@ def save_answer(db, session_id, payload):
     return answer_response(answer)
 
 
-def complete(db, session_id):
+def complete(db, session_id, user=None):
     session = get_session(db, session_id)
+    verify_session_access(db, session, user)
     require_consent(db, session_id)
     if session.status in ("ready_for_review", "under_review", "confirmed"):
         return session
