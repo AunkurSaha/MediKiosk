@@ -1,5 +1,7 @@
 from logging.config import fileConfig
 
+import sqlalchemy as sa
+
 from alembic import context
 from app import models  # noqa: F401
 from app.database import Base, engine
@@ -22,10 +24,18 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    with engine.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+    with engine.begin() as connection:
+        if connection.dialect.name == "sqlite":
+            connection.execute(sa.text("PRAGMA foreign_keys = OFF;"))
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            render_as_batch=True,
+        )
         with context.begin_transaction():
             context.run_migrations()
+        if connection.dialect.name == "sqlite":
+            connection.execute(sa.text("PRAGMA foreign_keys = ON;"))
 
 
 if context.is_offline_mode():

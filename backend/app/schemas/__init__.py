@@ -18,6 +18,15 @@ from .alert import (
     TriggeringFact,
 )
 from .audit_trail import AuditTrailItem, AuditTrailResponse
+from .auth import (
+    AuthUserResponse,
+    DemoLoginRequest,
+    LoginResponse,
+    LogoutResponse,
+    OtpRequest,
+    OtpRequestResponse,
+    OtpVerifyRequest,
+)
 from .clinical_summary import (
     ClinicalSummary,
     ClinicalSummaryUpdate,
@@ -81,6 +90,13 @@ __all__ = [
     "AlertStatus",
     "AlertSummary",
     "TriggeringFact",
+    "AuthUserResponse",
+    "DemoLoginRequest",
+    "LoginResponse",
+    "LogoutResponse",
+    "OtpRequest",
+    "OtpRequestResponse",
+    "OtpVerifyRequest",
     "ClinicalSummary",
     "ClinicalSummaryUpdate",
     "EvidenceReference",

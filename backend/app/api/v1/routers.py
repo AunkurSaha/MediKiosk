@@ -1,8 +1,20 @@
 from fastapi import APIRouter
 
-from . import adaptive, consents, doctor, documents, interview, medical, sessions, speech, triage
+from . import (
+    adaptive,
+    auth,
+    consents,
+    doctor,
+    documents,
+    interview,
+    medical,
+    sessions,
+    speech,
+    triage,
+)
 
 api_router = APIRouter()
+api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
 api_router.include_router(sessions.router, prefix="/sessions", tags=["sessions"])
 api_router.include_router(consents.router, prefix="/sessions", tags=["consent"])
 api_router.include_router(interview.router, prefix="/sessions", tags=["interview"])

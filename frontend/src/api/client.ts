@@ -480,6 +480,55 @@ export class ApiError extends Error {
     this.status = status;
   }
 }
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  role: string;
+  phone_number: string | null;
+  phone_verified: boolean;
+}
+
+export interface OtpRequestResult {
+  success: boolean;
+  message: string;
+  expires_in: number;
+  cooldown_seconds: number;
+  delivery_mode: string;
+  masked_phone: string;
+}
+
+export interface LoginResult {
+  success: boolean;
+  user: AuthUser;
+  token?: string;
+}
+
+export interface LogoutResult {
+  success: boolean;
+  message: string;
+}
+
+let activeAuthToken: string | null = null;
+
+export function setAuthToken(token: string | null) {
+  activeAuthToken = token;
+  if (typeof sessionStorage !== 'undefined') {
+    if (token) {
+      sessionStorage.setItem('medikiosk.auth_token', token);
+    } else {
+      sessionStorage.removeItem('medikiosk.auth_token');
+    }
+  }
+}
+
+export function getStoredAuthToken(): string | null {
+  if (!activeAuthToken && typeof sessionStorage !== 'undefined') {
+    activeAuthToken = sessionStorage.getItem('medikiosk.auth_token');
+  }
+  return activeAuthToken;
+}
+
 const base = import.meta.env.VITE_API_BASE_URL || '/api';
 
 async function request<T>(
@@ -491,16 +540,19 @@ async function request<T>(
 ): Promise<T> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 15000);
+  const token = getStoredAuthToken();
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
   try {
     const response = await fetch(base + path, {
       method,
+      credentials: 'include',
       signal: externalSignal
         ? AbortSignal.any([controller.signal, externalSignal])
         : controller.signal,
       headers: {
         ...(body === undefined || isFormData ? {} : { 'Content-Type': 'application/json' }),
         ...(doctor ? { 'X-Demo-Doctor': 'true' } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
       ...(body === undefined ? {} : { body: isFormData ? body : JSON.stringify(body) }),
     });
@@ -821,5 +873,17 @@ export const api = {
       'POST',
       { text },
       true,
+    ),
+  requestOtp: (phone: string) =>
+    request<OtpRequestResult>('/auth/otp/request', 'POST', { phone_number: phone }),
+  verifyOtp: (phone: string, otp: string) =>
+    request<LoginResult>('/auth/otp/verify', 'POST', { phone_number: phone, otp }),
+  logout: () => request<LogoutResult>('/auth/logout', 'POST'),
+  getMe: () => request<AuthUser>('/auth/me'),
+  demoLogin: (role = 'patient') =>
+    request<LoginResult>('/auth/demo-login', 'POST', { role }),
+  getDevLastOtp: (phone: string) =>
+    request<{ phone_number: string; otp: string }>(
+      `/auth/dev/last-otp?phone_number=${encodeURIComponent(phone)}`,
     ),
 };
