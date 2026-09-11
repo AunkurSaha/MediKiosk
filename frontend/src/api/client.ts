@@ -444,6 +444,33 @@ export interface HISDispatchResponse {
   message: string;
   attached_bundle_type: string;
 }
+export interface TranslationResult {
+  status: 'success' | 'unavailable';
+  source_text: string;
+  source_language: string;
+  target_language: string;
+  translated_text: string | null;
+  provider: string;
+  model: string | null;
+  reason: string | null;
+  provenance_note: string;
+}
+export interface TransliterationResult {
+  status: 'success' | 'unavailable';
+  source_text: string;
+  source_language: string;
+  transliterated_text: string | null;
+  provider: string;
+  reason: string | null;
+  provenance_note: string;
+}
+export interface LanguageIdentificationResult {
+  status: 'success' | 'unavailable';
+  detected_language: string | null;
+  script_code: string | null;
+  provider: string;
+  reason: string | null;
+}
 export class ApiError extends Error {
   code: string;
   status: number;
@@ -774,4 +801,25 @@ export const api = {
       success: boolean;
       message: string;
     }>('/doctor/demo/reset', 'POST', {}, true),
+  translate: (id: string, text: string, sourceLanguage = 'auto', targetLanguage = 'en') =>
+    request<TranslationResult>(
+      '/doctor/sessions/' + id + '/translate',
+      'POST',
+      { text, source_language: sourceLanguage, target_language: targetLanguage },
+      true,
+    ),
+  transliterate: (id: string, text: string, sourceLanguage: string, targetLanguage = 'en') =>
+    request<TransliterationResult>(
+      '/doctor/sessions/' + id + '/transliterate',
+      'POST',
+      { text, source_language: sourceLanguage, target_language: targetLanguage },
+      true,
+    ),
+  identifyLanguage: (id: string, text: string) =>
+    request<LanguageIdentificationResult>(
+      '/doctor/sessions/' + id + '/identify-language',
+      'POST',
+      { text },
+      true,
+    ),
 };

@@ -1,10 +1,26 @@
-param([ValidateSet('mock', 'nvidia', 'disabled')][string]$NormalizationProvider, [switch]$UseRunningDatabase)
+param(
+    [ValidateSet('mock', 'nvidia', 'disabled')][string]$NormalizationProvider,
+    [ValidateSet('mock', 'bhashini', 'sarvam', 'disabled')][string]$SpeechProvider,
+    [ValidateSet('mock', 'sarvam', 'disabled')][string]$OcrProvider,
+    [ValidateSet('mock', 'sarvam', 'disabled')][string]$TranslationProvider,
+    [switch]$UseRunningDatabase
+)
 
 $ErrorActionPreference = 'Stop'
 if ($NormalizationProvider) {
     # Explicit process override; preserves the user's backend/.env and credentials.
     $env:CLINICAL_NORMALIZATION_PROVIDER = $NormalizationProvider
     $env:CLINICAL_NORMALIZATION_TIMEOUT_SECONDS = if ($NormalizationProvider -eq 'nvidia') { '8' } else { '0.5' }
+}
+if ($SpeechProvider) {
+    # Explicit process override; the API key remains backend-only in backend/.env.
+    $env:SPEECH_PROVIDER = $SpeechProvider
+}
+if ($OcrProvider) {
+    $env:OCR_PROVIDER = $OcrProvider
+}
+if ($TranslationProvider) {
+    $env:TRANSLATION_PROVIDER = $TranslationProvider
 }
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $runtimeRoot = Join-Path $projectRoot '.runtime'
@@ -29,19 +45,36 @@ function Test-HttpReady([string]$url) {
     catch { return $false }
 }
 $desiredProvider = $null
+$desiredSpeechProvider = $null
+$desiredOcrProvider = $null
+$desiredTranslationProvider = $null
 Push-Location (Join-Path $projectRoot 'backend')
 try {
     $desiredProvider = (& $pythonPath -c "from app.core import config; from app.services.normalization_provider import configured_provider; print(configured_provider().name)").Trim()
     if ($LASTEXITCODE -ne 0 -or -not $desiredProvider) { throw 'Could not resolve the configured normalization provider.' }
+    $desiredSpeechProvider = (& $pythonPath -c "from app.core import config; print(config.SPEECH_PROVIDER.strip().lower())").Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $desiredSpeechProvider) { throw 'Could not resolve the configured speech provider.' }
+    $desiredOcrProvider = (& $pythonPath -c "import os; print(os.getenv('OCR_PROVIDER', 'mock').strip().lower())").Trim()
+    $desiredTranslationProvider = (& $pythonPath -c "import os; print(os.getenv('TRANSLATION_PROVIDER', 'mock').strip().lower())").Trim()
 } finally { Pop-Location }
 
 # A healthy process may still be running with a provider override from an earlier
 # launch. Restart only the project-owned backend so /api/config matches the
 # environment selected for this invocation.
 if (Test-HttpReady 'http://127.0.0.1:8010/api/health') {
-    try { $runningProvider = (Invoke-RestMethod -Uri 'http://127.0.0.1:8010/api/config' -TimeoutSec 2).normalization_provider }
-    catch { $runningProvider = $null }
-    if ($runningProvider -ne $desiredProvider) {
+    try {
+        $runningConfig = Invoke-RestMethod -Uri 'http://127.0.0.1:8010/api/config' -TimeoutSec 2
+        $runningProvider = $runningConfig.normalization_provider
+        $runningSpeechProvider = $runningConfig.speech_provider
+        $runningOcrProvider = $runningConfig.ocr_provider
+        $runningTranslationProvider = $runningConfig.translation_provider
+    } catch {
+        $runningProvider = $null
+        $runningSpeechProvider = $null
+        $runningOcrProvider = $null
+        $runningTranslationProvider = $null
+    }
+    if ($runningProvider -ne $desiredProvider -or $runningSpeechProvider -ne $desiredSpeechProvider -or ($desiredOcrProvider -and $runningOcrProvider -ne $desiredOcrProvider) -or ($desiredTranslationProvider -and $runningTranslationProvider -ne $desiredTranslationProvider)) {
         $listener = Get-NetTCPConnection -LocalPort 8010 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
         $running = if ($listener) { Get-CimInstance Win32_Process -Filter ("ProcessId = " + $listener.OwningProcess) } else { $null }
         if (-not $running -or $running.CommandLine -notlike ('*' + (Join-Path $projectRoot 'backend') + '*')) {
@@ -84,3 +117,6 @@ $processes | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $runtimeRoot '
 Write-Output 'MediKiosk: http://127.0.0.1:5175'
 Write-Output 'API docs: http://127.0.0.1:8010/docs'
 Write-Output "Normalization provider: $desiredProvider"
+Write-Output "Speech provider: $desiredSpeechProvider"
+Write-Output "OCR provider: $desiredOcrProvider"
+Write-Output "Translation provider: $desiredTranslationProvider"

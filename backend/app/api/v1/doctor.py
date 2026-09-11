@@ -337,3 +337,59 @@ def reset_demo(
     if not demo_enabled():
         raise HTTPException(status_code=403, detail="Demo endpoints disabled in this environment.")
     return ShowcaseService.reset_demo_data(db)
+
+
+@router.post("/sessions/{session_id}/translate", response_model=schemas.translation.TranslationResponse)
+async def translate_text(
+    session_id: UUID,
+    payload: schemas.translation.TranslationRequest,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    session = db.get(models.Session, str(session_id))
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    from app.services.translation_provider import get_translation_provider
+
+    provider = get_translation_provider()
+    return await provider.translate(
+        text=payload.text,
+        source_language=payload.source_language,
+        target_language=payload.target_language,
+    )
+
+
+@router.post("/sessions/{session_id}/transliterate", response_model=schemas.translation.TransliterationResponse)
+async def transliterate_text(
+    session_id: UUID,
+    payload: schemas.translation.TransliterationRequest,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    session = db.get(models.Session, str(session_id))
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    from app.services.translation_provider import get_translation_provider
+
+    provider = get_translation_provider()
+    return await provider.transliterate(
+        text=payload.text,
+        source_language=payload.source_language,
+        target_language=payload.target_language,
+    )
+
+
+@router.post("/sessions/{session_id}/identify-language", response_model=schemas.translation.LanguageIdentificationResponse)
+async def identify_language(
+    session_id: UUID,
+    payload: schemas.translation.LanguageIdentificationRequest,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    session = db.get(models.Session, str(session_id))
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    from app.services.translation_provider import get_translation_provider
+
+    provider = get_translation_provider()
+    return await provider.identify_language(text=payload.text)

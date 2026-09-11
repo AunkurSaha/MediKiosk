@@ -71,12 +71,23 @@ class DisabledOcrProvider:
         return "", None, {"engine": self.name}
 
 
+_sarvam_ocr_instance = None
+
+
 def get_ocr_provider() -> OcrProvider:
     provider_name = os.getenv("OCR_PROVIDER", "mock").strip().lower()
     if provider_name == "mock":
         return MockOcrProvider()
     if provider_name == "disabled":
         return DisabledOcrProvider()
+    if provider_name == "sarvam":
+        global _sarvam_ocr_instance
+        from app.services.sarvam_ocr import SarvamOcrProvider, SarvamOcrSettings
+
+        settings = SarvamOcrSettings.from_environment()
+        if _sarvam_ocr_instance is None or _sarvam_ocr_instance.settings != settings:
+            _sarvam_ocr_instance = SarvamOcrProvider(settings)
+        return _sarvam_ocr_instance
     raise RuntimeError(
-        f"Unsupported OCR_PROVIDER: '{provider_name}'. Allowed: 'mock', 'disabled'."
+        f"Unsupported OCR_PROVIDER: '{provider_name}'. Allowed: 'mock', 'sarvam', 'disabled'."
     )

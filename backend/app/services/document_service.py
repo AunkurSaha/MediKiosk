@@ -106,21 +106,25 @@ async def ingest_document(
             # Execute OCR and parsing
             try:
                 ocr_provider = get_ocr_provider()
+                timeout_val = 18.0 if ocr_provider.name == "sarvam" else 5.0
                 raw_text, confidence, metadata = await asyncio.wait_for(
                     ocr_provider.extract(
                         image_bytes=bytes(data),
                         media_type=media_type,
                         filename=filename,
                     ),
-                    timeout=5.0,
+                    timeout=timeout_val,
                 )
                 inferred_type, doc_date, structured = parse_document(raw_text, filename)
 
                 doc.document_type = document_type or inferred_type
                 doc.document_date = doc_date
-                doc.processing_status = (
-                    "mock_fixture" if metadata.get("fixture_id") else "unavailable"
-                )
+                if metadata.get("fixture_id"):
+                    doc.processing_status = "mock_fixture"
+                elif ocr_provider.name == "sarvam" and raw_text and metadata.get("status") == "completed":
+                    doc.processing_status = "completed"
+                else:
+                    doc.processing_status = "unavailable"
 
                 extraction = models.DocumentExtraction(
                     id=str(uuid.uuid4()),
@@ -135,7 +139,11 @@ async def ingest_document(
                     confidence=confidence,
                     verification_status="unverified",
                 )
-                if raw_text and metadata.get("fixture_id"):
+                is_valid_extraction = raw_text and (
+                    bool(metadata.get("fixture_id"))
+                    or (ocr_provider.name == "sarvam" and metadata.get("status") == "completed")
+                )
+                if is_valid_extraction:
                     db.add(extraction)
                     # Flush to get the extraction ID before extracting medical facts
                     db.flush()

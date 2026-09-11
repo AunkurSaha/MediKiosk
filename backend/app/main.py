@@ -110,6 +110,7 @@ def public_config():
         "normalization_provider": os.getenv("CLINICAL_NORMALIZATION_PROVIDER", "mock"),
         "speech_provider": os.getenv("SPEECH_PROVIDER", "mock"),
         "ocr_provider": os.getenv("OCR_PROVIDER", "mock"),
+        "translation_provider": os.getenv("TRANSLATION_PROVIDER", "mock"),
     }
 
 

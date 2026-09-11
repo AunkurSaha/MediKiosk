@@ -221,6 +221,7 @@ class DisabledSpeechProvider:
 
 
 _bhashini_instance = None
+_sarvam_instance = None
 
 
 def get_speech_provider() -> SpeechProvider:
@@ -236,9 +237,17 @@ def get_speech_provider() -> SpeechProvider:
         if _bhashini_instance is None or _bhashini_instance.settings != settings:
             _bhashini_instance = BhashiniSpeechProvider(settings)
         return _bhashini_instance
+    if provider_name == "sarvam":
+        global _sarvam_instance
+        from app.services.sarvam_speech import SarvamSettings, SarvamSpeechProvider
+
+        settings = SarvamSettings.from_environment()
+        if _sarvam_instance is None or _sarvam_instance.settings != settings:
+            _sarvam_instance = SarvamSpeechProvider(settings)
+        return _sarvam_instance
     raise RuntimeError(
         f"Unsupported SPEECH_PROVIDER: '{provider_name}'. "
-        "Allowed: 'mock', 'disabled', 'bhashini'."
+        "Allowed: 'mock', 'disabled', 'bhashini', 'sarvam'."
     )
 
 
@@ -253,4 +262,10 @@ def validate_speech_configuration() -> None:
             raise RuntimeError(
                 "BHASHINI_API_KEY and BHASHINI_USER_ID are required when SPEECH_PROVIDER=bhashini"
             )
+    if provider.name == "sarvam":
+        from app.services.sarvam_speech import SarvamSettings
+
+        settings = SarvamSettings.from_environment()
+        if not settings.api_key.get_secret_value():
+            raise RuntimeError("SARVAM_API_KEY is required when SPEECH_PROVIDER=sarvam")
 

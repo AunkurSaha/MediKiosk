@@ -179,6 +179,7 @@ SpeechService
 Possible implementations:
 - mock;
 - BHASHINI;
+- Sarvam REST speech-to-text and text-to-speech;
 - AI4Bharat/self-hosted;
 - another explicitly approved provider.
 
@@ -563,3 +564,30 @@ Key architectural guarantees:
 
 Phase 10 maps the internal relational source of truth into on-demand Pydantic FHIR R4 document or collection bundles; FHIR is not the persistence model. Phase 11 adds mock/sandbox ABDM identity and care-context state plus a simulated HIS dispatcher, all behind the staff boundary and patient sharing consent. Phase 12 adds no schema: it assembles a deterministic synthetic showcase record through existing models and services, stores content-addressed repository document fixtures in local storage, evaluates the versioned red-flag rules, and generates a clinician-reviewable summary. See the [Phase 10](phase10-implementation-status.md), [Phase 11](phase11-implementation-status.md), and [Phase 12](phase12-implementation-status.md) reports.
 
+## Implemented Sarvam AI Integration Boundary
+
+Sarvam AI services are integrated behind MediKiosk's provider abstractions without altering clinical workflows, consent gates, or provenance pipelines:
+
+```text
+MediKiosk Client (Kiosk / Doctor)
+       │
+       ▼
+FastAPI Backend Layer (SARVAM_API_KEY kept strictly server-side)
+       ├── SpeechProvider (SPEECH_PROVIDER=sarvam)
+       │   ├── ASR (saaras:v3): 16-kHz mono PCM16 WAV → signed candidate transcript
+       │   └── TTS (bulbul:v3 / shubh): Pinned question text → 16-kHz WAV
+       ├── TranslationProvider (TRANSLATION_PROVIDER=sarvam)
+       │   ├── Translation (mayura:v1): Staff-assisted on-demand translation
+       │   ├── Language Identification: Assistive validation (never overrides patient choice)
+       │   └── Transliteration: Script assistance for clinicians
+       └── OcrProvider (OCR_PROVIDER=sarvam)
+           └── Document Intelligence (doc-ai-digitise-v1): Bounded polling (max 8s)
+               → Nullable confidence, non-diagnostic, strictly unverified until doctor review
+```
+
+Key Architectural Invariants:
+1. **Zero Secret Leakage**: `SARVAM_API_KEY` is loaded as a `SecretStr` from `backend/.env` and never logged, committed, or transmitted to frontend clients.
+2. **Patient Source Immutability**: Patient answers, raw recordings, and interview state remain immutable. Translations and transliterations are returned alongside original text with full provenance metadata.
+3. **Signed Candidate Gate**: ASR outputs are treated strictly as unconfirmed suggestions requiring explicit patient confirmation on the kiosk touchscreen.
+4. **Bounded Document Processing**: Document digitization is bounded to 8 seconds maximum polling with strictly nullable confidence scores, and all extractions remain unverified until clinician confirmation.
+5. **Intentional Scope Exclusions**: Dubbing (video-oriented) and WebSocket streaming are excluded from the clinical intake path to maintain deterministic safety and simple, auditable session authorization.

@@ -67,7 +67,7 @@ Application runtime and migrations use the same configuration. SQLite is permitt
 - `DEMO_MODE=true`: enables explicitly labeled demo-doctor access after seeding.
 - `CORS_ORIGINS`: comma-separated permitted frontend origins, defaulting to local port 5175.
 - `CLINICAL_NORMALIZATION_PROVIDER`: `mock`, `disabled`, or `nvidia`; the optional launcher switch overrides it for that process only.
-- `SPEECH_PROVIDER`: `mock`, `disabled`, or `bhashini`. BHASHINI credential names and optional endpoint overrides are listed in `backend/.env.example`.
+- `SPEECH_PROVIDER`: `mock`, `disabled`, `sarvam`, or `bhashini`. Sarvam uses the backend-only `SARVAM_API_KEY`; optional pinned model, speaker, and bounded timeout settings are listed in `backend/.env.example`. BHASHINI remains separately configurable.
 - `OCR_PROVIDER`: `mock` or `disabled`; real OCR is not implemented.
 - `ABDM_ENV`, `ABDM_CLIENT_ID`, `ABDM_CLIENT_SECRET`, `HIS_ENDPOINT_URL`: reserved integration configuration; the shipped demonstration remains mock/simulated.
 - `VITE_API_BASE_URL`: optional frontend variable, default `/api`; never put backend credentials in it.

@@ -307,3 +307,36 @@ Enforce the following architectural invariants:
 **Status:** Accepted
 
 2026-09-10: After explicit authorization to complete Phase 7, derive timeline and discrepancy responses deterministically from current source facts instead of materializing timeline rows. Preserve the existing timeline table without a producer. Keep extracted fact values immutable and store every clinician verification/rejection/correction as an optimistic, additive `medical_fact_revisions` row with server-owned attribution. This supersedes ADR-022 only for its prior scope restriction; its repair and preservation decisions remain active.
+
+## ADR-024 — Sarvam REST speech behind the existing provider boundary
+
+**Status:** Accepted
+
+2026-09-11: Add Sarvam as an explicitly selected `SPEECH_PROVIDER=sarvam` implementation without changing the provider-neutral interview workflow. Use the exact official Python SDK `sarvamai==0.1.31a4` only in the backend; never expose `SARVAM_API_KEY` to the browser. Pin `saaras:v3` for same-language transcription and `bulbul:v3`/`shubh` for 16-kHz WAV question audio. Map en/bn/hi to BCP-47 `-IN` codes, set SDK retries to zero, and keep a 12-second provider timeout inside the existing 15-second application deadline.
+
+Sarvam receives only consented, current-question 16-kHz mono PCM16 WAV input. Its transcript remains an unconfirmed signed candidate and cannot bypass confirmation or provenance controls. TTS remains limited to pinned question text. Mock and BHASHINI providers remain available; live selection is explicit so merely storing a key cannot trigger billable network calls. The successful Bengali synthetic TTS-to-ASR loopback establishes REST transport only, not physical microphone, accent, or clinical accuracy acceptance.
+
+---
+
+## ADR-025 — Sarvam Translation, Language Identification, and Document Intelligence Integration
+
+**Status:** Accepted
+
+**Decision:**
+1. **Translation (`mayura:v1`) & Transliteration**:
+   - Implemented behind the `TranslationProvider` abstraction (`backend/app/services/sarvam_translation.py`).
+   - Exposed as staff-assisted on-demand tools in the Doctor Workspace (`POST /api/doctor/sessions/{session_id}/translate` and `transliterate`).
+   - **Immutability of Source Truth**: Patient-reported answers and raw wording remain strictly immutable. Translations are returned and presented alongside original wording with complete provenance metadata (source language, target language, provider, model, timestamp) and never overwrite or alter canonical clinical facts.
+2. **Language Identification**:
+   - Used for assisting staff and validation; it never overrides the patient's explicitly chosen language at intake.
+3. **Document Intelligence / OCR (`doc-ai-digitise-v1`)**:
+   - Implemented behind the `OcrProvider` abstraction (`backend/app/services/sarvam_ocr.py`) via official SDK `SarvamAI.doc_ai.digitise`.
+   - Bounded execution: Polled at 0.5s intervals up to 16 polls (8s maximum window) with a 15s overall timeout.
+   - Preserves typed file validation, size limits (<= 10MB), and content-addressed storage.
+   - Outputs assembled markdown text and markdown/HTML tables with strictly nullable confidence (`None`), preventing hallucinated confidence numbers.
+   - Non-negotiable clinical boundary: OCR extraction is explicitly marked unverified until a clinician reviews and confirms or rejects it. No medical values, dates, or diagnoses are invented.
+4. **Dubbing & Streaming Exclusion**:
+   - Sarvam Dubbing is excluded from the clinical intake loop because MediKiosk uses ephemeral question text and voice input rather than pre-recorded media dubbing.
+   - WebSocket streaming ASR/TTS is intentionally excluded: the REST ASR endpoint achieves ~0.36s latency, so adding streaming WebSocket proxying would increase session security complexity without meaningful clinical benefit.
+5. **Security & Credentials**:
+   - `SARVAM_API_KEY` remains strictly backend-side in `backend/.env`. It is never returned to the frontend or included in public config (`/api/config` only reveals provider name `sarvam`).

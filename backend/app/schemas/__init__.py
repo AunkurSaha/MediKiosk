@@ -63,6 +63,14 @@ from .medical_fact import (
 from .patient import Patient, PatientCreate
 from .session import Session, SessionCreate, SessionDetail, SessionList, SessionListItem
 from .showcase import DemoResetResponse, ShowcaseSeedResponse
+from .translation import (
+    LanguageIdentificationRequest,
+    LanguageIdentificationResponse,
+    TranslationRequest,
+    TranslationResponse,
+    TransliterationRequest,
+    TransliterationResponse,
+)
 from .user import User
 
 __all__ = [
@@ -83,18 +91,18 @@ __all__ = [
     "SummaryRevisionRecord",
     "Consent",
     "ConsentUpdate",
-    "DocumentExtractionResponse",
-    "DocumentListResponse",
     "DocumentResponse",
+    "DocumentListResponse",
+    "DocumentExtractionResponse",
     "ExtractionVerifyRequest",
-    "LabObservationFact",
     "MedicationFact",
+    "LabObservationFact",
     "InterviewAnswer",
     "InterviewAnswerCreate",
     "MedicalFactsResponse",
     "MedicationFactRecord",
-    "MedicationFactReview",
     "LabFactRecord",
+    "MedicationFactReview",
     "LabFactReview",
     "TimelineResponse",
     "DiscrepancyResponse",
@@ -128,5 +136,11 @@ __all__ = [
     "HISDispatchResponse",
     "ShowcaseSeedResponse",
     "DemoResetResponse",
+    "TranslationRequest",
+    "TranslationResponse",
+    "LanguageIdentificationRequest",
+    "LanguageIdentificationResponse",
+    "TransliterationRequest",
+    "TransliterationResponse",
     "User",
 ]

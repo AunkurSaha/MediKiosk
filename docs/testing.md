@@ -51,6 +51,12 @@ Cover:
 - authorization checks;
 - provider adapters with mocks.
 
+### Sarvam AI Adapter Unit Tests (Mocked Boundaries)
+Cover:
+- `test_sarvam_speech.py`: 14 tests verifying Bengali, Hindi, and English ASR/TTS, 16-kHz mono PCM16 audio format enforcement, timeout/rate-limit error mapping, empty transcript rejection, signed candidate generation, and zero live credential exposure.
+- `test_sarvam_translation.py`: 13 tests covering bn→en, hi→en, en→bn translation, same-language short circuiting, language identification, transliteration, timeout/error propagation, staff authentication on doctor routes, and raw source answer immutability.
+- `test_sarvam_ocr.py`: 7 tests covering document digitization initiation, bounded polling within 8s limit, timeout handling, job failure mapping, markdown text assembly, and strictly nullable confidence scores.
+
 ### Backend API integration tests
 Cover:
 - create patient/session;
@@ -89,6 +95,7 @@ Critical flows:
 ### Patient flow
 - user can select English/Bengali/Hindi;
 - identification creates/associates a session;
+
 - consent cannot be skipped if doctor-sharing is required;
 - interview answers persist;
 - page refresh does not silently create duplicate sessions if session ID is retained appropriately;
@@ -309,7 +316,7 @@ New test coverage includes:
 
 ## Phase 7 acceptance
 
-Current verified totals are **356 backend tests on SQLite**, **98 frontend component tests**, and **29 Chromium E2E tests** against the migrated local SQLite acceptance database. The suite includes browser recording conversion/TTS fallback coverage and a real fixture upload-to-extraction/timeline/preview journey. The PostgreSQL profile is not currently verified because the Windows PostgreSQL service is disabled and stopped.
+Current verified totals are **364 backend tests on SQLite**, **98 frontend component tests**, and **29 Chromium E2E tests** against the migrated local SQLite acceptance database. The suite includes browser recording conversion/TTS fallback coverage, Sarvam SDK contract/error/audio-boundary coverage, and a real fixture upload-to-extraction/timeline/preview journey. The PostgreSQL profile is not currently verified because the Windows PostgreSQL service is disabled and stopped.
 
 `backend/tests/test_phase7_repairs.py` retains materialization, idempotence, atomicity, schema-alignment, provenance, null, and logging regressions. `backend/tests/test_phase7_complete.py` adds staff authorization, source exclusion, stable retrieval, verify/reject/correct review, forged identity, optimistic conflict, original/revision preservation, confirmed-state lock, timeline ordering/unknown dates/determinism/no duplicates, and conservative medication/allergy/lab discrepancy coverage.
 

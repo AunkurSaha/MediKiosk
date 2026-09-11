@@ -64,6 +64,12 @@ export default function QuestionAudioPlayer({
 
     try {
       const res = await api.synthesizeSpeech(sessionId, questionId);
+      if (res.provider !== 'mock' && (res.status !== 'success' || !res.audio_base64)) {
+        setStatus('error');
+        setErrorMsg(t.ttsError);
+        return;
+      }
+
       if (res.provider === 'mock' || res.status !== 'success' || !res.audio_base64) {
         if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
           setStatus('error');
