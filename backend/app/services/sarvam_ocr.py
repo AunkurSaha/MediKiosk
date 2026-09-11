@@ -12,7 +12,7 @@ from sarvamai.errors import ForbiddenError, TooManyRequestsError, UnauthorizedEr
 
 DEFAULT_TIMEOUT_SECONDS = 15
 DEFAULT_POLL_INTERVAL_SECONDS = 0.5
-DEFAULT_MAX_POLLS = 16  # 16 * 0.5s = 8 seconds polling window
+DEFAULT_MAX_POLLS = 28  # 28 * 0.5s = 14 seconds polling window
 
 
 class SarvamOcrSettings(BaseModel):
@@ -21,7 +21,7 @@ class SarvamOcrSettings(BaseModel):
     api_key: SecretStr = Field(exclude=True, repr=False)
     timeout: int = Field(default=DEFAULT_TIMEOUT_SECONDS, ge=1, le=30)
     poll_interval: float = Field(default=DEFAULT_POLL_INTERVAL_SECONDS, ge=0.1, le=2.0)
-    max_polls: int = Field(default=DEFAULT_MAX_POLLS, ge=1, le=40)
+    max_polls: int = Field(default=DEFAULT_MAX_POLLS, ge=1, le=50)
 
     @classmethod
     def from_environment(cls) -> "SarvamOcrSettings":

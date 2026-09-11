@@ -87,7 +87,7 @@ def test_seed_showcase_patient_service(database, isolated_document_storage):
         .filter(models.MedicationFact.session_id == session.id)
         .all()
     )
-    assert len(med_facts) == 3
+    assert len(med_facts) == 4
 
     lab_facts = database.query(models.LabFact).filter(models.LabFact.session_id == session.id).all()
     assert len(lab_facts) == 4

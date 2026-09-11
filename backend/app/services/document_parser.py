@@ -1,3 +1,4 @@
+import html
 import re
 from datetime import datetime, timezone
 from typing import Any
@@ -69,7 +70,7 @@ def parse_prescription(raw_text: str) -> dict[str, Any]:
 
     rx_section = False
     med_pattern = re.compile(
-        r"^(?:\d+[\.\)]\s*)?(?:(Tab|Cap|Syp|Inj|Oint)\.?\s+)?([A-Za-z0-9\s]+?)\s+(\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g|IU))?"
+        r"^(?:\d+[\.\)]\s*)?(?:(Tab|Cap|Syp|Inj|Oint)\.?\s+)?([A-Za-z0-9\s]+?)\s+(\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g|IU)(?:/\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g|IU))?)?"
         r"(?:\s*-\s*|\s+)(.+)?$",
         re.IGNORECASE,
     )
@@ -118,14 +119,119 @@ def parse_prescription(raw_text: str) -> dict[str, Any]:
 
 def parse_lab_report(raw_text: str) -> dict[str, Any]:
     observations: list[dict[str, Any]] = []
-    lines = [line.strip() for line in raw_text.splitlines() if line.strip()]
 
-    # Pattern matching: Test Name, Result, Unit, Range, Optional Flag
+    # 1. HTML table parsing (standard output from Sarvam AI doc-ai-digitise-v1)
+    if "<table" in raw_text.lower() and "<tr" in raw_text.lower():
+        rows = re.findall(r"<tr[^>]*>(.*?)</tr>", raw_text, re.DOTALL | re.IGNORECASE)
+        for r in rows:
+            if "<td" not in r.lower():
+                continue
+            cells = [html.unescape(c.strip()) for c in re.findall(r"<td[^>]*>(.*?)</td>", r, re.DOTALL | re.IGNORECASE)]
+            if not cells or len(cells) < 2:
+                continue
+            test_name = cells[0].strip()
+            if test_name.lower() in ("test name", "test", "investigation", "parameter"):
+                continue
+            val = ""
+            unit = None
+            ref_range = None
+            flag = None
+            if len(cells) == 2:
+                val = cells[1].strip()
+            elif len(cells) == 3:
+                val_str = cells[1].strip()
+                vm = re.match(r"^([\d\.\s\-<]+)\s*([a-zA-Z/%]+(?:\/[a-zA-Z]+)?)$", val_str)
+                if vm:
+                    val = vm.group(1).strip()
+                    unit = vm.group(2).strip()
+                else:
+                    val = val_str
+                ref_raw = cells[2].strip()
+                fm = re.search(r"\(?(normal|high|low|abnormal)\)?\s*$", ref_raw, re.I)
+                if fm:
+                    flag = fm.group(1).lower()
+                    ref_range = ref_raw[:fm.start()].strip()
+                else:
+                    ref_range = ref_raw
+            elif len(cells) >= 4:
+                val = cells[1].strip()
+                unit = cells[2].strip() or None
+                ref_raw = cells[3].strip()
+                fm = re.search(r"\(?(normal|high|low|abnormal)\)?\s*$", ref_raw, re.I)
+                if fm:
+                    flag = fm.group(1).lower()
+                    ref_range = ref_raw[:fm.start()].strip()
+                else:
+                    ref_range = ref_raw
+            observations.append({
+                "test_name": test_name,
+                "value": val,
+                "unit": unit,
+                "reference_range": ref_range,
+                "flag": flag,
+            })
+        if observations:
+            return {"observations": observations}
+
+    # 2. Markdown table parsing
+    md_lines = [line_text.strip() for line_text in raw_text.splitlines() if line_text.strip()]
+    if any(line_text.startswith("|") and line_text.endswith("|") for line_text in md_lines):
+        for line in md_lines:
+            if not line.startswith("|") or not line.endswith("|"):
+                continue
+            cells = [c.strip() for c in line.strip("|").split("|")]
+            if len(cells) < 2 or all(set(c) <= {"-", ":", " "} for c in cells):
+                continue
+            test_name = cells[0].strip()
+            if test_name.lower() in ("test name", "test", "investigation", "parameter"):
+                continue
+            val = ""
+            unit = None
+            ref_range = None
+            flag = None
+            if len(cells) == 2:
+                val = cells[1].strip()
+            elif len(cells) == 3:
+                val_str = cells[1].strip()
+                vm = re.match(r"^([\d\.\s\-<]+)\s*([a-zA-Z/%]+(?:\/[a-zA-Z]+)?)$", val_str)
+                if vm:
+                    val = vm.group(1).strip()
+                    unit = vm.group(2).strip()
+                else:
+                    val = val_str
+                ref_raw = html.unescape(cells[2].strip())
+                fm = re.search(r"\(?(normal|high|low|abnormal)\)?\s*$", ref_raw, re.I)
+                if fm:
+                    flag = fm.group(1).lower()
+                    ref_range = ref_raw[:fm.start()].strip()
+                else:
+                    ref_range = ref_raw
+            elif len(cells) >= 4:
+                val = cells[1].strip()
+                unit = cells[2].strip() or None
+                ref_raw = html.unescape(cells[3].strip())
+                fm = re.search(r"\(?(normal|high|low|abnormal)\)?\s*$", ref_raw, re.I)
+                if fm:
+                    flag = fm.group(1).lower()
+                    ref_range = ref_raw[:fm.start()].strip()
+                else:
+                    ref_range = ref_raw
+            observations.append({
+                "test_name": test_name,
+                "value": val,
+                "unit": unit,
+                "reference_range": ref_range,
+                "flag": flag,
+            })
+        if observations:
+            return {"observations": observations}
+
+    # 3. Plaintext whitespace-separated pattern
     row_pattern = re.compile(
         r"^([A-Za-z\s]+?)\s{2,}(\d+(?:\.\d+)?)\s+([a-zA-Z/%]+(?:\/[a-zA-Z]+)?)\s+([\d\.\s\-<]+)\s*(?:\(?([A-Za-z]+)\)?)?$"
     )
 
-    for line in lines:
+    for line in md_lines:
         match = row_pattern.match(line)
         if match:
             test_name, val, unit, ref_range, flag = match.groups()

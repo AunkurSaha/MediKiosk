@@ -178,3 +178,216 @@ def test_ocr_provider_exception_handling():
     assert text == ""
     assert conf is None
     assert meta["reason"] == "provider_error"
+
+
+def test_parse_prescription_compound_dosage():
+    from app.services.document_parser import parse_prescription
+
+    raw_text = """SYNTHETIC MOCK FIXTURE
+Dr. R K Sharma, MBBS, MD
+Rx:
+1. Tab Paracetamol 500mg - 1 tablet TDS after food x 5 days
+2. Cap Amoxicillin 250mg - 1 capsule BD x 7 days
+3. Tab Pantoprazole 40mg - 1 tablet OD before food x 14 days
+4. Syp Cetirizine 5mg/5ml - 5ml HS as needed"""
+    parsed = parse_prescription(raw_text)
+    meds = parsed["medications"]
+    assert len(meds) == 4
+    cetirizine = next((m for m in meds if "cetirizine" in m["name"].lower()), None)
+    assert cetirizine is not None
+    assert cetirizine["dosage"] == "5mg/5ml"
+    assert cetirizine["frequency"] == "HS"
+
+
+def test_parse_lab_report_sarvam_html_table():
+    from app.services.document_parser import parse_lab_report
+
+    html_text = """METROPOLIS DIAGNOSTICS & LABS
+Complete Blood Count & Biochemistry
+Date: 2026-08-20
+
+<table>
+<thead>
+<tr>
+<th>Test Name</th>
+<th>Result</th>
+<th>Unit</th>
+<th>Reference Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hemoglobin</td>
+<td>10.5 g/dL</td>
+<td>12.0 - 15.5 (Low)</td>
+</tr>
+<tr>
+<td>Fasting Blood Glucose</td>
+<td>142 mg/dL</td>
+<td>70 - 100 (High)</td>
+</tr>
+<tr>
+<td>Serum Creatinine</td>
+<td>1.1 mg/dL</td>
+<td>0.6 - 1.2 (Normal)</td>
+</tr>
+<tr>
+<td>Total Cholesterol</td>
+<td>210 mg/dL</td>
+<td>&lt; 200 (High)</td>
+</tr>
+</tbody>
+</table>"""
+    parsed = parse_lab_report(html_text)
+    obs = parsed["observations"]
+    assert len(obs) == 4
+    hb = next((o for o in obs if o["test_name"] == "Hemoglobin"), None)
+    assert hb is not None
+    assert hb["value"] == "10.5"
+    assert hb["unit"] == "g/dL"
+    assert hb["flag"] == "low"
+    assert hb["reference_range"] == "12.0 - 15.5"
+
+    chol = next((o for o in obs if o["test_name"] == "Total Cholesterol"), None)
+    assert chol is not None
+    assert chol["value"] == "210"
+    assert chol["unit"] == "mg/dL"
+    assert chol["flag"] == "high"
+    assert chol["reference_range"] == "< 200"
+
+
+def test_parse_lab_report_markdown_table():
+    from app.services.document_parser import parse_lab_report
+
+    md_text = """| Test Name | Result | Unit | Reference Range |
+| --- | --- | --- | --- |
+| Hemoglobin | 10.5 | g/dL | 12.0 - 15.5 (Low) |
+| Total Cholesterol | 210 mg/dL | < 200 (High) |"""
+    parsed = parse_lab_report(md_text)
+    obs = parsed["observations"]
+    assert len(obs) == 2
+    assert obs[0]["test_name"] == "Hemoglobin"
+    assert obs[0]["value"] == "10.5"
+    assert obs[0]["unit"] == "g/dL"
+    assert obs[0]["flag"] == "low"
+    assert obs[1]["test_name"] == "Total Cholesterol"
+    assert obs[1]["value"] == "210"
+    assert obs[1]["unit"] == "mg/dL"
+    assert obs[1]["flag"] == "high"
+
+
+def test_sarvam_ocr_e2e_prescription_and_facts(client, monkeypatch):
+    import uuid
+
+    mock_text = """Dr. R K Sharma, MBBS, MD
+Rx:
+1. Tab Paracetamol 500mg - 1 tablet TDS after food x 5 days
+2. Syp Cetirizine 5mg/5ml - 5ml HS as needed"""
+
+    doc_ai = _DocAiMock(results={
+        "documents": [{"pages": [{"blocks": [{"text": mock_text}]}]}]
+    })
+    mock_prov = _ocr_provider(doc_ai)
+    monkeypatch.setattr("app.services.document_service.get_ocr_provider", lambda: mock_prov)
+
+    session_id = str(uuid.uuid4())
+    client.post("/api/sessions", json={
+        "id": session_id,
+        "patient": {"name": "Test Patient", "demo_abha_id": None},
+        "hospital_token": "RX-1234",
+        "language": "en",
+    })
+    client.put(f"/api/sessions/{session_id}/consent", json={
+        "voice_processing": False,
+        "document_processing": True,
+        "share_with_doctor": True,
+    })
+
+    from pathlib import Path
+    sample_png = (Path(__file__).resolve().parents[2] / "ai/document_fixtures/prescription.png").read_bytes()
+    res = client.post(
+        f"/api/sessions/{session_id}/documents",
+        files={"file": ("rx.png", sample_png, "image/png")},
+        data={"document_type": "prescription"},
+    )
+    assert res.status_code == 201
+    doc_data = res.json()
+    assert doc_data["processing_status"] == "completed"
+    assert len(doc_data["extractions"]) == 1
+    ext = doc_data["extractions"][0]
+    assert ext["extractor"] == "sarvam"
+    assert len(ext["structured_json"]["medications"]) == 2
+
+    facts_res = client.get(
+        f"/api/doctor/sessions/{session_id}/medical-facts",
+        headers={"X-Demo-Doctor": "true"},
+    )
+    assert facts_res.status_code == 200
+    med_facts = facts_res.json()["medications"]
+    assert len(med_facts) == 2
+    assert any(m["current"]["name"] == "Syp Cetirizine" for m in med_facts)
+
+
+def test_sarvam_ocr_e2e_lab_report_and_facts(client, monkeypatch):
+    import uuid
+    from pathlib import Path
+
+    mock_html = """<table>
+<tr><th>Test Name</th><th>Result</th><th>Unit</th><th>Reference Range</th></tr>
+<tr><td>Hemoglobin</td><td>10.5 g/dL</td><td>12.0 - 15.5 (Low)</td></tr>
+<tr><td>Total Cholesterol</td><td>210 mg/dL</td><td>&lt; 200 (High)</td></tr>
+</table>"""
+
+    doc_ai = _DocAiMock(results={
+        "documents": [{"pages": [{"blocks": [{"text": mock_html}]}]}]
+    })
+    mock_prov = _ocr_provider(doc_ai)
+    monkeypatch.setattr("app.services.document_service.get_ocr_provider", lambda: mock_prov)
+
+    session_id = str(uuid.uuid4())
+    client.post("/api/sessions", json={
+        "id": session_id,
+        "patient": {"name": "Test Patient", "demo_abha_id": None},
+        "hospital_token": "LAB-1234",
+        "language": "en",
+    })
+    client.put(f"/api/sessions/{session_id}/consent", json={
+        "voice_processing": False,
+        "document_processing": True,
+        "share_with_doctor": True,
+    })
+
+    sample_png = (Path(__file__).resolve().parents[2] / "ai/document_fixtures/lab_report.png").read_bytes()
+    res = client.post(
+        f"/api/sessions/{session_id}/documents",
+        files={"file": ("lab.png", sample_png, "image/png")},
+        data={"document_type": "lab_report"},
+    )
+    assert res.status_code == 201
+    doc_data = res.json()
+    assert doc_data["processing_status"] == "completed"
+    assert len(doc_data["extractions"]) == 1
+    ext = doc_data["extractions"][0]
+    assert ext["extractor"] == "sarvam"
+    assert len(ext["structured_json"]["observations"]) == 2
+
+    facts_res = client.get(
+        f"/api/doctor/sessions/{session_id}/medical-facts",
+        headers={"X-Demo-Doctor": "true"},
+    )
+    assert facts_res.status_code == 200
+    lab_facts = facts_res.json()["labs"]
+    assert len(lab_facts) == 2
+    hb_fact = next(item for item in lab_facts if item["current"]["test_name"] == "Hemoglobin")
+    assert hb_fact["current"]["value"] == "10.5"
+    assert hb_fact["current"]["flag"] == "low"
+
+    # Also test cross-references endpoint
+    xref_res = client.get(
+        f"/api/doctor/sessions/{session_id}/cross-references",
+        headers={"X-Demo-Doctor": "true"},
+    )
+    assert xref_res.status_code == 200
+    docs = xref_res.json()["documents"]
+    assert len(docs) == 1
+    assert len(docs[0]["labs"]) == 2

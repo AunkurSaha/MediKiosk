@@ -55,7 +55,8 @@ Cover:
 Cover:
 - `test_sarvam_speech.py`: 14 tests verifying Bengali, Hindi, and English ASR/TTS, 16-kHz mono PCM16 audio format enforcement, timeout/rate-limit error mapping, empty transcript rejection, signed candidate generation, and zero live credential exposure.
 - `test_sarvam_translation.py`: 13 tests covering bn→en, hi→en, en→bn translation, same-language short circuiting, language identification, transliteration, timeout/error propagation, staff authentication on doctor routes, and raw source answer immutability.
-- `test_sarvam_ocr.py`: 7 tests covering document digitization initiation, bounded polling within 8s limit, timeout handling, job failure mapping, markdown text assembly, and strictly nullable confidence scores.
+- `test_sarvam_ocr.py`: 12 tests covering document digitization initiation, bounded polling within 14s limit (28 polls at 0.5s), timeout handling, job failure mapping, HTML table and Markdown table parsing for lab observations, compound liquid dosage parsing (e.g. 5mg/5ml), end-to-end prescription and lab report fact materialization, cross-reference linkage, and strictly nullable confidence scores.
+- `e2e/document-flow.spec.ts`: Playwright browser test validating patient consent, interview completion, UI document upload, live Sarvam OCR extraction, unverified medication/lab fact display, and doctor workspace document viewer linkage.
 
 ### Backend API integration tests
 Cover:

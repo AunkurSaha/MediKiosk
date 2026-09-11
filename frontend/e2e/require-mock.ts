@@ -1,6 +1,9 @@
 import { request } from '@playwright/test';
 
 export default async function requireMock() {
+  if (process.env.ALLOW_LIVE_E2E === 'true') {
+    return;
+  }
   const client = await request.newContext({ baseURL: 'http://127.0.0.1:5175' });
   try {
     const response = await client.get('/api/config');

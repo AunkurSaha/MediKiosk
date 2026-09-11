@@ -77,7 +77,7 @@ def get_cross_references(db: Session, session_id: str) -> CrossReferenceResponse
     # 6. Group facts by document
     doc_meds_map: dict[str, list[DocumentFactLink]] = {d.id: [] for d in docs}
     for m in med_facts:
-        d_id = extraction_doc_map.get(m.source_extraction_id)
+        d_id = extraction_doc_map.get(m.document_extraction_id)
         if d_id and d_id in doc_meds_map:
             dosage_str = f" {m.dosage}" if m.dosage else ""
             freq_str = f" ({m.frequency})" if m.frequency else ""
@@ -92,7 +92,7 @@ def get_cross_references(db: Session, session_id: str) -> CrossReferenceResponse
 
     doc_labs_map: dict[str, list[DocumentFactLink]] = {d.id: [] for d in docs}
     for lab_item in lab_facts:
-        d_id = extraction_doc_map.get(lab_item.source_extraction_id)
+        d_id = extraction_doc_map.get(lab_item.document_extraction_id)
         if d_id and d_id in doc_labs_map:
             unit_str = f" {lab_item.unit}" if lab_item.unit else ""
             doc_labs_map[d_id].append(
