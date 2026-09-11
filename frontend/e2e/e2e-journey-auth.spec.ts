@@ -19,12 +19,13 @@ test.describe('MediKiosk Authenticated End-to-End User Journey', () => {
     await expect(page.getByText('Patient Login', { exact: true })).toBeVisible();
 
     // Step 2: Enter Indian mobile number (+91)
-    const phone = '9876543210';
+    const phone = `96${String(Date.now()).slice(-8)}`;
+    const maskedPhone = `+91******${phone.slice(-4)}`;
     await page.getByLabel('Mobile Number').fill(phone);
     await page.getByRole('button', { name: 'Send OTP' }).click();
 
     // Step 3: Verify OTP transition
-    await expect(page.getByText('+91******3210')).toBeVisible();
+    await expect(page.getByText(maskedPhone)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Verify OTP' })).toBeVisible();
 
     // Step 4: Fetch OTP from test sink
@@ -41,7 +42,7 @@ test.describe('MediKiosk Authenticated End-to-End User Journey', () => {
 
     // Step 6: Authenticated redirect to /kiosk/language
     await expect(page).toHaveURL(/\/kiosk\/language/);
-    await expect(page.getByText(/\+91\*{6}3210/)).toBeVisible();
+    await expect(page.getByText(maskedPhone)).toBeVisible();
 
     // Screenshot: Authenticated kiosk landing
     await page.screenshot({
@@ -49,12 +50,24 @@ test.describe('MediKiosk Authenticated End-to-End User Journey', () => {
       fullPage: true,
     });
 
-    // Step 7: Load showcase patient (bilingual Bengali/English cardiac case)
+    // Step 7: Patient auth cannot grant doctor privileges; switch explicitly in demo mode.
+    await page.goto('/doctor');
+    await expect(page.getByRole('heading', { name: 'Doctor Access Required' })).toBeVisible();
+    const doctorLogin = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/auth/demo-login') && response.request().method() === 'POST',
+    );
+    await page.getByRole('button', { name: 'Sign in as Demo Doctor' }).click();
+    expect((await doctorLogin).ok()).toBeTruthy();
+    await expect(page).toHaveURL(/\/doctor/);
+    await page.goto('/kiosk/language');
+
+    // Step 8: Load showcase patient (bilingual Bengali/English cardiac case)
     const showcaseBtn = page.getByTestId('kiosk-load-showcase-btn');
     await expect(showcaseBtn).toBeVisible();
     await showcaseBtn.click();
 
-    // Step 8: Intake completes and navigates to complete screen
+    // Step 9: Intake completes and navigates to complete screen
     await expect(page).toHaveURL(/\/kiosk\/complete$/);
     await expect(page.getByRole('heading', { name: 'চিকিৎসকের পর্যালোচনার জন্য প্রস্তুত' })).toBeVisible();
     await expect(page.getByText('T-SHOWCASE-101')).toBeVisible();

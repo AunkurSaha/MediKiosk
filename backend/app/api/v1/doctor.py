@@ -192,7 +192,7 @@ def export_fhir(
 ):
     from app.services.fhir import FHIRAdapterService
 
-    intake.detail(db, str(session_id), doctor=True)
+    intake.detail(db, str(session_id), doctor=True, user=user)
     res = FHIRAdapterService.export(db, str(session_id), bundle_type=bundle_type)
     intake.audit(db, "FHIR_EXPORTED", str(session_id), user, {"bundle_type": bundle_type})
     db.commit()

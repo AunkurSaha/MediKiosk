@@ -370,9 +370,9 @@ def complete(db, session_id, user=None):
     from app.services import adaptive
     from app.services.clinical_summary import ClinicalSummaryService
 
-    history = adaptive.history(db, session_id)
+    history = adaptive.history(db, session_id, user=user)
     if db.get(models.InterviewRun, session_id):
-        if not adaptive.state(db, session_id).is_complete:
+        if not adaptive.state(db, session_id, user=user).is_complete:
             raise WorkflowError("ANSWERS_REQUIRED", "Address all applicable questions first.", 422)
     else:
         answers = {a.field: a.value for a in latest_answers(db, session_id)}
@@ -382,7 +382,7 @@ def complete(db, session_id, user=None):
             )
 
     draft_text, structured_summary = ClinicalSummaryService.generate_draft(
-        db, session_id, draft_version=1
+        db, session_id, draft_version=1, user=user
     )
     db.add(
         models.ClinicalSummary(
@@ -399,7 +399,7 @@ def complete(db, session_id, user=None):
     )
     session.status = "ready_for_review"
     session.completed_at = now()
-    audit(db, "intake_completed", session_id)
+    audit(db, "intake_completed", session_id, user=user)
     db.commit()
     db.refresh(session)
     return session
@@ -489,7 +489,7 @@ def regenerate_summary(db, session_id, payload, user) -> schemas.ClinicalSummary
 
     next_draft_version = (summary.draft_version or 1) + 1
     draft_text, structured_summary = ClinicalSummaryService.generate_draft(
-        db, session_id, draft_version=next_draft_version
+        db, session_id, draft_version=next_draft_version, user=user
     )
 
     summary.version += 1

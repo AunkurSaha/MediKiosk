@@ -52,6 +52,71 @@ def test_patient_creates_owned_session(client, database):
     assert session.user_id == user.id
 
 
+def test_owned_patient_can_select_flow_and_repeat_selection(client):
+    token = login_patient(client, "+919876540021")
+    session_id = create_patient_session(client, token)
+    headers = auth_header(token)
+    consent = client.put(
+        f"/api/sessions/{session_id}/consent",
+        json={"share_with_doctor": True, "voice_processing": True, "document_processing": True},
+        headers=headers,
+    )
+    assert consent.status_code == 200, consent.text
+
+    selected = client.put(
+        f"/api/sessions/{session_id}/interview/flow",
+        json={"flow_id": "chest_pain"},
+        headers=headers,
+    )
+    assert selected.status_code == 200, selected.text
+    assert selected.json()["question"]["question_id"] == "chief_complaint.description"
+
+    repeated = client.put(
+        f"/api/sessions/{session_id}/interview/flow",
+        json={"flow_id": "chest_pain"},
+        headers=headers,
+    )
+    assert repeated.status_code == 200, repeated.text
+    assert repeated.json()["question"]["question_id"] == "chief_complaint.description"
+
+    state = repeated.json()
+    for _ in range(100):
+        question = state["question"]
+        if question is None:
+            break
+        answered = question["type"] == "boolean"
+        response = client.post(
+            f"/api/sessions/{session_id}/interview/answers",
+            json={
+                "request_id": str(uuid4()),
+                "expected_revision": state["revision"],
+                "question_id": question["question_id"],
+                "status": "answered" if answered else "unknown",
+                "value": False if answered else None,
+                "raw_value": "No" if answered else "Unknown",
+                "source": "touch" if answered else "typed",
+                "language": "en",
+            },
+            headers=headers,
+        )
+        assert response.status_code == 200, response.text
+        state = response.json()
+    assert state["is_complete"] is True
+
+    completed = client.post(f"/api/sessions/{session_id}/complete", headers=headers)
+    assert completed.status_code == 200, completed.text
+    assert completed.json()["status"] == "ready_for_review"
+
+    doctor_login = client.post("/api/auth/demo-login", json={"role": "doctor"})
+    assert doctor_login.status_code == 200, doctor_login.text
+    exported = client.get(
+        f"/api/doctor/sessions/{session_id}/fhir/export",
+        headers=auth_header(doctor_login.json()["token"]),
+    )
+    assert exported.status_code == 200, exported.text
+    assert exported.json()["bundle"]["resourceType"] == "Bundle"
+
+
 def test_cross_patient_session_detail_forbidden(client):
     token_a = login_patient(client, "+919876540002")
     token_b = login_patient(client, "+919876540003")

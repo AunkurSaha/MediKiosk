@@ -119,7 +119,7 @@ def select_flow(db, session_id, payload, user=None):
             raise WorkflowError(
                 "FLOW_LOCKED", "This intake already has a flow. Start a new intake to change it."
             )
-        return state(db, session_id)
+        return state(db, session_id, user=user)
     flow = registry().get(payload.flow_id)
     if flow is None or flow.namespace == "legacy":
         raise WorkflowError(
@@ -141,7 +141,7 @@ def select_flow(db, session_id, payload, user=None):
         metadata={"flow_id": flow.flow_id, "version": flow.version},
     )
     db.commit()
-    return state(db, session_id)
+    return state(db, session_id, user=user)
 
 
 def require_run(db, session_id):

@@ -49,6 +49,7 @@ class ClinicalSummaryService:
         db: Session,
         session_id: str,
         draft_version: int = 1,
+        user: models.User | None = None,
     ) -> tuple[str, StructuredClinicalSummary]:
         session = intake.get_session(db, session_id)
         intake.require_consent(db, session_id)
@@ -57,7 +58,7 @@ class ClinicalSummaryService:
         patient_name = patient.name if patient else "Unknown Patient"
         patient_id = patient.id if patient else session.patient_id
         run = db.get(models.InterviewRun, session_id)
-        history = adaptive.state(db, session_id).history if run else None
+        history = adaptive.state(db, session_id, user=user).history if run else None
         answers = intake.latest_answers(db, session_id)
         facts = medical_facts.get_current_facts(db, session_id)
         timeline = timeline_service.get_timeline(db, session_id)
