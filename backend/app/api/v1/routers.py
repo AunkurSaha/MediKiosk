@@ -8,6 +8,7 @@ from . import (
     documents,
     interview,
     medical,
+    rag,
     sessions,
     speech,
     triage,
@@ -25,3 +26,4 @@ api_router.include_router(doctor.router, prefix="/doctor", tags=["doctor"])
 api_router.include_router(medical.router, prefix="/doctor/sessions", tags=["doctor medical facts"])
 api_router.include_router(triage.router, prefix="/triage", tags=["triage"])
 api_router.include_router(triage.session_router, prefix="/sessions", tags=["triage"])
+api_router.include_router(rag.router, prefix="/rag", tags=["rag"])

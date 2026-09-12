@@ -18,6 +18,8 @@ os.environ["NVIDIA_API_KEY"] = ""
 os.environ["SPEECH_PROVIDER"] = "mock"
 os.environ["OCR_PROVIDER"] = "mock"
 os.environ["TRANSLATION_PROVIDER"] = "mock"
+os.environ["RAG_EMBEDDING_PROVIDER"] = "mock"
+os.environ["RAG_EMBEDDING_TIMEOUT_SECONDS"] = "0.5"
 
 from app import models  # noqa: E402
 from app.api.deps import DEMO_DOCTOR_ID  # noqa: E402

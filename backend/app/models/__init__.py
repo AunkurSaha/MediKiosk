@@ -9,6 +9,7 @@ from .document_extraction import DocumentExtraction
 from .field_verification import FieldVerification, FieldVerificationRevision
 from .interview_answer import InterviewAnswer
 from .interview_run import InterviewRequest, InterviewRun
+from .knowledge_chunk import KnowledgeChunk
 from .lab_fact import LabFact
 from .medical_fact_revision import MedicalFactRevision
 from .medication_fact import MedicationFact
@@ -43,4 +44,5 @@ __all__ = [
     "MedicalFactRevision",
     "LabFact",
     "User",
+    "KnowledgeChunk",
 ]

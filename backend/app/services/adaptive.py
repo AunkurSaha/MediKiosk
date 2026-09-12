@@ -7,7 +7,7 @@ from app import models
 from app.core.errors import WorkflowError
 from app.schemas.adaptive import Fact, FlowChoice, InterviewState
 from app.schemas.alert import AlertSummary
-from app.schemas.flow import Flow
+from app.schemas.flow import Flow, Localized
 from app.services import intake, normalization, red_flags
 from app.services.flow_registry import registry
 from app.services.interview_engine import InterviewEngine, validate_answer
@@ -35,6 +35,8 @@ def engine_for(db, session_id, flow):
     facts = {}
     normalized = normalization.for_answers(db, session_id)
     for row in rows(db, session_id):
+        if row.question_id.startswith("rag_followup"):
+            continue
         question = questions.get(row.question_id)
         if question is None:
             raise WorkflowError(
@@ -99,6 +101,57 @@ def state(db, session_id, user=None):
             reason=highest.reason,
             created_at=highest.created_at,
         )
+
+    # Include any previously answered RAG facts into active_answers and history
+    rag_facts = []
+    norm_map = normalization.for_answers(db, session_id)
+    for row in rows(db, session_id):
+        if row.question_id.startswith("rag_followup"):
+            stored = json.loads(row.value_json) if row.value_json else {}
+            envelope = (
+                stored
+                if isinstance(stored, dict) and "status" in stored
+                else {"status": "answered", "value": stored}
+            )
+            rag_fact = Fact(
+                answer_id=row.id,
+                question_id=row.question_id,
+                field=row.field,
+                label=Localized(en="Clinical follow-up", bn="Clinical follow-up", hi="Clinical follow-up"),
+                status=envelope.get("status", "answered"),
+                value=envelope.get("value", row.raw_value),
+                raw_value=row.raw_value or "",
+                source=row.source,
+                language=row.language,
+                recorded_at=row.created_at,
+                normalization=norm_map.get(row.id),
+            )
+            rag_facts.append(rag_fact)
+
+    if rag_facts:
+        res.active_answers.extend(rag_facts)
+        if res.history and res.history.sections:
+            target_sec = next((s for s in res.history.sections if s.section_id == "hpi"), None)
+            if target_sec is None:
+                target_sec = res.history.sections[0]
+            target_sec.facts.extend(rag_facts)
+
+    # If the deterministic state says we are complete and there's no red flag and no missing required,
+    # evaluate grounded RAG follow-up candidates
+    if res.is_complete and res.red_flag_alert is None and len(res.missing_required) == 0:
+        try:
+            from app.services.rag_integration import select_next_rag_question
+            rag_result = select_next_rag_question(str(session_id), db, flow, res)
+            if rag_result is not None:
+                rag_question, rag_suggestion = rag_result
+                new_res = res.model_copy()
+                new_res.is_complete = False
+                new_res.question = rag_question
+                new_res.rag_suggestions = [rag_suggestion]
+                return new_res
+        except Exception:
+            pass
+
     return res
 
 
@@ -186,9 +239,19 @@ def submit(db, session_id, payload, user=None):
         return state(db, session_id, user=user)
     check_revision(run, payload.expected_revision)
     engine = engine_for(db, session_id, flow)
-    current = engine.state(run.cursor).question
+    current_state = engine.state(
+        run.cursor if run else None, run.revision if run else 0
+    )
+    current = current_state.question
+    if current is None:
+        # Fallback to engine's state question if state.question is None (should not happen)
+        current = engine.state(run.cursor).question
     if current is None or current.question_id != payload.question_id:
-        raise WorkflowError("QUESTION_NOT_CURRENT", "Reload the current interview question.", 409)
+        active_state = state(db, session_id, user=user)
+        if active_state.question and active_state.question.question_id == payload.question_id:
+            current = active_state.question
+        else:
+            raise WorkflowError("QUESTION_NOT_CURRENT", "Reload the current interview question.", 409)
     if payload.language != session.language:
         raise WorkflowError("INVALID_ANSWER", "Answer language must match the session.", 422)
     candidate = None
@@ -224,7 +287,11 @@ def submit(db, session_id, payload, user=None):
             "answer_recorded",
             session_id,
             user=user,
-            metadata={"field": current.field, "flow_version": flow.version},
+            metadata={
+                "field": current.field,
+                "flow_version": flow.version,
+                "origin": "rag" if current.question_id.startswith("rag_followup") else "flow",
+            },
         )
         db.flush()
     if candidate is not None:
@@ -233,7 +300,8 @@ def submit(db, session_id, payload, user=None):
             "question_id": current.question_id, "language": payload.language,
             "source_answer_id": saved_answer.id if saved_answer is not None else previous.answer_id,
         })
-    run.cursor = engine_for(db, session_id, flow).after(payload.question_id)
+    if not payload.question_id.startswith("rag_followup"):
+        run.cursor = engine_for(db, session_id, flow).after(payload.question_id)
     run.revision += 1
     session.updated_at = intake.now()
     db.add(
@@ -247,7 +315,24 @@ def submit(db, session_id, payload, user=None):
     intake.get_session(db, session_id)
     active_engine = engine_for(db, session_id, flow)
     db.info.pop("triage_events", None)
-    red_flags.evaluate_and_persist(db, session_id, flow.flow_id, list(active_engine.active.values()))
+    all_facts = list(active_engine.active.values()) + [
+        Fact(
+            answer_id=r.id,
+            question_id=r.question_id,
+            field=r.field,
+            label=Localized(en="Clinical follow-up", bn="Clinical follow-up", hi="Clinical follow-up"),
+            status=json.loads(r.value_json).get("status", "answered") if r.value_json else "answered",
+            value=json.loads(r.value_json).get("value", r.raw_value) if r.value_json else r.raw_value,
+            raw_value=r.raw_value or "",
+            source=r.source,
+            language=r.language,
+            recorded_at=r.created_at,
+            normalization=normalization.for_answers(db, session_id).get(r.id),
+        )
+        for r in rows(db, session_id)
+        if r.question_id.startswith("rag_followup")
+    ]
+    red_flags.evaluate_and_persist(db, session_id, flow.flow_id, all_facts)
     db.commit()
     return state(db, session_id, user=user)
 

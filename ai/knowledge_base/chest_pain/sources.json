@@ -1,0 +1,35 @@
+{
+  "history_taking.md": {
+    "source_id": "demo-chest-pain-history-taking",
+    "source_title": "Chest Pain History Taking Guide",
+    "section": "History Taking",
+    "topic": "chest_pain",
+    "specialty": "cardiology",
+    "language": "en",
+    "document_version": "1.0-demo",
+    "source_reference": "Internally generated for MediKiosk demo",
+    "note": "DEMO / SYNTHETIC CLINICAL KNOWLEDGE - Not for clinical use"
+  },
+  "associated_symptoms.md": {
+    "source_id": "demo-chest-pain-associated-symptoms",
+    "source_title": "Associated Symptoms in Chest Pain",
+    "section": "Associated Symptoms",
+    "topic": "chest_pain",
+    "specialty": "cardiology",
+    "language": "en",
+    "document_version": "1.0-demo",
+    "source_reference": "Internally generated for MediKiosk demo",
+    "note": "DEMO / SYNTHETIC CLINICAL KNOWLEDGE - Not for clinical use"
+  },
+  "warning_features.md": {
+    "source_id": "demo-chest-pain-warning-features",
+    "source_title": "Warning Features in Chest Pain",
+    "section": "Warning Features",
+    "topic": "chest_pain",
+    "specialty": "cardiology",
+    "language": "en",
+    "document_version": "1.0-demo",
+    "source_reference": "Internally generated for MediKiosk demo",
+    "note": "DEMO / SYNTHETIC CLINICAL KNOWLEDGE - Not for clinical use"
+  }
+}

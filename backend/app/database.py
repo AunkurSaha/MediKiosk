@@ -3,10 +3,10 @@ from datetime import datetime, timezone
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-from app.core.config import APP_ENV, DATABASE_URL
+from app.core.config import APP_ENV, DATABASE_URL, demo_enabled
 
-if DATABASE_URL.startswith("sqlite") and APP_ENV != "test":
-    raise RuntimeError("SQLite is only supported for tests. Configure PostgreSQL in backend/.env.")
+if DATABASE_URL.startswith("sqlite") and not (APP_ENV == "test" or demo_enabled()):
+    raise RuntimeError("SQLite is only supported for tests and demo mode. Configure PostgreSQL in backend/.env.")
 
 engine = create_engine(
     DATABASE_URL,

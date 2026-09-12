@@ -117,8 +117,13 @@ def latest_answers(db, session_id):
     if db.get(models.InterviewRun, session_id):
         flow, run = adaptive.flow_for(db, session_id)
         active = adaptive.engine_for(db, session_id, flow).active
-        by_id = {row.id: row for row in adaptive.rows(db, session_id)}
-        return [answer_response(by_id[fact.answer_id]) for fact in active.values()]
+        all_rows = adaptive.rows(db, session_id)
+        by_id = {row.id: row for row in all_rows}
+        answers = [answer_response(by_id[fact.answer_id]) for fact in active.values()]
+        for row in all_rows:
+            if row.question_id.startswith("rag_followup") and row.id in by_id:
+                answers.append(answer_response(row))
+        return answers
     rows = db.scalars(
         select(models.InterviewAnswer)
         .where(models.InterviewAnswer.session_id == session_id)

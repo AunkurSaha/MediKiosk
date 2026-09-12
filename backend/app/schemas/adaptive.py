@@ -63,6 +63,18 @@ class Fact(APIModel):
     normalization: Normalization | None = None
 
 
+
+class RAGSuggestion(APIModel):
+    question: str
+    reason: str
+    source_chunk_ids: list[str]
+    origin: str = "rag"
+    candidate_id: str | None = None
+    target_field: str | None = None
+    similarity_score: float | None = None
+    source_title: str | None = None
+    source_section: str | None = None
+
 class HistorySection(APIModel):
     section_id: SectionID
     label: Localized
@@ -102,4 +114,5 @@ class InterviewState(APIModel):
     progress: Progress = Progress(addressed=0, applicable=0, position=0)
     is_complete: bool = False
     history: ClinicalHistory | None = None
+    rag_suggestions: list[RAGSuggestion] = Field(default_factory=list)
     red_flag_alert: AlertSummary | None = None
