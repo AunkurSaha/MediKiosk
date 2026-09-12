@@ -4,12 +4,23 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+
   server: {
     host: '127.0.0.1',
     port: 5175,
     strictPort: true,
-    proxy: { '/api': { target: 'http://127.0.0.1:8010', changeOrigin: true, ws: true } },
+
+    allowedHosts: ['.trycloudflare.com'],
+
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8010',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
   },
+
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],

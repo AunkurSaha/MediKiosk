@@ -386,6 +386,20 @@ def demo_login(
             )
             db.add(user)
             db.flush()
+    elif role == "triage":
+        from app.api.deps import DEMO_TRIAGE_ID
+
+        user = db.get(models.User, DEMO_TRIAGE_ID)
+        if user is None:
+            user = models.User(
+                id=DEMO_TRIAGE_ID,
+                name="Demo Triage Staff",
+                email="triage@tests.invalid",
+                role="triage",
+                is_active=True,
+            )
+            db.add(user)
+            db.flush()
     else:
         demo_phone = "+919999999999"
         user = db.scalar(select(models.User).where(models.User.phone_number == demo_phone))
@@ -429,3 +443,270 @@ def demo_login(
     db.commit()
     db.refresh(user)
     return user, raw_token, auth_session
+
+
+def staff_login(
+    db: Session,
+    identifier: str,
+    password: str,
+    ip_address: str | None = None,
+    user_agent: str | None = None,
+) -> tuple[models.User, str, models.AuthSession]:
+    """Authenticate staff (doctor or triage) using phone number or email with password."""
+    cleaned = identifier.strip()
+    if not cleaned or not password:
+        raise WorkflowError("INVALID_CREDENTIALS", "Please provide both identifier and password.", 401)
+
+    # 1. Attempt phone normalization lookup
+    user: models.User | None = None
+    try:
+        canonical_phone = phone.normalize_phone_number(cleaned)
+        user = db.scalar(select(models.User).where(models.User.phone_number == canonical_phone))
+    except WorkflowError:
+        pass
+
+    # 2. Fallback to direct email or phone match
+    if user is None:
+        user = db.scalar(
+            select(models.User).where(
+                (models.User.email == cleaned) | (models.User.phone_number == cleaned)
+            )
+        )
+
+    # 3. Security checks
+    if user is None or not user.is_active:
+        raise WorkflowError("INVALID_CREDENTIALS", "Invalid staff credentials.", 401)
+
+    if user.role not in ("doctor", "triage"):
+        raise WorkflowError("FORBIDDEN", "Staff and management access only.", 403)
+
+    if not user.hashed_password or not security.verify_password(password, user.hashed_password):
+        raise WorkflowError("INVALID_CREDENTIALS", "Invalid staff credentials.", 401)
+
+    now = datetime.now(timezone.utc)
+    raw_token, token_hash = security.generate_session_token()
+    session_expires_at = now + timedelta(days=7)
+
+    auth_session = models.AuthSession(
+        id=str(uuid.uuid4()),
+        session_token_hash=token_hash,
+        user_id=user.id,
+        role=user.role,
+        created_at=now,
+        expires_at=session_expires_at,
+        is_revoked=False,
+        ip_address=ip_address,
+        user_agent=user_agent,
+    )
+    db.add(auth_session)
+    db.flush()
+
+    masked_id = phone.mask_phone_number(cleaned) if (cleaned.startswith("+") or cleaned.isdigit()) else cleaned
+    log_auth_audit(
+        db,
+        "STAFF_LOGIN",
+        auth_session.id,
+        actor_user_id=user.id,
+        actor_type=user.role,
+        metadata={"role": user.role, "identifier": masked_id},
+    )
+    db.commit()
+    db.refresh(user)
+    return user, raw_token, auth_session
+
+
+def register_staff(
+    db: Session,
+    name: str,
+    role: str,
+    phone_raw: str,
+    email: str | None,
+    password: str,
+    ip_address: str | None = None,
+    user_agent: str | None = None,
+) -> tuple[models.User, str, models.AuthSession]:
+    """Register a new staff member (doctor or triage) and create an active session."""
+    clean_name = name.strip()
+    if not clean_name:
+        raise WorkflowError("INVALID_DATA", "Full name is required.", 422)
+
+    if role not in ("doctor", "triage"):
+        raise WorkflowError("INVALID_ROLE", "Role must be 'doctor' or 'triage'.", 422)
+
+    if not password or len(password) < 6:
+        raise WorkflowError("WEAK_PASSWORD", "Password must be at least 6 characters.", 422)
+
+    canonical_phone = phone.normalize_phone_number(phone_raw)
+
+    existing_phone = db.scalar(select(models.User).where(models.User.phone_number == canonical_phone))
+    if existing_phone:
+        raise WorkflowError("USER_EXISTS", "A user is already registered with this mobile number.", 409)
+
+    clean_email = email.strip().lower() if email and email.strip() else None
+    if clean_email:
+        existing_email = db.scalar(select(models.User).where(models.User.email == clean_email))
+        if existing_email:
+            raise WorkflowError("USER_EXISTS", "A user is already registered with this email address.", 409)
+
+    hashed_pass = security.hash_password(password)
+    user = models.User(
+        id=str(uuid.uuid4()),
+        name=clean_name,
+        role=role,
+        phone_number=canonical_phone,
+        email=clean_email,
+        hashed_password=hashed_pass,
+        phone_verified=True,
+        is_active=True,
+    )
+    db.add(user)
+    db.flush()
+
+    now = datetime.now(timezone.utc)
+    raw_token, token_hash = security.generate_session_token()
+    session_expires_at = now + timedelta(days=7)
+
+    auth_session = models.AuthSession(
+        id=str(uuid.uuid4()),
+        session_token_hash=token_hash,
+        user_id=user.id,
+        role=user.role,
+        created_at=now,
+        expires_at=session_expires_at,
+        is_revoked=False,
+        ip_address=ip_address,
+        user_agent=user_agent,
+    )
+    db.add(auth_session)
+    db.flush()
+
+    masked_phone = phone.mask_phone_number(canonical_phone)
+    log_auth_audit(
+        db,
+        "STAFF_REGISTERED",
+        auth_session.id,
+        actor_user_id=user.id,
+        actor_type=user.role,
+        metadata={"role": user.role, "name": user.name, "phone": masked_phone},
+    )
+    db.commit()
+    db.refresh(user)
+    return user, raw_token, auth_session
+
+
+def request_staff_otp(
+    db: Session,
+    phone_raw: str,
+    ip_address: str | None = None,
+    user_agent: str | None = None,
+) -> dict:
+    """Request an OTP for an existing staff member (doctor or triage)."""
+    canonical_phone = phone.normalize_phone_number(phone_raw)
+    staff_user = db.scalar(select(models.User).where(models.User.phone_number == canonical_phone))
+    if staff_user is None or staff_user.role not in ("doctor", "triage") or not staff_user.is_active:
+        raise WorkflowError("NOT_FOUND", "No staff account found with this mobile number. Please register first or use password login.", 404)
+
+    return request_otp(db, phone_raw, ip_address, user_agent)
+
+
+def verify_staff_otp(
+    db: Session,
+    phone_raw: str,
+    otp_candidate: str,
+    ip_address: str | None = None,
+    user_agent: str | None = None,
+) -> tuple[models.User, str, models.AuthSession]:
+    """Verify an OTP for staff login and create a session with doctor/triage authorization."""
+    canonical_phone = phone.normalize_phone_number(phone_raw)
+    staff_user = db.scalar(select(models.User).where(models.User.phone_number == canonical_phone))
+    if staff_user is None or staff_user.role not in ("doctor", "triage") or not staff_user.is_active:
+        raise WorkflowError("FORBIDDEN", "Staff access only.", 403)
+
+    masked_phone = phone.mask_phone_number(canonical_phone)
+    now = datetime.now(timezone.utc)
+
+    challenge = db.scalar(
+        select(models.OTPChallenge)
+        .where(
+            models.OTPChallenge.phone_number == canonical_phone,
+            models.OTPChallenge.consumed_at.is_(None),
+        )
+        .order_by(desc(models.OTPChallenge.created_at))
+    )
+
+    if challenge is None:
+        log_auth_audit(
+            db,
+            "OTP_VERIFICATION_FAILED",
+            canonical_phone,
+            metadata={"phone": masked_phone, "reason": "no_active_challenge"},
+        )
+        db.commit()
+        raise WorkflowError("INVALID_OTP", "No active OTP challenge found. Please request a new OTP.", 400)
+
+    expires_at = (
+        challenge.expires_at.replace(tzinfo=timezone.utc)
+        if challenge.expires_at.tzinfo is None
+        else challenge.expires_at
+    )
+    if now > expires_at:
+        log_auth_audit(db, "OTP_EXPIRED", challenge.id, metadata={"phone": masked_phone})
+        db.commit()
+        raise WorkflowError("OTP_EXPIRED", "The OTP has expired. Please request a new OTP.", 400)
+
+    if challenge.attempt_count >= challenge.max_attempts:
+        log_auth_audit(
+            db,
+            "OTP_LOCKED",
+            challenge.id,
+            metadata={"phone": masked_phone, "attempt_count": challenge.attempt_count},
+        )
+        db.commit()
+        raise WorkflowError("TOO_MANY_ATTEMPTS", "Maximum verification attempts exceeded. Please request a new OTP.", 400)
+
+    is_valid = security.verify_otp(otp_candidate.strip(), challenge.otp_salt, challenge.otp_hash)
+    if not is_valid:
+        challenge.attempt_count += 1
+        db.commit()
+        remaining = max(0, challenge.max_attempts - challenge.attempt_count)
+        log_auth_audit(
+            db,
+            "OTP_VERIFICATION_FAILED",
+            challenge.id,
+            metadata={"phone": masked_phone, "remaining_attempts": remaining},
+        )
+        db.commit()
+        raise WorkflowError("INVALID_OTP", f"Invalid OTP. {remaining} attempt(s) remaining.", 400)
+
+    challenge.consumed_at = now
+    staff_user.phone_verified = True
+
+    raw_token, token_hash = security.generate_session_token()
+    session_expires_at = now + timedelta(days=7)
+
+    auth_session = models.AuthSession(
+        id=str(uuid.uuid4()),
+        session_token_hash=token_hash,
+        user_id=staff_user.id,
+        role=staff_user.role,
+        created_at=now,
+        expires_at=session_expires_at,
+        is_revoked=False,
+        ip_address=ip_address,
+        user_agent=user_agent,
+    )
+    db.add(auth_session)
+    db.flush()
+
+    log_auth_audit(
+        db,
+        "STAFF_OTP_LOGIN",
+        auth_session.id,
+        actor_user_id=staff_user.id,
+        actor_type=staff_user.role,
+        metadata={"role": staff_user.role, "phone": masked_phone},
+    )
+    db.commit()
+    db.refresh(staff_user)
+    return staff_user, raw_token, auth_session
+

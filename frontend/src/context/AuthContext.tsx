@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { api, setAuthToken } from '../api/client';
-import type { AuthUser, LoginResult, OtpRequestResult } from '../api/client';
+import type { AuthUser, LoginResult, OtpRequestResult, StaffRegisterPayload } from '../api/client';
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -9,7 +9,11 @@ interface AuthContextType {
   error: string | null;
   requestOtp: (phone: string) => Promise<OtpRequestResult>;
   verifyOtp: (phone: string, otp: string) => Promise<LoginResult>;
-  demoLogin: (role?: 'patient' | 'doctor') => Promise<LoginResult>;
+  demoLogin: (role?: 'patient' | 'doctor' | 'triage') => Promise<LoginResult>;
+  staffLogin: (identifier: string, password: string) => Promise<LoginResult>;
+  staffRegister: (payload: StaffRegisterPayload) => Promise<LoginResult>;
+  staffOtpRequest: (phone: string) => Promise<OtpRequestResult>;
+  staffOtpVerify: (phone: string, otp: string) => Promise<LoginResult>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -30,27 +34,7 @@ function getInitialUser(): AuthUser | null {
     }
   }
 
-  // In development / demo environment, provide route-matched default identity unless explicitly logged out
-  const path = window.location.pathname;
-  if (path === '/login' || path.startsWith('/login')) {
-    return null;
-  }
-  if (path.startsWith('/doctor') || path.startsWith('/triage')) {
-    return {
-      id: '00000000-0000-4000-8000-000000000001',
-      name: 'Demo Doctor',
-      role: 'doctor',
-      phone_number: null,
-      phone_verified: false,
-    };
-  }
-  return {
-    id: 'demo-patient-0001',
-    name: 'Demo Patient',
-    role: 'patient',
-    phone_number: '+919999999999',
-    phone_verified: true,
-  };
+  return null;
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -149,9 +133,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return result;
   };
 
-  const demoLogin = async (role: 'patient' | 'doctor' = 'patient'): Promise<LoginResult> => {
+  const demoLogin = async (
+    role: 'patient' | 'doctor' | 'triage' = 'patient',
+  ): Promise<LoginResult> => {
     setError(null);
     const result = await api.demoLogin(role);
+    if (result.success && result.user) {
+      setUser(result.user);
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem('medikiosk.logged_out');
+        sessionStorage.setItem('medikiosk.auth_user', JSON.stringify(result.user));
+      }
+      if (result.token) {
+        setAuthToken(result.token);
+      }
+    }
+    return result;
+  };
+
+  const staffLogin = async (identifier: string, password: string): Promise<LoginResult> => {
+    setError(null);
+    const result = await api.staffLogin(identifier, password);
+    if (result.success && result.user) {
+      setUser(result.user);
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem('medikiosk.logged_out');
+        sessionStorage.setItem('medikiosk.auth_user', JSON.stringify(result.user));
+      }
+      if (result.token) {
+        setAuthToken(result.token);
+      }
+    }
+    return result;
+  };
+
+  const staffRegister = async (payload: StaffRegisterPayload): Promise<LoginResult> => {
+    setError(null);
+    const result = await api.staffRegister(payload);
+    if (result.success && result.user) {
+      setUser(result.user);
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.removeItem('medikiosk.logged_out');
+        sessionStorage.setItem('medikiosk.auth_user', JSON.stringify(result.user));
+      }
+      if (result.token) {
+        setAuthToken(result.token);
+      }
+    }
+    return result;
+  };
+
+  const staffOtpRequest = async (phone: string): Promise<OtpRequestResult> => {
+    setError(null);
+    return await api.staffOtpRequest(phone);
+  };
+
+  const staffOtpVerify = async (phone: string, otp: string): Promise<LoginResult> => {
+    setError(null);
+    const result = await api.staffOtpVerify(phone, otp);
     if (result.success && result.user) {
       setUser(result.user);
       if (typeof sessionStorage !== 'undefined') {
@@ -189,6 +228,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         requestOtp,
         verifyOtp,
         demoLogin,
+        staffLogin,
+        staffRegister,
+        staffOtpRequest,
+        staffOtpVerify,
         logout,
         refreshUser,
       }}

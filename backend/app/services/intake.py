@@ -62,6 +62,11 @@ def verify_session_access(db: Session, session: models.Session, user: models.Use
             )
         return
 
+    if user and user.role == "triage":
+        raise WorkflowError(
+            "FORBIDDEN", "Triage staff does not have direct access to patient intake sessions.", 403
+        )
+
     # Unauthenticated caller
     if session.user_id is not None:
         raise WorkflowError("AUTH_REQUIRED", "Authentication is required to access this session.", 401)

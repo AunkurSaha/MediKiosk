@@ -21,6 +21,7 @@ node_modules/
 dist/
 .vite/
 coverage/
+test-results/
 
 # IDE / OS
 .vscode/

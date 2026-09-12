@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { copy } from '../../i18n';
@@ -185,12 +185,12 @@ export default function Login() {
     }
   };
 
-  const handleDemoLogin = async (role: 'patient' | 'doctor') => {
+  const handleDemoLogin = async (role: 'doctor' | 'triage') => {
     setError(null);
     setBusy(true);
     try {
       await demoLogin(role);
-      navigate(role === 'doctor' ? '/doctor' : redirectTarget, { replace: true });
+      navigate(role === 'doctor' ? '/doctor' : '/triage', { replace: true });
     } catch {
       setError('Demo login failed.');
     } finally {
@@ -450,6 +450,40 @@ export default function Login() {
           </form>
         )}
 
+        {/* Option to switch to management / specialist portal */}
+        <div
+          style={{
+            marginTop: '28px',
+            padding: '16px 20px',
+            borderRadius: '10px',
+            background: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            textAlign: 'center',
+          }}
+        >
+          <p style={{ margin: '0 0 4px', fontWeight: 600, fontSize: '0.92rem', color: '#1e293b' }}>
+            👨‍⚕️ Clinical Specialist & Staff Portal
+          </p>
+          <p style={{ margin: '0 0 12px', fontSize: '0.82rem', color: '#64748b' }}>
+            Physician consultation workspace & emergency triage management.
+          </p>
+          <Link
+            to="/staff/login"
+            className="btn secondary"
+            style={{
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '8px 16px',
+              fontSize: '0.88rem',
+              fontWeight: 600,
+            }}
+          >
+            Staff Password Login →
+          </Link>
+        </div>
+
         {demoMode && (
           <div
             style={{
@@ -466,20 +500,20 @@ export default function Login() {
               <button
                 type="button"
                 className="secondary"
-                onClick={() => handleDemoLogin('patient')}
-                disabled={busy}
-                style={{ fontSize: '0.85rem', padding: '10px 14px', minHeight: '44px' }}
-              >
-                {t.demoPatientLogin}
-              </button>
-              <button
-                type="button"
-                className="secondary"
                 onClick={() => handleDemoLogin('doctor')}
                 disabled={busy}
                 style={{ fontSize: '0.85rem', padding: '10px 14px', minHeight: '44px' }}
               >
                 {t.demoDoctorLogin}
+              </button>
+              <button
+                type="button"
+                className="secondary"
+                onClick={() => handleDemoLogin('triage')}
+                disabled={busy}
+                style={{ fontSize: '0.85rem', padding: '10px 14px', minHeight: '44px' }}
+              >
+                Quick Triage Demo
               </button>
             </div>
           </div>

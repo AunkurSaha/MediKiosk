@@ -340,3 +340,32 @@ Sarvam receives only consented, current-question 16-kHz mono PCM16 WAV input. It
    - WebSocket streaming ASR/TTS is intentionally excluded: the REST ASR endpoint achieves ~0.36s latency, so adding streaming WebSocket proxying would increase session security complexity without meaningful clinical benefit.
 5. **Security & Credentials**:
    - `SARVAM_API_KEY` remains strictly backend-side in `backend/.env`. It is never returned to the frontend or included in public config (`/api/config` only reveals provider name `sarvam`).
+
+---
+
+## ADR-026 — Hardened Strict Role-Based Access Control (RBAC) and Triage Isolation
+
+**Status:** Accepted
+
+**Context:**
+MediKiosk operates in clinical healthcare environments where patients authenticate at physical kiosks via phone number OTP, while clinical review and emergency triage are managed by distinct hospital staff roles. Patient phone OTP authentication must never confer clinician or triage capabilities, and triage responders must not automatically inherit full doctor workspace permissions.
+
+**Decision:**
+1. **Three Dedicated Roles:**
+   - `patient`: Authenticated via phone OTP or patient demo login. Can only access `/kiosk/*` and patient intake sessions where `session.patient_id == user.id`.
+   - `doctor`: Authenticated clinical staff. Has exclusive access to `/doctor/*`, clinical fact verification/rejection, summary generation/confirmation, document verification, timeline discrepancies, FHIR exports, and ABDM operations. Blocked from `/triage`.
+   - `triage`: Authenticated operational triage staff. Has access to `/triage`, emergency red-flag alert queue, acknowledgement/escalation, and live emergency WebSocket. Blocked from `/doctor/*` and direct patient intake.
+2. **Backend Defense-in-Depth:**
+   - Dedicated FastAPI dependencies in `backend/app/api/deps.py`: `require_doctor`, `require_triage`, `require_staff`, `require_patient`.
+   - Unauthenticated requests receive HTTP 401 (`UNAUTHORIZED`).
+   - Unauthorized role attempts receive HTTP 403 (`FORBIDDEN`).
+   - Triage endpoints (`/api/triage/alerts`, `/api/triage/ws-ticket`, `/api/triage/alerts/{id}/acknowledge`) protected with `require_triage`.
+   - Doctor endpoints (`/api/doctor/*`, `/api/fhir/*`, `/api/abdm/*`) protected with `require_doctor`.
+   - Patient intake endpoints enforce `verify_session_access` ensuring patients only access their own sessions and triage staff cannot inspect patient intake.
+3. **WebSocket Security:**
+   - Live triage alerts (`/api/triage/ws`) mandate an ephemeral, cryptographically secured ticket via `/api/triage/ws-ticket`.
+   - Tickets are role-verified in `admit_websocket`: non-staff and patient connections are disconnected immediately with close code 1008 (Policy Violation).
+4. **Frontend Route & Navigation Guards:**
+   - `ProtectedRoute` enforces `allowedRoles`. When unauthorized, it displays a strict "Doctor Access Required" or "Triage Access Required" screen and never renders protected child components or leaks data.
+   - Header navigation dynamically filters visible navigation items based on the active role.
+   - Direct browser URL changes or page reloads maintain complete role enforcement.

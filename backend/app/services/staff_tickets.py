@@ -45,7 +45,7 @@ async def admit_websocket(websocket: WebSocket, db: Session) -> bool:
         await websocket.close(code=1008)
         return False
     user = db.get(models.User, entry[0])
-    if user is None or not user.is_active or user.role != "doctor":
+    if user is None or not user.is_active or user.role not in ("triage", "doctor"):
         await websocket.close(code=1008)
         return False
     db.close()  # Do not hold a transaction/connection for the socket lifetime.

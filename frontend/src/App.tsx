@@ -10,12 +10,13 @@ import {
 import Doctor from './routes/doctor';
 import Kiosk from './routes/kiosk';
 import Login from './routes/login';
+import StaffLogin from './routes/staff-login';
 import Triage from './routes/triage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { copy } from './i18n';
 
-function Shell() {
+export function Shell() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -36,9 +37,15 @@ function Shell() {
           {t.brand}
         </NavLink>
         <nav aria-label={t.brand} style={{ alignItems: 'center' }}>
-          <NavLink to="/kiosk/language">{t.kiosk}</NavLink>
-          <NavLink to="/doctor">{t.doctor}</NavLink>
-          <NavLink to="/triage">{t.triage}</NavLink>
+          {(!user || user.role === 'patient') && (
+            <NavLink to="/kiosk/language">{t.kiosk}</NavLink>
+          )}
+          {user?.role === 'doctor' && (
+            <NavLink to="/doctor">{t.doctor}</NavLink>
+          )}
+          {user?.role === 'triage' && (
+            <NavLink to="/triage">{t.triage}</NavLink>
+          )}
 
           {user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
@@ -52,7 +59,11 @@ function Shell() {
                   borderRadius: '12px',
                 }}
               >
-                {user.role === 'doctor' ? '👨‍⚕️ Clinician' : `👤 ${user.phone_number || 'Patient'}`}
+                {user.role === 'doctor'
+                  ? '👨‍⚕️ Clinician'
+                  : user.role === 'triage'
+                  ? '🚨 Triage Staff'
+                  : `👤 ${user.phone_number || 'Patient'}`}
               </span>
               <button
                 type="button"
@@ -89,10 +100,12 @@ function Shell() {
       <main>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/staff/login" element={<StaffLogin />} />
+          <Route path="/management/login" element={<Navigate to="/staff/login" replace />} />
           <Route
             path="/kiosk/*"
             element={
-              <ProtectedRoute requiredRole="patient">
+              <ProtectedRoute allowedRoles={['patient']}>
                 <Kiosk />
               </ProtectedRoute>
             }
@@ -100,7 +113,7 @@ function Shell() {
           <Route
             path="/doctor"
             element={
-              <ProtectedRoute requiredRole="doctor">
+              <ProtectedRoute allowedRoles={['doctor']}>
                 <Doctor key={location.pathname} />
               </ProtectedRoute>
             }
@@ -108,7 +121,7 @@ function Shell() {
           <Route
             path="/doctor/sessions/:sessionId"
             element={
-              <ProtectedRoute requiredRole="doctor">
+              <ProtectedRoute allowedRoles={['doctor']}>
                 <Doctor key={location.pathname} />
               </ProtectedRoute>
             }
@@ -116,7 +129,7 @@ function Shell() {
           <Route
             path="/triage"
             element={
-              <ProtectedRoute requiredRole="doctor">
+              <ProtectedRoute allowedRoles={['triage']}>
                 <Triage />
               </ProtectedRoute>
             }

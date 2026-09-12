@@ -62,12 +62,28 @@ def database(pg_engine):
     with engine.connect() as connection:
         transaction = connection.begin()
         with Session(bind=connection, join_transaction_mode="create_savepoint") as db:
+            from app.api.deps import DEMO_TRIAGE_ID
+            from app.core import security
+
             db.add(
                 models.User(
                     id=DEMO_DOCTOR_ID,
                     name="Synthetic Doctor",
                     email="doctor@tests.invalid",
+                    phone_number="+919876500001",
+                    hashed_password=security.hash_password("Doctor@123"),
                     role="doctor",
+                    is_active=True,
+                )
+            )
+            db.add(
+                models.User(
+                    id=DEMO_TRIAGE_ID,
+                    name="Synthetic Triage Staff",
+                    email="triage@tests.invalid",
+                    phone_number="+919876500002",
+                    hashed_password=security.hash_password("Triage@123"),
+                    role="triage",
                     is_active=True,
                 )
             )

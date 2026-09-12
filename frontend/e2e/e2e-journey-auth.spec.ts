@@ -60,26 +60,14 @@ test.describe('MediKiosk Authenticated End-to-End User Journey', () => {
     await page.getByRole('button', { name: 'Sign in as Demo Doctor' }).click();
     expect((await doctorLogin).ok()).toBeTruthy();
     await expect(page).toHaveURL(/\/doctor/);
-    await page.goto('/kiosk/language');
 
-    // Step 8: Load showcase patient (bilingual Bengali/English cardiac case)
-    const showcaseBtn = page.getByTestId('kiosk-load-showcase-btn');
-    await expect(showcaseBtn).toBeVisible();
-    await showcaseBtn.click();
-
-    // Step 9: Intake completes and navigates to complete screen
-    await expect(page).toHaveURL(/\/kiosk\/complete$/);
-    await expect(page.getByRole('heading', { name: 'চিকিৎসকের পর্যালোচনার জন্য প্রস্তুত' })).toBeVisible();
-    await expect(page.getByText('T-SHOWCASE-101')).toBeVisible();
-
-    // Screenshot: Completed intake
-    await page.screenshot({
-      path: '../.runtime/screenshots/journey-02-intake-completed.png',
-      fullPage: true,
-    });
+    // Step 8: Seed showcase patient (bilingual Bengali/English cardiac case)
+    const seedBtn = page.getByTestId('seed-showcase-btn');
+    await expect(seedBtn).toBeVisible();
+    await seedBtn.click();
+    await expect(page.getByText(/Showcase patient.*seeded successfully/)).toBeVisible();
 
     // Step 9: Doctor Review Workspace
-    await page.goto('/doctor');
     const patientRow = page.locator('.session-card').filter({ hasText: 'সুমিতা শর্মা' });
     await expect(patientRow).toBeVisible();
     await patientRow.click();

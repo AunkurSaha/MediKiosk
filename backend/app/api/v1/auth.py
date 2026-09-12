@@ -142,6 +142,117 @@ def demo_login_endpoint(
     )
 
 
+@router.post("/staff-login", response_model=schemas.LoginResponse)
+def staff_login_endpoint(
+    req: schemas.StaffLoginRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    ip = request.client.host if request.client else None
+    ua = request.headers.get("User-Agent")
+    user, raw_token, _ = auth_service.staff_login(
+        db,
+        identifier=req.identifier,
+        password=req.password,
+        ip_address=ip,
+        user_agent=ua,
+    )
+    _set_session_cookie(response, raw_token)
+    return schemas.LoginResponse(
+        success=True,
+        user=schemas.AuthUserResponse(
+            id=user.id,
+            name=user.name,
+            role=user.role,
+            phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
+            phone_verified=user.phone_verified,
+        ),
+        token=raw_token,
+    )
+
+
+@router.post("/staff-register", response_model=schemas.LoginResponse)
+def staff_register_endpoint(
+    req: schemas.StaffRegisterRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    ip = request.client.host if request.client else None
+    ua = request.headers.get("User-Agent")
+    user, raw_token, _ = auth_service.register_staff(
+        db,
+        name=req.name,
+        role=req.role,
+        phone_raw=req.phone_number,
+        email=req.email,
+        password=req.password,
+        ip_address=ip,
+        user_agent=ua,
+    )
+    _set_session_cookie(response, raw_token)
+    return schemas.LoginResponse(
+        success=True,
+        user=schemas.AuthUserResponse(
+            id=user.id,
+            name=user.name,
+            role=user.role,
+            phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
+            phone_verified=user.phone_verified,
+        ),
+        token=raw_token,
+    )
+
+
+@router.post("/staff-otp/request", response_model=schemas.OtpRequestResponse)
+def staff_otp_request_endpoint(
+    req: schemas.OtpRequest,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    ip = request.client.host if request.client else None
+    ua = request.headers.get("User-Agent")
+    res = auth_service.request_staff_otp(
+        db,
+        phone_raw=req.phone_number,
+        ip_address=ip,
+        user_agent=ua,
+    )
+    return schemas.OtpRequestResponse(**res)
+
+
+@router.post("/staff-otp/verify", response_model=schemas.LoginResponse)
+def staff_otp_verify_endpoint(
+    req: schemas.OtpVerifyRequest,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+):
+    ip = request.client.host if request.client else None
+    ua = request.headers.get("User-Agent")
+    user, raw_token, _ = auth_service.verify_staff_otp(
+        db,
+        phone_raw=req.phone_number,
+        otp_candidate=req.otp,
+        ip_address=ip,
+        user_agent=ua,
+    )
+    _set_session_cookie(response, raw_token)
+    return schemas.LoginResponse(
+        success=True,
+        user=schemas.AuthUserResponse(
+            id=user.id,
+            name=user.name,
+            role=user.role,
+            phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
+            phone_verified=user.phone_verified,
+        ),
+        token=raw_token,
+    )
+
+
+
 @router.get("/dev/last-otp")
 def get_dev_last_otp(phone_number: str):
     """Test-only sink to retrieve OTP in development/test mode without live SMS.

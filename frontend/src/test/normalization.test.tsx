@@ -89,6 +89,17 @@ function detail(normalization: Normalization | null, confirmed = false): Detail 
 }
 beforeEach(() => {
   vi.restoreAllMocks();
+  sessionStorage.clear();
+  sessionStorage.setItem(
+    'medikiosk.auth_user',
+    JSON.stringify({
+      id: '00000000-0000-4000-8000-000000000001',
+      name: 'Demo Doctor',
+      role: 'doctor',
+      phone_number: null,
+      phone_verified: false,
+    }),
+  );
   window.history.replaceState({}, '', '/doctor/sessions/session');
   vi.spyOn(api, 'medicalFacts').mockResolvedValue({
     medications: [],

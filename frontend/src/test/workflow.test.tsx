@@ -51,6 +51,16 @@ function open(path: string) {
 beforeEach(() => {
   vi.resetAllMocks();
   sessionStorage.clear();
+  sessionStorage.setItem(
+    'medikiosk.auth_user',
+    JSON.stringify({
+      id: 'demo-patient-0001',
+      name: 'Demo Patient',
+      role: 'patient',
+      phone_number: '+919999999999',
+      phone_verified: true,
+    }),
+  );
   vi.spyOn(window, 'confirm').mockReturnValue(true);
   vi.mocked(api.session).mockResolvedValue(detail());
   vi.mocked(api.interview).mockImplementation(async () => {
@@ -180,6 +190,19 @@ describe('Patient intake', () => {
 });
 
 describe('Doctor review', () => {
+  beforeEach(() => {
+    sessionStorage.setItem(
+      'medikiosk.auth_user',
+      JSON.stringify({
+        id: '00000000-0000-4000-8000-000000000001',
+        name: 'Demo Doctor',
+        role: 'doctor',
+        phone_number: null,
+        phone_verified: false,
+      }),
+    );
+  });
+
   function reviewDetail(): Detail {
     return {
       ...detail(),

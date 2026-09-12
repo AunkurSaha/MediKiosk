@@ -509,6 +509,14 @@ export interface LogoutResult {
   message: string;
 }
 
+export interface StaffRegisterPayload {
+  name: string;
+  role: 'doctor' | 'triage';
+  phone_number: string;
+  email?: string;
+  password: string;
+}
+
 let activeAuthToken: string | null = null;
 
 export function setAuthToken(token: string | null) {
@@ -881,6 +889,14 @@ export const api = {
   logout: () => request<LogoutResult>('/auth/logout', 'POST'),
   getMe: () => request<AuthUser>('/auth/me'),
   demoLogin: (role = 'patient') => request<LoginResult>('/auth/demo-login', 'POST', { role }),
+  staffLogin: (identifier: string, password: string) =>
+    request<LoginResult>('/auth/staff-login', 'POST', { identifier, password }),
+  staffRegister: (payload: StaffRegisterPayload) =>
+    request<LoginResult>('/auth/staff-register', 'POST', payload),
+  staffOtpRequest: (phone: string) =>
+    request<OtpRequestResult>('/auth/staff-otp/request', 'POST', { phone_number: phone }),
+  staffOtpVerify: (phone: string, otp: string) =>
+    request<LoginResult>('/auth/staff-otp/verify', 'POST', { phone_number: phone, otp }),
   getDevLastOtp: (phone: string) =>
     request<{ phone_number: string; otp: string }>(
       `/auth/dev/last-otp?phone_number=${encodeURIComponent(phone)}`,

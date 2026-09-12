@@ -5,7 +5,7 @@ from sqlalchemy import case, select
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.api.deps import get_current_user
+from app.api.deps import require_triage
 from app.database import get_db
 from app.services import intake, triage_notifier
 from app.services.staff_tickets import admit_websocket, issue_ticket
@@ -49,7 +49,7 @@ def list_alerts(
     status: Literal["new", "acknowledged", "resolved"] | None = Query(default=None),
     priority: Literal["emergency", "urgent", "priority"] | None = Query(default=None),
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_triage),
 ):
     query = (
         select(models.Alert, models.Session.hospital_token, models.Patient.name)
@@ -96,7 +96,7 @@ async def acknowledge_alert(
     alert_id: str,
     payload: schemas.AlertAcknowledgeRequest,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_triage),
 ):
     alert_row = db.execute(
         select(models.Alert, models.Session.hospital_token, models.Patient.name)
@@ -156,7 +156,7 @@ session_router = APIRouter()
 def get_session_alerts_endpoint(
     session_id: str,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_triage),
 ):
     return get_session_alerts(session_id, db, user)
 
@@ -165,7 +165,7 @@ def get_session_alerts_endpoint(
 def get_session_alerts(
     session_id: str,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_triage),
 ):
     rows = db.execute(
         select(models.Alert, models.Session.hospital_token, models.Patient.name)
@@ -183,7 +183,7 @@ def get_session_alerts(
 
 
 @router.post("/ws-ticket")
-def websocket_ticket(user: models.User = Depends(get_current_user)):
+def websocket_ticket(user: models.User = Depends(require_triage)):
     return {"ticket": issue_ticket(user.id)}
 
 

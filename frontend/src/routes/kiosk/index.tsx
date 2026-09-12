@@ -94,25 +94,6 @@ export default function Kiosk() {
     }
   }
 
-  async function loadShowcase() {
-    await action(async () => {
-      const res = await api.seedShowcase();
-      sessionStorage.setItem(sessionKey, res.session_id);
-      pendingId.current = res.session_id;
-      setResumeId(res.session_id);
-      setLanguage('bn');
-      setName(res.patient_name);
-      setToken(res.hospital_token);
-      setAbha('patient@abdm');
-      setAbhaVerified(true);
-      const detail = await api.session(res.session_id);
-      setRecord(detail);
-      setAgreed(Boolean(detail.consent?.share_with_doctor));
-      setVoiceAgreed(Boolean(detail.consent?.voice_processing));
-      setDocAgreed(Boolean(detail.consent?.document_processing));
-      navigate('/kiosk/complete', { replace: true });
-    });
-  }
 
   async function action(work: () => Promise<void>) {
     setBusy(true);
@@ -208,20 +189,7 @@ export default function Kiosk() {
 
   return (
     <div lang={language} className="kiosk">
-      <div className="flex items-center justify-between pb-3 mb-2 border-b border-slate-200">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            data-testid="kiosk-load-showcase-btn"
-            onClick={() => void loadShowcase()}
-            disabled={busy}
-            className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 font-semibold px-3 py-1 rounded shadow-sm transition-colors flex items-center gap-1"
-            title="Pre-populate canonical Bengali showcase patient"
-          >
-            <span>🌟</span>
-            <span>Showcase: সুমিতা শর্মা (BN)</span>
-          </button>
-        </div>
+      <div className="flex items-center justify-end pb-3 mb-2 border-b border-slate-200">
         <div className="flex items-center gap-2">
           <button
             type="button"

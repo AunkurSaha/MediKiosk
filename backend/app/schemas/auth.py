@@ -44,4 +44,21 @@ class LogoutResponse(APIModel):
 
 
 class DemoLoginRequest(APIModel):
-    role: str = Field(default="patient", description="Role to log in as ('patient' or 'doctor').")
+    role: str = Field(default="patient", description="Role to log in as ('patient', 'doctor', or 'triage').")
+
+
+class StaffLoginRequest(APIModel):
+    identifier: str = Field(
+        ...,
+        description="Mobile phone number (+91XXXXXXXXXX or 10 digits) or staff email/ID.",
+    )
+    password: str = Field(..., min_length=1, description="Staff account password.")
+
+
+class StaffRegisterRequest(APIModel):
+    name: str = Field(..., min_length=2, max_length=100, description="Full name of staff member.")
+    role: str = Field(..., description="Role ('doctor' or 'triage').")
+    phone_number: str = Field(..., description="Mobile phone number in Indian format (+91XXXXXXXXXX or 10 digits).")
+    email: str | None = Field(default=None, description="Optional official staff email.")
+    password: str = Field(..., min_length=6, description="Staff account password (minimum 6 characters).")
+

@@ -37,7 +37,7 @@ describe('Phase 12 Demo Polish & Showcase Seeding Components', () => {
   });
 
   describe('Kiosk Demo Polish', () => {
-    it('renders fullscreen and showcase loader buttons', () => {
+    it('renders fullscreen button and does not expose showcase loader on patient kiosk', () => {
       render(
         <MemoryRouter initialEntries={['/kiosk/language']}>
           <Routes>
@@ -47,69 +47,9 @@ describe('Phase 12 Demo Polish & Showcase Seeding Components', () => {
       );
 
       const fullscreenBtn = screen.getByTestId('kiosk-fullscreen-btn');
-      const showcaseBtn = screen.getByTestId('kiosk-load-showcase-btn');
-
       expect(fullscreenBtn).toBeInTheDocument();
       expect(fullscreenBtn).toHaveTextContent('Fullscreen');
-      expect(showcaseBtn).toBeInTheDocument();
-      expect(showcaseBtn).toHaveTextContent('Showcase: সুমিতা শর্মা');
-    });
-
-    it('triggers seedShowcase when clicking showcase loader button', async () => {
-      const mockShowcaseRes = {
-        session_id: 'session-showcase-101',
-        patient_name: 'Sunita Sharma (সুমিতা শর্মা)',
-        hospital_token: 'T-SHOWCASE-101',
-        language: 'bn',
-        status: 'ready_for_review',
-        summary_id: 'sum-101',
-        message: 'Showcase patient seeded successfully.',
-      };
-
-      const mockDetail: Detail = {
-        session: {
-          id: 'session-showcase-101',
-          patient_id: 'patient-showcase-101',
-          hospital_token: 'T-SHOWCASE-101',
-          language: 'bn',
-          status: 'ready_for_review',
-          created_at: new Date().toISOString(),
-          completed_at: new Date().toISOString(),
-        },
-        patient: {
-          id: 'patient-showcase-101',
-          name: 'Sunita Sharma (সুমিতা শর্মা)',
-          demo_abha_id: 'patient@abdm',
-        },
-        consent: {
-          share_with_doctor: true,
-          voice_processing: true,
-          document_processing: true,
-        },
-        answers: [],
-        alerts: [],
-        documents: [],
-        summary: null,
-      };
-
-      vi.spyOn(api, 'seedShowcase').mockResolvedValueOnce(mockShowcaseRes);
-      vi.spyOn(api, 'session').mockResolvedValueOnce(mockDetail);
-
-      render(
-        <MemoryRouter initialEntries={['/kiosk/language']}>
-          <Routes>
-            <Route path="/kiosk/*" element={<Kiosk />} />
-          </Routes>
-        </MemoryRouter>,
-      );
-
-      const showcaseBtn = screen.getByTestId('kiosk-load-showcase-btn');
-      fireEvent.click(showcaseBtn);
-
-      await waitFor(() => {
-        expect(api.seedShowcase).toHaveBeenCalledTimes(1);
-        expect(api.session).toHaveBeenCalledWith('session-showcase-101');
-      });
+      expect(screen.queryByTestId('kiosk-load-showcase-btn')).not.toBeInTheDocument();
     });
 
     it('toggles fullscreen button label and follows fullscreenchange', async () => {

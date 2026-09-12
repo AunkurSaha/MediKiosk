@@ -26,6 +26,8 @@ from .auth import (
     OtpRequest,
     OtpRequestResponse,
     OtpVerifyRequest,
+    StaffLoginRequest,
+    StaffRegisterRequest,
 )
 from .clinical_summary import (
     ClinicalSummary,
@@ -97,6 +99,7 @@ __all__ = [
     "OtpRequest",
     "OtpRequestResponse",
     "OtpVerifyRequest",
+    "StaffLoginRequest",
     "ClinicalSummary",
     "ClinicalSummaryUpdate",
     "EvidenceReference",

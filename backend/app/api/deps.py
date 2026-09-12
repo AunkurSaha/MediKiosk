@@ -7,6 +7,7 @@ from app.core.errors import WorkflowError
 from app.database import get_db
 
 DEMO_DOCTOR_ID = "00000000-0000-4000-8000-000000000001"
+DEMO_TRIAGE_ID = "00000000-0000-4000-8000-000000000002"
 SESSION_COOKIE_NAME = "medikiosk_session"
 
 
@@ -25,8 +26,9 @@ def get_optional_auth_user(
     request: Request,
     db: Session = Depends(get_db),
     x_demo_doctor: str | None = Header(default=None),
+    x_demo_triage: str | None = Header(default=None),
 ) -> models.User | None:
-    """Resolve current user if session exists or if demo doctor header is provided."""
+    """Resolve current user if session exists or if demo staff header is provided."""
     from app.services import auth_service
 
     token = extract_token(request)
@@ -36,11 +38,16 @@ def get_optional_auth_user(
             user, _ = res
             return user
 
-    # Fallback to demo doctor header when demo mode is enabled
-    if demo_enabled() and x_demo_doctor == "true":
-        user = db.get(models.User, DEMO_DOCTOR_ID)
-        if user and user.is_active:
-            return user
+    # Fallback to demo doctor/triage headers when demo mode is enabled
+    if demo_enabled():
+        if x_demo_doctor == "true":
+            user = db.get(models.User, DEMO_DOCTOR_ID)
+            if user and user.is_active:
+                return user
+        if x_demo_triage == "true":
+            user = db.get(models.User, DEMO_TRIAGE_ID)
+            if user and user.is_active:
+                return user
 
     return None
 
@@ -49,35 +56,74 @@ def get_current_auth_user(
     request: Request,
     db: Session = Depends(get_db),
     x_demo_doctor: str | None = Header(default=None),
+    x_demo_triage: str | None = Header(default=None),
 ) -> models.User:
-    """Require an authenticated user (patient or doctor)."""
-    user = get_optional_auth_user(request, db, x_demo_doctor)
+    """Require an authenticated user of any role."""
+    user = get_optional_auth_user(request, db, x_demo_doctor, x_demo_triage)
     if user is None:
         raise WorkflowError("AUTH_REQUIRED", "Authentication is required.", 401)
     return user
 
 
-def get_current_user(
+def require_doctor(
     request: Request,
     db: Session = Depends(get_db),
     x_demo_doctor: str | None = Header(default=None),
 ) -> models.User:
-    """Existing staff/doctor dependency.
-
-    Accepts:
-    1. Authenticated session with role="doctor"
-    2. Demo doctor mode with X-Demo-Doctor: true when demo_enabled()
-    """
-    user = get_optional_auth_user(request, db, x_demo_doctor)
+    """Require an authenticated user with role='doctor'."""
+    user = get_optional_auth_user(request, db, x_demo_doctor=x_demo_doctor)
     if user is None:
         raise WorkflowError("AUTH_REQUIRED", "A configured doctor identity is required.", 401)
     if user.role != "doctor":
         raise WorkflowError("FORBIDDEN", "Doctor access is required.", 403)
+    if not user.is_active:
+        raise WorkflowError("FORBIDDEN", "Account is inactive.", 403)
+    return user
+
+
+# Backward compatibility alias
+get_current_user = require_doctor
+
+
+def require_triage(
+    request: Request,
+    db: Session = Depends(get_db),
+    x_demo_doctor: str | None = Header(default=None),
+    x_demo_triage: str | None = Header(default=None),
+) -> models.User:
+    """Require an authenticated staff member with triage or doctor permission."""
+    user = get_optional_auth_user(request, db, x_demo_doctor=x_demo_doctor, x_demo_triage=x_demo_triage)
+    if user is None:
+        raise WorkflowError("AUTH_REQUIRED", "Triage staff identity is required.", 401)
+    if user.role not in ("triage", "doctor"):
+        raise WorkflowError("FORBIDDEN", "Triage staff access is required.", 403)
+    if not user.is_active:
+        raise WorkflowError("FORBIDDEN", "Account is inactive.", 403)
+    return user
+
+
+def require_staff(
+    request: Request,
+    db: Session = Depends(get_db),
+    x_demo_doctor: str | None = Header(default=None),
+    x_demo_triage: str | None = Header(default=None),
+) -> models.User:
+    """Require an authenticated staff member (doctor, triage, or admin)."""
+    user = get_optional_auth_user(request, db, x_demo_doctor=x_demo_doctor, x_demo_triage=x_demo_triage)
+    if user is None:
+        raise WorkflowError("AUTH_REQUIRED", "Staff identity is required.", 401)
+    if user.role not in ("doctor", "triage", "admin"):
+        raise WorkflowError("FORBIDDEN", "Staff access is required.", 403)
+    if not user.is_active:
+        raise WorkflowError("FORBIDDEN", "Account is inactive.", 403)
     return user
 
 
 def require_patient(user: models.User = Depends(get_current_auth_user)) -> models.User:
-    """Require authenticated user account."""
+    """Require an authenticated patient account."""
+    if user.role != "patient":
+        raise WorkflowError("FORBIDDEN", "Patient access is required.", 403)
     if not user.is_active:
         raise WorkflowError("FORBIDDEN", "Account is inactive.", 403)
     return user
+
