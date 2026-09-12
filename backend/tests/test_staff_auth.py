@@ -1,9 +1,8 @@
-import pytest
 from starlette.testclient import TestClient
 
+from app import models
 from app.api.deps import DEMO_DOCTOR_ID, DEMO_TRIAGE_ID
 from app.core import security
-from app import models
 
 
 def test_doctor_login_with_10_digit_phone_and_password(client: TestClient):

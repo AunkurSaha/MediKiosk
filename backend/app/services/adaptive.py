@@ -83,9 +83,16 @@ def state(db, session_id, user=None):
                 if f.namespace != "legacy"
             ],
         )
-    res = engine_for(db, session_id, flow).state(
+    engine = engine_for(db, session_id, flow)
+    res = engine.state(
         run.cursor if run else None, run.revision if run else 0
     )
+    from app.services.rag_interview_planner import coverage_domains
+
+    covered, missing_required_domains, missing_optional_domains = coverage_domains(engine)
+    res.covered_domains = covered
+    res.missing_required_domains = missing_required_domains
+    res.missing_optional_domains = missing_optional_domains
     alerts = red_flags.get_session_alerts(db, session_id)
     active_alerts = [a for a in alerts if a.status in ("new", "acknowledged")]
     if active_alerts:
@@ -136,18 +143,40 @@ def state(db, session_id, user=None):
                 target_sec = res.history.sections[0]
             target_sec.facts.extend(rag_facts)
 
-    # If the deterministic state says we are complete and there's no red flag and no missing required,
-    # evaluate grounded RAG follow-up candidates
-    if res.is_complete and res.red_flag_alert is None and len(res.missing_required) == 0:
+    # RAG plans the next approved coverage field after chief-complaint acquisition.
+    # The deterministic question already in ``res`` is the fail-safe fallback.
+    if (
+        not res.is_complete
+        and res.question is not None
+        and res.current_answer is None
+        and res.question.question_id in engine.pending
+    ):
         try:
-            from app.services.rag_integration import select_next_rag_question
-            rag_result = select_next_rag_question(str(session_id), db, flow, res)
+            from app.services.rag_integration import get_known_clinical_context
+            from app.services.rag_interview_planner import plan_next_question
+
+            rag_result = plan_next_question(
+                str(session_id),
+                res.revision,
+                session.language,
+                db,
+                flow,
+                engine,
+                get_known_clinical_context(db, str(session_id)),
+            )
             if rag_result is not None:
                 rag_question, rag_suggestion = rag_result
                 new_res = res.model_copy()
-                new_res.is_complete = False
                 new_res.question = rag_question
                 new_res.rag_suggestions = [rag_suggestion]
+                applicable_ids = [q.question_id for _, q in engine.applicable]
+                selected_index = applicable_ids.index(rag_question.question_id)
+                new_res.previous_question_id = (
+                    applicable_ids[selected_index - 1] if selected_index > 0 else None
+                )
+                new_res.progress = new_res.progress.model_copy(
+                    update={"position": selected_index + 1}
+                )
                 return new_res
         except Exception:
             pass
@@ -239,19 +268,10 @@ def submit(db, session_id, payload, user=None):
         return state(db, session_id, user=user)
     check_revision(run, payload.expected_revision)
     engine = engine_for(db, session_id, flow)
-    current_state = engine.state(
-        run.cursor if run else None, run.revision if run else 0
-    )
-    current = current_state.question
-    if current is None:
-        # Fallback to engine's state question if state.question is None (should not happen)
-        current = engine.state(run.cursor).question
+    active_state = state(db, session_id, user=user)
+    current = active_state.question
     if current is None or current.question_id != payload.question_id:
-        active_state = state(db, session_id, user=user)
-        if active_state.question and active_state.question.question_id == payload.question_id:
-            current = active_state.question
-        else:
-            raise WorkflowError("QUESTION_NOT_CURRENT", "Reload the current interview question.", 409)
+        raise WorkflowError("QUESTION_NOT_CURRENT", "Reload the current interview question.", 409)
     if payload.language != session.language:
         raise WorkflowError("INVALID_ANSWER", "Answer language must match the session.", 422)
     candidate = None
@@ -290,7 +310,9 @@ def submit(db, session_id, payload, user=None):
             metadata={
                 "field": current.field,
                 "flow_version": flow.version,
-                "origin": "rag" if current.question_id.startswith("rag_followup") else "flow",
+                "origin": "rag"
+                if current.origin == "rag" or current.question_id.startswith("rag_followup")
+                else "flow",
             },
         )
         db.flush()
@@ -335,8 +357,10 @@ def submit(db, session_id, payload, user=None):
     red_flags.evaluate_and_persist(db, session_id, flow.flow_id, all_facts)
     db.commit()
     from app.services.rag_integration import clear_rag_question_cache
+    from app.services.rag_interview_planner import clear_plan_cache
 
     clear_rag_question_cache(session_id)
+    clear_plan_cache(session_id)
     return state(db, session_id, user=user)
 
 

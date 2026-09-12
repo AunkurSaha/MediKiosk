@@ -161,9 +161,9 @@ async def synthesize_question(
     question_id: str,
     user: models.User | None = None,
 ) -> SpeechSynthesisResult:
-    """Synthesize audio for the exact localized question text from the session's pinned flow snapshot.
+    """Synthesize audio for the exact localized text of the active server question.
 
-    Privacy Invariant: Strictly synthesizes pinned static question text. Never sends patient answers or history to TTS.
+    Privacy invariant: only the active question text is sent to TTS, never patient answers/history.
     """
     session = db.get(models.Session, session_id)
     if not session:
@@ -180,26 +180,28 @@ async def synthesize_question(
             "FLOW_SELECTION_REQUIRED", "Interview flow has not been selected yet.", 409
         )
 
+    from app.services import adaptive
+
     target_q = None
-    for section in run.flow_snapshot.get("sections", []):
-        for q in section.get("questions", []):
-            if q.get("question_id") == question_id:
-                target_q = q
+    current_state = adaptive.state(db, session_id, user=user)
+    if current_state.question and current_state.question.question_id == question_id:
+        target_q = current_state.question.model_dump()
+
+    if target_q is None:
+        for section in run.flow_snapshot.get("sections", []):
+            for q in section.get("questions", []):
+                if q.get("question_id") == question_id:
+                    target_q = q
+                    break
+            if target_q:
                 break
-        if target_q:
-            break
 
     if not target_q and question_id.startswith("rag_followup"):
-        from app.services import adaptive
         from app.services.rag_integration import get_cached_rag_question
 
-        curr_state = adaptive.state(db, session_id, user=user)
-        if curr_state.question and curr_state.question.question_id == question_id:
-            target_q = curr_state.question.model_dump()
-        else:
-            cached_q = get_cached_rag_question(session_id, question_id, session.language)
-            if cached_q:
-                target_q = cached_q.model_dump()
+        cached_q = get_cached_rag_question(session_id, question_id, session.language)
+        if cached_q:
+            target_q = cached_q.model_dump()
 
     if not target_q:
         raise WorkflowError(

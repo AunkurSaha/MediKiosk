@@ -6,7 +6,9 @@ from uuid import uuid4
 import pytest
 
 from app.schemas.translation import TranslationResponse
+from app.services.rag import KnowledgeRetrievalService
 from app.services.rag_integration import clear_rag_question_cache
+from app.services.rag_interview_planner import clear_plan_cache
 from app.services.rag_localization import (
     clear_translation_cache,
     localize_rag_question,
@@ -19,9 +21,11 @@ from tests.test_workflow import consent, create
 def _clean_caches():
     clear_translation_cache()
     clear_rag_question_cache()
+    clear_plan_cache()
     yield
     clear_translation_cache()
     clear_rag_question_cache()
+    clear_plan_cache()
 
 
 def test_english_rag_bypasses_translation():
@@ -121,35 +125,25 @@ def test_translation_cache_prevents_duplicate_calls():
     assert meta1 == meta2
 
 
-def _setup_full_chest_pain_interview(client, monkeypatch, language="en"):
-    """Helper to register session, consent, chest pain flow and answer all deterministic questions with matching language."""
-    from app.services import rag_integration
+def _setup_full_chest_pain_interview(client, monkeypatch, language="en", grounded=True):
+    """Reach the first short-text RAG-planned field with matching language."""
+    from types import SimpleNamespace
 
-    def mock_get_rag_suggestions(session_id, db_session_factory=None, top_k=6, min_similarity=0.1):
-        return [
-            {
-                "candidate_id": "dyspnea",
-                "question": "Are you experiencing any shortness of breath or difficulty breathing?",
-                "reason": "Shortness of breath is an important associated symptom in chest pain.",
-                "source_chunk_ids": ["chest_pain-associated_symptoms-001"],
-                "origin": "rag",
-                "target_field": "hpi.associated_details",
-                "concept": "DYSPNEA",
-                "similarity_score": 0.79,
-            },
-            {
-                "candidate_id": "sweating",
-                "question": "Have you experienced heavy sweating or cold sweats along with the chest pain?",
-                "reason": "Sweating is an important autonomic sign in acute chest pain assessment.",
-                "source_chunk_ids": ["chest_pain-associated_symptoms-001"],
-                "origin": "rag",
-                "target_field": "hpi.associated_details",
-                "concept": "SWEATING",
-                "similarity_score": 0.75,
-            },
-        ]
+    async def mock_retrieve(self, **kwargs):
+        if not grounded:
+            raise RuntimeError("synthetic retrieval outage")
+        chunk = SimpleNamespace(
+            id="chest_pain-history_taking-001",
+            source_title="History Taking",
+            section="history_taking",
+            content=(
+                "Assess chest-pain onset, site, character, radiation, associated symptoms, "
+                "timing, aggravating and relieving factors, and severity."
+            ),
+        )
+        return [(chunk, 0.91)]
 
-    monkeypatch.setattr(rag_integration, "get_rag_suggestions", mock_get_rag_suggestions)
+    monkeypatch.setattr(KnowledgeRetrievalService, "retrieve", mock_retrieve)
 
     session_id, _ = create(client, language)
     consent(client, session_id)
@@ -184,7 +178,9 @@ def _setup_full_chest_pain_interview(client, monkeypatch, language="en"):
         if not state.get("question"):
             break
         qid = state["question"]["question_id"]
-        if qid.startswith("rag_followup"):
+        if not grounded and qid != "chief_complaint.description":
+            break
+        if state["question"].get("origin") == "rag" and state["question"]["type"] == "short_text":
             break
 
         val, stat = qa_map.get(
@@ -213,10 +209,11 @@ def test_bengali_rag_question_presentation_and_tts(client, monkeypatch):
     """Bengali session displays translated question text and synthesizes Bengali speech."""
     session_id, st = _setup_full_chest_pain_interview(client, monkeypatch, language="bn")
 
-    # We should now be at the first RAG follow-up question
+    # We should now be at a RAG-planned canonical coverage question.
     q = st.get("question")
     assert q is not None
-    assert q["question_id"].startswith("rag_followup.")
+    assert q["question_id"] == "hpi.site"
+    assert q["origin"] == "rag"
     assert q["type"] == "short_text"
 
     # In Bengali session, bn text must be non-empty and present
@@ -228,7 +225,7 @@ def test_bengali_rag_question_presentation_and_tts(client, monkeypatch):
     sug = st["rag_suggestions"][0]
     assert sug["display_language"] == "bn"
     assert sug["translated_question"] == q["text"]["bn"]
-    assert sug["candidate_id"] in ("dyspnea", "sweating", "nausea", "dizziness")
+    assert sug["candidate_id"] == "pain_site"
 
     # Speech synthesis check: TTS synthesizes the exact Bengali text
     tts_resp = client.post(
@@ -249,7 +246,8 @@ def test_hindi_rag_question_presentation_and_tts(client, monkeypatch):
 
     q = st.get("question")
     assert q is not None
-    assert q["question_id"].startswith("rag_followup.")
+    assert q["question_id"] == "hpi.site"
+    assert q["origin"] == "rag"
 
     # In Hindi session, hi text must be non-empty and present
     assert q["text"]["hi"] != ""
@@ -276,7 +274,8 @@ def test_english_rag_question_presentation_and_tts(client, monkeypatch):
 
     q = st.get("question")
     assert q is not None
-    assert q["question_id"].startswith("rag_followup.")
+    assert q["question_id"] == "hpi.site"
+    assert q["origin"] == "rag"
     assert q["text"]["en"] != ""
 
     sug = st["rag_suggestions"][0]
@@ -323,7 +322,7 @@ def test_multilingual_rag_answer_submission_and_normalization(client, monkeypatc
     # RAG candidate 1 answered, next question is candidate 2 or complete
     if next_st.get("question"):
         assert next_st["question"]["question_id"] != first_rag_id
-        assert next_st["question"]["question_id"].startswith("rag_followup.")
+        assert next_st["question"].get("origin") == "rag"
 
     # Verify fact appears in active_answers and history
     answers_list = client.get(f"/api/sessions/{session_id}/answers").json()
@@ -373,56 +372,41 @@ def test_tts_failure_does_not_break_interview(client, monkeypatch):
 
 
 def test_template_fallback_passes_through_translation(client, monkeypatch):
-    """When NVIDIA wording fails, the deterministic template fallback is translated into session language."""
-    from app.services.rag_wording_provider import TemplateWordingProvider, WordingResult
-
-    # Force wording provider to report fallback used
-    def mock_word_candidate(self, candidate, clinical_context, supporting_chunks):
-        template = candidate["question"].strip()
-        return WordingResult(
-            question=template,
-            provider="template",
-            model=None,
-            fallback_used=True,
-            fallback_reason="forced_fallback_test",
-            latency_ms=1,
-            template_question=template,
-        )
-
-    monkeypatch.setattr(TemplateWordingProvider, "word_candidate", mock_word_candidate)
-
-    session_id, st = _setup_full_chest_pain_interview(client, monkeypatch, language="bn")
+    """A RAG outage exposes the configured localized question without stopping intake."""
+    session_id, st = _setup_full_chest_pain_interview(
+        client, monkeypatch, language="bn", grounded=False
+    )
     q = st["question"]
-    assert q["question_id"].startswith("rag_followup.")
+    assert q["question_id"] == "hpi.onset"
+    assert q.get("origin") is None
 
     # Even with wording fallback, Bengali translation occurs
     assert q["text"]["bn"] != ""
     assert q["text"]["en"] != ""
 
-    sug = st["rag_suggestions"][0]
-    assert sug["generation_fallback_used"] is True
-    assert sug["display_language"] == "bn"
-    assert sug["translated_question"] == q["text"]["bn"]
+    assert st["rag_suggestions"] == []
 
 
 def test_validated_english_wording_translated_not_template(client, monkeypatch):
     """When NVIDIA wording succeeds, the generated English is translated, NOT the template."""
-    from app.services.rag_wording_provider import TemplateWordingProvider, WordingResult
+    from app.services import rag_interview_planner
+    from app.services.rag_interview_planner import PlannedWording
 
-    custom_validated_english = "Have you felt breathless during the chest pain?"
+    custom_validated_english = "Where in your chest do you feel the pain?"
 
-    def mock_word_candidate(self, candidate, clinical_context, supporting_chunks):
-        return WordingResult(
+    def mock_template_plan(candidates):
+        selected = next(c for c in candidates if c["question_id"] == "hpi.site")
+        return PlannedWording(
+            question_id=selected["question_id"],
+            target_field=selected["target_field"],
+            target_domain=selected["target_domain"],
             question=custom_validated_english,
             provider="mock_nvidia",
             model="test-model",
-            fallback_used=False,
-            fallback_reason=None,
             latency_ms=42,
-            template_question=candidate["question"].strip(),
         )
 
-    monkeypatch.setattr(TemplateWordingProvider, "word_candidate", mock_word_candidate)
+    monkeypatch.setattr(rag_interview_planner, "_template_plan", mock_template_plan)
 
     session_id, st = _setup_full_chest_pain_interview(client, monkeypatch, language="bn")
     q = st["question"]
@@ -435,4 +419,3 @@ def test_validated_english_wording_translated_not_template(client, monkeypatch):
     assert sug["template_question"] != custom_validated_english
     assert sug["generation_fallback_used"] is False
     assert sug["display_language"] == "bn"
-

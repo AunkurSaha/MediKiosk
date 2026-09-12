@@ -74,6 +74,14 @@ COMPILED_AI_RES = [re.compile(p, re.IGNORECASE) for p in AI_PROVENANCE_PATTERNS]
 
 # Keywords belonging to specific clinical symptom domains for cross-contamination detection
 CANDIDATE_CROSS_DOMAINS = {
+    "pain_onset": {
+        "allowed_keywords": ["when", "start", "started", "begin", "began", "how long", "onset"],
+        "disallowed_other_symptoms": ["sweat", "nausea", "dizz", "fever"],
+    },
+    "pain_site": {
+        "allowed_keywords": ["where", "location", "located", "part of your chest", "site"],
+        "disallowed_other_symptoms": ["sweat", "nausea", "dizz", "fever"],
+    },
     "dyspnea": {
         "allowed_keywords": ["short of breath", "shortness of breath", "breathless", "breathing", "breath", "dyspnea", "winded", "air"],
         "disallowed_other_symptoms": ["sweat", "diaphoresis", "nausea", "vomit", "radiat", "left arm", "jaw", "neck", "dizz", "lighthead", "fever"],
@@ -101,6 +109,26 @@ CANDIDATE_CROSS_DOMAINS = {
     "pain_radiation": {
         "allowed_keywords": ["radiate", "radiating", "spread", "spreading", "move", "moving", "arm", "jaw", "neck", "back", "shoulder"],
         "disallowed_other_symptoms": ["short of breath", "sweat", "nausea", "vomit", "dizz", "fever"],
+    },
+    "pain_radiation_site": {
+        "allowed_keywords": ["where", "spread", "spreading", "radiate", "radiating"],
+        "disallowed_other_symptoms": ["short of breath", "sweat", "nausea", "dizz", "fever"],
+    },
+    "associated_symptoms": {
+        "allowed_keywords": ["other symptom", "along with", "associated", "anything else"],
+        "disallowed_other_symptoms": [],
+    },
+    "pain_timing": {
+        "allowed_keywords": ["constant", "come and go", "comes and goes", "timing", "pattern"],
+        "disallowed_other_symptoms": ["sweat", "nausea", "dizz", "fever"],
+    },
+    "pain_relieving": {
+        "allowed_keywords": ["better", "relieve", "relieves", "go away", "ease"],
+        "disallowed_other_symptoms": ["sweat", "nausea", "dizz", "fever"],
+    },
+    "pain_severity": {
+        "allowed_keywords": ["severe", "severity", "scale", "0 to 10", "intense"],
+        "disallowed_other_symptoms": ["sweat", "nausea", "dizz", "fever"],
     },
     "exertion": {
         "allowed_keywords": ["exertion", "walking", "physical activity", "exercise", "stairs", "effort", "worse with", "worsen"],

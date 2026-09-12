@@ -71,6 +71,7 @@ class RAGSuggestion(APIModel):
     origin: str = "rag"
     candidate_id: str | None = None
     target_field: str | None = None
+    target_domain: str | None = None
     similarity_score: float | None = None
     source_title: str | None = None
     source_section: str | None = None
@@ -121,6 +122,9 @@ class InterviewState(APIModel):
     active_answers: list[Fact] = Field(default_factory=list)
     inactive_question_ids: list[str] = Field(default_factory=list)
     missing_required: list[str] = Field(default_factory=list)
+    covered_domains: list[str] = Field(default_factory=list)
+    missing_required_domains: list[str] = Field(default_factory=list)
+    missing_optional_domains: list[str] = Field(default_factory=list)
     progress: Progress = Progress(addressed=0, applicable=0, position=0)
     is_complete: bool = False
     history: ClinicalHistory | None = None

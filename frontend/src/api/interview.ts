@@ -101,6 +101,7 @@ export interface RAGSuggestion {
   origin: string;
   candidate_id?: string | null;
   target_field?: string | null;
+  target_domain?: string | null;
   similarity_score?: number | null;
   source_title?: string | null;
   source_section?: string | null;
@@ -129,6 +130,9 @@ export interface InterviewState {
   active_answers: Fact[];
   inactive_question_ids: string[];
   missing_required: string[];
+  covered_domains?: string[];
+  missing_required_domains?: string[];
+  missing_optional_domains?: string[];
   progress: { addressed: number; applicable: number; position: number };
   is_complete: boolean;
   history: ClinicalHistory | null;

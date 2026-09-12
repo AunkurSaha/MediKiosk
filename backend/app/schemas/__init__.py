@@ -100,6 +100,7 @@ __all__ = [
     "OtpRequestResponse",
     "OtpVerifyRequest",
     "StaffLoginRequest",
+    "StaffRegisterRequest",
     "ClinicalSummary",
     "ClinicalSummaryUpdate",
     "EvidenceReference",

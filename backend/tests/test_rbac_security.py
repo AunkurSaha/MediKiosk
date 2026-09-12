@@ -16,10 +16,10 @@ Covers:
 """
 
 from uuid import uuid4
+
 import pytest
 from starlette.websockets import WebSocketDisconnect
 
-from app import models
 from app.services.sms_provider import get_sms_provider
 
 

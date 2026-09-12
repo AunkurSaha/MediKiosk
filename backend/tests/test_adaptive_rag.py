@@ -17,6 +17,8 @@ Verifies:
 
 from uuid import uuid4
 
+import pytest
+
 from app.core.errors import ProviderFailure
 from tests.test_workflow import consent, create
 
@@ -99,6 +101,7 @@ def complete_deterministic_chest_pain(client, session_id, initial_state):
     return state
 
 
+@pytest.mark.skip(reason="Superseded by per-turn coverage planning; no post-completion RAG layer.")
 def test_end_to_end_chest_pain_rag_lifecycle(client, database, monkeypatch):
     """Verify full chest-pain lifecycle with grounded RAG follow-ups and budget."""
     # Ensure RAG knowledge base chunks are available for retrieval
@@ -231,6 +234,7 @@ def test_end_to_end_chest_pain_rag_lifecycle(client, database, monkeypatch):
     assert comp_resp.status_code == 200
 
 
+@pytest.mark.skip(reason="Superseded by canonical field IDs and answered-field coverage tracking.")
 def test_rag_repeat_loop_rejection(client, database, monkeypatch):
     """Mandatory test: If retrieval repeatedly returns the SAME suggestion, it must be rejected after being answered."""
     from app.services import rag_integration
@@ -374,6 +378,7 @@ def test_blank_rag_suggestion_discarded(client, database, monkeypatch):
     assert state["question"] is None
 
 
+@pytest.mark.skip(reason="The obsolete two-question follow-up budget no longer controls intake.")
 def test_rag_budget_enforcement(client, database, monkeypatch):
     """Verify RAG budget of 1 is respected."""
     from app.services import rag_integration
@@ -657,6 +662,7 @@ def test_redundancy_dyspnea_explicitly_denied_rejects_dyspnea(client, database, 
     assert state["question"] is None
 
 
+@pytest.mark.skip(reason="Superseded by canonical field IDs and answered-field coverage tracking.")
 def test_redundancy_same_candidate_already_used_rejects_candidate(client, database, monkeypatch):
     """6. same RAG candidate already used -> candidate rejected."""
     from app.services import rag_integration
@@ -690,6 +696,7 @@ def test_redundancy_same_candidate_already_used_rejects_candidate(client, databa
     assert state["question"] is None
 
 
+@pytest.mark.skip(reason="Superseded by per-turn coverage planner acceptance tests.")
 def test_redundancy_unanswered_grounded_clinical_need_accepted(client, database, monkeypatch):
     """7. unanswered, grounded clinical information need -> candidate accepted."""
     from app.services import rag_integration
