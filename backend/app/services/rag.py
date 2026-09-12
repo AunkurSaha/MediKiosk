@@ -386,6 +386,7 @@ class RAGGenerationService:
                         "similarity_score": score,
                         "source_title": chunk.source_title,
                         "source_section": chunk.section,
+                        "chunk_content": chunk.content,
                     })
 
             # 2. Exertional provocation / worsening
@@ -406,6 +407,7 @@ class RAGGenerationService:
                         "similarity_score": score,
                         "source_title": chunk.source_title,
                         "source_section": chunk.section,
+                        "chunk_content": chunk.content,
                     })
 
             # 3. Diaphoresis / sweating
@@ -425,6 +427,7 @@ class RAGGenerationService:
                         "similarity_score": score,
                         "source_title": chunk.source_title,
                         "source_section": chunk.section,
+                        "chunk_content": chunk.content,
                     })
 
             # 4. Nausea / vomiting
@@ -444,6 +447,7 @@ class RAGGenerationService:
                         "similarity_score": score,
                         "source_title": chunk.source_title,
                         "source_section": chunk.section,
+                        "chunk_content": chunk.content,
                     })
 
             # 5. Dizziness / palpitations
@@ -463,6 +467,7 @@ class RAGGenerationService:
                         "similarity_score": score,
                         "source_title": chunk.source_title,
                         "source_section": chunk.section,
+                        "chunk_content": chunk.content,
                     })
 
             # 6. Cough or fever (associated_symptoms-002: Less Common but Important)
@@ -482,6 +487,7 @@ class RAGGenerationService:
                         "similarity_score": score,
                         "source_title": chunk.source_title,
                         "source_section": chunk.section,
+                        "chunk_content": chunk.content,
                     })
 
             # 7. Radiation
@@ -502,6 +508,7 @@ class RAGGenerationService:
                         "similarity_score": score,
                         "source_title": chunk.source_title,
                         "source_section": chunk.section,
+                        "chunk_content": chunk.content,
                     })
 
             # 8. Character / quality
@@ -522,6 +529,7 @@ class RAGGenerationService:
                         "similarity_score": score,
                         "source_title": chunk.source_title,
                         "source_section": chunk.section,
+                        "chunk_content": chunk.content,
                     })
 
         return suggestions

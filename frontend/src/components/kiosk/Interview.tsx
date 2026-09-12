@@ -175,6 +175,16 @@ export default function Interview({
               fixtureId={fixtureId}
               question={state.question}
               initial={state.current_answer}
+              ragSuggestion={
+                state.question.origin === 'rag' ||
+                state.question.question_id.startsWith('rag_followup.')
+                  ? state.rag_suggestions?.find(
+                      (s) =>
+                        s.candidate_id &&
+                        state.question?.question_id === `rag_followup.${s.candidate_id}`,
+                    ) || state.rag_suggestions?.[0]
+                  : undefined
+              }
               language={language}
               busy={busy}
               blocked={conflict}

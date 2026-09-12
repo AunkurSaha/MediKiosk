@@ -117,7 +117,7 @@ def state(db, session_id, user=None):
                 answer_id=row.id,
                 question_id=row.question_id,
                 field=row.field,
-                label=Localized(en="Clinical follow-up", bn="Clinical follow-up", hi="Clinical follow-up"),
+                label=Localized(en="Clinical follow-up", bn="ক্লিনিক্যাল ফলো-আপ", hi="चिकित्सीय अनुवर्ती"),
                 status=envelope.get("status", "answered"),
                 value=envelope.get("value", row.raw_value),
                 raw_value=row.raw_value or "",
@@ -320,7 +320,7 @@ def submit(db, session_id, payload, user=None):
             answer_id=r.id,
             question_id=r.question_id,
             field=r.field,
-            label=Localized(en="Clinical follow-up", bn="Clinical follow-up", hi="Clinical follow-up"),
+            label=Localized(en="Clinical follow-up", bn="ক্লিনিক্যাল ফলো-আপ", hi="चिकित्सीय अनुवर्ती"),
             status=json.loads(r.value_json).get("status", "answered") if r.value_json else "answered",
             value=json.loads(r.value_json).get("value", r.raw_value) if r.value_json else r.raw_value,
             raw_value=r.raw_value or "",
@@ -334,6 +334,9 @@ def submit(db, session_id, payload, user=None):
     ]
     red_flags.evaluate_and_persist(db, session_id, flow.flow_id, all_facts)
     db.commit()
+    from app.services.rag_integration import clear_rag_question_cache
+
+    clear_rag_question_cache(session_id)
     return state(db, session_id, user=user)
 
 

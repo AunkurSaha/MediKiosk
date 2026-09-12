@@ -26,6 +26,7 @@ export interface Question {
     integer?: boolean;
     unit?: string | null;
   };
+  origin?: string;
 }
 export interface Fact {
   answer_id: string;
@@ -93,6 +94,27 @@ export interface AlertSummary {
   created_at: string;
 }
 
+export interface RAGSuggestion {
+  question: string;
+  reason: string;
+  source_chunk_ids: string[];
+  origin: string;
+  candidate_id?: string | null;
+  target_field?: string | null;
+  similarity_score?: number | null;
+  source_title?: string | null;
+  source_section?: string | null;
+  generation_provider?: string | null;
+  generation_model?: string | null;
+  generation_fallback_used?: boolean | null;
+  generation_latency_ms?: number | null;
+  template_question?: string | null;
+  display_language?: string | null;
+  translated_question?: string | null;
+  translation_provider?: string | null;
+  translation_fallback_used?: boolean | null;
+}
+
 export interface InterviewState {
   selection_required: boolean;
   flows: { flow_id: string; version: string; namespace: string; label: Localized }[];
@@ -111,6 +133,7 @@ export interface InterviewState {
   is_complete: boolean;
   history: ClinicalHistory | null;
   red_flag_alert?: AlertSummary | null;
+  rag_suggestions?: RAGSuggestion[];
 }
 export interface Submission {
   request_id: string;

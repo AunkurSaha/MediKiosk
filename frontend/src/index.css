@@ -1564,3 +1564,85 @@ details .muted {
     flex-basis: 100%;
   }
 }
+
+/* ==========================================================================
+   RAG Grounded Follow-up Demo Indicator
+   ========================================================================== */
+
+.rag-grounded-badge-container {
+  margin: 4px 0 14px;
+}
+
+.rag-grounded-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #15803d;
+  font-size: 0.85rem;
+  font-weight: 650;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(22, 101, 52, 0.08);
+  letter-spacing: -0.01em;
+}
+
+.rag-badge-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.rag-provenance-details {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.rag-provenance-summary {
+  cursor: pointer;
+  color: #15803d;
+  font-weight: 600;
+  user-select: none;
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: #f0fdf4;
+  border: 1px dashed #86efac;
+  transition: all 0.15s ease;
+  font-size: 0.78rem;
+}
+
+.rag-provenance-summary:hover {
+  background: #dcfce7;
+}
+
+.rag-provenance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 8px 16px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.rag-prov-label {
+  font-weight: 650;
+  color: #64748b;
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.rag-prov-val {
+  color: #0f172a;
+  font-weight: 550;
+  font-size: 0.85rem;
+  word-break: break-word;
+}
+

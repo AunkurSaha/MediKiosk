@@ -14,7 +14,7 @@ from app.core.config import MAX_RAG_FOLLOWUPS_PER_INTERVIEW
 from app.core.errors import ProviderFailure, ProviderUnavailable
 from app.database import SessionLocal
 from app.schemas.adaptive import RAGSuggestion
-from app.schemas.flow import Localized, Question
+from app.schemas.flow import Question
 from app.services import normalization
 from app.services.rag import (
     KnowledgeRetrievalService,
@@ -27,6 +27,28 @@ from app.services.rag_clinical_mapping import (
 )
 
 logger = logging.getLogger(__name__)
+# Active RAG question cache:
+# Key: (session_id, question_id, language) -> (Question, RAGSuggestion)
+_ACTIVE_RAG_QUESTION_CACHE: dict[tuple[str, str, str], tuple[Question, RAGSuggestion]] = {}
+
+
+def get_cached_rag_question(session_id: str, question_id: str, language: str = "en") -> Question | None:
+    cached = _ACTIVE_RAG_QUESTION_CACHE.get((session_id, question_id, language))
+    if cached:
+        return cached[0]
+    for (s_id, q_id, _), (q, _) in _ACTIVE_RAG_QUESTION_CACHE.items():
+        if s_id == session_id and q_id == question_id:
+            return q
+    return None
+
+
+def clear_rag_question_cache(session_id: str | None = None) -> None:
+    if session_id is None:
+        _ACTIVE_RAG_QUESTION_CACHE.clear()
+    else:
+        keys_to_del = [k for k in _ACTIVE_RAG_QUESTION_CACHE if k[0] == session_id]
+        for k in keys_to_del:
+            _ACTIVE_RAG_QUESTION_CACHE.pop(k, None)
 
 
 def get_rag_suggestions(
@@ -469,11 +491,41 @@ def select_next_rag_question(
             target_field,
         )
 
-        # Candidate passed all checks!
+        # Candidate passed all checks! EXACTLY ONE candidate approved.
         question_id = f"rag_followup.{clean_cid}"
         clean_storage_field = re.sub(r"[^a-z0-9_.]", "_", storage_field.lower())
         clean_target_field = re.sub(r"[^a-z0-9_.]", "_", target_field.lower())
-        question_text = cand["question"].strip()
+        template_question = cand["question"].strip()
+
+        session = db.get(models.Session, session_id)
+        session_lang = session.language if session else "en"
+        cache_key = (session_id, question_id, session_lang)
+        if cache_key in _ACTIVE_RAG_QUESTION_CACHE:
+            return _ACTIVE_RAG_QUESTION_CACHE[cache_key]
+
+        # Word the approved candidate using the configured wording provider
+        from app.services.rag_localization import localize_rag_question
+        from app.services.rag_wording_provider import configured_wording_provider
+
+        wording_provider = configured_wording_provider()
+        supporting_chunks = []
+        if chunk_content := cand.get("chunk_content"):
+            supporting_chunks.append({"content": chunk_content})
+
+        wording_res = wording_provider.word_candidate(
+            candidate=cand,
+            clinical_context=context,
+            supporting_chunks=supporting_chunks,
+        )
+
+        canonical_question_text = (wording_res.question or template_question).strip()
+
+        # Localize canonical English wording into patient's language
+        localized_text, trans_meta = localize_rag_question(
+            canonical_en=canonical_question_text,
+            target_language=session_lang,
+            candidate_id=clean_cid,
+        )
 
         # Build schema-compliant Question and RAGSuggestion
         rag_question = Question(
@@ -482,14 +534,15 @@ def select_next_rag_question(
             type="short_text",
             required=False,
             allow_unknown=True,
-            text=Localized(en=question_text, bn=question_text, hi=question_text),
+            text=localized_text,
             options=[],
             depends_on=[],
             when=[],
+            origin="rag",
         )
 
         rag_suggestion = RAGSuggestion(
-            question=question_text,
+            question=canonical_question_text,
             reason=cand.get("reason", "Follow-up question suggested by clinical guidance."),
             source_chunk_ids=cand.get("source_chunk_ids", []),
             origin="rag",
@@ -498,8 +551,18 @@ def select_next_rag_question(
             similarity_score=cand.get("similarity_score"),
             source_title=cand.get("source_title"),
             source_section=cand.get("source_section"),
+            generation_provider=wording_res.provider,
+            generation_model=wording_res.model,
+            generation_fallback_used=wording_res.fallback_used,
+            generation_latency_ms=wording_res.latency_ms,
+            template_question=wording_res.template_question,
+            display_language=session_lang,
+            translated_question=localized_text.model_dump().get(session_lang),
+            translation_provider=trans_meta.provider,
+            translation_fallback_used=trans_meta.fallback_used,
         )
 
+        _ACTIVE_RAG_QUESTION_CACHE[cache_key] = (rag_question, rag_suggestion)
         return rag_question, rag_suggestion
 
     return None

@@ -3,6 +3,7 @@
 import asyncio
 import base64
 import io
+import logging
 import os
 import wave
 from collections.abc import Callable
@@ -66,7 +67,11 @@ def _valid_pcm_wav(audio: bytes) -> bool:
         return False
 
 
+logger = logging.getLogger(__name__)
+
+
 def _failure_reason(error: Exception) -> str:
+    logger.warning("Sarvam speech error (%s): %s", type(error).__name__, error)
     if isinstance(error, (asyncio.TimeoutError, TimeoutError, httpx.TimeoutException)):
         return "timeout"
     if isinstance(error, (UnauthorizedError, ForbiddenError)):
@@ -86,10 +91,23 @@ class SarvamSpeechProvider:
     ) -> None:
         self.settings = settings
         self.version = settings.stt_model
-        self._client = client_factory(
-            api_subscription_key=settings.api_key.get_secret_value(),
-            timeout=settings.timeout,
-        )
+        self._client_factory = client_factory
+        self._loop_id: int | None = None
+        self._client: Any = None
+
+    def _get_client(self) -> Any:
+        try:
+            current_loop = asyncio.get_running_loop()
+            current_loop_id = id(current_loop)
+        except RuntimeError:
+            current_loop_id = None
+        if self._client is None or (current_loop_id is not None and self._loop_id != current_loop_id):
+            self._client = self._client_factory(
+                api_subscription_key=self.settings.api_key.get_secret_value(),
+                timeout=self.settings.timeout,
+            )
+            self._loop_id = current_loop_id
+        return self._client
 
     async def transcribe(
         self,
@@ -106,7 +124,7 @@ class SarvamSpeechProvider:
             return self._unavailable_transcription(safe_language, "unsupported_audio_format")
 
         try:
-            response = await self._client.speech_to_text.transcribe(
+            response = await self._get_client().speech_to_text.transcribe(
                 file=("recording.wav", audio, "audio/wav"),
                 model=self.settings.stt_model,
                 mode="transcribe",
@@ -137,7 +155,7 @@ class SarvamSpeechProvider:
         if not text.strip():
             return self._unavailable_synthesis(text, safe_language, "empty_text")
         try:
-            response = await self._client.text_to_speech.convert(
+            response = await self._get_client().text_to_speech.convert(
                 text=text,
                 language_code=LANGUAGE_CODES[safe_language],
                 speaker=self.settings.tts_speaker,

@@ -72,6 +72,7 @@ class Question(APIModel):
     constraints: Constraints = Field(default_factory=Constraints)
     depends_on: list[str] = Field(default_factory=list)
     when: list[Condition] = Field(default_factory=list)
+    origin: str | None = None
 
     @model_validator(mode="after")
     def shape(self):

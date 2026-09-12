@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { api, ApiError } from '../api/client';
 import type { InterviewState, Question } from '../api/interview';
 import Interview from '../components/kiosk/Interview';
@@ -287,3 +287,119 @@ it('blocks stale submission until the user reloads and retains review on complet
   fireEvent.click(screen.getByRole('button', { name: 'Finish intake' }));
   await waitFor(() => expect(complete).toHaveBeenCalledTimes(2));
 });
+
+describe('RAG Grounded Follow-up Indicator', () => {
+  it('does not display RAG indicator for normal deterministic questions', () => {
+    const normalQ: Question = {
+      question_id: 'hpi.onset',
+      field: 'hpi.onset',
+      type: 'duration',
+      text: { en: 'When did your chest pain start?', bn: 'কখন শুরু হয়েছিল?', hi: 'कब शुरू हुआ था?' },
+      required: true,
+      allow_unknown: true,
+      constraints: { max_length: 100 },
+      options: [],
+    };
+    render(
+      <QuestionRenderer
+        question={normalQ}
+        initial={null}
+        language="en"
+        busy={false}
+        onSave={vi.fn()}
+      />,
+    );
+    expect(screen.queryByTestId('rag-grounded-indicator')).not.toBeInTheDocument();
+    expect(screen.queryByText(/AI Grounded Follow-up/i)).not.toBeInTheDocument();
+  });
+
+  it('displays AI Grounded Follow-up indicator when active question is rag_followup.*', () => {
+    const ragQ: Question = {
+      question_id: 'rag_followup.dyspnea',
+      field: 'hpi.associated_details',
+      type: 'short_text',
+      text: {
+        en: 'Have you noticed any shortness of breath?',
+        bn: 'আপনার কি শ্বাসকষ্ট হচ্ছে?',
+        hi: 'क्या आपको सांस लेने में तकलीफ हो रही है?',
+      },
+      required: false,
+      allow_unknown: true,
+      constraints: { max_length: 500 },
+      options: [],
+      origin: 'rag',
+    };
+    const ragSuggestion = {
+      question: 'Have you noticed any shortness of breath?',
+      reason: 'Shortness of breath is an important associated symptom.',
+      source_chunk_ids: ['chest_pain-associated_symptoms-001'],
+      origin: 'rag',
+      candidate_id: 'dyspnea',
+      target_field: 'hpi.associated_details',
+      similarity_score: 0.85,
+      source_title: 'Associated Symptoms in Chest Pain',
+      generation_provider: 'nvidia',
+      generation_fallback_used: false,
+    };
+
+    render(
+      <QuestionRenderer
+        question={ragQ}
+        initial={null}
+        language="en"
+        busy={false}
+        onSave={vi.fn()}
+        ragSuggestion={ragSuggestion}
+      />,
+    );
+
+    const indicator = screen.getByTestId('rag-grounded-indicator');
+    expect(indicator).toBeVisible();
+    expect(screen.getByText('AI Grounded Follow-up')).toBeVisible();
+
+    const details = screen.getByTestId('rag-provenance-details');
+    expect(details).toBeInTheDocument();
+    expect(screen.getByText('Associated Symptoms in Chest Pain')).toBeInTheDocument();
+    expect(screen.getByText('dyspnea')).toBeInTheDocument();
+    expect(screen.getByText('0.85')).toBeInTheDocument();
+    expect(screen.getByText('NVIDIA generated')).toBeInTheDocument();
+    expect(screen.getByText('NVIDIA semantic embedding')).toBeInTheDocument();
+    expect(screen.getByText('chest_pain-associated_symptoms-001')).toBeInTheDocument();
+
+    // Verify no secrets or sensitive data are displayed
+    expect(screen.queryByText(/api[_-]?key/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/secret/i)).not.toBeInTheDocument();
+  });
+
+  it('displays RAG indicator even without full suggestion metadata', () => {
+    const ragQ: Question = {
+      question_id: 'rag_followup.sweating',
+      field: 'hpi.associated_details',
+      type: 'short_text',
+      text: {
+        en: 'Have you noticed heavy sweating?',
+        bn: 'আপনার কি অস্বাভাবিক ঘাম হচ্ছে?',
+        hi: 'क्या आपको असामान्य पसीना आ रहा है?',
+      },
+      required: false,
+      allow_unknown: true,
+      constraints: { max_length: 500 },
+      options: [],
+    };
+
+    render(
+      <QuestionRenderer
+        question={ragQ}
+        initial={null}
+        language="en"
+        busy={false}
+        onSave={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('rag-grounded-indicator')).toBeVisible();
+    expect(screen.getByText('AI Grounded Follow-up')).toBeVisible();
+    expect(screen.queryByTestId('rag-provenance-details')).not.toBeInTheDocument();
+  });
+});
+

@@ -1,6 +1,7 @@
 """Sarvam REST translation, language identification, and transliteration provider using the pinned official Python SDK."""
 
 import asyncio
+import logging
 import os
 from collections.abc import Callable
 from typing import Any
@@ -15,6 +16,8 @@ from app.schemas.translation import (
     TranslationResponse,
     TransliterationResponse,
 )
+
+logger = logging.getLogger(__name__)
 
 LANGUAGE_CODES = {
     "en": "en-IN",
@@ -49,6 +52,7 @@ class SarvamTranslationSettings(BaseModel):
 
 
 def _failure_reason(error: Exception) -> str:
+    logger.warning("Sarvam translation error (%s): %s", type(error).__name__, error)
     if isinstance(error, (asyncio.TimeoutError, TimeoutError, httpx.TimeoutException)):
         return "timeout"
     if isinstance(error, (UnauthorizedError, ForbiddenError)):
@@ -68,10 +72,23 @@ class SarvamTranslationProvider:
     ) -> None:
         self.settings = settings
         self.version = settings.translation_model
-        self._client = client_factory(
-            api_subscription_key=settings.api_key.get_secret_value(),
-            timeout=settings.timeout,
-        )
+        self._client_factory = client_factory
+        self._loop_id: int | None = None
+        self._client: Any = None
+
+    def _get_client(self) -> Any:
+        try:
+            current_loop = asyncio.get_running_loop()
+            current_loop_id = id(current_loop)
+        except RuntimeError:
+            current_loop_id = None
+        if self._client is None or (current_loop_id is not None and self._loop_id != current_loop_id):
+            self._client = self._client_factory(
+                api_subscription_key=self.settings.api_key.get_secret_value(),
+                timeout=self.settings.timeout,
+            )
+            self._loop_id = current_loop_id
+        return self._client
 
     async def translate(
         self,
@@ -118,7 +135,7 @@ class SarvamTranslationProvider:
             )
 
         try:
-            response = await self._client.text.translate(
+            response = await self._get_client().text.translate(
                 input=clean_text,
                 source_language_code=src_code,
                 target_language_code=tgt_code,
@@ -169,7 +186,7 @@ class SarvamTranslationProvider:
                 reason="empty_text",
             )
         try:
-            response = await self._client.text.identify_language(
+            response = await self._get_client().text.identify_language(
                 input=clean_text,
                 request_options={
                     "timeout_in_seconds": self.settings.timeout,
@@ -212,7 +229,7 @@ class SarvamTranslationProvider:
         tgt_code = LANGUAGE_CODES.get(target_language.lower(), target_language)
 
         try:
-            response = await self._client.text.transliterate(
+            response = await self._get_client().text.transliterate(
                 input=clean_text,
                 source_language_code=src_code,
                 target_language_code=tgt_code,

@@ -84,12 +84,13 @@ async def transcribe_audio(
     from app.services import adaptive
 
     flow, run = adaptive.require_run(db, session_id)
-    question = adaptive.engine_for(db, session_id, flow).state(run.cursor).question
+    curr_state = adaptive.state(db, session_id, user=user)
+    question = curr_state.question
     if question is None or question.question_id != question_id or question.type != "short_text":
         raise WorkflowError(
             "QUESTION_NOT_CURRENT", "Voice input requires the current free-text question.", 409
         )
-    revision = run.revision
+    revision = curr_state.revision
     media_type = _validate_media_type(audio_file.content_type)
 
     # Stream bounded bytes into memory with size check
@@ -187,6 +188,18 @@ async def synthesize_question(
                 break
         if target_q:
             break
+
+    if not target_q and question_id.startswith("rag_followup"):
+        from app.services import adaptive
+        from app.services.rag_integration import get_cached_rag_question
+
+        curr_state = adaptive.state(db, session_id, user=user)
+        if curr_state.question and curr_state.question.question_id == question_id:
+            target_q = curr_state.question.model_dump()
+        else:
+            cached_q = get_cached_rag_question(session_id, question_id, session.language)
+            if cached_q:
+                target_q = cached_q.model_dump()
 
     if not target_q:
         raise WorkflowError(

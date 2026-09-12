@@ -20,6 +20,9 @@ os.environ["OCR_PROVIDER"] = "mock"
 os.environ["TRANSLATION_PROVIDER"] = "mock"
 os.environ["RAG_EMBEDDING_PROVIDER"] = "mock"
 os.environ["RAG_EMBEDDING_TIMEOUT_SECONDS"] = "0.5"
+os.environ["RAG_GENERATION_PROVIDER"] = "template"
+os.environ["RAG_GENERATION_TIMEOUT_SECONDS"] = "0.5"
+
 
 from app import models  # noqa: E402
 from app.api.deps import DEMO_DOCTOR_ID  # noqa: E402

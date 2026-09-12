@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import type { Language } from '../../api/client';
-import type { AnswerStatus, AnswerValue, Fact, Question } from '../../api/interview';
+import type { AnswerStatus, AnswerValue, Fact, Question, RAGSuggestion } from '../../api/interview';
 import { copy } from '../../i18n';
 import { interviewCopy } from '../../i18n/interview';
 
 import QuestionAudioPlayer from './QuestionAudioPlayer';
 import VoiceRecorder from './VoiceRecorder';
+
+function isRagQuestion(q?: Question | null): boolean {
+  if (!q) return false;
+  return q.origin === 'rag' || q.question_id.startsWith('rag_followup.');
+}
 
 export interface ResponseInput {
   value: AnswerValue;
@@ -25,6 +30,7 @@ export default function QuestionRenderer({
   voiceConsent = false,
   fixtureId,
   onSave,
+  ragSuggestion,
 }: {
   question: Question;
   initial: Fact | null;
@@ -35,6 +41,7 @@ export default function QuestionRenderer({
   sessionId?: string;
   voiceConsent?: boolean;
   fixtureId?: string;
+  ragSuggestion?: RAGSuggestion | null;
 }) {
   const t = copy[language];
   const u = interviewCopy[language];
@@ -55,6 +62,20 @@ export default function QuestionRenderer({
   const [error, setError] = useState(false);
   const [answerSource, setAnswerSource] = useState<'typed' | 'voice'>('typed');
   const q = question;
+  const isRag = isRagQuestion(q);
+
+  useEffect(() => {
+    if (import.meta.env.DEV && isRag) {
+      console.log('[MediKiosk RAG]', {
+        candidate: ragSuggestion?.candidate_id || q.question_id.replace(/^rag_followup\./, ''),
+        question_id: q.question_id,
+        sources: ragSuggestion?.source_chunk_ids || [],
+        similarity: ragSuggestion?.similarity_score,
+        generation_provider: ragSuggestion?.generation_provider || 'unknown',
+      });
+    }
+  }, [q.question_id, isRag, ragSuggestion]);
+
   function submit(event: FormEvent) {
     event.preventDefault();
     let saved = value;
@@ -112,6 +133,65 @@ export default function QuestionRenderer({
   }
   return (
     <form onSubmit={submit} noValidate>
+      {isRag && (
+        <div className="rag-grounded-badge-container" data-testid="rag-grounded-indicator">
+          <div className="rag-grounded-badge">
+            <span className="rag-badge-icon" aria-hidden="true">
+              ✨
+            </span>
+            <span className="rag-badge-text">AI Grounded Follow-up</span>
+          </div>
+          {ragSuggestion && (
+            <details className="rag-provenance-details" data-testid="rag-provenance-details">
+              <summary className="rag-provenance-summary">Demo Details</summary>
+              <div className="rag-provenance-grid">
+                {ragSuggestion.source_title && (
+                  <div>
+                    <span className="rag-prov-label">Grounded source</span>
+                    <span className="rag-prov-val">{ragSuggestion.source_title}</span>
+                  </div>
+                )}
+                {ragSuggestion.candidate_id && (
+                  <div>
+                    <span className="rag-prov-label">Candidate</span>
+                    <span className="rag-prov-val">{ragSuggestion.candidate_id}</span>
+                  </div>
+                )}
+                {ragSuggestion.similarity_score != null && (
+                  <div>
+                    <span className="rag-prov-label">Similarity</span>
+                    <span className="rag-prov-val">{ragSuggestion.similarity_score.toFixed(2)}</span>
+                  </div>
+                )}
+                <div>
+                  <span className="rag-prov-label">Retrieval</span>
+                  <span className="rag-prov-val">NVIDIA semantic embedding</span>
+                </div>
+                {ragSuggestion.generation_provider && (
+                  <div>
+                    <span className="rag-prov-label">Wording</span>
+                    <span className="rag-prov-val">
+                      {ragSuggestion.generation_provider === 'nvidia'
+                        ? ragSuggestion.generation_fallback_used
+                          ? 'Template (NVIDIA fallback)'
+                          : 'NVIDIA generated'
+                        : ragSuggestion.generation_provider === 'template'
+                          ? 'Template wording'
+                          : ragSuggestion.generation_provider}
+                    </span>
+                  </div>
+                )}
+                {ragSuggestion.source_chunk_ids && ragSuggestion.source_chunk_ids.length > 0 && (
+                  <div>
+                    <span className="rag-prov-label">Chunks</span>
+                    <span className="rag-prov-val">{ragSuggestion.source_chunk_ids.join(', ')}</span>
+                  </div>
+                )}
+              </div>
+            </details>
+          )}
+        </div>
+      )}
       <div className="question-header">
         <h1 id="question-title">{q.text[language]}</h1>
         {sessionId && (

@@ -74,6 +74,16 @@ class RAGSuggestion(APIModel):
     similarity_score: float | None = None
     source_title: str | None = None
     source_section: str | None = None
+    generation_provider: str | None = None
+    generation_model: str | None = None
+    generation_fallback_used: bool | None = None
+    generation_latency_ms: int | None = None
+    template_question: str | None = None
+    display_language: str | None = None
+    translated_question: str | None = None
+    translation_provider: str | None = None
+    translation_fallback_used: bool | None = None
+
 
 class HistorySection(APIModel):
     section_id: SectionID

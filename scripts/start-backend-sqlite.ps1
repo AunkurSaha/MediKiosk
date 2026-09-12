@@ -1,7 +1,9 @@
 # start-backend-sqlite.ps1
 # Starts the MediKiosk backend using the local SQLite acceptance database.
 # Use when PostgreSQL is unavailable (e.g., blocked by Application Control).
-# The SQLite file at .runtime/acceptance.sqlite must be already migrated to head.
+# The SQLite file at backend/runtime/acceptance.sqlite must already be migrated to head.
+# Keeping it under backend/runtime makes the path agree with backend/.env even
+# when the launcher is invoked from the repository root.
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File scripts\start-backend-sqlite.ps1
@@ -20,7 +22,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $projectRoot   = Split-Path -Parent $PSScriptRoot
 $runtimeRoot   = Join-Path $projectRoot '.runtime'
-$sqlitePath    = Join-Path $runtimeRoot 'acceptance.sqlite'
+$sqlitePath    = Join-Path $projectRoot 'backend\runtime\acceptance.sqlite'
 $pythonPath    = Join-Path $projectRoot 'backend\.venv\Scripts\python.exe'
 $backendDir    = Join-Path $projectRoot 'backend'
 
@@ -130,7 +132,20 @@ if (-not $ready) {
     throw "Backend did not become healthy. Inspect .runtime/backend.err.log."
 }
 
+# Start-Process tracks the cmd launcher, while the listening Uvicorn worker is
+# its Python child. Record the actual listener so stop-dev.ps1 can reliably
+# stop the backend after later source changes.
+$listener = Get-NetTCPConnection -LocalPort 8010 -State Listen -ErrorAction SilentlyContinue |
+    Select-Object -First 1
+if (-not $listener) { throw 'Backend is healthy but no listener was found on port 8010.' }
+$running = Get-CimInstance Win32_Process -Filter ("ProcessId = " + $listener.OwningProcess)
+if (-not $running -or $running.CommandLine -notlike ('*' + $backendDir + '*')) {
+    throw 'Port 8010 is not owned by the expected MediKiosk backend.'
+}
+$processes['backend'] = $running.ProcessId
+$processes | ConvertTo-Json | Set-Content -LiteralPath $processFile
+
 Write-Output "Backend healthy  : http://127.0.0.1:8010/api/health"
 Write-Output "API docs         : http://127.0.0.1:8010/docs"
 Write-Output "MediKiosk UI     : http://127.0.0.1:5175"
-Write-Output "Backend PID      : $($backendProcess.Id)"
+Write-Output "Backend PID      : $($running.ProcessId)"
