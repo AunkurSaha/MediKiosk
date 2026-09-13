@@ -41,7 +41,6 @@ export default function Doctor() {
   const auth = useOptionalAuth();
   const [loggingIn, setLoggingIn] = useState(false);
   const [error, setError] = useState<unknown>(null);
-  const [notice, setNotice] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [fhirModalOpen, setFhirModalOpen] = useState(false);
   const [abdmModalOpen, setAbdmModalOpen] = useState(false);
@@ -152,44 +151,7 @@ export default function Doctor() {
   }, [sessionId, attempt, activeHospitalId]);
   function refresh() {
     setLoading(true);
-    setNotice('');
     setAttempt(attempt + 1);
-  }
-
-  async function handleSeedShowcase() {
-    setLoading(true);
-    setError(null);
-    setNotice('');
-    try {
-      const res = await api.seedShowcase();
-      setNotice(
-        `Showcase patient ${res.patient_name} (${res.hospital_token}) seeded successfully!`,
-      );
-      setAttempt((a) => a + 1);
-    } catch (err) {
-      setError(err);
-      setLoading(false);
-    }
-  }
-
-  async function handleResetDemo() {
-    if (
-      typeof window !== 'undefined' &&
-      !window.confirm('Reset all demo patient intake records? Doctor accounts will be preserved.')
-    ) {
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    setNotice('');
-    try {
-      const res = await api.resetDemo();
-      setNotice(res.message || 'Demo data reset successfully.');
-      setAttempt((a) => a + 1);
-    } catch (err) {
-      setError(err);
-      setLoading(false);
-    }
   }
 
   const summary = detail?.summary;
@@ -288,28 +250,6 @@ export default function Doctor() {
           <p className="muted">{t.doctorIntro}</p>
         </div>
         <div className="doctor-header-actions">
-          <button
-            type="button"
-            className="secondary"
-            data-testid="seed-showcase-btn"
-            onClick={() => void handleSeedShowcase()}
-            disabled={busy || loading}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
-            title="Seed canonical Bengali chest-pain showcase patient"
-          >
-            <span>🌟</span> Seed Showcase
-          </button>
-          <button
-            type="button"
-            className="secondary"
-            data-testid="reset-demo-btn"
-            onClick={() => void handleResetDemo()}
-            disabled={busy || loading}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#b91c1c' }}
-            title="Reset all demo intake data while preserving doctor user accounts"
-          >
-            <span>🔄</span> Reset Demo
-          </button>
           <button className="secondary" onClick={refresh} disabled={busy || loading}>
             {t.refresh}
           </button>
@@ -347,11 +287,6 @@ export default function Doctor() {
             </button>
           </div>
         </div>
-      )}
-      {notice && (
-        <p className="success" role="status">
-          {notice}
-        </p>
       )}
       {loading && <p role="status">{t.loading}</p>}
       {!loading && !sessionId && list && (

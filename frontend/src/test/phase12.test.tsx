@@ -106,7 +106,7 @@ describe('Phase 12 Demo Polish & Showcase Seeding Components', () => {
       ],
     };
 
-    it('renders Seed Showcase and Reset Demo buttons on Doctor overview', async () => {
+    it('does not expose showcase seed or destructive reset controls on Doctor overview', async () => {
       vi.spyOn(api, 'sessions').mockResolvedValueOnce(mockSessionList);
 
       render(
@@ -118,70 +118,10 @@ describe('Phase 12 Demo Polish & Showcase Seeding Components', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId('seed-showcase-btn')).toBeInTheDocument();
-        expect(screen.getByTestId('reset-demo-btn')).toBeInTheDocument();
         expect(screen.getByText('Sunita Sharma (সুমিতা শর্মা)')).toBeInTheDocument();
       });
-    });
-
-    it('calls seedShowcase API when clicking Seed Showcase button', async () => {
-      vi.spyOn(api, 'sessions').mockResolvedValue(mockSessionList);
-      vi.spyOn(api, 'seedShowcase').mockResolvedValueOnce({
-        session_id: 'session-showcase-101',
-        patient_name: 'Sunita Sharma (সুমিতা শর্মা)',
-        hospital_token: 'T-SHOWCASE-101',
-        language: 'bn',
-        status: 'ready_for_review',
-        summary_id: 'sum-101',
-        message: 'Showcase seeded',
-      });
-
-      render(
-        <MemoryRouter initialEntries={['/doctor']}>
-          <Routes>
-            <Route path="/doctor" element={<Doctor />} />
-          </Routes>
-        </MemoryRouter>,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId('seed-showcase-btn')).toBeInTheDocument();
-      });
-
-      fireEvent.click(screen.getByTestId('seed-showcase-btn'));
-
-      await waitFor(() => {
-        expect(api.seedShowcase).toHaveBeenCalledTimes(1);
-        expect(screen.getByText(/Showcase patient Sunita Sharma/i)).toBeInTheDocument();
-      });
-    });
-
-    it('calls resetDemo API when clicking Reset Demo button with confirm', async () => {
-      vi.spyOn(api, 'sessions').mockResolvedValue(mockSessionList);
-      vi.spyOn(api, 'resetDemo').mockResolvedValueOnce({
-        success: true,
-        message: 'Demo data reset successfully.',
-      });
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
-
-      render(
-        <MemoryRouter initialEntries={['/doctor']}>
-          <Routes>
-            <Route path="/doctor" element={<Doctor />} />
-          </Routes>
-        </MemoryRouter>,
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId('reset-demo-btn')).toBeInTheDocument();
-      });
-
-      fireEvent.click(screen.getByTestId('reset-demo-btn'));
-
-      await waitFor(() => {
-        expect(api.resetDemo).toHaveBeenCalledTimes(1);
-        expect(screen.getByText('Demo data reset successfully.')).toBeInTheDocument();
-      });
+      expect(screen.queryByTestId('seed-showcase-btn')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('reset-demo-btn')).not.toBeInTheDocument();
     });
 
     it('renders emergency triage alerts with high-visibility pulsing style', async () => {

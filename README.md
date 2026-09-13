@@ -2,6 +2,8 @@
 
 MediKiosk is a local SIH prototype for pre-consultation intake. The patient supplies a structured history; a doctor reviews, edits, and confirms it. It does not diagnose or prescribe.
 
+For a single end-to-end explanation of the roadmap, architecture, workflows, technology stack, and implementation, see the [complete project guide](docs/complete-project-guide.md).
+
 ## Current working scope
 
 Phases 1–12 are implemented for the local synthetic-data prototype: deterministic intake, optional normalization, mock speech, deterministic safety alerts, document storage/typed fixture extraction, source-linked evidence and timeline, doctor-controlled summaries and amendments, FHIR R4 export, mock ABDM/HIS interoperability, and a seeded Bengali showcase journey.

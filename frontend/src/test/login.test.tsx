@@ -34,6 +34,8 @@ describe('Login Component & Auth Flow', () => {
   it('renders phone input screen with Indian +91 prefix and Send OTP button', async () => {
     renderLogin();
     expect(await screen.findByRole('heading', { name: /MediKiosk/ })).toBeVisible();
+    expect(document.querySelector('.auth-brand-logo .brand-logo')).not.toBeInTheDocument();
+    expect(document.querySelector('.auth-brand-logo .brand-wordmark')).toBeInTheDocument();
     expect(screen.getByText('Patient Login')).toBeVisible();
     expect(screen.getByLabelText('Mobile Number')).toBeVisible();
     expect(screen.getByText('+91')).toBeVisible();

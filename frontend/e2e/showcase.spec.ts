@@ -1,16 +1,22 @@
 import { expect, test } from '@playwright/test';
 
-test('one-click showcase is complete and reviewable with safety and source evidence', async ({
-  page,
-}) => {
+test('seeded showcase is reviewable with safety and source evidence', async ({ page }) => {
   await page.goto('/login');
   await page.getByRole('button', { name: 'Quick Demo Doctor Login' }).click();
   await expect(page).toHaveURL(/\/doctor/);
 
-  const seedBtn = page.getByTestId('seed-showcase-btn');
-  await expect(seedBtn).toBeVisible();
-  await seedBtn.click();
-  await expect(page.getByText(/Showcase patient.*seeded successfully/)).toBeVisible();
+  const seeded = await page.evaluate(async () => {
+    const response = await fetch('/api/doctor/demo/seed-showcase', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    return response.ok;
+  });
+  expect(seeded).toBe(true);
+  await page.reload();
+  await expect(page.getByTestId('seed-showcase-btn')).toHaveCount(0);
+  await expect(page.getByTestId('reset-demo-btn')).toHaveCount(0);
   const showcase = page.locator('.session-card').filter({ hasText: 'সুমিতা শর্মা' });
   await expect(showcase).toBeVisible();
   await showcase.click();
