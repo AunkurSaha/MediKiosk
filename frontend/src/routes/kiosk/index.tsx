@@ -94,8 +94,12 @@ export default function Kiosk() {
   const [docAgreed, setDocAgreed] = useState(false);
   const [hospitals, setHospitals] = useState<Hospital[] | null>(null);
   const [queueEstimate, setQueueEstimate] = useState<PatientQueueEstimate | null>(null);
+  const [queueEstimateLoading, setQueueEstimateLoading] = useState(true);
+  const [queueEstimateError, setQueueEstimateError] = useState(false);
+  const [queueEstimateAttempt, setQueueEstimateAttempt] = useState(0);
   const step = location.pathname.split('/').pop() || 'language';
   const t = copy[language];
+  const queueSessionId = record?.session.id;
 
   useEffect(() => {
     if (!resumeId) return;
@@ -127,6 +131,28 @@ export default function Kiosk() {
       active = false;
     };
   }, [attempt, resumeId]);
+
+  useEffect(() => {
+    if (step !== 'complete' || !queueSessionId) return;
+    let active = true;
+    api
+      .queueEstimate(queueSessionId)
+      .then((estimate) => {
+        if (!active) return;
+        setQueueEstimate(estimate);
+      })
+      .catch(() => {
+        if (!active) return;
+        setQueueEstimate(null);
+        setQueueEstimateError(true);
+      })
+      .finally(() => {
+        if (active) setQueueEstimateLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [queueEstimateAttempt, queueSessionId, step]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenError, setFullscreenError] = useState('');
@@ -177,6 +203,9 @@ export default function Kiosk() {
     pendingId.current = null;
     setRecord(null);
     setQueueEstimate(null);
+    setQueueEstimateLoading(false);
+    setQueueEstimateError(false);
+    setQueueEstimateAttempt(0);
     setName('');
     setToken('');
     setAbha('');
@@ -214,14 +243,9 @@ export default function Kiosk() {
     setRecord((current) => (current ? { ...current, session } : current));
     sessionStorage.removeItem(sessionKey);
     setResumeId(null);
+    setQueueEstimateLoading(true);
+    setQueueEstimateError(false);
     navigate('/kiosk/complete', { replace: true });
-    try {
-      setQueueEstimate(await api.queueEstimate(record.session.id));
-    } catch {
-      // Completion is authoritative. A temporary estimate failure must never
-      // strand the patient on the interview review screen.
-      setQueueEstimate(null);
-    }
   }
 
   if (loading)
@@ -535,30 +559,49 @@ export default function Kiosk() {
             <p className="eyebrow">{t.saved}</p>
             <h1>{t.complete}</h1>
             <p>{t.doneText}</p>
-            {queueEstimate && (
-              <div className="queue-estimate" role="status">
-                <p>
-                  {t.queuePriority}: <strong>{queueEstimate.position}</strong>
-                  {' · '}
-                  <strong>{queueEstimate.doctor_name}</strong>
-                </p>
-                <p>
-                  {t.approximateWait}:{' '}
-                  <strong>
-                    {queueEstimate.estimated_wait_minutes} {t.minutes}
-                  </strong>
-                </p>
-                <p>
-                  {t.expectedMeeting}:{' '}
-                  <strong>
-                    {new Intl.DateTimeFormat(language, {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    }).format(new Date(queueEstimate.expected_meeting_at))}
-                  </strong>
-                </p>
-              </div>
-            )}
+            <div className="queue-estimate" role="status" aria-live="polite">
+              {queueEstimateLoading && <p>{t.queueEstimateLoading}</p>}
+              {queueEstimateError && !queueEstimateLoading && (
+                <div>
+                  <p>{t.queueEstimateUnavailable}</p>
+                  <button
+                    type="button"
+                    className="secondary queue-estimate-retry"
+                    onClick={() => {
+                      setQueueEstimateLoading(true);
+                      setQueueEstimateError(false);
+                      setQueueEstimateAttempt((value) => value + 1);
+                    }}
+                  >
+                    {t.retry}
+                  </button>
+                </div>
+              )}
+              {queueEstimate && !queueEstimateLoading && (
+                <>
+                  <p>
+                    {t.queuePriority}: <strong>{queueEstimate.position}</strong>
+                    {' · '}
+                    <strong>{queueEstimate.doctor_name}</strong>
+                  </p>
+                  <p>
+                    {t.approximateWait}:{' '}
+                    <strong>
+                      {queueEstimate.estimated_wait_minutes} {t.minutes}
+                    </strong>
+                  </p>
+                  <p>
+                    {t.expectedMeeting}:{' '}
+                    <strong>
+                      {new Intl.DateTimeFormat(language, {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                      }).format(new Date(queueEstimate.expected_meeting_at))}
+                    </strong>
+                  </p>
+                </>
+              )}
+            </div>
             <div className="token">
               <span>{t.token}</span>
               <strong>{record.session.hospital_token}</strong>

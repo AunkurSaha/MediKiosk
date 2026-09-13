@@ -71,6 +71,14 @@ beforeEach(() => {
     legacyState(questions.findIndex((q) => q.question_id === submission.question_id) + 1),
   );
   vi.mocked(api.complete).mockResolvedValue({ ...detail().session, status: 'ready_for_review' });
+  vi.mocked(api.queueEstimate).mockResolvedValue({
+    session_id: id,
+    doctor_id: 'doctor-1',
+    doctor_name: 'Dr. Queue',
+    position: 3,
+    estimated_wait_minutes: 15,
+    expected_meeting_at: '2026-09-09T00:15:00Z',
+  });
   vi.mocked(api.medicalFacts).mockResolvedValue({
     medications: [],
     labs: [],
@@ -112,6 +120,8 @@ describe('Patient intake', () => {
     }
     await user.click(await screen.findByRole('button', { name: 'Finish intake' }));
     await screen.findByRole('heading', { name: 'Ready for your doctor' });
+    expect(await screen.findByText('15 minutes')).toBeVisible();
+    expect(screen.getByText('Estimated total wait time:')).toBeVisible();
     expect(api.interviewAnswer).toHaveBeenCalledTimes(5);
     expect(api.complete).toHaveBeenCalledTimes(1);
     expect(sessionStorage.getItem('medikiosk.session')).toBeNull();
@@ -119,6 +129,31 @@ describe('Patient intake', () => {
     await user.click(screen.getByRole('button', { name: /English/ }));
     expect(screen.getByLabelText('Patient name')).toHaveValue('');
     expect(screen.getByLabelText('Hospital token')).toHaveValue('');
+  });
+
+  it('explains a temporary wait-time failure and retries the estimate', async () => {
+    const completed = {
+      ...detail(),
+      session: { ...detail().session, status: 'ready_for_review' as const },
+    };
+    sessionStorage.setItem('medikiosk.session', id);
+    vi.mocked(api.session).mockResolvedValue(completed);
+    vi.mocked(api.queueEstimate)
+      .mockRejectedValueOnce(new ApiError('NETWORK_ERROR', 0))
+      .mockResolvedValueOnce({
+        session_id: id,
+        doctor_id: 'doctor-1',
+        doctor_name: 'Dr. Queue',
+        position: 2,
+        estimated_wait_minutes: 10,
+        expected_meeting_at: '2026-09-09T00:10:00Z',
+      });
+
+    open('/kiosk/complete');
+    expect(await screen.findByText(/wait-time estimate could not be loaded/i)).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('10 minutes')).toBeVisible();
+    expect(api.queueEstimate).toHaveBeenCalledTimes(2);
   });
 
   it('resumes the retained session at the first missing question without creating a patient', async () => {

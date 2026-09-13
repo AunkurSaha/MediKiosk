@@ -15,6 +15,7 @@ from app.services.document_parser import parse_document
 from app.services.medical_extractor import extract_medical_facts
 
 SHOWCASE_TOKEN = "T-SHOWCASE-101"
+SHOWCASE_HOSPITAL_ID = "10000000-0000-4000-8000-000000000001"
 SHOWCASE_PATIENT_NAME = "Sunita Sharma (সুমিতা শর্মা)"
 FIXTURE_ROOT = Path(__file__).resolve().parents[3] / "ai" / "document_fixtures"
 
@@ -273,7 +274,21 @@ class ShowcaseService:
             )
             db.add(patient)
 
-            hospital = db.scalar(select(models.Hospital).where(models.Hospital.active.is_(True)))
+            hospital = db.scalar(
+                select(models.Hospital)
+                .where(models.Hospital.active.is_(True))
+                .order_by(models.Hospital.id)
+            )
+            if hospital is None:
+                hospital = models.Hospital(
+                    id=SHOWCASE_HOSPITAL_ID,
+                    code="DEMO-KOL-01",
+                    name="MediKiosk City Hospital",
+                    city="Kolkata",
+                    active=True,
+                )
+                db.add(hospital)
+                db.flush()
             hospital_id = hospital.id if hospital else None
 
             valid_doctor_id = None
@@ -315,6 +330,8 @@ class ShowcaseService:
                             active=True,
                         )
                     )
+                else:
+                    membership.active = True
                 queue_entry = db.scalar(
                     select(models.DoctorQueueEntry).where(
                         models.DoctorQueueEntry.session_id == session_id
@@ -327,7 +344,6 @@ class ShowcaseService:
                             doctor_id=actor_user_id,
                             hospital_id=hospital_id,
                             status="WAITING",
-                            priority="HIGH",
                             joined_at=now - timedelta(hours=1),
                         )
                     )
@@ -512,16 +528,53 @@ class ShowcaseService:
         db.query(models.Patient).delete()
         db.query(models.AuditLog).delete()
 
-        if db.get(models.User, DEMO_DOCTOR_ID) is None:
+        doctor = db.get(models.User, DEMO_DOCTOR_ID)
+        if doctor is None:
+            doctor = models.User(
+                id=DEMO_DOCTOR_ID,
+                name="Demo Doctor",
+                email="demo@medikiosk.invalid",
+                role="doctor",
+                is_active=True,
+            )
+            db.add(doctor)
+            db.flush()
+
+        profile = db.get(models.DoctorProfile, DEMO_DOCTOR_ID)
+        if profile is None:
             db.add(
-                models.User(
-                    id=DEMO_DOCTOR_ID,
-                    name="Demo Doctor",
-                    email="demo@medikiosk.invalid",
-                    role="doctor",
-                    is_active=True,
+                models.DoctorProfile(
+                    doctor_user_id=DEMO_DOCTOR_ID,
+                    display_name=doctor.name,
+                    qualification="Demo clinician",
+                    active=True,
+                    accepting_patients=True,
                 )
             )
+            db.flush()
+
+        hospital = db.scalar(
+            select(models.Hospital)
+            .where(models.Hospital.active.is_(True))
+            .order_by(models.Hospital.id)
+        )
+        if hospital is not None:
+            membership = db.scalar(
+                select(models.DoctorHospitalMembership).where(
+                    models.DoctorHospitalMembership.doctor_id == DEMO_DOCTOR_ID,
+                    models.DoctorHospitalMembership.hospital_id == hospital.id,
+                )
+            )
+            if membership is None:
+                db.add(
+                    models.DoctorHospitalMembership(
+                        doctor_id=DEMO_DOCTOR_ID,
+                        hospital_id=hospital.id,
+                        active=True,
+                    )
+                )
+            else:
+                membership.active = True
         db.add(
             models.AuditLog(
                 actor_user_id=DEMO_DOCTOR_ID,
