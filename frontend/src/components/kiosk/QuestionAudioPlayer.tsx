@@ -62,35 +62,32 @@ export default function QuestionAudioPlayer({
     setStatus('loading');
     setErrorMsg(null);
 
-    try {
-      const res = await api.synthesizeSpeech(sessionId, questionId);
-      if (res.provider !== 'mock' && (res.status !== 'success' || !res.audio_base64)) {
+    const playWithBrowserVoice = (text: string) => {
+      if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+        throw new Error('Browser speech synthesis is unavailable');
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = { en: 'en-IN', bn: 'bn-IN', hi: 'hi-IN' }[language];
+      utterance.onend = () => {
+        utteranceRef.current = null;
+        setStatus('idle');
+      };
+      utterance.onerror = () => {
+        utteranceRef.current = null;
         setStatus('error');
         setErrorMsg(t.ttsError);
-        return;
-      }
+      };
+      utteranceRef.current = utterance;
+      setUsingBrowserVoice(true);
+      window.speechSynthesis.speak(utterance);
+      setStatus('playing');
+    };
 
+    try {
+      const res = await api.synthesizeSpeech(sessionId, questionId);
       if (res.provider === 'mock' || res.status !== 'success' || !res.audio_base64) {
-        if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
-          setStatus('error');
-          setErrorMsg(t.ttsError);
-          return;
-        }
-        const utterance = new SpeechSynthesisUtterance(res.text);
-        utterance.lang = { en: 'en-IN', bn: 'bn-IN', hi: 'hi-IN' }[language];
-        utterance.onend = () => {
-          utteranceRef.current = null;
-          setStatus('idle');
-        };
-        utterance.onerror = () => {
-          utteranceRef.current = null;
-          setStatus('error');
-          setErrorMsg(t.ttsError);
-        };
-        utteranceRef.current = utterance;
-        setUsingBrowserVoice(true);
-        window.speechSynthesis.speak(utterance);
-        setStatus('playing');
+        playWithBrowserVoice(res.text);
         return;
       }
 
@@ -113,9 +110,15 @@ export default function QuestionAudioPlayer({
       await audio.play();
       setStatus('playing');
     } catch {
-      setStatus('error');
-      setErrorMsg(t.ttsError);
       audioRef.current = null;
+      try {
+        const questionText = document.getElementById('question-title')?.textContent?.trim();
+        if (!questionText) throw new Error('Question text unavailable');
+        playWithBrowserVoice(questionText);
+      } catch {
+        setStatus('error');
+        setErrorMsg(t.ttsError);
+      }
     }
   }
 

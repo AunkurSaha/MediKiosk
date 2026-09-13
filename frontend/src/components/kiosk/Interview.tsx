@@ -17,6 +17,7 @@ export default function Interview({
   fixtureId,
   onComplete,
   onBusyChange,
+  onManageConsent,
 }: {
   sessionId: string;
   language: Language;
@@ -25,6 +26,7 @@ export default function Interview({
   fixtureId?: string;
   onComplete: () => Promise<void>;
   onBusyChange?: (busy: boolean) => void;
+  onManageConsent?: () => void;
 }) {
   const [state, setState] = useState<InterviewState | null>(null);
   const [error, setError] = useState<unknown>(null);
@@ -96,6 +98,17 @@ export default function Interview({
   return (
     <div className="adaptive-interview">
       <p className="notice">{u.prototype}</p>
+      {(!voiceConsent || !documentConsent) && onManageConsent && (
+        <div className="notice" role="note">
+          <p>
+            Voice-to-text and OCR require their separate consent options. You can enable them
+            without restarting this interview.
+          </p>
+          <button type="button" className="secondary" disabled={busy} onClick={onManageConsent}>
+            Enable voice / document processing
+          </button>
+        </div>
+      )}
       {Boolean(error) && (
         <div className="error" role="alert">
           <p>{conflict ? u.conflict : errorText(error, language)}</p>
@@ -117,25 +130,33 @@ export default function Interview({
       {state?.selection_required && (
         <>
           <h1>{u.select}</h1>
-          {['standard', 'ayush_demo'].map((namespace) => (
-            <section key={namespace} className="flow-group">
-              <h2>{namespace === 'standard' ? u.standard : u.ayush}</h2>
-              <div className="language-grid">
-                {state.flows
-                  .filter((f) => f.namespace === namespace)
-                  .map((flow) => (
+          {['standard', 'other', 'ayush_demo'].map((namespace) => {
+            const flows = state.flows.filter((f) => f.namespace === namespace);
+            if (!flows.length) return null;
+            return (
+              <section key={namespace} className="flow-group">
+                <h2>
+                  {namespace === 'standard'
+                    ? u.standard
+                    : namespace === 'other'
+                    ? (u.other || 'Other health concern')
+                    : u.ayush}
+                </h2>
+                <div className="language-grid">
+                  {flows.map((flow) => (
                     <button
                       className="language-card"
                       key={flow.flow_id}
                       disabled={busy}
                       onClick={() => void action(() => api.selectFlow(sessionId, flow.flow_id))}
                     >
-                      {flow.label[language]}
+                      {flow.label[language] || flow.label.en}
                     </button>
                   ))}
-              </div>
-            </section>
-          ))}
+                </div>
+              </section>
+            );
+          })}
         </>
       )}
       {state?.flow_id && (
@@ -150,6 +171,13 @@ export default function Interview({
             max={state.progress.applicable || 1}
             value={state.progress.addressed}
           />
+          {documentConsent && (
+            <DocumentUploader
+              sessionId={sessionId}
+              language={language}
+              documentConsent={documentConsent}
+            />
+          )}
           {state.red_flag_alert && (
             <aside
               className={`kiosk-safety-advisory ${state.red_flag_alert.priority}`}
@@ -211,13 +239,6 @@ export default function Interview({
                     </div>
                   ))}
                 </div>
-                {documentConsent && (
-                  <DocumentUploader
-                    sessionId={sessionId}
-                    language={language}
-                    documentConsent={documentConsent}
-                  />
-                )}
                 <button disabled={busy} onClick={() => void action(onComplete)}>
                   {busy ? t.saving : u.finish}
                 </button>

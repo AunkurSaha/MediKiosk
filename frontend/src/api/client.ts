@@ -545,9 +545,10 @@ async function request<T>(
   body?: unknown,
   doctor = false,
   externalSignal?: AbortSignal,
+  timeoutMs = 15000,
 ): Promise<T> {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 15000);
+  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
   const token = getStoredAuthToken();
   const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
   try {
@@ -603,7 +604,14 @@ export const api = {
     const data = new FormData();
     data.append('file', file);
     if (documentType) data.append('document_type', documentType);
-    return request<DocumentRecord>(`/sessions/${id}/documents`, 'POST', data);
+    return request<DocumentRecord>(
+      `/sessions/${id}/documents`,
+      'POST',
+      data,
+      false,
+      undefined,
+      60000,
+    );
   },
   documents: (id: string) =>
     request<{ documents: DocumentRecord[]; total: number }>(
@@ -654,12 +662,18 @@ export const api = {
       data,
       false,
       signal,
+      30000,
     );
   },
   synthesizeSpeech: (id: string, questionId: string) =>
-    request<SpeechSynthesisResponse>(`/sessions/${id}/interview/speech/synthesize`, 'POST', {
-      question_id: questionId,
-    }),
+    request<SpeechSynthesisResponse>(
+      `/sessions/${id}/interview/speech/synthesize`,
+      'POST',
+      { question_id: questionId },
+      false,
+      undefined,
+      30000,
+    ),
   answer: (id: string, field: FieldName, value: string, language: Language) =>
     request<Answer>('/sessions/' + id + '/answers', 'POST', {
       question_id: field,
@@ -669,11 +683,19 @@ export const api = {
       source: 'typed',
       language,
     }),
-  interview: (id: string) => request<InterviewState>(`/sessions/${id}/interview`),
+  interview: (id: string) =>
+    request<InterviewState>(`/sessions/${id}/interview`, 'GET', undefined, false, undefined, 60000),
   selectFlow: (id: string, flow_id: string) =>
     request<InterviewState>(`/sessions/${id}/interview/flow`, 'PUT', { flow_id }),
   interviewAnswer: (id: string, body: Submission) =>
-    request<InterviewState>(`/sessions/${id}/interview/answers`, 'POST', body),
+    request<InterviewState>(
+      `/sessions/${id}/interview/answers`,
+      'POST',
+      body,
+      false,
+      undefined,
+      60000,
+    ),
   interviewCursor: (id: string, question_id: string, expected_revision: number) =>
     request<InterviewState>(`/sessions/${id}/interview/cursor`, 'PUT', {
       question_id,

@@ -419,6 +419,7 @@ export default function Kiosk() {
             documentConsent={Boolean(record.consent?.document_processing)}
             onComplete={completeInterview}
             onBusyChange={setBusy}
+            onManageConsent={() => navigate('/kiosk/consent')}
           />
         )}
         {step === 'complete' && record && (
