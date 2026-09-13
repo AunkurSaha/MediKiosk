@@ -53,6 +53,8 @@ class AlertItem(APIModel):
     updated_at: UTCDate | None = None
     hospital_token: str | None = None
     patient_name: str | None = None
+    hospital_id: str | None = None
+    hospital_name: str | None = None
 
 
 class AlertList(APIModel):

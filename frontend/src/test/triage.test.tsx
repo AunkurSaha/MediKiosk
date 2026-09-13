@@ -14,6 +14,7 @@ vi.mock('../api/triage', async (original) => {
     ...actual,
     triageApi: {
       getAlerts: vi.fn(),
+      getQueue: vi.fn().mockResolvedValue({ items: [] }),
       acknowledgeAlert: vi.fn(),
       getSessionAlerts: vi.fn(),
       getWebSocketUrl: vi.fn(() => 'ws://localhost/mock-ws'),
@@ -124,6 +125,59 @@ describe('AlertCard', () => {
 describe('Triage Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    sessionStorage.setItem(
+      'triage_active_hospital',
+      JSON.stringify({
+        id: 'mock-hosp-1',
+        name: 'MediKiosk General Hospital',
+        city: 'Kolkata',
+        state: 'West Bengal',
+        is_active: true,
+      }),
+    );
+    if (api) {
+      api.hospitals = vi.fn().mockResolvedValue({
+        items: [
+          {
+            id: 'mock-hosp-1',
+            name: 'MediKiosk General Hospital',
+            city: 'Kolkata',
+            state: 'West Bengal',
+            is_active: true,
+          },
+        ],
+      });
+    }
+  });
+
+  it('shows the live waiting-patient count and queue for the selected hospital', async () => {
+    vi.mocked(triageApi.getAlerts).mockResolvedValue({
+      items: [],
+      total: 0,
+      emergency_count: 0,
+      urgent_count: 0,
+      acknowledged_count: 0,
+    });
+    vi.mocked(triageApi.getQueue).mockResolvedValue({
+      items: [
+        {
+          id: 'queue-session-1',
+          patient_name: 'Synthetic Patient 01-1',
+          hospital_token: 'DEMO-Q-0001-1',
+          language: 'en',
+          status: 'ready_for_review',
+          selected_doctor_id: 'doctor-1',
+          queue_status: 'WAITING',
+          queue_joined_at: '2026-09-13T08:00:00Z',
+        },
+      ],
+    });
+
+    render(<Triage />);
+
+    expect(await screen.findByText('Waiting patient queue (1)')).toBeInTheDocument();
+    expect(screen.getByText(/Synthetic Patient 01-1/)).toBeInTheDocument();
+    expect(triageApi.getQueue).toHaveBeenCalledWith('mock-hosp-1');
   });
 
   it('does not restore stale active alerts when an older refresh finishes last', async () => {

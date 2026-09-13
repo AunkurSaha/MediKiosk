@@ -13,15 +13,52 @@ from app.services.staff_tickets import admit_websocket, issue_ticket
 router = APIRouter()
 
 
+@router.get("/queue", response_model=schemas.SessionList)
+def list_waiting_patients(
+    hospital_id: str = Query(min_length=1),
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_triage),
+):
+    rows = db.execute(
+        select(
+            models.Session,
+            models.Patient.name,
+            models.DoctorQueueEntry.status,
+            models.DoctorQueueEntry.joined_at,
+        )
+        .join(models.Patient, models.Patient.id == models.Session.patient_id)
+        .join(models.Consent, models.Consent.session_id == models.Session.id)
+        .join(models.DoctorQueueEntry, models.DoctorQueueEntry.session_id == models.Session.id)
+        .where(
+            models.Session.hospital_id == hospital_id,
+            models.Consent.share_with_doctor.is_(True),
+            models.DoctorQueueEntry.status == "WAITING",
+        )
+        .order_by(models.DoctorQueueEntry.joined_at, models.Session.id)
+    ).all()
+    return schemas.SessionList(
+        items=[
+            schemas.SessionListItem(
+                **schemas.Session.model_validate(session).model_dump(),
+                patient_name=patient_name,
+                queue_status=queue_status,
+                queue_joined_at=joined_at,
+            )
+            for session, patient_name, queue_status, joined_at in rows
+        ]
+    )
+
+
 def _to_alert_item(
     alert: models.Alert,
     hospital_token: str | None = None,
     patient_name: str | None = None,
+    hospital_id: str | None = None,
+    hospital_name: str | None = None,
 ) -> schemas.AlertItem:
     tf_raw = alert.triggering_facts_json or []
     triggering_facts = [
-        schemas.TriggeringFact.model_validate(tf) if isinstance(tf, dict) else tf
-        for tf in tf_raw
+        schemas.TriggeringFact.model_validate(tf) if isinstance(tf, dict) else tf for tf in tf_raw
     ]
     return schemas.AlertItem(
         id=alert.id,
@@ -41,6 +78,8 @@ def _to_alert_item(
         updated_at=alert.updated_at,
         hospital_token=hospital_token,
         patient_name=patient_name,
+        hospital_id=hospital_id,
+        hospital_name=hospital_name,
     )
 
 
@@ -48,15 +87,25 @@ def _to_alert_item(
 def list_alerts(
     status: Literal["new", "acknowledged", "resolved"] | None = Query(default=None),
     priority: Literal["emergency", "urgent", "priority"] | None = Query(default=None),
+    hospital_id: str | None = Query(default=None),
     db: Session = Depends(get_db),
     user: models.User = Depends(require_triage),
 ):
     query = (
-        select(models.Alert, models.Session.hospital_token, models.Patient.name)
+        select(
+            models.Alert,
+            models.Session.hospital_token,
+            models.Patient.name,
+            models.Session.hospital_id,
+            models.Hospital.name.label("hospital_name"),
+        )
         .join(models.Session, models.Session.id == models.Alert.session_id)
         .join(models.Patient, models.Patient.id == models.Session.patient_id)
+        .outerjoin(models.Hospital, models.Hospital.id == models.Session.hospital_id)
     )
 
+    if hospital_id:
+        query = query.where(models.Session.hospital_id == hospital_id)
     if status:
         query = query.where(models.Alert.status == status)
     if priority:
@@ -70,10 +119,19 @@ def list_alerts(
 
     rows = db.execute(query).all()
 
-    items = [_to_alert_item(alert, token, name) for alert, token, name in rows]
+    items = [
+        _to_alert_item(alert, token, name, hosp_id, hosp_name)
+        for alert, token, name, hosp_id, hosp_name in rows
+    ]
 
-    # Compute overall statistics across all alerts
-    all_alerts = db.scalars(select(models.Alert)).all()
+    # Compute overall statistics filtered by hospital if specified
+    stats_query = select(models.Alert).join(
+        models.Session, models.Session.id == models.Alert.session_id
+    )
+    if hospital_id:
+        stats_query = stats_query.where(models.Session.hospital_id == hospital_id)
+    all_alerts = db.scalars(stats_query).all()
+
     emergency_count = sum(
         1 for a in all_alerts if a.priority == "emergency" and a.status in ("new", "acknowledged")
     )
@@ -112,7 +170,9 @@ async def acknowledge_alert(
     intake.get_session(db, alert.session_id)  # serialize against reconciliation
     db.refresh(alert)
     if payload.expected_revision != alert.revision:
-        raise HTTPException(status_code=409, detail="Alert evidence changed; reload before acknowledging.")
+        raise HTTPException(
+            status_code=409, detail="Alert evidence changed; reload before acknowledging."
+        )
     if alert.status == "resolved":
         raise HTTPException(status_code=409, detail="The alert is resolved.")
     if alert.acknowledged_at is not None:

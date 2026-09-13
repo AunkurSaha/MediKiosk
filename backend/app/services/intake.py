@@ -298,6 +298,7 @@ def create_session(db, payload, user=None):
         id=session_id,
         patient_id=patient.id,
         user_id=owner_id,
+        hospital_id=payload.hospital_id,
         hospital_token=payload.hospital_token,
         language=payload.language,
         status="intake",

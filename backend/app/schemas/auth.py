@@ -30,6 +30,11 @@ class AuthUserResponse(APIModel):
     role: str
     phone_number: str | None = None
     phone_verified: bool = False
+    hospital_id: str | None = None
+    hospital_name: str | None = None
+    specialty: str | None = None
+    specialties: list[str] = []
+    qualification: str | None = None
 
 
 class LoginResponse(APIModel):
@@ -45,6 +50,8 @@ class LogoutResponse(APIModel):
 
 class DemoLoginRequest(APIModel):
     role: str = Field(default="patient", description="Role to log in as ('patient', 'doctor', or 'triage').")
+    hospital_id: str | None = Field(default=None, description="Optional active hospital ID for doctors.")
+    specialty: str | None = Field(default=None, description="Optional clinical specialisation for doctors.")
 
 
 class StaffLoginRequest(APIModel):
@@ -53,6 +60,8 @@ class StaffLoginRequest(APIModel):
         description="Mobile phone number (+91XXXXXXXXXX or 10 digits) or staff email/ID.",
     )
     password: str = Field(..., min_length=1, description="Staff account password.")
+    hospital_id: str | None = Field(default=None, description="Optional active hospital ID for doctors.")
+    specialty: str | None = Field(default=None, description="Optional active specialisation for doctors.")
 
 
 class StaffRegisterRequest(APIModel):
@@ -61,4 +70,7 @@ class StaffRegisterRequest(APIModel):
     phone_number: str = Field(..., description="Mobile phone number in Indian format (+91XXXXXXXXXX or 10 digits).")
     email: str | None = Field(default=None, description="Optional official staff email.")
     password: str = Field(..., min_length=6, description="Staff account password (minimum 6 characters).")
+    hospital_id: str | None = Field(default=None, description="Optional active hospital ID for doctors.")
+    specialty: str | None = Field(default=None, description="Optional active clinical specialisation for doctors.")
+    qualification: str | None = Field(default=None, description="Optional qualification/designation for doctors (e.g. MD, MBBS).")
 

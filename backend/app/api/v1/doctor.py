@@ -12,24 +12,63 @@ from app.services import intake
 router = APIRouter()
 
 
-@router.get("/sessions", response_model=schemas.SessionList)
-def read_doctor_sessions(
+@router.get("/context", response_model=schemas.AuthUserResponse)
+def get_doctor_context(
     db: Session = Depends(get_db),
     user: models.User = Depends(get_current_user),
 ):
-    rows = db.execute(
-        select(models.Session, models.Patient.name, models.DoctorQueueEntry.status, models.DoctorQueueEntry.joined_at)
+    from app.services.auth_service import get_auth_user_response
+
+    return get_auth_user_response(db, user)
+
+
+@router.put("/context", response_model=schemas.AuthUserResponse)
+def update_doctor_context(
+    payload: schemas.AuthUserResponse,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.auth_service import get_auth_user_response, sync_doctor_memberships
+
+    sync_doctor_memberships(
+        db,
+        doctor_id=user.id,
+        hospital_id=payload.hospital_id,
+        specialty=payload.specialty,
+        qualification=payload.qualification,
+        name=payload.name if payload.name != user.name else None,
+    )
+    db.commit()
+    return get_auth_user_response(db, user)
+
+
+@router.get("/sessions", response_model=schemas.SessionList)
+def read_doctor_sessions(
+    hospital_id: str | None = None,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    query = (
+        select(
+            models.Session,
+            models.Patient.name,
+            models.DoctorQueueEntry.status,
+            models.DoctorQueueEntry.joined_at,
+        )
         .join(models.Patient, models.Patient.id == models.Session.patient_id)
         .join(models.Consent, models.Consent.session_id == models.Session.id)
-        .join(models.DoctorQueueEntry, models.DoctorQueueEntry.session_id == models.Session.id)
-        .join(models.DoctorHospitalMembership, (models.DoctorHospitalMembership.doctor_id == user.id) & (models.DoctorHospitalMembership.hospital_id == models.Session.hospital_id))
+        .outerjoin(models.DoctorQueueEntry, models.DoctorQueueEntry.session_id == models.Session.id)
         .where(
             models.Consent.share_with_doctor.is_(True),
             models.Session.selected_doctor_id == user.id,
-            models.DoctorHospitalMembership.active.is_(True),
             models.Session.status.in_(["ready_for_review", "under_review", "confirmed"]),
         )
-        .order_by(
+    )
+    if hospital_id:
+        query = query.where(models.Session.hospital_id == hospital_id)
+
+    rows = db.execute(
+        query.order_by(
             models.DoctorQueueEntry.status != "WAITING",
             models.DoctorQueueEntry.joined_at.asc(),
             models.Session.id,
@@ -362,7 +401,9 @@ def reset_demo(
     return ShowcaseService.reset_demo_data(db)
 
 
-@router.post("/sessions/{session_id}/translate", response_model=schemas.translation.TranslationResponse)
+@router.post(
+    "/sessions/{session_id}/translate", response_model=schemas.translation.TranslationResponse
+)
 async def translate_text(
     session_id: UUID,
     payload: schemas.translation.TranslationRequest,
@@ -382,7 +423,10 @@ async def translate_text(
     )
 
 
-@router.post("/sessions/{session_id}/transliterate", response_model=schemas.translation.TransliterationResponse)
+@router.post(
+    "/sessions/{session_id}/transliterate",
+    response_model=schemas.translation.TransliterationResponse,
+)
 async def transliterate_text(
     session_id: UUID,
     payload: schemas.translation.TransliterationRequest,
@@ -402,7 +446,10 @@ async def transliterate_text(
     )
 
 
-@router.post("/sessions/{session_id}/identify-language", response_model=schemas.translation.LanguageIdentificationResponse)
+@router.post(
+    "/sessions/{session_id}/identify-language",
+    response_model=schemas.translation.LanguageIdentificationResponse,
+)
 async def identify_language(
     session_id: UUID,
     payload: schemas.translation.LanguageIdentificationRequest,

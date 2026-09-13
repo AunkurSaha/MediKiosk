@@ -1188,6 +1188,10 @@ Backend Services & APIs (`/api/doctor/sessions/{id}/abdm/*`, `/api/doctor/sessio
 
 Phase 12 delivers the **SIH (Smart India Hackathon) showcase demo polish** for MediKiosk, providing a canonical Bengali chest-pain patient scenario, demo management tools, kiosk full-screen display, and judge-friendly triage presentation. This is the **final phase** in the prototype roadmap.
 
+The local demo routing fixtures also provide five synthetic doctors at each of the two demo hospitals. Each doctor has a visible, deterministic waiting-patient load (30 synthetic queue patients total), and the staff login page offers hospital-filtered credential buttons for switching between those doctor personas. All names, credentials, and patient rows are synthetic and enabled only by demo mode.
+
+Every synthetic queue patient has five explicitly patient-reported generic history fields (presenting concern, onset, medicines, allergies, and past history) plus a deterministic, unconfirmed draft summary. Seeded visit and queue identifiers are stable UUIDs; older non-UUID demo queues are retired during an idempotent upgrade so doctor detail routes remain usable. These records contain no diagnoses, treatment recommendations, documents, or inferred clinical facts.
+
 ## Delivered
 
 ### 1. Showcase Seeding Engine (`backend/app/services/showcase.py`)

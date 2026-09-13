@@ -1,21 +1,22 @@
 from datetime import datetime, timedelta, timezone
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
-from sqlalchemy import select
+from sqlalchemy import func, select
 
 from app import models
 from app.api.deps import require_patient
 from app.core import security
 from app.main import app
-from app.services import doctor_routing
+from app.services import doctor_routing, intake
 
 
 def patient(database, suffix="a"):
+    unique_phone = f"+91{str(uuid4().int)[-10:]}"
     user = models.User(
         id=str(uuid4()),
         name=f"Patient {suffix}",
-        phone_number=f"+9190000000{suffix}",
+        phone_number=unique_phone,
         role="patient",
         is_active=True,
     )
@@ -84,6 +85,182 @@ def auth_headers(database, user):
     )
     database.commit()
     return {"Authorization": f"Bearer {raw}"}
+
+
+def test_demo_fixtures_seed_five_doctors_and_visible_patient_load_per_hospital(client, database):
+    response = client.get("/api/hospitals")
+    assert response.status_code == 200
+    # Re-seeding is part of every local startup and must remain idempotent.
+    doctor_routing.ensure_demo_routing_data(database)
+
+    for hospital_id in (
+        doctor_routing.DEMO_HOSPITAL_A,
+        doctor_routing.DEMO_HOSPITAL_B,
+    ):
+        doctor_count = database.scalar(
+            select(func.count(models.DoctorHospitalMembership.id)).where(
+                models.DoctorHospitalMembership.hospital_id == hospital_id,
+                models.DoctorHospitalMembership.active.is_(True),
+            )
+        )
+        assert doctor_count == 5
+
+        patient_load = database.scalar(
+            select(func.count(models.DoctorQueueEntry.id)).where(
+                models.DoctorQueueEntry.hospital_id == hospital_id,
+                models.DoctorQueueEntry.status == "WAITING",
+            )
+        )
+        assert patient_load == 15
+        roster = client.get(f"/api/hospitals/{hospital_id}/doctors")
+        assert roster.status_code == 200, roster.text
+        assert len(roster.json()["items"]) == 5
+        assert sum(item["waiting_count"] for item in roster.json()["items"]) == 15
+
+    seeded_session_ids = database.scalars(
+        select(models.DoctorQueueEntry.session_id).where(
+            models.DoctorQueueEntry.hospital_id.in_(
+                [doctor_routing.DEMO_HOSPITAL_A, doctor_routing.DEMO_HOSPITAL_B]
+            ),
+            models.DoctorQueueEntry.status == "WAITING",
+        )
+    ).all()
+    consent_count = database.scalar(
+        select(func.count(models.Consent.session_id)).where(
+            models.Consent.session_id.in_(seeded_session_ids),
+            models.Consent.share_with_doctor.is_(True),
+        )
+    )
+    assert consent_count == 30
+
+    triage_user = database.scalar(select(models.User).where(models.User.role == "triage"))
+    triage_headers = auth_headers(database, triage_user)
+    hospital_queues = []
+    for hospital_id in (
+        doctor_routing.DEMO_HOSPITAL_A,
+        doctor_routing.DEMO_HOSPITAL_B,
+    ):
+        queue_response = client.get(
+            f"/api/triage/queue?hospital_id={hospital_id}", headers=triage_headers
+        )
+        assert queue_response.status_code == 200, queue_response.text
+        assert len(queue_response.json()["items"]) == 15
+        assert {item["hospital_id"] for item in queue_response.json()["items"]} == {hospital_id}
+        hospital_queues.append({item["id"] for item in queue_response.json()["items"]})
+    assert hospital_queues[0].isdisjoint(hospital_queues[1])
+
+    for (
+        _,
+        name,
+        phone_number,
+        _,
+        hospital_id,
+        specialties,
+        queue_count,
+    ) in doctor_routing.DEMO_DOCTORS:
+        login = client.post(
+            "/api/auth/staff-login",
+            json={
+                "identifier": phone_number,
+                "password": doctor_routing.DEMO_DOCTOR_PASSWORD,
+                "hospital_id": hospital_id,
+                "specialty": specialties[0],
+            },
+        )
+        assert login.status_code == 200, f"{name}: {login.text}"
+        assert login.json()["user"]["name"] == name
+
+        listing = client.get("/api/doctor/sessions")
+        assert listing.status_code == 200, f"{name}: {listing.text}"
+        active_visits = [
+            item for item in listing.json()["items"] if item["queue_status"] == "WAITING"
+        ]
+        assert len(active_visits) == queue_count
+        for item in active_visits:
+            UUID(item["id"])
+            detail = client.get(f"/api/doctor/sessions/{item['id']}")
+            assert detail.status_code == 200, f"{name}: {detail.text}"
+            record = detail.json()
+            assert len(record["answers"]) == 5
+            assert record["summary"]["status"] == "generated"
+            assert "Patient reports" in record["summary"]["generated_text"]
+
+
+def test_demo_seed_upgrades_legacy_queue_ids_without_collisions(database):
+    database.add_all(
+        [
+            models.Hospital(
+                id=doctor_routing.DEMO_HOSPITAL_A,
+                code="DEMO-KOL-01",
+                name="MediKiosk City Hospital",
+                active=True,
+            ),
+            models.Hospital(
+                id=doctor_routing.DEMO_HOSPITAL_B,
+                code="DEMO-KOL-02",
+                name="MediKiosk Lake Medical Centre",
+                active=True,
+            ),
+        ]
+    )
+    database.add(
+        models.DoctorProfile(
+            doctor_user_id=doctor_routing.DEMO_DOCTOR_A,
+            display_name="Legacy Demo Doctor",
+            active=True,
+            accepting_patients=True,
+        )
+    )
+    database.flush()
+    patient_id = "demo-queue-patient-0001-0"
+    legacy_session_id = "demo-queue-0001-0"
+    database.add(models.Patient(id=patient_id, name="Legacy Synthetic Patient"))
+    database.add(
+        models.Session(
+            id=legacy_session_id,
+            patient_id=patient_id,
+            hospital_token="DEMO-Q-0001-1",
+            language="en",
+            status="ready_for_review",
+            hospital_id=doctor_routing.DEMO_HOSPITAL_A,
+            selected_doctor_id=doctor_routing.DEMO_DOCTOR_A,
+        )
+    )
+    database.flush()
+    database.add(
+        models.Consent(
+            session_id=legacy_session_id,
+            share_with_doctor=True,
+            voice_processing=False,
+            document_processing=False,
+        )
+    )
+    database.add(
+        models.DoctorQueueEntry(
+            id="queue-0001-0",
+            session_id=legacy_session_id,
+            doctor_id=doctor_routing.DEMO_DOCTOR_A,
+            hospital_id=doctor_routing.DEMO_HOSPITAL_A,
+            status="WAITING",
+        )
+    )
+    database.commit()
+
+    doctor_routing.ensure_demo_routing_data(database)
+    doctor_routing.ensure_demo_routing_data(database)
+
+    legacy = database.get(models.Session, legacy_session_id)
+    assert legacy.status == "cancelled"
+    replacement = database.scalar(
+        select(models.Session).where(
+            models.Session.patient_id == patient_id,
+            models.Session.status == "ready_for_review",
+        )
+    )
+    assert replacement is not None
+    UUID(replacement.id)
+    assert len(intake.latest_answers(database, replacement.id)) == 5
+    assert intake.summary_for(database, replacement.id) is not None
 
 
 def test_hospital_selection_and_ownership(client, database):
@@ -238,6 +415,59 @@ def test_assignment_revalidation_queue_uniqueness_and_doctor_isolation(client, d
     doctor_routing.require_assigned_doctor(database, visit, same_hospital)
 
 
+def test_patient_queue_estimate_uses_only_selected_doctors_waiting_queue(database):
+    hospital = models.Hospital(
+        id=str(uuid4()), code=f"TEST-{uuid4()}", name="Queue Test Hospital", active=True
+    )
+    database.add(hospital)
+    database.commit()
+    selected_doctor = doctor(database, "Dr. Selected", hospital.id)
+    other_doctor = doctor(database, "Dr. Other", hospital.id)
+    current_user = patient(database, "current")
+    earlier_user = patient(database, "earlier")
+    other_user = patient(database, "other-doctor")
+    earlier = session_for(database, earlier_user, hospital.id, selected_doctor.id)
+    current = session_for(database, current_user, hospital.id, selected_doctor.id)
+    other = session_for(database, other_user, hospital.id, other_doctor.id)
+    joined_at = datetime.now(timezone.utc)
+    database.add_all(
+        [
+            models.DoctorQueueEntry(
+                session_id=earlier.id,
+                doctor_id=selected_doctor.id,
+                hospital_id=hospital.id,
+                status="WAITING",
+                joined_at=joined_at - timedelta(minutes=1),
+            ),
+            models.DoctorQueueEntry(
+                session_id=current.id,
+                doctor_id=selected_doctor.id,
+                hospital_id=hospital.id,
+                status="WAITING",
+                joined_at=joined_at,
+            ),
+            models.DoctorQueueEntry(
+                session_id=other.id,
+                doctor_id=other_doctor.id,
+                hospital_id=hospital.id,
+                status="WAITING",
+                joined_at=joined_at - timedelta(minutes=2),
+            ),
+        ]
+    )
+    database.commit()
+
+    estimate = doctor_routing.patient_queue_estimate(database, current.id, current_user)
+
+    assert estimate.doctor_id == selected_doctor.id
+    assert estimate.doctor_name == "Dr. Selected"
+    assert estimate.position == 2
+    assert estimate.estimated_wait_minutes == 10
+    assert timedelta(minutes=9, seconds=55) <= estimate.expected_meeting_at - datetime.now(
+        timezone.utc
+    ) <= timedelta(minutes=10)
+
+
 def test_only_selected_doctor_can_list_view_and_transition_queue(client, database):
     hospital = models.Hospital(
         id=str(uuid4()), code="WORKSPACE", name="Workspace Hospital", active=True
@@ -260,6 +490,16 @@ def test_only_selected_doctor_can_list_view_and_transition_queue(client, databas
     database.add(
         models.DoctorQueueEntry(
             session_id=visit.id, doctor_id=selected.id, hospital_id=hospital.id, status="WAITING"
+        )
+    )
+    unassigned = session_for(database, patient(database, "42"), hospital.id)
+    unassigned.status = "ready_for_review"
+    database.add(
+        models.Consent(
+            session_id=unassigned.id,
+            share_with_doctor=True,
+            voice_processing=False,
+            document_processing=False,
         )
     )
     database.commit()

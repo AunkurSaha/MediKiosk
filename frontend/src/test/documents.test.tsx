@@ -129,3 +129,56 @@ it('explains why a stored arbitrary upload has no extraction or facts', async ()
   render(<DocumentUploader sessionId="synthetic" language="en" documentConsent />);
   expect(await screen.findByText(/real OCR is not enabled/)).toBeInTheDocument();
 });
+
+it('attaches the granted camera stream after rendering and captures a ready frame', async () => {
+  vi.mocked(api.documents).mockResolvedValueOnce({ documents: [], total: 0 });
+  vi.mocked(api.uploadDocument).mockImplementationOnce(() => new Promise(() => undefined));
+
+  const stop = vi.fn();
+  const stream = { getTracks: () => [{ stop }] } as unknown as MediaStream;
+  const getUserMedia = vi.fn().mockResolvedValue(stream);
+  Object.defineProperty(navigator, 'mediaDevices', {
+    configurable: true,
+    value: { getUserMedia },
+  });
+  const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
+  const drawImage = vi.fn();
+  const getContext = vi
+    .spyOn(HTMLCanvasElement.prototype, 'getContext')
+    .mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D);
+  const toBlob = vi
+    .spyOn(HTMLCanvasElement.prototype, 'toBlob')
+    .mockImplementation((callback) => callback(new Blob(['photo'], { type: 'image/jpeg' })));
+
+  const { unmount } = render(
+    <DocumentUploader sessionId="synthetic" language="en" documentConsent />,
+  );
+  fireEvent.click(screen.getByTestId('open-camera-btn'));
+
+  const video = await screen
+    .findByRole('button', { name: 'Starting camera…' })
+    .then(() => document.querySelector('video') as HTMLVideoElement);
+  await waitFor(() => expect(video.srcObject).toBe(stream));
+  expect(play).toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: 'Starting camera…' })).toBeDisabled();
+
+  Object.defineProperties(video, {
+    videoWidth: { configurable: true, value: 1280 },
+    videoHeight: { configurable: true, value: 720 },
+  });
+  fireEvent.loadedMetadata(video);
+  fireEvent.click(screen.getByRole('button', { name: '📸 Capture Image' }));
+
+  await waitFor(() => expect(api.uploadDocument).toHaveBeenCalled());
+  const capturedFile = vi.mocked(api.uploadDocument).mock.calls.at(-1)?.[1];
+  expect(capturedFile).toBeInstanceOf(File);
+  expect(capturedFile?.type).toBe('image/jpeg');
+  expect(drawImage).toHaveBeenCalledWith(video, 0, 0, 1280, 720);
+  expect(toBlob).toHaveBeenCalled();
+  expect(stop).toHaveBeenCalled();
+
+  unmount();
+  play.mockRestore();
+  getContext.mockRestore();
+  toBlob.mockRestore();
+});

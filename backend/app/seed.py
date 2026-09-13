@@ -5,6 +5,7 @@ from app.api.deps import DEMO_DOCTOR_ID, DEMO_TRIAGE_ID
 from app.core import security
 from app.core.config import demo_enabled
 from app.database import SessionLocal
+from app.services.doctor_routing import ensure_demo_routing_data
 from app.services.showcase import ShowcaseService
 
 
@@ -53,6 +54,9 @@ def main():
             triage.name = "Sister Priya (OPD Triage)"
         db.commit()
 
+        # Ensure both hospitals have five selectable demo doctors and visible queue load.
+        ensure_demo_routing_data(db)
+
         if "--reset" in sys.argv:
             res = ShowcaseService.reset_demo_data(db)
             print("Demo reset complete:", res["message"])
@@ -65,7 +69,7 @@ def main():
             return
 
         print(
-            "Demo doctor ready. Use --showcase to seed Bengali chest-pain showcase patient or --reset to reset data."
+            "Demo hospitals ready with five doctors and patient load each. Use --showcase to seed the Bengali chest-pain showcase patient or --reset to reset patient data."
         )
 
 

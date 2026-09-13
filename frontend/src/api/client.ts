@@ -39,6 +39,20 @@ export interface DoctorMatch {
   recommended: boolean;
   fallback: boolean;
 }
+
+export interface PatientQueueEstimate {
+  session_id: string;
+  doctor_id: string;
+  doctor_name: string;
+  position: number;
+  estimated_wait_minutes: number;
+  expected_meeting_at: string;
+}
+export interface DoctorRosterItem {
+  doctor_id: string;
+  name: string;
+  waiting_count: number;
+}
 export interface DoctorMatches {
   specialty_codes: string[];
   fallback_used: boolean;
@@ -283,7 +297,11 @@ export interface Detail {
   documents?: DocumentRecord[];
 }
 export interface SessionList {
-  items: (Session & { patient_name: string; queue_status?: string | null; queue_joined_at?: string | null })[];
+  items: (Session & {
+    patient_name: string;
+    queue_status?: string | null;
+    queue_joined_at?: string | null;
+  })[];
 }
 
 export type VerificationStatus = 'unverified' | 'verified' | 'rejected';
@@ -483,6 +501,77 @@ export interface TransliterationResult {
   status: 'success' | 'unavailable';
   source_text: string;
   source_language: string;
+  source_type: 'document' | 'patient_answer';
+  source_id: string;
+  document_id: string | null;
+  extraction_id: string | null;
+  document_filename: string | null;
+  raw_text: string | null;
+  source_location: string | null;
+}
+
+export interface ABDMProfile {
+  abha_number: string;
+  abha_address: string;
+  name: string;
+  gender: string;
+  dob: string;
+  mobile_masked: string;
+  status: string;
+}
+export interface ABDMVerificationResponse {
+  success: boolean;
+  profile: ABDMProfile | null;
+  message: string;
+}
+export interface ABDMCareContextLinkResponse {
+  success: boolean;
+  care_context_reference: string;
+  display: string;
+  status: string;
+  linked_at: string;
+  message: string;
+}
+export interface ABDMStatusResponse {
+  session_id: string;
+  patient_id: string;
+  abha_number: string | null;
+  abha_address: string | null;
+  abha_status: string;
+  care_context_reference: string | null;
+  care_context_display: string | null;
+  care_context_status: string;
+  care_context_linked_at: string | null;
+  his_dispatch_status: string;
+  his_dispatch_receipt: Record<string, unknown> | null;
+  his_dispatched_at: string | null;
+  consent_artefact_id: string | null;
+}
+export interface HISDispatchResponse {
+  success: boolean;
+  dispatch_id: string;
+  target_endpoint: string;
+  status: string;
+  dispatched_at: string;
+  receipt_reference: string;
+  message: string;
+  attached_bundle_type: string;
+}
+export interface TranslationResult {
+  status: 'success' | 'unavailable';
+  source_text: string;
+  source_language: string;
+  target_language: string;
+  translated_text: string | null;
+  provider: string;
+  model: string | null;
+  reason: string | null;
+  provenance_note: string;
+}
+export interface TransliterationResult {
+  status: 'success' | 'unavailable';
+  source_text: string;
+  source_language: string;
   transliterated_text: string | null;
   provider: string;
   reason: string | null;
@@ -495,6 +584,7 @@ export interface LanguageIdentificationResult {
   provider: string;
   reason: string | null;
 }
+
 export class ApiError extends Error {
   code: string;
   status: number;
@@ -511,6 +601,11 @@ export interface AuthUser {
   role: string;
   phone_number: string | null;
   phone_verified: boolean;
+  hospital_id?: string | null;
+  hospital_name?: string | null;
+  specialty?: string | null;
+  specialties?: string[];
+  qualification?: string | null;
 }
 
 export interface OtpRequestResult {
@@ -539,6 +634,9 @@ export interface StaffRegisterPayload {
   phone_number: string;
   email?: string;
   password: string;
+  hospital_id?: string;
+  specialty?: string;
+  qualification?: string;
 }
 
 let activeAuthToken: string | null = null;
@@ -618,6 +716,8 @@ export const api = {
     language: Language;
   }) => request<Session>('/sessions', 'POST', body),
   hospitals: () => request<{ items: Hospital[] }>('/hospitals'),
+  hospitalDoctors: (hospitalId: string) =>
+    request<{ items: DoctorRosterItem[] }>(`/hospitals/${encodeURIComponent(hospitalId)}/doctors`),
   selectHospital: (id: string, hospitalId: string) =>
     request<Session>(`/sessions/${id}/hospital`, 'PUT', { hospital_id: hospitalId }),
   matchedDoctors: (id: string) => request<DoctorMatches>(`/sessions/${id}/doctors`),
@@ -736,7 +836,18 @@ export const api = {
       expected_revision,
     }),
   complete: (id: string) => request<Session>('/sessions/' + id + '/complete', 'POST'),
-  sessions: () => request<SessionList>('/doctor/sessions', 'GET', undefined, true),
+  queueEstimate: (id: string) =>
+    request<PatientQueueEstimate>(`/sessions/${id}/queue-estimate`, 'GET'),
+  sessions: (hospitalId?: string) =>
+    request<SessionList>(
+      '/doctor/sessions' + (hospitalId ? `?hospital_id=${encodeURIComponent(hospitalId)}` : ''),
+      'GET',
+      undefined,
+      true,
+    ),
+  getDoctorContext: () => request<AuthUser>('/doctor/context', 'GET', undefined, true),
+  updateDoctorContext: (payload: Partial<AuthUser>) =>
+    request<AuthUser>('/doctor/context', 'PUT', payload, true),
   doctorDetail: (id: string) => request<Detail>('/doctor/sessions/' + id, 'GET', undefined, true),
   updateQueue: (id: string, status: 'CALLED' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED') =>
     request<{ status: string }>(`/doctor/sessions/${id}/queue`, 'PUT', { status }, true),
@@ -946,9 +1057,19 @@ export const api = {
     request<LoginResult>('/auth/otp/verify', 'POST', { phone_number: phone, otp }),
   logout: () => request<LogoutResult>('/auth/logout', 'POST'),
   getMe: () => request<AuthUser>('/auth/me'),
-  demoLogin: (role = 'patient') => request<LoginResult>('/auth/demo-login', 'POST', { role }),
-  staffLogin: (identifier: string, password: string) =>
-    request<LoginResult>('/auth/staff-login', 'POST', { identifier, password }),
+  demoLogin: (role = 'patient', hospitalId?: string, specialty?: string) =>
+    request<LoginResult>('/auth/demo-login', 'POST', {
+      role,
+      hospital_id: hospitalId,
+      specialty,
+    }),
+  staffLogin: (identifier: string, password: string, hospitalId?: string, specialty?: string) =>
+    request<LoginResult>('/auth/staff-login', 'POST', {
+      identifier,
+      password,
+      hospital_id: hospitalId,
+      specialty,
+    }),
   staffRegister: (payload: StaffRegisterPayload) =>
     request<LoginResult>('/auth/staff-register', 'POST', payload),
   staffOtpRequest: (phone: string) =>

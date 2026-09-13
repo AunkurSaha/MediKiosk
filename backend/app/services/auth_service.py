@@ -361,9 +361,131 @@ def logout_session(db: Session, raw_token: str) -> bool:
     return False
 
 
+def sync_doctor_memberships(
+    db: Session,
+    doctor_id: str,
+    hospital_id: str | None = None,
+    specialty: str | None = None,
+    qualification: str | None = None,
+    name: str | None = None,
+) -> None:
+    """Ensure doctor profile and active hospital/specialty memberships are synced."""
+    profile = db.get(models.DoctorProfile, doctor_id)
+    if profile is None:
+        user = db.get(models.User, doctor_id)
+        display_name = name or (user.name if user else "Doctor")
+        profile = models.DoctorProfile(
+            doctor_user_id=doctor_id,
+            display_name=display_name,
+            qualification=qualification or "MD / MBBS",
+            active=True,
+            accepting_patients=True,
+        )
+        db.add(profile)
+        db.flush()
+    else:
+        if qualification:
+            profile.qualification = qualification
+        if name:
+            profile.display_name = name
+
+    if hospital_id:
+        hospital = db.get(models.Hospital, hospital_id)
+        if hospital:
+            membership = db.scalar(
+                select(models.DoctorHospitalMembership).where(
+                    models.DoctorHospitalMembership.doctor_id == doctor_id,
+                    models.DoctorHospitalMembership.hospital_id == hospital_id,
+                )
+            )
+            if membership is None:
+                db.add(
+                    models.DoctorHospitalMembership(
+                        id=str(uuid.uuid4()),
+                        doctor_id=doctor_id,
+                        hospital_id=hospital_id,
+                        active=True,
+                    )
+                )
+            else:
+                membership.active = True
+
+    if specialty:
+        clean_spec = specialty.strip().upper()
+        spec_membership = db.scalar(
+            select(models.DoctorSpecialtyMembership).where(
+                models.DoctorSpecialtyMembership.doctor_id == doctor_id,
+                models.DoctorSpecialtyMembership.specialty_code == clean_spec,
+            )
+        )
+        if spec_membership is None:
+            db.add(
+                models.DoctorSpecialtyMembership(
+                    id=str(uuid.uuid4()),
+                    doctor_id=doctor_id,
+                    specialty_code=clean_spec,
+                )
+            )
+    db.flush()
+
+
+def get_auth_user_response(db: Session, user: models.User) -> "schemas.AuthUserResponse":
+    from app import schemas
+    from app.core import phone
+
+    hospital_id = None
+    hospital_name = None
+    specialty = None
+    specialties: list[str] = []
+    qualification = None
+
+    if user.role == "doctor":
+        profile = db.get(models.DoctorProfile, user.id)
+        if profile:
+            qualification = profile.qualification
+
+        hosp_row = db.execute(
+            select(models.Hospital.id, models.Hospital.name)
+            .join(
+                models.DoctorHospitalMembership,
+                models.DoctorHospitalMembership.hospital_id == models.Hospital.id,
+            )
+            .where(
+                models.DoctorHospitalMembership.doctor_id == user.id,
+                models.DoctorHospitalMembership.active.is_(True),
+            )
+        ).first()
+        if hosp_row:
+            hospital_id, hospital_name = hosp_row
+
+        specs = db.scalars(
+            select(models.DoctorSpecialtyMembership.specialty_code).where(
+                models.DoctorSpecialtyMembership.doctor_id == user.id
+            )
+        ).all()
+        specialties = list(specs)
+        if specialties:
+            specialty = specialties[0]
+
+    return schemas.AuthUserResponse(
+        id=user.id,
+        name=user.name,
+        role=user.role,
+        phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
+        phone_verified=user.phone_verified,
+        hospital_id=hospital_id,
+        hospital_name=hospital_name,
+        specialty=specialty,
+        specialties=specialties,
+        qualification=qualification,
+    )
+
+
 def demo_login(
     db: Session,
     role: str = "patient",
+    hospital_id: str | None = None,
+    specialty: str | None = None,
     ip_address: str | None = None,
     user_agent: str | None = None,
 ) -> tuple[models.User, str, models.AuthSession]:
@@ -386,6 +508,14 @@ def demo_login(
             )
             db.add(user)
             db.flush()
+        sync_doctor_memberships(
+            db,
+            doctor_id=user.id,
+            hospital_id=hospital_id or "10000000-0000-4000-8000-000000000001",
+            specialty=specialty or "CARDIOLOGY",
+            qualification="MD, Cardiology",
+            name=user.name,
+        )
     elif role == "triage":
         from app.api.deps import DEMO_TRIAGE_ID
 
@@ -449,6 +579,8 @@ def staff_login(
     db: Session,
     identifier: str,
     password: str,
+    hospital_id: str | None = None,
+    specialty: str | None = None,
     ip_address: str | None = None,
     user_agent: str | None = None,
 ) -> tuple[models.User, str, models.AuthSession]:
@@ -482,6 +614,15 @@ def staff_login(
 
     if not user.hashed_password or not security.verify_password(password, user.hashed_password):
         raise WorkflowError("INVALID_CREDENTIALS", "Invalid staff credentials.", 401)
+
+    if user.role == "doctor" and (hospital_id or specialty):
+        sync_doctor_memberships(
+            db,
+            doctor_id=user.id,
+            hospital_id=hospital_id,
+            specialty=specialty,
+            name=user.name,
+        )
 
     now = datetime.now(timezone.utc)
     raw_token, token_hash = security.generate_session_token()
@@ -522,6 +663,9 @@ def register_staff(
     phone_raw: str,
     email: str | None,
     password: str,
+    hospital_id: str | None = None,
+    specialty: str | None = None,
+    qualification: str | None = None,
     ip_address: str | None = None,
     user_agent: str | None = None,
 ) -> tuple[models.User, str, models.AuthSession]:
@@ -561,6 +705,16 @@ def register_staff(
     )
     db.add(user)
     db.flush()
+
+    if role == "doctor":
+        sync_doctor_memberships(
+            db,
+            doctor_id=user.id,
+            hospital_id=hospital_id,
+            specialty=specialty,
+            qualification=qualification,
+            name=clean_name,
+        )
 
     now = datetime.now(timezone.utc)
     raw_token, token_hash = security.generate_session_token()

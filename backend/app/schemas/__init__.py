@@ -80,6 +80,7 @@ from .routing import (
     HospitalList,
     HospitalPublic,
     HospitalSelection,
+    PatientQueueEstimate,
     QueueEntryResponse,
     QueueTransition,
 )
@@ -148,6 +149,7 @@ __all__ = [
     "DiscrepancyResponse",
     "Patient",
     "PatientCreate",
+    "PatientQueueEstimate",
     "Session",
     "SessionCreate",
     "SessionDetail",

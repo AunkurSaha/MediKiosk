@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, ApiError } from '../../api/client';
 import type { DocumentRecord, Language } from '../../api/client';
 import { copy } from '../../i18n';
@@ -23,6 +23,88 @@ export default function DocumentUploader({
   const [docType, setDocType] = useState<'prescription' | 'lab_report' | 'other'>('prescription');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setCameraReady(false);
+    setCameraOpen(false);
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const stream = streamRef.current;
+    if (!cameraOpen || !video || !stream) return;
+
+    video.srcObject = stream;
+    void video.play().catch(() => {
+      setError('Camera preview could not start. Please close the camera and try again.');
+    });
+
+    return () => {
+      if (video.srcObject === stream) video.srcObject = null;
+    };
+  }, [cameraOpen]);
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, [stopCamera]);
+
+  const startCamera = async () => {
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setError('Camera access is not supported in this browser.');
+        return;
+      }
+      setCameraReady(false);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
+      streamRef.current = stream;
+      setCameraOpen(true);
+      setError(null);
+    } catch {
+      setError('Unable to access camera. Please ensure permissions are granted.');
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!cameraReady || video.videoWidth === 0 || video.videoHeight === 0) {
+        setError('Camera is still starting. Please wait for the preview before capturing.');
+        return;
+      }
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          async (blob) => {
+            if (blob) {
+              const file = new File([blob], 'camera-capture.jpg', { type: 'image/jpeg' });
+              stopCamera();
+              await uploadFile(file);
+            }
+          },
+          'image/jpeg',
+          0.8,
+        );
+      }
+    }
+  };
+
   // Load any previously uploaded documents for this session
   useEffect(() => {
     let active = true;
@@ -40,10 +122,7 @@ export default function DocumentUploader({
     };
   }, [sessionId, documentConsent]);
 
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  async function uploadFile(file: File) {
     setError(null);
 
     // Client-side validation: size <= 10MB
@@ -83,6 +162,12 @@ export default function DocumentUploader({
     } finally {
       setUploading(false);
     }
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadFile(file);
   }
 
   if (!documentConsent) {
@@ -144,7 +229,61 @@ export default function DocumentUploader({
         >
           {uploading ? t.docUploading : `📎 ${t.docUploadBtn}`}
         </button>
+
+        <button
+          type="button"
+          className="secondary"
+          disabled={uploading || cameraOpen}
+          onClick={startCamera}
+          style={{ marginLeft: '1rem' }}
+          data-testid="open-camera-btn"
+        >
+          📸 Open Camera
+        </button>
       </div>
+
+      {cameraOpen && (
+        <div
+          className="camera-container"
+          style={{
+            marginTop: '1rem',
+            border: '1px solid var(--border-subtle)',
+            padding: '1rem',
+            borderRadius: '8px',
+          }}
+        >
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            onLoadedMetadata={() => setCameraReady(true)}
+            style={{
+              width: '100%',
+              maxHeight: '400px',
+              objectFit: 'contain',
+              backgroundColor: '#000',
+              borderRadius: '4px',
+            }}
+          />
+          <canvas ref={canvasRef} style={{ display: 'none' }} />
+          <div
+            style={{ marginTop: '1rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}
+          >
+            <button
+              type="button"
+              onClick={capturePhoto}
+              className="primary"
+              disabled={!cameraReady || uploading}
+            >
+              {cameraReady ? '📸 Capture Image' : 'Starting camera…'}
+            </button>
+            <button type="button" onClick={stopCamera} className="secondary">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {error && (
         <p className="error" role="alert" style={{ marginTop: '0.5rem' }}>

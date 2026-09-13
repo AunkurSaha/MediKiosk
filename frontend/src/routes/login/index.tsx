@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import { BrandLogo } from '../../components/BrandLogo';
 import { copy } from '../../i18n';
 
 export default function Login() {
@@ -202,13 +203,7 @@ export default function Login() {
     <div className="kiosk" style={{ maxWidth: '500px', margin: '40px auto' }}>
       <div className="card" style={{ padding: '36px' }}>
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-          <div
-            className="brand-mark"
-            style={{ width: '48px', height: '48px', fontSize: '2.2rem', margin: '0 auto 12px' }}
-            aria-hidden="true"
-          >
-            +
-          </div>
+          <BrandLogo className="auth-brand-logo" />
           <h1 style={{ fontSize: '1.8rem', margin: '0 0 6px' }}>{t.brand}</h1>
           <p className="eyebrow" style={{ margin: 0 }}>
             {step === 'phone' ? t.loginTitle : t.verifyMobile}

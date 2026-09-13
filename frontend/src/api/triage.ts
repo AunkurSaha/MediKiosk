@@ -31,6 +31,8 @@ export interface AlertItem {
   updated_at: string | null;
   hospital_token: string | null;
   patient_name: string | null;
+  hospital_id?: string | null;
+  hospital_name?: string | null;
 }
 
 export interface AlertList {
@@ -44,6 +46,17 @@ export interface AlertList {
 export interface AlertAcknowledgeRequest {
   expected_revision?: number;
   note?: string | null;
+}
+
+export interface WaitingPatient {
+  id: string;
+  patient_name: string;
+  hospital_token: string;
+  language: string;
+  status: string;
+  selected_doctor_id: string | null;
+  queue_status: string | null;
+  queue_joined_at: string | null;
 }
 
 const base = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -75,10 +88,20 @@ async function request<T>(path: string, method = 'GET', body?: unknown): Promise
 }
 
 export const triageApi = {
-  getAlerts: (params?: { status?: AlertStatus; priority?: AlertPriority }) => {
+  getQueue: (hospitalId: string) =>
+    request<{ items: WaitingPatient[] }>(
+      `/triage/queue?hospital_id=${encodeURIComponent(hospitalId)}`,
+    ),
+
+  getAlerts: (params?: {
+    status?: AlertStatus;
+    priority?: AlertPriority;
+    hospital_id?: string;
+  }) => {
     const searchParams = new URLSearchParams();
     if (params?.status) searchParams.set('status', params.status);
     if (params?.priority) searchParams.set('priority', params.priority);
+    if (params?.hospital_id) searchParams.set('hospital_id', params.hospital_id);
     const qs = searchParams.toString();
     return request<AlertList>(`/triage/alerts${qs ? `?${qs}` : ''}`);
   },

@@ -76,13 +76,7 @@ def verify_otp_endpoint(
     _set_session_cookie(response, raw_token)
     return schemas.LoginResponse(
         success=True,
-        user=schemas.AuthUserResponse(
-            id=user.id,
-            name=user.name,
-            role=user.role,
-            phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
-            phone_verified=user.phone_verified,
-        ),
+        user=auth_service.get_auth_user_response(db, user),
         token=raw_token,
     )
 
@@ -101,14 +95,11 @@ def logout_endpoint(
 
 
 @router.get("/me", response_model=schemas.AuthUserResponse)
-def get_me(user: models.User = Depends(get_current_auth_user)):
-    return schemas.AuthUserResponse(
-        id=user.id,
-        name=user.name,
-        role=user.role,
-        phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
-        phone_verified=user.phone_verified,
-    )
+def get_me(
+    user: models.User = Depends(get_current_auth_user),
+    db: Session = Depends(get_db),
+):
+    return auth_service.get_auth_user_response(db, user)
 
 
 @router.post("/demo-login", response_model=schemas.LoginResponse)
@@ -125,19 +116,15 @@ def demo_login_endpoint(
     user, raw_token, _ = auth_service.demo_login(
         db,
         role=req.role,
+        hospital_id=req.hospital_id,
+        specialty=req.specialty,
         ip_address=ip,
         user_agent=ua,
     )
     _set_session_cookie(response, raw_token)
     return schemas.LoginResponse(
         success=True,
-        user=schemas.AuthUserResponse(
-            id=user.id,
-            name=user.name,
-            role=user.role,
-            phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
-            phone_verified=user.phone_verified,
-        ),
+        user=auth_service.get_auth_user_response(db, user),
         token=raw_token,
     )
 
@@ -155,19 +142,15 @@ def staff_login_endpoint(
         db,
         identifier=req.identifier,
         password=req.password,
+        hospital_id=req.hospital_id,
+        specialty=req.specialty,
         ip_address=ip,
         user_agent=ua,
     )
     _set_session_cookie(response, raw_token)
     return schemas.LoginResponse(
         success=True,
-        user=schemas.AuthUserResponse(
-            id=user.id,
-            name=user.name,
-            role=user.role,
-            phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
-            phone_verified=user.phone_verified,
-        ),
+        user=auth_service.get_auth_user_response(db, user),
         token=raw_token,
     )
 
@@ -188,19 +171,16 @@ def staff_register_endpoint(
         phone_raw=req.phone_number,
         email=req.email,
         password=req.password,
+        hospital_id=req.hospital_id,
+        specialty=req.specialty,
+        qualification=req.qualification,
         ip_address=ip,
         user_agent=ua,
     )
     _set_session_cookie(response, raw_token)
     return schemas.LoginResponse(
         success=True,
-        user=schemas.AuthUserResponse(
-            id=user.id,
-            name=user.name,
-            role=user.role,
-            phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
-            phone_verified=user.phone_verified,
-        ),
+        user=auth_service.get_auth_user_response(db, user),
         token=raw_token,
     )
 
@@ -241,13 +221,7 @@ def staff_otp_verify_endpoint(
     _set_session_cookie(response, raw_token)
     return schemas.LoginResponse(
         success=True,
-        user=schemas.AuthUserResponse(
-            id=user.id,
-            name=user.name,
-            role=user.role,
-            phone_number=phone.mask_phone_number(user.phone_number) if user.phone_number else None,
-            phone_verified=user.phone_verified,
-        ),
+        user=auth_service.get_auth_user_response(db, user),
         token=raw_token,
     )
 

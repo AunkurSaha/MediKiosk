@@ -142,7 +142,7 @@ describe('Login Component & Auth Flow', () => {
 
     fireEvent.click(demoDoctorBtn);
     await waitFor(() => {
-      expect(api.demoLogin).toHaveBeenCalledWith('doctor');
+      expect(api.demoLogin).toHaveBeenCalledWith('doctor', undefined, undefined);
     });
   });
 

@@ -1,9 +1,109 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
+import { BrandLogo } from '../../components/BrandLogo';
+import type { Hospital } from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 
 type TabMode = 'password' | 'otp' | 'register';
+
+const DEMO_HOSPITAL_OPTIONS: Hospital[] = [
+  {
+    id: '10000000-0000-4000-8000-000000000001',
+    name: 'MediKiosk City Hospital',
+    city: 'Kolkata',
+    address: 'Central Kolkata',
+  },
+  {
+    id: '10000000-0000-4000-8000-000000000002',
+    name: 'MediKiosk Lake Medical Centre',
+    city: 'Kolkata',
+    address: 'South Kolkata',
+  },
+];
+
+const SPECIALTY_OPTIONS = [
+  { code: 'CARDIOLOGY', label: '❤️ Cardiology (Heart & Chest Pain)' },
+  { code: 'NEUROLOGY', label: '🧠 Neurology (Headache & Neurological)' },
+  { code: 'GENERAL_MEDICINE', label: '🩺 General Medicine (Fever & General Care)' },
+  { code: 'PULMONOLOGY', label: '🫁 Pulmonology (Cough, Breathlessness, Lungs)' },
+  { code: 'GASTROENTEROLOGY', label: '🧪 Gastroenterology (Abdominal Pain, GI)' },
+  { code: 'AYUSH', label: '🌿 AYUSH (Integrative & Traditional)' },
+  { code: 'ORTHOPEDICS', label: '🦴 Orthopedics (Bone & Joint Care)' },
+];
+
+const DEMO_DOCTOR_PERSONAS = [
+  {
+    name: 'Dr. Ananya Sen',
+    phone: '9876500001',
+    hospitalId: '10000000-0000-4000-8000-000000000001',
+    specialty: 'CARDIOLOGY',
+    waiting: 2,
+  },
+  {
+    name: 'Dr. Rahul Das',
+    phone: '9876500011',
+    hospitalId: '10000000-0000-4000-8000-000000000001',
+    specialty: 'CARDIOLOGY',
+    waiting: 5,
+  },
+  {
+    name: 'Dr. Ishan Gupta',
+    phone: '9876500012',
+    hospitalId: '10000000-0000-4000-8000-000000000001',
+    specialty: 'GENERAL_MEDICINE',
+    waiting: 1,
+  },
+  {
+    name: 'Dr. Nandini Bose',
+    phone: '9876500013',
+    hospitalId: '10000000-0000-4000-8000-000000000001',
+    specialty: 'PULMONOLOGY',
+    waiting: 3,
+  },
+  {
+    name: 'Dr. Arjun Mehta',
+    phone: '9876500014',
+    hospitalId: '10000000-0000-4000-8000-000000000001',
+    specialty: 'GASTROENTEROLOGY',
+    waiting: 4,
+  },
+  {
+    name: 'Dr. Mira Roy',
+    phone: '9876500021',
+    hospitalId: '10000000-0000-4000-8000-000000000002',
+    specialty: 'CARDIOLOGY',
+    waiting: 4,
+  },
+  {
+    name: 'Dr. Kabir Khan',
+    phone: '9876500022',
+    hospitalId: '10000000-0000-4000-8000-000000000002',
+    specialty: 'GENERAL_MEDICINE',
+    waiting: 2,
+  },
+  {
+    name: 'Dr. Priyanka Pal',
+    phone: '9876500023',
+    hospitalId: '10000000-0000-4000-8000-000000000002',
+    specialty: 'NEUROLOGY',
+    waiting: 5,
+  },
+  {
+    name: 'Dr. Sayan Ghosh',
+    phone: '9876500024',
+    hospitalId: '10000000-0000-4000-8000-000000000002',
+    specialty: 'PULMONOLOGY',
+    waiting: 1,
+  },
+  {
+    name: 'Dr. Leena Iyer',
+    phone: '9876500025',
+    hospitalId: '10000000-0000-4000-8000-000000000002',
+    specialty: 'AYUSH',
+    waiting: 3,
+  },
+] as const;
 
 export default function StaffLogin() {
   const navigate = useNavigate();
@@ -16,6 +116,13 @@ export default function StaffLogin() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [demoMode, setDemoMode] = useState(true);
+  const [hospitals, setHospitals] = useState<Hospital[]>(DEMO_HOSPITAL_OPTIONS);
+  const [waitingCounts, setWaitingCounts] = useState<Record<string, number> | null>(null);
+
+  // Doctor Clinical Affiliation State
+  const [loginRole, setLoginRole] = useState<'doctor' | 'triage'>('doctor');
+  const [selectedHospitalId, setSelectedHospitalId] = useState<string>(DEMO_HOSPITAL_OPTIONS[0].id);
+  const [selectedSpecialty, setSelectedSpecialty] = useState<string>('CARDIOLOGY');
 
   // Tab 1: Password State
   const [identifier, setIdentifier] = useState('');
@@ -35,18 +142,49 @@ export default function StaffLogin() {
   const [regPhone, setRegPhone] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regQualification, setRegQualification] = useState('MD, Cardiology');
   const [showRegPassword, setShowRegPassword] = useState(false);
 
   const queryParams = new URLSearchParams(location.search);
   const redirectParam = queryParams.get('redirect');
 
   useEffect(() => {
-    api.config?.()
+    api
+      .config?.()
       .then((cfg) => {
         if (cfg) setDemoMode(Boolean(cfg.demo_mode));
       })
       .catch(() => {});
+
+    api
+      .hospitals?.()
+      .then((res) => {
+        if (res?.items?.length) {
+          setHospitals(res.items);
+          setSelectedHospitalId(res.items[0].id);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    api
+      .hospitalDoctors(selectedHospitalId)
+      .then((result) => {
+        if (active) {
+          setWaitingCounts(
+            Object.fromEntries(result.items.map((doctor) => [doctor.name, doctor.waiting_count])),
+          );
+        }
+      })
+      .catch(() => {
+        if (active) setWaitingCounts({});
+      });
+    return () => {
+      active = false;
+    };
+  }, [selectedHospitalId]);
 
   const handleRoleRedirect = (role: string) => {
     if (redirectParam && redirectParam.startsWith('/')) {
@@ -74,7 +212,12 @@ export default function StaffLogin() {
     setError(null);
 
     try {
-      const result = await staffLogin(identifier.trim(), password);
+      const result = await staffLogin(
+        identifier.trim(),
+        password,
+        loginRole === 'doctor' ? selectedHospitalId : undefined,
+        loginRole === 'doctor' ? selectedSpecialty : undefined,
+      );
       if (result.success && result.user) {
         handleRoleRedirect(result.user.role);
       } else {
@@ -211,6 +354,9 @@ export default function StaffLogin() {
         phone_number: cleanPhone,
         email: regEmail.trim() || undefined,
         password: regPassword,
+        hospital_id: regRole === 'doctor' ? selectedHospitalId : undefined,
+        specialty: regRole === 'doctor' ? selectedSpecialty : undefined,
+        qualification: regRole === 'doctor' ? regQualification : undefined,
       });
 
       if (result.success && result.user) {
@@ -229,23 +375,26 @@ export default function StaffLogin() {
     }
   };
 
-  const handleQuickFill = (demoId: string, demoPass: string) => {
+  const handleQuickFill = (
+    demoId: string,
+    demoPass: string,
+    role: 'doctor' | 'triage',
+    hospitalId?: string,
+    specialty?: string,
+  ) => {
     setIdentifier(demoId);
     setPassword(demoPass);
+    setLoginRole(role);
+    if (hospitalId) setSelectedHospitalId(hospitalId);
+    if (specialty) setSelectedSpecialty(specialty);
     setError(null);
   };
 
   return (
-    <div className="kiosk" style={{ maxWidth: '540px', margin: '40px auto' }}>
+    <div className="kiosk" style={{ maxWidth: '720px', margin: '40px auto' }}>
       <div className="card" style={{ padding: '32px' }}>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <div
-            className="brand-mark"
-            style={{ width: '48px', height: '48px', fontSize: '2.2rem', margin: '0 auto 10px' }}
-            aria-hidden="true"
-          >
-            +
-          </div>
+          <BrandLogo className="auth-brand-logo" />
           <h1 style={{ fontSize: '1.75rem', margin: '0 0 6px' }}>MediKiosk</h1>
           <p
             className="eyebrow"
@@ -263,8 +412,12 @@ export default function StaffLogin() {
           </p>
         </div>
 
-        <p className="muted" style={{ marginBottom: '20px', textAlign: 'center', fontSize: '0.88rem' }}>
-          Authorized access for consulting physicians, medical officers, and emergency triage personnel.
+        <p
+          className="muted"
+          style={{ marginBottom: '20px', textAlign: 'center', fontSize: '0.88rem' }}
+        >
+          Authorized access for consulting physicians, medical officers, and emergency triage
+          personnel.
         </p>
 
         {/* Tab Selection */}
@@ -364,10 +517,146 @@ export default function StaffLogin() {
         {/* ------------------------------------------------------------------ */}
         {activeTab === 'password' && (
           <form onSubmit={handlePasswordSubmit}>
+            {/* Role Switcher */}
+            <div style={{ marginBottom: '16px' }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '6px',
+                  fontSize: '0.88rem',
+                }}
+              >
+                Accessing As
+              </label>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setLoginRole('doctor')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: loginRole === 'doctor' ? '2px solid #0284c7' : '1px solid #cbd5e1',
+                    background: loginRole === 'doctor' ? '#f0f9ff' : '#fff',
+                    color: loginRole === 'doctor' ? '#0369a1' : '#475569',
+                    fontWeight: 600,
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                  }}
+                >
+                  👨‍⚕️ Doctor / Specialist
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLoginRole('triage')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    borderRadius: '8px',
+                    border: loginRole === 'triage' ? '2px solid #0284c7' : '1px solid #cbd5e1',
+                    background: loginRole === 'triage' ? '#f0f9ff' : '#fff',
+                    color: loginRole === 'triage' ? '#0369a1' : '#475569',
+                    fontWeight: 600,
+                    fontSize: '0.88rem',
+                    cursor: 'pointer',
+                  }}
+                >
+                  🚨 Triage Staff
+                </button>
+              </div>
+            </div>
+
+            {/* Doctor Clinical Affiliations */}
+            {loginRole === 'doctor' && (
+              <div
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  padding: '14px',
+                  marginBottom: '16px',
+                }}
+              >
+                <div style={{ marginBottom: '12px' }}>
+                  <label
+                    htmlFor="login-hospital"
+                    style={{
+                      display: 'block',
+                      fontWeight: 600,
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    🏥 Hospital / Facility
+                  </label>
+                  <select
+                    id="login-hospital"
+                    value={selectedHospitalId}
+                    onChange={(e) => setSelectedHospitalId(e.target.value)}
+                    disabled={busy}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.9rem',
+                      background: '#fff',
+                    }}
+                  >
+                    {hospitals.map((h) => (
+                      <option key={h.id} value={h.id}>
+                        {h.name} ({h.city || 'Facility'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="login-specialty"
+                    style={{
+                      display: 'block',
+                      fontWeight: 600,
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    🩺 Clinical Specialisation
+                  </label>
+                  <select
+                    id="login-specialty"
+                    value={selectedSpecialty}
+                    onChange={(e) => setSelectedSpecialty(e.target.value)}
+                    disabled={busy}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.9rem',
+                      background: '#fff',
+                    }}
+                  >
+                    {SPECIALTY_OPTIONS.map((s) => (
+                      <option key={s.code} value={s.code}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
             <div style={{ marginBottom: '18px' }}>
               <label
                 htmlFor="staff-identifier"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '6px', fontSize: '0.9rem' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '6px',
+                  fontSize: '0.9rem',
+                }}
               >
                 Phone Number or Staff ID
               </label>
@@ -407,7 +696,12 @@ export default function StaffLogin() {
             <div style={{ marginBottom: '22px' }}>
               <label
                 htmlFor="staff-password"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '6px', fontSize: '0.9rem' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '6px',
+                  fontSize: '0.9rem',
+                }}
               >
                 Password
               </label>
@@ -478,14 +772,102 @@ export default function StaffLogin() {
                 textAlign: 'center',
               }}
             >
-              <p className="eyebrow" style={{ fontSize: '0.75rem', marginBottom: '8px', color: '#6b7280' }}>
-                Quick Demo Staff Credentials:
+              <div
+                aria-label="Choose demo hospital"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '8px',
+                  marginBottom: '14px',
+                }}
+              >
+                {hospitals.map((hospital) => (
+                  <button
+                    key={hospital.id}
+                    type="button"
+                    onClick={() => setSelectedHospitalId(hospital.id)}
+                    disabled={busy}
+                    aria-pressed={selectedHospitalId === hospital.id}
+                    style={{
+                      padding: '10px',
+                      borderRadius: '8px',
+                      border:
+                        selectedHospitalId === hospital.id
+                          ? '2px solid #0284c7'
+                          : '1px solid #cbd5e1',
+                      background: selectedHospitalId === hospital.id ? '#f0f9ff' : '#fff',
+                      color: selectedHospitalId === hospital.id ? '#0369a1' : '#475569',
+                      fontWeight: 600,
+                      cursor: busy ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    🏥 {hospital.name}
+                    <span className="muted" style={{ display: 'block', fontSize: '0.72rem' }}>
+                      {hospital.address || hospital.city}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <p
+                className="eyebrow"
+                style={{ fontSize: '0.75rem', marginBottom: '4px', color: '#6b7280' }}
+              >
+                Demo doctors at the selected hospital
               </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <p className="muted" style={{ fontSize: '0.75rem', margin: '0 0 10px' }}>
+                Choose a doctor to fill their demo credentials. The badge shows waiting patients.
+              </p>
+              <div
+                data-testid="demo-doctor-buttons"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                  gap: '8px',
+                }}
+              >
+                {DEMO_DOCTOR_PERSONAS.filter(
+                  (doctor) => !selectedHospitalId || doctor.hospitalId === selectedHospitalId,
+                ).map((doctor) => (
+                  <button
+                    key={doctor.phone}
+                    type="button"
+                    className="secondary"
+                    onClick={() =>
+                      handleQuickFill(
+                        doctor.phone,
+                        'Doctor@123',
+                        'doctor',
+                        doctor.hospitalId,
+                        doctor.specialty,
+                      )
+                    }
+                    disabled={busy}
+                    aria-label={`Demo doctor ${doctor.name}, ${waitingCounts?.[doctor.name] ?? 'counting'} waiting patients`}
+                    style={{
+                      fontSize: '0.82rem',
+                      padding: '9px 11px',
+                      minHeight: '48px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '8px',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <span>
+                      👨‍⚕️ <strong>{doctor.name}</strong>
+                    </span>
+                    <span className="badge" title="Waiting patients">
+                      {waitingCounts === null
+                        ? 'Counting…'
+                        : `${waitingCounts[doctor.name] ?? 0} waiting`}
+                    </span>
+                  </button>
+                ))}
                 <button
                   type="button"
                   className="secondary"
-                  onClick={() => handleQuickFill('9876500001', 'Doctor@123')}
+                  onClick={() => handleQuickFill('9876500002', 'Triage@123', 'triage')}
                   disabled={busy}
                   style={{
                     fontSize: '0.85rem',
@@ -496,25 +878,12 @@ export default function StaffLogin() {
                     alignItems: 'center',
                   }}
                 >
-                  <span>👨‍⚕️ <strong>Doctor:</strong> Dr. A. Sharma</span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>9876500001 · Doctor@123</span>
-                </button>
-                <button
-                  type="button"
-                  className="secondary"
-                  onClick={() => handleQuickFill('9876500002', 'Triage@123')}
-                  disabled={busy}
-                  style={{
-                    fontSize: '0.85rem',
-                    padding: '8px 12px',
-                    minHeight: '38px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
-                >
-                  <span>🚨 <strong>Triage:</strong> Sister Priya</span>
-                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>9876500002 · Triage@123</span>
+                  <span>
+                    🚨 <strong>Triage:</strong> Sister Priya
+                  </span>
+                  <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                    9876500002 · Triage@123
+                  </span>
                 </button>
               </div>
             </div>
@@ -531,7 +900,12 @@ export default function StaffLogin() {
                 <div style={{ marginBottom: '18px' }}>
                   <label
                     htmlFor="staff-otp-phone"
-                    style={{ display: 'block', fontWeight: 600, marginBottom: '6px', fontSize: '0.9rem' }}
+                    style={{
+                      display: 'block',
+                      fontWeight: 600,
+                      marginBottom: '6px',
+                      fontSize: '0.9rem',
+                    }}
                   >
                     Registered Staff Mobile Number
                   </label>
@@ -585,7 +959,7 @@ export default function StaffLogin() {
                     marginBottom: '16px',
                   }}
                 >
-                  {busy ? 'Sending Staff OTP…' : 'Send Staff OTP'}
+                  {busy ? 'Sending OTP…' : 'Send One-Time Password'}
                 </button>
 
                 {/* Quick Staff Numbers */}
@@ -597,7 +971,10 @@ export default function StaffLogin() {
                     textAlign: 'center',
                   }}
                 >
-                  <p className="eyebrow" style={{ fontSize: '0.75rem', marginBottom: '8px', color: '#6b7280' }}>
+                  <p
+                    className="eyebrow"
+                    style={{ fontSize: '0.75rem', marginBottom: '8px', color: '#6b7280' }}
+                  >
                     Fill Registered Staff Number:
                   </p>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
@@ -624,22 +1001,26 @@ export default function StaffLogin() {
               </form>
             ) : (
               <form onSubmit={handleVerifyOtp}>
-                <div style={{ textAlign: 'center', marginBottom: '18px' }}>
-                  <p style={{ margin: '0 0 4px', fontSize: '0.95rem', fontWeight: 600 }}>
-                    Enter 6-digit Code Sent to {maskedPhone}
+                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                  <p style={{ margin: '0 0 6px', fontWeight: 600 }}>Enter 6-Digit Code</p>
+                  <p className="muted" style={{ margin: 0, fontSize: '0.88rem' }}>
+                    Sent to {maskedPhone}{' '}
+                    <button
+                      type="button"
+                      onClick={() => setOtpStep('request')}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#0284c7',
+                        cursor: 'pointer',
+                        padding: 0,
+                        fontSize: '0.88rem',
+                        textDecoration: 'underline',
+                      }}
+                    >
+                      Change
+                    </button>
                   </p>
-                  <button
-                    type="button"
-                    className="text-button"
-                    onClick={() => {
-                      setOtpStep('request');
-                      setOtpDigits(['', '', '', '', '', '']);
-                      setError(null);
-                    }}
-                    style={{ fontSize: '0.85rem', color: '#0284c7', minHeight: 'auto', padding: '4px' }}
-                  >
-                    Change Number
-                  </button>
                 </div>
 
                 <div
@@ -724,7 +1105,12 @@ export default function StaffLogin() {
             <div style={{ marginBottom: '16px' }}>
               <label
                 htmlFor="staff-reg-name"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '6px', fontSize: '0.9rem' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '6px',
+                  fontSize: '0.9rem',
+                }}
               >
                 Full Name
               </label>
@@ -747,7 +1133,12 @@ export default function StaffLogin() {
 
             <div style={{ marginBottom: '16px' }}>
               <label
-                style={{ display: 'block', fontWeight: 600, marginBottom: '6px', fontSize: '0.9rem' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '6px',
+                  fontSize: '0.9rem',
+                }}
               >
                 Staff Role & Department
               </label>
@@ -789,10 +1180,126 @@ export default function StaffLogin() {
               </div>
             </div>
 
+            {/* Doctor specific fields during registration */}
+            {regRole === 'doctor' && (
+              <div
+                style={{
+                  background: '#f8fafc',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  padding: '14px',
+                  marginBottom: '16px',
+                }}
+              >
+                <div style={{ marginBottom: '12px' }}>
+                  <label
+                    htmlFor="reg-hospital"
+                    style={{
+                      display: 'block',
+                      fontWeight: 600,
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    🏥 Primary Hospital Affiliation
+                  </label>
+                  <select
+                    id="reg-hospital"
+                    value={selectedHospitalId}
+                    onChange={(e) => setSelectedHospitalId(e.target.value)}
+                    disabled={busy}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.9rem',
+                      background: '#fff',
+                    }}
+                  >
+                    {hospitals.map((h) => (
+                      <option key={h.id} value={h.id}>
+                        {h.name} ({h.city || 'Facility'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: '12px' }}>
+                  <label
+                    htmlFor="reg-specialty"
+                    style={{
+                      display: 'block',
+                      fontWeight: 600,
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    🩺 Primary Specialisation
+                  </label>
+                  <select
+                    id="reg-specialty"
+                    value={selectedSpecialty}
+                    onChange={(e) => setSelectedSpecialty(e.target.value)}
+                    disabled={busy}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.9rem',
+                      background: '#fff',
+                    }}
+                  >
+                    {SPECIALTY_OPTIONS.map((s) => (
+                      <option key={s.code} value={s.code}>
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="reg-qual"
+                    style={{
+                      display: 'block',
+                      fontWeight: 600,
+                      marginBottom: '4px',
+                      fontSize: '0.85rem',
+                    }}
+                  >
+                    🎓 Medical Qualification / Degrees
+                  </label>
+                  <input
+                    id="reg-qual"
+                    type="text"
+                    placeholder="e.g. MBBS, MD (Cardiology)"
+                    value={regQualification}
+                    onChange={(e) => setRegQualification(e.target.value)}
+                    disabled={busy}
+                    style={{
+                      width: '100%',
+                      padding: '8px 10px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.9rem',
+                      background: '#fff',
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+
             <div style={{ marginBottom: '16px' }}>
               <label
                 htmlFor="staff-reg-phone"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '6px', fontSize: '0.9rem' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '6px',
+                  fontSize: '0.9rem',
+                }}
               >
                 Mobile Number
               </label>
@@ -833,7 +1340,12 @@ export default function StaffLogin() {
             <div style={{ marginBottom: '16px' }}>
               <label
                 htmlFor="staff-reg-email"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '6px', fontSize: '0.9rem' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '6px',
+                  fontSize: '0.9rem',
+                }}
               >
                 Official Email (Optional)
               </label>
@@ -857,7 +1369,12 @@ export default function StaffLogin() {
             <div style={{ marginBottom: '22px' }}>
               <label
                 htmlFor="staff-reg-password"
-                style={{ display: 'block', fontWeight: 600, marginBottom: '6px', fontSize: '0.9rem' }}
+                style={{
+                  display: 'block',
+                  fontWeight: 600,
+                  marginBottom: '6px',
+                  fontSize: '0.9rem',
+                }}
               >
                 Create Password
               </label>

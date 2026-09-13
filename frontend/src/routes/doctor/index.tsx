@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api/client';
 import type {
   Detail,
+  Hospital,
   SessionList,
   TranslationResult,
   TransliterationResult,
@@ -49,6 +50,38 @@ export default function Doctor() {
     {},
   );
   const [translatingFieldId, setTranslatingFieldId] = useState<string | null>(null);
+
+  // Doctor Clinical Affiliation Context
+  const [hospitals, setHospitals] = useState<Hospital[]>([]);
+  const [activeHospitalId, setActiveHospitalId] = useState<string>(() => {
+    return auth?.user?.hospital_id || '';
+  });
+
+  useEffect(() => {
+    if (typeof api.hospitals === 'function') {
+      const p = api.hospitals();
+      if (p && typeof p.then === 'function') {
+        p.then((res) => {
+          if (res?.items) {
+            setHospitals(res.items);
+          }
+        }).catch(() => {});
+      }
+    }
+  }, []);
+
+  async function handleSwitchFacility(newHospitalId: string) {
+    setActiveHospitalId(newHospitalId);
+    setLoading(true);
+    try {
+      if (newHospitalId) {
+        await api.updateDoctorContext({ hospital_id: newHospitalId });
+      }
+    } catch {
+      // Non-fatal
+    }
+    setAttempt((a) => a + 1);
+  }
 
   async function handleTranslate(fieldId: string, text: string, sourceLang: string) {
     if (!detail) return;
@@ -98,7 +131,7 @@ export default function Doctor() {
         });
     } else {
       api
-        .sessions()
+        .sessions(activeHospitalId || undefined)
         .then((result) => {
           if (active) {
             setList(result);
@@ -116,7 +149,7 @@ export default function Doctor() {
     return () => {
       active = false;
     };
-  }, [sessionId, attempt]);
+  }, [sessionId, attempt, activeHospitalId]);
   function refresh() {
     setLoading(true);
     setNotice('');
@@ -164,6 +197,92 @@ export default function Doctor() {
     <div className="doctor-workspace">
       <div className="page-heading">
         <div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              flexWrap: 'wrap',
+              marginBottom: '8px',
+            }}
+          >
+            {auth?.user?.name && (
+              <span
+                style={{
+                  background: '#f0fdf4',
+                  color: '#166534',
+                  border: '1px solid #bbf7d0',
+                  padding: '3px 10px',
+                  borderRadius: '12px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                }}
+              >
+                👨‍⚕️ {auth.user.name}
+              </span>
+            )}
+            {(auth?.user?.specialty || auth?.user?.specialties?.[0]) && (
+              <span
+                style={{
+                  background: '#f0f9ff',
+                  color: '#0369a1',
+                  border: '1px solid #bae6fd',
+                  padding: '3px 10px',
+                  borderRadius: '12px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                }}
+              >
+                🩺 {auth.user.specialty || auth.user.specialties?.[0]}
+              </span>
+            )}
+            {auth?.user?.qualification && (
+              <span
+                style={{
+                  background: '#faf5ff',
+                  color: '#6b21a8',
+                  border: '1px solid #e9d5ff',
+                  padding: '3px 10px',
+                  borderRadius: '12px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                }}
+              >
+                🎓 {auth.user.qualification}
+              </span>
+            )}
+            {hospitals.length > 0 && (
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <label
+                  htmlFor="doctor-facility-select"
+                  style={{ fontSize: '0.82rem', color: '#475569', fontWeight: 600 }}
+                >
+                  🏥 Facility:
+                </label>
+                <select
+                  id="doctor-facility-select"
+                  value={activeHospitalId}
+                  onChange={(e) => handleSwitchFacility(e.target.value)}
+                  style={{
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid #cbd5e1',
+                    fontSize: '0.82rem',
+                    background: '#fff',
+                    color: '#0f172a',
+                    fontWeight: 500,
+                  }}
+                >
+                  <option value="">🌐 All Facilities (Consolidated)</option>
+                  {hospitals.map((h) => (
+                    <option key={h.id} value={h.id}>
+                      {h.name} ({h.city || 'Facility'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
           <p className="eyebrow">{t.overview}</p>
           <h1>{sessionId ? t.detailTitle : t.doctorTitle}</h1>
           <p className="muted">{t.doctorIntro}</p>
@@ -199,9 +318,7 @@ export default function Doctor() {
       <p className="notice">{t.demoDoctor}</p>
       {Boolean(error) && (
         <div className="error" role="alert">
-          <div style={{ marginBottom: '8px' }}>
-            {errorText(error)}
-          </div>
+          <div style={{ marginBottom: '8px' }}>{errorText(error)}</div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
             <button className="secondary" onClick={refresh} disabled={loggingIn}>
               {t.reload}
@@ -217,7 +334,9 @@ export default function Doctor() {
                   }
                   navigate('/doctor', { replace: true });
                   refresh();
-                } catch { /* ignore */ } finally {
+                } catch {
+                  /* ignore */
+                } finally {
                   setLoggingIn(false);
                 }
               }}
@@ -237,6 +356,14 @@ export default function Doctor() {
       {loading && <p role="status">{t.loading}</p>}
       {!loading && !sessionId && list && (
         <section className="session-list">
+          <div className="card" role="status">
+            <strong>
+              {list.items.filter((item) => item.queue_status === 'WAITING').length} patients waiting
+            </strong>
+            <span className="muted" style={{ display: 'block' }}>
+              Assigned only to {auth?.user?.name || 'the signed-in doctor'}
+            </span>
+          </div>
           {list.items.length === 0 && (
             <div className="card empty">
               <h2>{t.empty}</h2>
@@ -256,7 +383,9 @@ export default function Doctor() {
                 </p>
               </div>
               <span className={'badge ' + session.status}>{t[session.status]}</span>
-              {session.queue_status && <span className="badge">Queue: {session.queue_status.replaceAll('_', ' ')}</span>}
+              {session.queue_status && (
+                <span className="badge">Queue: {session.queue_status.replaceAll('_', ' ')}</span>
+              )}
               <span className="review-link">{t.open} →</span>
             </Link>
           ))}
@@ -275,8 +404,26 @@ export default function Doctor() {
               </p>
             </div>
             <div className="doctor-header-actions">
-              <button type="button" className="secondary" onClick={async () => { await api.updateQueue(detail.session.id, 'IN_CONSULTATION'); refresh(); }}>Start consultation</button>
-              <button type="button" className="secondary" onClick={async () => { await api.updateQueue(detail.session.id, 'COMPLETED'); refresh(); }}>Complete consultation</button>
+              <button
+                type="button"
+                className="secondary"
+                onClick={async () => {
+                  await api.updateQueue(detail.session.id, 'IN_CONSULTATION');
+                  refresh();
+                }}
+              >
+                Start consultation
+              </button>
+              <button
+                type="button"
+                className="secondary"
+                onClick={async () => {
+                  await api.updateQueue(detail.session.id, 'COMPLETED');
+                  refresh();
+                }}
+              >
+                Complete consultation
+              </button>
               <button
                 type="button"
                 className="btn btn-secondary"

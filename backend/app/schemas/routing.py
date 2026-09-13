@@ -5,9 +5,17 @@ from pydantic import Field
 from .common import APIModel, UTCDate
 
 SpecialtyCode = Literal[
-    "GENERAL_MEDICINE", "CARDIOLOGY", "NEUROLOGY", "PULMONOLOGY",
-    "GASTROENTEROLOGY", "DERMATOLOGY", "ORTHOPAEDICS", "ENT",
-    "PAEDIATRICS", "GYNAECOLOGY", "AYUSH",
+    "GENERAL_MEDICINE",
+    "CARDIOLOGY",
+    "NEUROLOGY",
+    "PULMONOLOGY",
+    "GASTROENTEROLOGY",
+    "DERMATOLOGY",
+    "ORTHOPAEDICS",
+    "ENT",
+    "PAEDIATRICS",
+    "GYNAECOLOGY",
+    "AYUSH",
 ]
 QueueStatus = Literal["WAITING", "CALLED", "IN_CONSULTATION", "COMPLETED", "CANCELLED"]
 
@@ -21,6 +29,16 @@ class HospitalPublic(APIModel):
 
 class HospitalList(APIModel):
     items: list[HospitalPublic]
+
+
+class DoctorRosterItem(APIModel):
+    doctor_id: str
+    name: str
+    waiting_count: int = Field(ge=0)
+
+
+class DoctorRoster(APIModel):
+    items: list[DoctorRosterItem]
 
 
 class HospitalSelection(APIModel):
@@ -61,6 +79,15 @@ class QueueEntryResponse(APIModel):
     hospital_id: str
     status: QueueStatus
     joined_at: UTCDate
+
+
+class PatientQueueEstimate(APIModel):
+    session_id: str
+    doctor_id: str
+    doctor_name: str
+    position: int = Field(ge=1)
+    estimated_wait_minutes: int = Field(ge=5)
+    expected_meeting_at: UTCDate
 
 
 class QueueTransition(APIModel):

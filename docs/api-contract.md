@@ -120,6 +120,8 @@ Retained legacy answers can resume through the adaptive state API using the auth
 
 Completion atomically marks ready_for_review, stores completed_at, creates a deterministic draft and typed structured snapshot, and writes audit metadata. Repeating completion does not create another summary. Completed/confirmed intake answers, flow selection and navigation are locked.
 
+`GET /sessions/{id}/queue-estimate` returns the authenticated patient-safe estimate for the visit's selected doctor. `position` is the one-based position among that doctor's `WAITING` entries, `estimated_wait_minutes` is `position * 5`, and `expected_meeting_at` is the current server time plus that estimate. Queue entries assigned to other doctors are excluded. The endpoint returns `QUEUE_ESTIMATE_UNAVAILABLE` when the visit is no longer waiting.
+
 `ClinicalHistory` schema 1 contains flow identity/version/namespace, selected complaint/source and typed sections. Each section has a canonical enum ID and ordered facts; facts carry answer ID, question ID, canonical field, localized label, typed value, explicit status, raw wording, source, language, recorded timestamp and patient_reported verification. Empty sections remain explicit. The AYUSH section is isolated. Generated prose is not the canonical representation.
 
 The completion snapshot uses the existing `generated_structured_json` summary field. Current history is also available as the typed `history` property in patient/doctor detail and interview state.
@@ -455,3 +457,8 @@ These routes require the configured demo doctor and are disabled unless `DEMO_MO
 - `POST /api/doctor/demo/reset`: removes synthetic patient/session data and associated stored document files while preserving user accounts. It returns `DemoResetResponse`; `success=false` explicitly reports any file-cleanup failure.
 
 
+## Hospital workload and assignment visibility
+
+- `GET /api/hospitals/{hospital_id}/doctors` returns the active doctor roster with a database-derived `waiting_count` for each doctor. Only queue entries whose current status is `WAITING` are counted.
+- `GET /api/triage/queue?hospital_id={hospital_id}` requires triage authentication and returns the consented waiting-patient queue for that hospital.
+- `GET /api/doctor/sessions` returns only sessions whose `selected_doctor_id` equals the authenticated doctor. Unassigned sessions and sessions assigned to colleagues are excluded.

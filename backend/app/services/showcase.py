@@ -273,10 +273,23 @@ class ShowcaseService:
             )
             db.add(patient)
 
+            hospital = db.scalar(select(models.Hospital).where(models.Hospital.active.is_(True)))
+            hospital_id = hospital.id if hospital else None
+
+            valid_doctor_id = None
+            if actor_user_id:
+                doc_profile = db.scalar(
+                    select(models.DoctorProfile).where(models.DoctorProfile.doctor_user_id == actor_user_id)
+                )
+                if doc_profile:
+                    valid_doctor_id = actor_user_id
+
             session_id = str(uuid.uuid4())
             session = models.Session(
                 id=session_id,
                 patient_id=patient_id,
+                hospital_id=hospital_id,
+                selected_doctor_id=valid_doctor_id,
                 hospital_token=SHOWCASE_TOKEN,
                 language="bn",
                 status="intake",
@@ -286,6 +299,38 @@ class ShowcaseService:
             )
             db.add(session)
             db.flush()
+
+            if hospital_id and valid_doctor_id:
+                membership = db.scalar(
+                    select(models.DoctorHospitalMembership).where(
+                        models.DoctorHospitalMembership.doctor_id == actor_user_id,
+                        models.DoctorHospitalMembership.hospital_id == hospital_id,
+                    )
+                )
+                if not membership:
+                    db.add(
+                        models.DoctorHospitalMembership(
+                            doctor_id=actor_user_id,
+                            hospital_id=hospital_id,
+                            active=True,
+                        )
+                    )
+                queue_entry = db.scalar(
+                    select(models.DoctorQueueEntry).where(
+                        models.DoctorQueueEntry.session_id == session_id
+                    )
+                )
+                if not queue_entry:
+                    db.add(
+                        models.DoctorQueueEntry(
+                            session_id=session_id,
+                            doctor_id=actor_user_id,
+                            hospital_id=hospital_id,
+                            status="WAITING",
+                            priority="HIGH",
+                            joined_at=now - timedelta(hours=1),
+                        )
+                    )
 
             db.add(
                 models.Consent(

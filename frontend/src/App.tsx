@@ -15,6 +15,7 @@ import Triage from './routes/triage';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { copy } from './i18n';
+import { BrandLogo } from './components/BrandLogo';
 
 export function Shell() {
   const location = useLocation();
@@ -31,66 +32,28 @@ export function Shell() {
     <>
       <header className="site-header">
         <NavLink className="brand" to="/kiosk/language">
-          <span className="brand-mark" aria-hidden="true">
-            +
-          </span>
-          {t.brand}
+          <BrandLogo compact />
         </NavLink>
-        <nav aria-label={t.brand} style={{ alignItems: 'center' }}>
-          {(!user || user.role === 'patient') && (
-            <NavLink to="/kiosk/language">{t.kiosk}</NavLink>
-          )}
-          {user?.role === 'doctor' && (
-            <NavLink to="/doctor">{t.doctor}</NavLink>
-          )}
-          {user?.role === 'triage' && (
-            <NavLink to="/triage">{t.triage}</NavLink>
-          )}
+        <nav aria-label={t.brand}>
+          {(!user || user.role === 'patient') && <NavLink to="/kiosk/language">{t.kiosk}</NavLink>}
+          {user?.role === 'doctor' && <NavLink to="/doctor">{t.doctor}</NavLink>}
+          {user?.role === 'triage' && <NavLink to="/triage">{t.triage}</NavLink>}
 
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '12px' }}>
-              <span
-                style={{
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  color: '#1b5e52',
-                  background: '#eef5f2',
-                  padding: '4px 10px',
-                  borderRadius: '12px',
-                }}
-              >
+            <div className="account-menu">
+              <span className="role-pill">
                 {user.role === 'doctor'
-                  ? '👨‍⚕️ Clinician'
+                  ? 'Clinician'
                   : user.role === 'triage'
-                  ? '🚨 Triage Staff'
-                  : `👤 ${user.phone_number || 'Patient'}`}
+                    ? 'Triage staff'
+                    : user.phone_number || 'Patient'}
               </span>
-              <button
-                type="button"
-                className="text-button"
-                onClick={handleLogout}
-                style={{
-                  fontSize: '0.85rem',
-                  padding: '4px 8px',
-                  minHeight: 'auto',
-                  cursor: 'pointer',
-                }}
-              >
+              <button type="button" className="text-button nav-logout" onClick={handleLogout}>
                 {t.logout}
               </button>
             </div>
           ) : (
-            <NavLink
-              to="/login"
-              style={{
-                background: '#17685c',
-                color: '#fff',
-                padding: '6px 14px',
-                borderRadius: '6px',
-                fontWeight: 600,
-                textDecoration: 'none',
-              }}
-            >
+            <NavLink to="/login" className="nav-login">
               Login
             </NavLink>
           )}

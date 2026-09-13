@@ -27,11 +27,14 @@ def auth_header(token: str) -> dict[str, str]:
 def create_patient_session(client, token: str) -> str:
     headers = auth_header(token)
     session_id = str(uuid4())
+    hosp_res = client.get("/api/hospitals")
+    hospital_id = hosp_res.json()["items"][0]["id"] if hosp_res.status_code == 200 and hosp_res.json().get("items") else None
     res = client.post(
         "/api/sessions",
         json={
             "id": session_id,
             "patient": {"name": "Test Patient", "demo_abha_id": None},
+            "hospital_id": hospital_id,
             "hospital_token": f"T-{session_id[:8]}",
             "language": "en",
         },
@@ -56,6 +59,15 @@ def test_owned_patient_can_select_flow_and_repeat_selection(client):
     token = login_patient(client, "+919876540021")
     session_id = create_patient_session(client, token)
     headers = auth_header(token)
+    hosp_res = client.get("/api/hospitals")
+    if hosp_res.status_code == 200 and hosp_res.json().get("items"):
+        hosp_id = hosp_res.json()["items"][0]["id"]
+        client.put(
+            f"/api/sessions/{session_id}/hospital",
+            json={"hospital_id": hosp_id},
+            headers=headers,
+        )
+
     consent = client.put(
         f"/api/sessions/{session_id}/consent",
         json={"share_with_doctor": True, "voice_processing": True, "document_processing": True},
@@ -78,6 +90,17 @@ def test_owned_patient_can_select_flow_and_repeat_selection(client):
     )
     assert repeated.status_code == 200, repeated.text
     assert repeated.json()["question"]["question_id"] == "chief_complaint.description"
+
+    doc_matches = client.get(f"/api/sessions/{session_id}/doctors", headers=headers)
+    assert doc_matches.status_code == 200, doc_matches.text
+    assert len(doc_matches.json()["items"]) > 0, "Expected matched doctors"
+    matched_doc_id = doc_matches.json()["items"][0]["doctor_id"]
+    choose_doc = client.put(
+        f"/api/sessions/{session_id}/doctor",
+        json={"doctor_id": matched_doc_id},
+        headers=headers,
+    )
+    assert choose_doc.status_code == 200, choose_doc.text
 
     state = repeated.json()
     for _ in range(100):

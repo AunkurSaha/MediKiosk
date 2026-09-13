@@ -9,8 +9,17 @@ interface AuthContextType {
   error: string | null;
   requestOtp: (phone: string) => Promise<OtpRequestResult>;
   verifyOtp: (phone: string, otp: string) => Promise<LoginResult>;
-  demoLogin: (role?: 'patient' | 'doctor' | 'triage') => Promise<LoginResult>;
-  staffLogin: (identifier: string, password: string) => Promise<LoginResult>;
+  demoLogin: (
+    role?: 'patient' | 'doctor' | 'triage',
+    hospitalId?: string,
+    specialty?: string,
+  ) => Promise<LoginResult>;
+  staffLogin: (
+    identifier: string,
+    password: string,
+    hospitalId?: string,
+    specialty?: string,
+  ) => Promise<LoginResult>;
   staffRegister: (payload: StaffRegisterPayload) => Promise<LoginResult>;
   staffOtpRequest: (phone: string) => Promise<OtpRequestResult>;
   staffOtpVerify: (phone: string, otp: string) => Promise<LoginResult>;
@@ -135,9 +144,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const demoLogin = async (
     role: 'patient' | 'doctor' | 'triage' = 'patient',
+    hospitalId?: string,
+    specialty?: string,
   ): Promise<LoginResult> => {
     setError(null);
-    const result = await api.demoLogin(role);
+    const result = await api.demoLogin(role, hospitalId, specialty);
     if (result.success && result.user) {
       setUser(result.user);
       if (typeof sessionStorage !== 'undefined') {
@@ -151,9 +162,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return result;
   };
 
-  const staffLogin = async (identifier: string, password: string): Promise<LoginResult> => {
+  const staffLogin = async (
+    identifier: string,
+    password: string,
+    hospitalId?: string,
+    specialty?: string,
+  ): Promise<LoginResult> => {
     setError(null);
-    const result = await api.staffLogin(identifier, password);
+    const result = await api.staffLogin(identifier, password, hospitalId, specialty);
     if (result.success && result.user) {
       setUser(result.user);
       if (typeof sessionStorage !== 'undefined') {

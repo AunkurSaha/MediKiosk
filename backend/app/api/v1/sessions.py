@@ -67,6 +67,15 @@ def complete_session(
     return intake.complete(db, str(session_id), user=user)
 
 
+@router.get("/{session_id}/queue-estimate", response_model=schemas.PatientQueueEstimate)
+def read_patient_queue_estimate(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User | None = Depends(get_optional_auth_user),
+):
+    return doctor_routing.patient_queue_estimate(db, str(session_id), user)
+
+
 @router.post("/verify-abha", response_model=schemas.ABDMVerificationResponse)
 def verify_standalone_abha(req: schemas.ABDMVerifyRequest):
     from app.services.abdm import ABDMService

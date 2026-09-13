@@ -17,6 +17,7 @@ class SessionCreate(APIModel):
     patient: PatientCreate
     hospital_token: str = Field(min_length=1, max_length=80)
     language: Language
+    hospital_id: str | None = None
 
 
 class Session(APIModel):
@@ -53,5 +54,3 @@ class SessionDetail(APIModel):
     history: ClinicalHistory | None = None
     alerts: list[AlertItem] = Field(default_factory=list)
     documents: list[DocumentResponse] = Field(default_factory=list)
-
-

@@ -20,6 +20,40 @@ describe('Staff & Specialist Password Login System', () => {
       speech_provider: 'mock',
       ocr_provider: 'mock',
     });
+    vi.spyOn(api, 'hospitals').mockResolvedValue({
+      items: [
+        {
+          id: '10000000-0000-4000-8000-000000000001',
+          name: 'MediKiosk City Hospital',
+          city: 'Kolkata',
+          address: 'Central Kolkata',
+        },
+        {
+          id: '10000000-0000-4000-8000-000000000002',
+          name: 'MediKiosk Lake Medical Centre',
+          city: 'Kolkata',
+          address: 'South Kolkata',
+        },
+      ],
+    });
+    vi.spyOn(api, 'hospitalDoctors').mockImplementation(async (hospitalId) => ({
+      items:
+        hospitalId === '10000000-0000-4000-8000-000000000001'
+          ? [
+              { doctor_id: 'a', name: 'Dr. Ananya Sen', waiting_count: 2 },
+              { doctor_id: 'b', name: 'Dr. Rahul Das', waiting_count: 5 },
+              { doctor_id: 'c', name: 'Dr. Ishan Gupta', waiting_count: 1 },
+              { doctor_id: 'e', name: 'Dr. Nandini Bose', waiting_count: 3 },
+              { doctor_id: 'f', name: 'Dr. Arjun Mehta', waiting_count: 4 },
+            ]
+          : [
+              { doctor_id: 'd', name: 'Dr. Mira Roy', waiting_count: 4 },
+              { doctor_id: 'g', name: 'Dr. Kabir Khan', waiting_count: 2 },
+              { doctor_id: 'h', name: 'Dr. Priyanka Pal', waiting_count: 5 },
+              { doctor_id: 'i', name: 'Dr. Sayan Ghosh', waiting_count: 1 },
+              { doctor_id: 'j', name: 'Dr. Leena Iyer', waiting_count: 3 },
+            ],
+    }));
   });
 
   it('renders staff login page with phone/identifier and password inputs', async () => {
@@ -35,7 +69,9 @@ describe('Staff & Specialist Password Login System', () => {
     expect(screen.getByLabelText(/Phone Number or Staff ID/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Sign In to Staff Workspace/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Switch to Patient Kiosk Intake/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Switch to Patient Kiosk Intake/i }),
+    ).toBeInTheDocument();
   });
 
   it('populates fields when Doctor quick-fill button is clicked', async () => {
@@ -47,7 +83,7 @@ describe('Staff & Specialist Password Login System', () => {
       </MemoryRouter>,
     );
 
-    const docFillBtn = await screen.findByRole('button', { name: /Doctor: Dr\. A\. Sharma/i });
+    const docFillBtn = await screen.findByRole('button', { name: /Demo doctor Dr\. Ananya Sen/i });
     fireEvent.click(docFillBtn);
 
     const idInput = screen.getByLabelText(/Phone Number or Staff ID/i) as HTMLInputElement;
@@ -55,6 +91,58 @@ describe('Staff & Specialist Password Login System', () => {
 
     expect(idInput.value).toBe('9876500001');
     expect(passInput.value).toBe('Doctor@123');
+  });
+
+  it('shows five demo doctors for each selected hospital with their patient load', async () => {
+    render(
+      <MemoryRouter initialEntries={['/staff/login']}>
+        <AuthProvider>
+          <StaffLogin />
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    const cityGroup = await screen.findByTestId('demo-doctor-buttons');
+    expect(
+      screen.getByRole('button', { name: /MediKiosk City Hospital.*Central Kolkata/i }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    const lakeHospital = screen.getByRole('button', {
+      name: /MediKiosk Lake Medical Centre.*South Kolkata/i,
+    });
+    expect(cityGroup.querySelectorAll('button[aria-label^="Demo doctor"]')).toHaveLength(5);
+    expect(
+      screen.getByRole('button', { name: /Dr\. Rahul Das, 5 waiting patients/i }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(lakeHospital);
+
+    expect(lakeHospital).toHaveAttribute('aria-pressed', 'true');
+    expect(cityGroup.querySelectorAll('button[aria-label^="Demo doctor"]')).toHaveLength(5);
+    const lakeDoctor = await screen.findByRole('button', {
+      name: /Dr\. Priyanka Pal, 5 waiting patients/i,
+    });
+    fireEvent.click(lakeDoctor);
+    expect(screen.getByLabelText(/Phone Number or Staff ID/i)).toHaveValue('9876500023');
+    expect(screen.getByLabelText(/Clinical Specialisation/i)).toHaveValue('NEUROLOGY');
+  });
+
+  it('keeps both demo hospitals available when the hospital request fails', async () => {
+    vi.mocked(api.hospitals).mockRejectedValueOnce(new Error('backend unavailable'));
+
+    render(
+      <MemoryRouter initialEntries={['/staff/login']}>
+        <AuthProvider>
+          <StaffLogin />
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    expect(
+      await screen.findByRole('button', { name: /MediKiosk City Hospital.*Central Kolkata/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /MediKiosk Lake Medical Centre.*South Kolkata/i }),
+    ).toBeInTheDocument();
   });
 
   it('populates fields when Triage quick-fill button is clicked', async () => {
@@ -111,7 +199,12 @@ describe('Staff & Specialist Password Login System', () => {
     fireEvent.click(screen.getByRole('button', { name: /Sign In to Staff Workspace/i }));
 
     await waitFor(() => {
-      expect(staffLoginSpy).toHaveBeenCalledWith('9876500001', 'Doctor@123');
+      expect(staffLoginSpy).toHaveBeenCalledWith(
+        '9876500001',
+        'Doctor@123',
+        expect.anything(),
+        expect.anything(),
+      );
       expect(screen.getByText('Doctor Workspace Loaded')).toBeInTheDocument();
     });
   });
@@ -142,6 +235,9 @@ describe('Staff & Specialist Password Login System', () => {
       </MemoryRouter>,
     );
 
+    // Switch role to triage
+    fireEvent.click(screen.getByRole('button', { name: /Triage Staff/i }));
+
     fireEvent.change(await screen.findByLabelText(/Phone Number or Staff ID/i), {
       target: { value: '9876500002' },
     });
@@ -151,7 +247,7 @@ describe('Staff & Specialist Password Login System', () => {
     fireEvent.click(screen.getByRole('button', { name: /Sign In to Staff Workspace/i }));
 
     await waitFor(() => {
-      expect(staffLoginSpy).toHaveBeenCalledWith('9876500002', 'Triage@123');
+      expect(staffLoginSpy).toHaveBeenCalledWith('9876500002', 'Triage@123', undefined, undefined);
       expect(screen.getByText('Triage Dashboard Loaded')).toBeInTheDocument();
     });
   });
@@ -236,11 +332,11 @@ describe('Staff & Specialist Password Login System', () => {
     fireEvent.change(screen.getByLabelText(/Registered Staff Mobile Number/i), {
       target: { value: '9876500001' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Send Staff OTP/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Send One-Time Password|Send Staff OTP/i }));
 
     await waitFor(() => {
       expect(otpReqSpy).toHaveBeenCalledWith('9876500001');
-      expect(screen.getByText(/Enter 6-digit Code/i)).toBeInTheDocument();
+      expect(screen.getByText(/Enter 6-Digit Code/i)).toBeInTheDocument();
     });
 
     // Fill 6 digits
@@ -289,21 +385,27 @@ describe('Staff & Specialist Password Login System', () => {
     expect(screen.getByLabelText(/Full Name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Create Password/i)).toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText(/Full Name/i), { target: { value: 'Dr. New Clinician' } });
+    fireEvent.change(screen.getByLabelText(/Full Name/i), {
+      target: { value: 'Dr. New Clinician' },
+    });
     fireEvent.change(screen.getByLabelText(/Mobile Number/i), { target: { value: '9999988888' } });
-    fireEvent.change(screen.getByLabelText(/Official Email/i), { target: { value: 'new@hospital.gov.in' } });
+    fireEvent.change(screen.getByLabelText(/Official Email/i), {
+      target: { value: 'new@hospital.gov.in' },
+    });
     fireEvent.change(screen.getByLabelText(/Create Password/i), { target: { value: 'Secret123' } });
 
     fireEvent.click(screen.getByRole('button', { name: /Create Staff Account & Sign In/i }));
 
     await waitFor(() => {
-      expect(registerSpy).toHaveBeenCalledWith({
-        name: 'Dr. New Clinician',
-        role: 'doctor',
-        phone_number: '9999988888',
-        email: 'new@hospital.gov.in',
-        password: 'Secret123',
-      });
+      expect(registerSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Dr. New Clinician',
+          role: 'doctor',
+          phone_number: '9999988888',
+          email: 'new@hospital.gov.in',
+          password: 'Secret123',
+        }),
+      );
       expect(screen.getByText('New Doctor Registered')).toBeInTheDocument();
     });
   });
