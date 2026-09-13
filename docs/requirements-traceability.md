@@ -1,6 +1,6 @@
 # Requirements traceability — stabilization
 
-Evidence must demonstrate behavior; a test count alone does not accept a feature. Current acceptance gates and limits are in [stabilization status](stabilization-implementation-status.md).
+Evidence must demonstrate behavior; a test count alone does not accept a feature. Current acceptance gates and limits are in [implementation status](implementation-status.md).
 
 | Requirement | Implementation / regression evidence | Limit |
 |---|---|---|
@@ -20,7 +20,7 @@ Evidence must demonstrate behavior; a test count alone does not accept a feature
 | BHASHINI adapter/configuration/audio/deadline | test_bhashini_speech.py; test_stabilization_bhashini.py | Mocked transport only; native browser audio not live-accepted |
 | Sarvam REST speech adapter | sarvam_speech.py; test_sarvam_speech.py; live synthetic TTS-to-ASR loopback | Provider transport accepted for synthetic Bengali audio; physical microphone/accent performance not accepted |
 | Schema consistency and upgrade preservation | verify-stabilization-migrations.py; Alembic check | Application upgrades only; downgrades isolated to disposable test schemas |
-| Restart preservation | verify-restart.ps1 and stabilization references | PostgreSQL control currently blocked by Windows Application Control |
+| Restart preservation | verify-stabilization-restart.ps1 | PostgreSQL control currently blocked by Windows Application Control |
 | Source-linked medical facts and fact review history | medical_facts.py; medical_fact_revisions; test_phase7_complete.py; phase7.test.tsx | Synthetic typed fixtures only; no real OCR or clinical validation |
 | Deterministic timeline and explicit unknown dates | timeline.py; timeline API/UI; backend and browser ordering/unknown-date tests | Computed only from explicit dates; generic timeline table remains unused |
 | Conservative discrepancies | discrepancies.py; discrepancy API/UI; medication/allergy/lab unit and browser tests | Incomparable evidence emits nothing; output always requires clinician review |

@@ -5,6 +5,7 @@ session lifecycles, and audit trails.
 import logging
 import uuid
 from datetime import datetime, timedelta, timezone
+from typing import TYPE_CHECKING
 
 from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
@@ -14,6 +15,9 @@ from app.core import phone, security
 from app.core.config import demo_enabled
 from app.core.errors import WorkflowError
 from app.services.sms_provider import get_sms_provider
+
+if TYPE_CHECKING:
+    from app import schemas
 
 logger = logging.getLogger(__name__)
 

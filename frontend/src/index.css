@@ -229,15 +229,6 @@ nav a:hover {
   cursor: pointer;
   box-shadow: none;
 }
-.demo-bar {
-  text-align: center;
-  background: #e8f3ee;
-  color: #49655b;
-  padding: 7px 20px;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-}
 main {
   max-width: 1220px;
   padding: 46px 24px 80px;

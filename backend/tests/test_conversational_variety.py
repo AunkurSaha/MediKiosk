@@ -2,31 +2,18 @@
 multi-domain entity extraction, and non-repetitive clinical interviews.
 """
 
-import json
-from uuid import uuid4
-
-import pytest
-from fastapi.testclient import TestClient
-
-from app import models
-from app.main import app
-from app.schemas.flow import Localized, Question
+from app.schemas.flow import Localized
 from app.services import red_flags
 from app.services.clinical_domains import (
-    CHEST_PAIN_REQUIRED_DOMAINS,
     ClinicalDomainTracker,
-    DomainStatus,
     extract_domains_and_facts,
 )
 from app.services.flow_registry import registry
-from app.services.interview_engine import InterviewEngine
 from app.services.question_planner import (
-    CandidateScoreBreakdown,
     QuestionCandidate,
-    QuestionPlanner,
     score_and_rank_candidates,
 )
-from tests.test_adaptive import payload, selected, submit
+from tests.test_adaptive import selected, submit
 
 
 def test_1_rich_patient_answer_fills_multiple_domains_and_prevents_duplicates(database):
@@ -302,21 +289,6 @@ def test_9_red_flag_behavior_remains_unchanged(client, database):
     from app.schemas.adaptive import Fact
     from app.services import intake
 
-    # Manually check red flags evaluation on severe facts
-    flow = registry()["chest_pain"]
-    test_facts = [
-        models.InterviewAnswer(
-            session_id=session_id,
-            question_id="hpi.severity",
-            field="hpi.severity",
-            value_json=json.dumps({"status": "answered", "value": 10}),
-            raw_value="10",
-            source="typed",
-            language="en",
-            verification_status="patient_reported",
-            created_at=intake.now(),
-        )
-    ]
     facts = [
         Fact(
             answer_id="1",

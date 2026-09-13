@@ -12,9 +12,9 @@ COVERED DOMAINS
 NEXT QUESTION ORIGIN
 """
 
-from uuid import uuid4
 from fastapi.testclient import TestClient
-from app.services.clinical_domains import FIELD_TO_DOMAIN_MAP, ClinicalDomainTracker, extract_domains_and_facts
+
+from app.services.clinical_domains import FIELD_TO_DOMAIN_MAP, extract_domains_and_facts
 from tests.test_adaptive import submit
 from tests.test_workflow import consent, create
 
@@ -45,8 +45,6 @@ def run_interview_simulation(client: TestClient, flow_id: str, chief_complaint_d
         q_text = q["text"].get("en", str(q["text"]))
         target_field = q.get("field") or q_id
         target_domain = FIELD_TO_DOMAIN_MAP.get(target_field, "general")
-        origin = q.get("origin") or ("rag" if q_id.startswith("rag_") else "flow")
-
         # Pick scripted patient answer
         if script_idx < total_answers:
             script_item = answers_script[script_idx]

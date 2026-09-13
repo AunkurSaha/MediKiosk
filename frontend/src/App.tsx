@@ -59,7 +59,6 @@ export function Shell() {
           )}
         </nav>
       </header>
-      <div className="demo-bar">{t.demo}</div>
       <main>
         <Routes>
           <Route path="/login" element={<Login />} />

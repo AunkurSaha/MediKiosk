@@ -4,7 +4,7 @@ Do not jump phases merely because later phases are more impressive.
 
 Each phase should leave the repository runnable.
 
-Current status: **Phase 12 complete for the local synthetic-data prototype**, with the active interview architecture updated by ADR-027 to use grounded per-turn RAG planning over deterministic coverage and safety controls. Phase 1–3 foundations remain; Phase 4–6 remediation and the continuing PostgreSQL process-restart limitation are tracked in [stabilization status](stabilization-implementation-status.md).
+Current status: **Phase 12 complete for the local synthetic-data prototype**, with the active interview architecture updated by ADR-027 to use grounded per-turn RAG planning over deterministic coverage and safety controls. Current limitations are tracked in [implementation status](implementation-status.md).
 
 The sections below describe historical or future scope, not current acceptance. Phase 3B and 4B live integrations remain unaccepted; Phase 6 has storage and explicit mock fixtures, not real OCR.
 

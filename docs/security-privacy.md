@@ -16,7 +16,7 @@ Unexpected errors log only exception class, not exception messages, submitted va
 
 Alert delivery uses bounded writes to authorized sockets and browser resynchronization. A successful write does not establish human receipt; patient copy asks for direct staff contact. Current trigger state and acknowledgement history are separate. Rule content is prototype/unvalidated; unknown language is not evidence of absence.
 
-Security verification and outstanding acceptance gates are recorded in [stabilization status](stabilization-implementation-status.md). Full production authorization, encrypted deployment, consent revocation across active sessions, retention operations and crash-recovery controls require separate scope and review.
+Security verification and outstanding acceptance gates are recorded in [implementation status](implementation-status.md). Full production authorization, encrypted deployment, consent revocation across active sessions, retention operations and crash-recovery controls require separate scope and review.
 
 ## Phase 7 access and audit boundary
 
@@ -93,4 +93,3 @@ Summary drafting, review, regeneration, and confirmation endpoints reuse the exi
    - Prominent UI and API disclaimers state: *"ABDM Sandbox Demonstration (Non-Production / Synthetic Gateway). No real Aadhaar or production NHA gateway authentication claimed."*
    - Default mode operates completely offline with deterministic mock fixtures, preventing accidental external transmission of synthetic health data.
    - Clinical safety invariants remain strictly enforced: dispatched records and FHIR bundles never assert autonomous diagnoses or prescribe medications.
-
