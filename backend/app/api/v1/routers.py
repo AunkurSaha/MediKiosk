@@ -6,6 +6,7 @@ from . import (
     consents,
     doctor,
     documents,
+    hospitals,
     interview,
     medical,
     rag,
@@ -16,6 +17,7 @@ from . import (
 
 api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["authentication"])
+api_router.include_router(hospitals.router, prefix="/hospitals", tags=["hospitals"])
 api_router.include_router(sessions.router, prefix="/sessions", tags=["sessions"])
 api_router.include_router(consents.router, prefix="/sessions", tags=["consent"])
 api_router.include_router(interview.router, prefix="/sessions", tags=["interview"])

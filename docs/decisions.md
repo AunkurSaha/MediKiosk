@@ -383,3 +383,9 @@ The backend exposes the selected `target_field` and `target_domain`, source chun
 Deterministic code remains the sole authority for authentication, consent, typed answer validation, branch applicability, answered-field tracking, required completion, red-flag evaluation and priority, persistence/audit, doctor verification and finalization. Generated prose is never the clinical source of truth. No ingestion or re-indexing occurs in the request path, and repeated state/TTS reads reuse the per-revision question cache.
 
 This decision supersedes only the fixed-question-selection statements in ADR-015, ADR-016, ADR-017, and the pinned-only TTS wording statement in ADR-018. Their version pinning, structured normalization, explicit patient confirmation, privacy, provenance, deterministic safety and clinician-control requirements remain in force. Legacy `rag_followup.*` records remain readable for audit compatibility, but the obsolete two-question post-completion RAG layer no longer controls the active interview.
+
+## ADR-028: Deterministic visit routing and assignment-isolated doctor access
+
+Status: accepted for the synthetic prototype.
+
+Hospital choice is stored on each session because a patient may attend different hospitals on different visits. Complaint-to-specialty routing is deterministic configuration under `ai/routing/complaint_specialties.json`; no language model selects a specialty. Doctors use normalized profile, hospital-membership, and specialty-membership records. Queue load is derived from `WAITING` entries and is never a manually maintained counter. A patient selects an eligible doctor before answering the interview, and a queue entry is created only when intake is submitted. Doctor APIs authorize against the selected doctor and active visit-hospital membership, not specialty alone. Historical unowned fixtures retain direct demo-doctor compatibility only while explicit demo mode is enabled.

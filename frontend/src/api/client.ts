@@ -19,6 +19,30 @@ export interface Session {
   status: IntakeStatus;
   created_at: string;
   completed_at: string | null;
+  user_id?: string | null;
+  hospital_id?: string | null;
+  selected_doctor_id?: string | null;
+}
+export interface Hospital {
+  id: string;
+  name: string;
+  city: string | null;
+  address: string | null;
+}
+export interface DoctorMatch {
+  doctor_id: string;
+  name: string;
+  qualification: string | null;
+  specialties: string[];
+  matched_specialty: string;
+  waiting_count: number;
+  recommended: boolean;
+  fallback: boolean;
+}
+export interface DoctorMatches {
+  specialty_codes: string[];
+  fallback_used: boolean;
+  items: DoctorMatch[];
 }
 export interface Answer {
   id: string;
@@ -259,7 +283,7 @@ export interface Detail {
   documents?: DocumentRecord[];
 }
 export interface SessionList {
-  items: (Session & { patient_name: string })[];
+  items: (Session & { patient_name: string; queue_status?: string | null; queue_joined_at?: string | null })[];
 }
 
 export type VerificationStatus = 'unverified' | 'verified' | 'rejected';
@@ -593,6 +617,16 @@ export const api = {
     hospital_token: string;
     language: Language;
   }) => request<Session>('/sessions', 'POST', body),
+  hospitals: () => request<{ items: Hospital[] }>('/hospitals'),
+  selectHospital: (id: string, hospitalId: string) =>
+    request<Session>(`/sessions/${id}/hospital`, 'PUT', { hospital_id: hospitalId }),
+  matchedDoctors: (id: string) => request<DoctorMatches>(`/sessions/${id}/doctors`),
+  selectDoctor: (id: string, doctorId: string) =>
+    request<{ session_id: string; hospital_id: string; doctor_id: string }>(
+      `/sessions/${id}/doctor`,
+      'PUT',
+      { doctor_id: doctorId },
+    ),
   session: (id: string) => request<Detail>('/sessions/' + id),
   consent: (id: string, agreed: boolean, voiceProcessing = false, documentProcessing = false) =>
     request<Detail['consent']>('/sessions/' + id + '/consent', 'PUT', {
@@ -704,6 +738,8 @@ export const api = {
   complete: (id: string) => request<Session>('/sessions/' + id + '/complete', 'POST'),
   sessions: () => request<SessionList>('/doctor/sessions', 'GET', undefined, true),
   doctorDetail: (id: string) => request<Detail>('/doctor/sessions/' + id, 'GET', undefined, true),
+  updateQueue: (id: string, status: 'CALLED' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED') =>
+    request<{ status: string }>(`/doctor/sessions/${id}/queue`, 'PUT', { status }, true),
   medicalFacts: (id: string) =>
     request<MedicalFactsResponse>(`/doctor/sessions/${id}/medical-facts`, 'GET', undefined, true),
   timeline: (id: string) =>

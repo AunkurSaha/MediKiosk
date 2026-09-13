@@ -6,6 +6,7 @@ import { copy, errorText } from '../../i18n';
 import { interviewCopy } from '../../i18n/interview';
 import { getTriageCopy } from '../../i18n/triage';
 import DocumentUploader from './DocumentUploader';
+import DoctorSelector from './DoctorSelector';
 import QuestionRenderer from './QuestionRenderer';
 import type { ResponseInput } from './QuestionRenderer';
 
@@ -18,6 +19,8 @@ export default function Interview({
   onComplete,
   onBusyChange,
   onManageConsent,
+  selectedDoctorId,
+  onDoctorSelected,
 }: {
   sessionId: string;
   language: Language;
@@ -27,6 +30,8 @@ export default function Interview({
   onComplete: () => Promise<void>;
   onBusyChange?: (busy: boolean) => void;
   onManageConsent?: () => void;
+  selectedDoctorId?: string | null;
+  onDoctorSelected?: (doctorId: string) => void;
 }) {
   const [state, setState] = useState<InterviewState | null>(null);
   const [error, setError] = useState<unknown>(null);
@@ -161,6 +166,10 @@ export default function Interview({
       )}
       {state?.flow_id && (
         <>
+          {!selectedDoctorId && onDoctorSelected ? (
+            <DoctorSelector sessionId={sessionId} onSelected={onDoctorSelected} />
+          ) : (
+          <>
           {state.namespace === 'ayush_demo' && <h2>{u.ayush}</h2>}
           <p className="eyebrow">{state.section?.[language]}</p>
           <p className="muted">
@@ -253,6 +262,8 @@ export default function Interview({
             >
               {t.back}
             </button>
+          )}
+          </>
           )}
         </>
       )}

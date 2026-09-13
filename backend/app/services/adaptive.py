@@ -226,7 +226,9 @@ def editable(db, session_id, user=None):
 
 
 def select_flow(db, session_id, payload, user=None):
-    editable(db, session_id, user=user)
+    session = editable(db, session_id, user=user)
+    if user is not None and user.role == "patient" and not session.hospital_id:
+        raise WorkflowError("HOSPITAL_REQUIRED", "Choose a hospital before selecting a health concern.", 409)
     flow, run = flow_for(db, session_id)
     if flow is not None:
         if flow.flow_id != payload.flow_id:
@@ -284,6 +286,8 @@ def check_revision(run, expected):
 
 def submit(db, session_id, payload, user=None):
     session = editable(db, session_id, user=user)
+    if user is not None and user.role == "patient" and not session.selected_doctor_id:
+        raise WorkflowError("DOCTOR_REQUIRED", "Choose a doctor before continuing the interview.", 409)
     flow, run = require_run(db, session_id)
     hashed_payload = payload.model_dump(mode="json")
     if hashed_payload["voice_candidate"] is None:

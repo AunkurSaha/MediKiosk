@@ -30,10 +30,14 @@ class Session(APIModel):
     created_at: UTCDate
     updated_at: UTCDate | None = None
     user_id: str | None = None
+    hospital_id: str | None = None
+    selected_doctor_id: str | None = None
 
 
 class SessionListItem(Session):
     patient_name: str
+    queue_status: str | None = None
+    queue_joined_at: UTCDate | None = None
 
 
 class SessionList(APIModel):

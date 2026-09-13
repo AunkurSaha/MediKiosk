@@ -2,12 +2,23 @@ import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
-import type { Detail, Language } from '../../api/client';
+import type { Detail, Hospital, Language } from '../../api/client';
 import Interview from '../../components/kiosk/Interview';
 import { copy, errorText, languages } from '../../i18n';
 import { speechCopy } from '../../i18n/speech';
 
 const sessionKey = 'medikiosk.session';
+
+export function HospitalSelection({ hospitals, load, busy, onSelect }: { hospitals: Hospital[] | null; load: () => Promise<void>; busy: boolean; onSelect: (hospitalId: string) => void }) {
+  const [error, setError] = useState(false);
+  const refresh = () => { setError(false); void load().catch(() => setError(true)); };
+  useEffect(() => { if (hospitals === null) refresh(); }, []); // load once on entry
+  if (error) return <div className="error" role="alert"><p>Hospitals could not be loaded.</p><button className="secondary" onClick={refresh}>Retry</button></div>;
+  if (hospitals === null) return <p role="status">Loading hospitals…</p>;
+  if (!hospitals.length) return <div className="card empty"><h1>No hospitals are currently available.</h1><p>Please contact the registration desk.</p><button className="secondary" onClick={refresh}>Retry</button></div>;
+  return <><h1>Which hospital are you visiting today?</h1><p className="muted">This selection applies to this visit only.</p><div className="language-grid" data-testid="hospital-list">{hospitals.map((hospital) => <button className="language-card" key={hospital.id} disabled={busy} onClick={() => onSelect(hospital.id)}><strong>{hospital.name}</strong><span>{[hospital.address, hospital.city].filter(Boolean).join(' · ')}</span><span aria-hidden="true">→</span></button>)}</div></>;
+}
+
 export default function Kiosk() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,6 +39,7 @@ export default function Kiosk() {
   const [agreed, setAgreed] = useState(false);
   const [voiceAgreed, setVoiceAgreed] = useState(false);
   const [docAgreed, setDocAgreed] = useState(false);
+  const [hospitals, setHospitals] = useState<Hospital[] | null>(null);
   const step = location.pathname.split('/').pop() || 'language';
   const t = copy[language];
 
@@ -139,7 +151,7 @@ export default function Kiosk() {
       });
       const result = await api.session(id);
       setRecord(result);
-      navigate('/kiosk/consent');
+      navigate('/kiosk/hospital');
     });
   }
   async function completeInterview() {
@@ -181,7 +193,9 @@ export default function Kiosk() {
   if (record?.session.status !== 'intake' && record && step !== 'complete')
     return <Navigate to="/kiosk/complete" replace />;
   if (record?.session.status === 'intake') {
-    if (!record.consent?.share_with_doctor && step !== 'consent')
+    if (record.session.user_id && !record.session.hospital_id && step !== 'hospital')
+      return <Navigate to="/kiosk/hospital" replace />;
+    if ((!record.session.user_id || record.session.hospital_id) && !record.consent?.share_with_doctor && step !== 'consent')
       return <Navigate to="/kiosk/consent" replace />;
     if (record.consent?.share_with_doctor && !['consent', 'interview'].includes(step))
       return <Navigate to="/kiosk/interview" replace />;
@@ -208,10 +222,10 @@ export default function Kiosk() {
         </p>
       )}
       <div className="stepper" aria-label={t.kiosk}>
-        {['language', 'identify', 'consent', 'interview', 'complete'].map((s, i) => (
+        {['language', 'identify', 'hospital', 'consent', 'interview', 'complete'].map((s, i) => (
           <span key={s} aria-current={s === step ? 'step' : undefined}>
             <b>{i + 1}</b>
-            {t[s as 'language' | 'identify' | 'consent' | 'interview' | 'complete']}
+            {s === 'hospital' ? 'Hospital' : t[s as 'language' | 'identify' | 'consent' | 'interview' | 'complete']}
           </span>
         ))}
       </div>
@@ -344,6 +358,18 @@ export default function Kiosk() {
             </div>
           </form>
         )}
+        {step === 'hospital' && record && (
+          <HospitalSelection
+            hospitals={hospitals}
+            load={() => api.hospitals().then((result) => setHospitals(result.items))}
+            busy={busy}
+            onSelect={(hospitalId) => void action(async () => {
+              const session = await api.selectHospital(record.session.id, hospitalId);
+              setRecord({ ...record, session });
+              navigate('/kiosk/consent');
+            })}
+          />
+        )}
         {step === 'consent' && record && (
           <>
             <p className="eyebrow">{record.session.hospital_token}</p>
@@ -417,6 +443,8 @@ export default function Kiosk() {
             language={language}
             voiceConsent={Boolean(record.consent?.voice_processing)}
             documentConsent={Boolean(record.consent?.document_processing)}
+            selectedDoctorId={record.session.selected_doctor_id}
+            onDoctorSelected={record.session.user_id ? (doctorId) => setRecord({ ...record, session: { ...record.session, selected_doctor_id: doctorId } }) : undefined}
             onComplete={completeInterview}
             onBusyChange={setBusy}
             onManageConsent={() => navigate('/kiosk/consent')}

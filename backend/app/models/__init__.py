@@ -4,9 +4,16 @@ from .audit_log import AuditLog, SummaryRevision
 from .auth_session import AuthSession
 from .clinical_summary import ClinicalSummary
 from .consent import Consent
+from .doctor_routing import (
+    DoctorHospitalMembership,
+    DoctorProfile,
+    DoctorQueueEntry,
+    DoctorSpecialtyMembership,
+)
 from .document import Document
 from .document_extraction import DocumentExtraction
 from .field_verification import FieldVerification, FieldVerificationRevision
+from .hospital import Hospital
 from .interview_answer import InterviewAnswer
 from .interview_run import InterviewRequest, InterviewRun
 from .knowledge_chunk import KnowledgeChunk
@@ -45,4 +52,9 @@ __all__ = [
     "LabFact",
     "User",
     "KnowledgeChunk",
+    "Hospital",
+    "DoctorProfile",
+    "DoctorHospitalMembership",
+    "DoctorSpecialtyMembership",
+    "DoctorQueueEntry",
 ]

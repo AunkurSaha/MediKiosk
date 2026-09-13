@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app import models
-from app.api.deps import get_current_user
+from app.api.deps import require_assigned_doctor_session
 from app.database import get_db
 from app.schemas.medical_fact import (
     DiscrepancyResponse,
@@ -24,7 +24,7 @@ router = APIRouter()
 def read_medical_facts(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return medical_facts.get_current_facts(db, str(session_id))
 
@@ -33,7 +33,7 @@ def read_medical_facts(
 def read_timeline(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return timeline.get_timeline(db, str(session_id))
 
@@ -42,7 +42,7 @@ def read_timeline(
 def read_discrepancies(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return discrepancies.get_discrepancies(db, str(session_id))
 
@@ -56,7 +56,7 @@ def review_medication_fact(
     fact_id: UUID,
     payload: MedicationFactReview,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return medical_facts.review_medication(db, str(session_id), str(fact_id), payload, user)
 
@@ -70,6 +70,6 @@ def review_lab_fact(
     fact_id: UUID,
     payload: LabFactReview,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return medical_facts.review_lab(db, str(session_id), str(fact_id), payload, user)

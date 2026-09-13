@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_assigned_doctor_session
 from app.database import get_db
 from app.services import intake
 
@@ -18,30 +18,53 @@ def read_doctor_sessions(
     user: models.User = Depends(get_current_user),
 ):
     rows = db.execute(
-        select(models.Session, models.Patient.name)
+        select(models.Session, models.Patient.name, models.DoctorQueueEntry.status, models.DoctorQueueEntry.joined_at)
         .join(models.Patient, models.Patient.id == models.Session.patient_id)
         .join(models.Consent, models.Consent.session_id == models.Session.id)
+        .join(models.DoctorQueueEntry, models.DoctorQueueEntry.session_id == models.Session.id)
+        .join(models.DoctorHospitalMembership, (models.DoctorHospitalMembership.doctor_id == user.id) & (models.DoctorHospitalMembership.hospital_id == models.Session.hospital_id))
         .where(
             models.Consent.share_with_doctor.is_(True),
+            models.Session.selected_doctor_id == user.id,
+            models.DoctorHospitalMembership.active.is_(True),
             models.Session.status.in_(["ready_for_review", "under_review", "confirmed"]),
         )
-        .order_by(models.Session.created_at.desc(), models.Session.id)
+        .order_by(
+            models.DoctorQueueEntry.status != "WAITING",
+            models.DoctorQueueEntry.joined_at.asc(),
+            models.Session.id,
+        )
     ).all()
     return schemas.SessionList(
         items=[
             schemas.SessionListItem(
-                **schemas.Session.model_validate(s).model_dump(), patient_name=name
+                **schemas.Session.model_validate(s).model_dump(),
+                patient_name=name,
+                queue_status=queue_status,
+                queue_joined_at=joined_at,
             )
-            for s, name in rows
+            for s, name, queue_status, joined_at in rows
         ]
     )
+
+
+@router.put("/sessions/{session_id}/queue", response_model=schemas.QueueEntryResponse)
+def update_queue(
+    session_id: UUID,
+    payload: schemas.QueueTransition,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(get_current_user),
+):
+    from app.services.doctor_routing import transition_queue
+
+    return transition_queue(db, str(session_id), payload.status, user)
 
 
 @router.get("/sessions/{session_id}", response_model=schemas.SessionDetail)
 def read_session_detail(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     result = intake.detail(db, str(session_id), doctor=True, user=user)
     intake.audit(db, "session_viewed", str(session_id), user)
@@ -53,7 +76,7 @@ def read_session_detail(
 def read_summary(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return intake.get_summary(db, str(session_id))
 
@@ -63,7 +86,7 @@ def regenerate_summary(
     session_id: UUID,
     payload: schemas.SummaryRegenerateRequest,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return intake.regenerate_summary(db, str(session_id), payload, user)
 
@@ -73,7 +96,7 @@ def update_summary(
     session_id: UUID,
     payload: schemas.ClinicalSummaryUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return intake.review_summary(db, str(session_id), payload, user)
 
@@ -83,7 +106,7 @@ def confirm_summary(
     session_id: UUID,
     payload: schemas.SummaryConfirm,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return intake.review_summary(db, str(session_id), payload, user, confirm=True)
 
@@ -95,7 +118,7 @@ def confirm_summary(
 def read_summary_revisions(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return intake.get_summary_revisions(db, str(session_id))
 
@@ -107,7 +130,7 @@ def read_summary_revisions(
 def read_summary_evidence(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return intake.get_summary_evidence(db, str(session_id))
 
@@ -120,7 +143,7 @@ def amend_summary(
     session_id: UUID,
     payload: schemas.SummaryAmendRequest,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return intake.amend_summary(db, str(session_id), payload, user)
 
@@ -132,7 +155,7 @@ def amend_summary(
 def read_field_verifications(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     from app.services import field_verification
 
@@ -147,7 +170,7 @@ def create_or_update_field_verification(
     session_id: UUID,
     payload: schemas.FieldVerificationRequest,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     from app.services import field_verification
 
@@ -161,7 +184,7 @@ def create_or_update_field_verification(
 def read_audit_trail(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     return intake.get_audit_trail(db, str(session_id))
 
@@ -173,7 +196,7 @@ def read_audit_trail(
 def read_cross_references(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(get_current_user),
+    user: models.User = Depends(require_assigned_doctor_session),
 ):
     from app.services import cross_reference
 

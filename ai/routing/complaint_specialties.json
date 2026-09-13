@@ -1,0 +1,9 @@
+{
+  "chest_pain": {"primary": ["CARDIOLOGY"], "fallback": ["GENERAL_MEDICINE"]},
+  "headache": {"primary": ["NEUROLOGY"], "fallback": ["GENERAL_MEDICINE"]},
+  "cough_breathlessness": {"primary": ["PULMONOLOGY"], "fallback": ["GENERAL_MEDICINE"]},
+  "abdominal_pain": {"primary": ["GASTROENTEROLOGY"], "fallback": ["GENERAL_MEDICINE"]},
+  "fever": {"primary": ["GENERAL_MEDICINE"], "fallback": []},
+  "other.complaint": {"primary": ["GENERAL_MEDICINE"], "fallback": []},
+  "ayush_demo.history": {"primary": ["AYUSH"], "fallback": ["GENERAL_MEDICINE"]}
+}

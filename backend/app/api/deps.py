@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import Depends, Header, Request
 from sqlalchemy.orm import Session
 
@@ -127,3 +129,19 @@ def require_patient(user: models.User = Depends(get_current_auth_user)) -> model
         raise WorkflowError("FORBIDDEN", "Account is inactive.", 403)
     return user
 
+
+def require_assigned_doctor_session(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_doctor),
+) -> models.User:
+    """Authorize a doctor against both visit assignment and hospital membership."""
+    from app.services import doctor_routing, intake
+
+    session = intake.get_session(db, str(session_id))
+    # Demo-only compatibility for historical unowned fixtures is centralized in
+    # verify_session_access; owned sessions always require explicit assignment.
+    intake.verify_session_access(db, session, user)
+    if session.selected_doctor_id is not None:
+        doctor_routing.require_assigned_doctor(db, session, user)
+    return user

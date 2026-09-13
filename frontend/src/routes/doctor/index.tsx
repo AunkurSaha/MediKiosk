@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api } from '../../api/client';
 import type {
   Detail,
@@ -8,6 +8,7 @@ import type {
   TransliterationResult,
 } from '../../api/client';
 import { copy, errorText } from '../../i18n';
+import { useOptionalAuth } from '../../context/AuthContext';
 import NormalizationPanel from '../../components/doctor/NormalizationPanel';
 import DocumentViewer from '../../components/doctor/DocumentViewer';
 import ClinicalEvidencePanel from '../../components/doctor/ClinicalEvidencePanel';
@@ -35,6 +36,9 @@ export default function Doctor() {
   const [detail, setDetail] = useState<Detail | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy] = useState(false);
+  const navigate = useNavigate();
+  const auth = useOptionalAuth();
+  const [loggingIn, setLoggingIn] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [notice, setNotice] = useState('');
   const [attempt, setAttempt] = useState(0);
@@ -195,10 +199,34 @@ export default function Doctor() {
       <p className="notice">{t.demoDoctor}</p>
       {Boolean(error) && (
         <div className="error" role="alert">
-          {errorText(error)}{' '}
-          <button className="secondary" onClick={refresh}>
-            {t.reload}
-          </button>
+          <div style={{ marginBottom: '8px' }}>
+            {errorText(error)}
+          </div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+            <button className="secondary" onClick={refresh} disabled={loggingIn}>
+              {t.reload}
+            </button>
+            <button
+              type="button"
+              className="secondary"
+              onClick={async () => {
+                setLoggingIn(true);
+                try {
+                  if (auth?.demoLogin) {
+                    await auth.demoLogin('doctor');
+                  }
+                  navigate('/doctor', { replace: true });
+                  refresh();
+                } catch { /* ignore */ } finally {
+                  setLoggingIn(false);
+                }
+              }}
+              disabled={loggingIn}
+              title="Sign in as Demo Doctor to restore access"
+            >
+              {loggingIn ? 'Signing in…' : '🔐 Demo Doctor Login'}
+            </button>
+          </div>
         </div>
       )}
       {notice && (
@@ -228,6 +256,7 @@ export default function Doctor() {
                 </p>
               </div>
               <span className={'badge ' + session.status}>{t[session.status]}</span>
+              {session.queue_status && <span className="badge">Queue: {session.queue_status.replaceAll('_', ' ')}</span>}
               <span className="review-link">{t.open} →</span>
             </Link>
           ))}
@@ -246,6 +275,8 @@ export default function Doctor() {
               </p>
             </div>
             <div className="doctor-header-actions">
+              <button type="button" className="secondary" onClick={async () => { await api.updateQueue(detail.session.id, 'IN_CONSULTATION'); refresh(); }}>Start consultation</button>
+              <button type="button" className="secondary" onClick={async () => { await api.updateQueue(detail.session.id, 'COMPLETED'); refresh(); }}>Complete consultation</button>
               <button
                 type="button"
                 className="btn btn-secondary"

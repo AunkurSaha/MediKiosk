@@ -609,3 +609,9 @@ Key Architectural Invariants:
 3. **Signed Candidate Gate**: ASR outputs are treated strictly as unconfirmed suggestions requiring explicit patient confirmation on the kiosk touchscreen.
 4. **Bounded Document Processing**: Document digitization is bounded to 8 seconds maximum polling with strictly nullable confidence scores, and all extractions remain unverified until clinician confirmation.
 5. **Intentional Scope Exclusions**: Dubbing (video-oriented) and WebSocket streaming are excluded from the clinical intake path to maintain deterministic safety and simple, auditable session authorization.
+
+## Visit-scoped hospital and doctor routing
+
+Authenticated patient sessions bind a hospital to the visit, never to the patient identity. After the patient selects a configured complaint flow, a deterministic routing table maps that patient-selected health concern to one or more specialty codes. Eligible doctors must be active, accepting patients, actively affiliated with the same hospital, and hold one of the selected specialty codes. The patient chooses from the eligible list; the server revalidates the choice and stores `sessions.selected_doctor_id`.
+
+Consultation queues are represented by `doctor_queue_entries`, separately from the clinical intake/review status. Waiting load is derived with `COUNT` over entries whose status is exactly `WAITING` at the same hospital. Completing intake creates the session's sole queue entry. Doctor clinical access requires both explicit assignment and an active membership at the visit hospital.

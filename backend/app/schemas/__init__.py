@@ -72,6 +72,17 @@ from .medical_fact import (
     TimelineResponse,
 )
 from .patient import Patient, PatientCreate
+from .routing import (
+    DoctorAssignment,
+    DoctorMatch,
+    DoctorMatches,
+    DoctorSelection,
+    HospitalList,
+    HospitalPublic,
+    HospitalSelection,
+    QueueEntryResponse,
+    QueueTransition,
+)
 from .session import Session, SessionCreate, SessionDetail, SessionList, SessionListItem
 from .showcase import DemoResetResponse, ShowcaseSeedResponse
 from .translation import (
@@ -85,6 +96,15 @@ from .translation import (
 from .user import User
 
 __all__ = [
+    "DoctorAssignment",
+    "DoctorMatch",
+    "DoctorMatches",
+    "DoctorSelection",
+    "HospitalList",
+    "HospitalPublic",
+    "HospitalSelection",
+    "QueueEntryResponse",
+    "QueueTransition",
     "AlertAcknowledgeRequest",
     "AlertItem",
     "AlertList",

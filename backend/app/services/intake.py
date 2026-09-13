@@ -53,6 +53,14 @@ def verify_session_access(db: Session, session: models.Session, user: models.Use
     from app.core.config import demo_enabled
 
     if user and user.role == "doctor":
+        # Historical anonymous showcase fixtures predate visit assignment. Keep
+        # them usable only in explicit demo mode; every owned patient session is
+        # subject to strict selected-doctor and hospital isolation below.
+        if demo_enabled() and session.user_id is None and session.selected_doctor_id is None:
+            return
+        from app.services.doctor_routing import require_assigned_doctor
+
+        require_assigned_doctor(db, session, user)
         return
 
     if user and user.role == "patient":
@@ -407,8 +415,21 @@ def complete(db, session_id, user=None):
             version=1,
         )
     )
+    if session.user_id is None:
+        from app.services.doctor_routing import (
+            DEMO_DOCTOR_A,
+            DEMO_HOSPITAL_A,
+            ensure_demo_routing_data,
+        )
+
+        ensure_demo_routing_data(db)
+        session.hospital_id = session.hospital_id or DEMO_HOSPITAL_A
+        session.selected_doctor_id = session.selected_doctor_id or DEMO_DOCTOR_A
     session.status = "ready_for_review"
     session.completed_at = now()
+    from app.services.doctor_routing import enqueue_completed_session
+
+    enqueue_completed_session(db, session)
     audit(db, "intake_completed", session_id, user=user)
     db.commit()
     db.refresh(session)
