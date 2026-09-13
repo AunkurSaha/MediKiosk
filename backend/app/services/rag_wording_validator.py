@@ -157,6 +157,7 @@ def validate_generated_wording(
     raw_content: str,
     candidate_id: str,
     template_question: str,
+    known_facts: str | None = None,
 ) -> Tuple[bool, str, str]:
     """Validate LLM-generated wording against deterministic clinical and structural rules.
 
@@ -164,6 +165,7 @@ def validate_generated_wording(
         raw_content: The raw string completion returned by the model.
         candidate_id: The approved clinical candidate ID (e.g., 'dyspnea').
         template_question: The deterministic fallback template question.
+        known_facts: Optional known facts or context.
 
     Returns:
         (is_valid: bool, reason: str, question_to_use: str)
@@ -250,6 +252,9 @@ def validate_generated_wording(
 
         # 2. Must NOT contain keywords belonging to other clinical domains (cross-contamination)
         for disallowed in domain_rules["disallowed_other_symptoms"]:
+            # If the symptom is already an established patient fact, referencing it as context is allowed
+            if known_facts and disallowed.lower() in known_facts.lower():
+                continue
             # Word boundary search for disallowed keywords
             pattern = r"\b" + re.escape(disallowed) + r"\b"
             if re.search(pattern, q_lower):

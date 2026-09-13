@@ -56,14 +56,17 @@ def main():
                 # Source title: make it nice
                 source_title = section.replace("_", " ").title()
 
-                print(f"Ingesting {file_path} as source_id='{source_id}', section='{section}' (reembed={force_reembed})")
+                # Determine topic from subdirectory (e.g. chest_pain, general), falling back to args.topic
+                derived_topic = relative_path.parts[0] if len(relative_path.parts) > 1 else args.topic
+
+                print(f"Ingesting {file_path} as source_id='{source_id}', section='{section}', topic='{derived_topic}' (reembed={force_reembed})")
                 asyncio.run(
                     ingestion_service.ingest_file(
                         file_path=str(file_path),
                         source_id=source_id,
                         source_title=source_title,
                         section=section,
-                        topic=args.topic,
+                        topic=derived_topic,
                         language="en",
                         document_version="1.0-demo",
                         source_reference="Internally generated for MediKiosk demo",

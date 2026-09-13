@@ -49,6 +49,8 @@ logger = logging.getLogger(__name__)
 PROMPT_FILE = Path(__file__).resolve().parents[3] / "ai/prompts/rag_question_wording_nvidia_v1.md"
 DEFAULT_BASE_URL = "https://integrate.api.nvidia.com/v1"
 DEFAULT_GENERATION_MODEL = "meta/llama-3.2-11b-vision-instruct"
+DEFAULT_GROQ_BASE_URL = "https://api.groq.com/openai/v1"
+DEFAULT_GROQ_MODEL = "openai/gpt-oss-20b"
 
 
 @dataclass(frozen=True)
@@ -102,6 +104,46 @@ class NvidiaWordingSettings(BaseModel):
             timeout=timeout,
             temperature=temperature,
             max_tokens=max_tokens,
+        )
+
+
+class GroqWordingSettings(BaseModel):
+    """Configuration for Groq's OpenAI-compatible chat-completions API."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+    api_key: SecretStr = Field(exclude=True, repr=False)
+    model: str = DEFAULT_GROQ_MODEL
+    base_url: str = DEFAULT_GROQ_BASE_URL
+    timeout: float = 6.0
+    temperature: float = 0.1
+    max_tokens: int = 256
+
+    @classmethod
+    def from_environment(cls) -> "GroqWordingSettings":
+        base = os.getenv("GROQ_BASE_URL", DEFAULT_GROQ_BASE_URL).rstrip("/")
+        parsed = urlsplit(base)
+        if (
+            parsed.scheme != "https"
+            or not parsed.hostname
+            or parsed.username
+            or parsed.password
+            or parsed.query
+            or parsed.fragment
+        ):
+            raise ValueError("GROQ_BASE_URL must be an HTTPS base URL without credentials/query/fragment")
+        model = os.getenv("RAG_GENERATION_MODEL", DEFAULT_GROQ_MODEL).strip()
+        if not model or len(model) > 160 or any(char.isspace() for char in model):
+            raise ValueError("Invalid RAG_GENERATION_MODEL")
+        timeout = float(os.getenv("RAG_GENERATION_TIMEOUT_SECONDS", "6"))
+        if not 0.5 <= timeout <= 30:
+            raise ValueError("RAG_GENERATION_TIMEOUT_SECONDS must be between 0.5 and 30")
+        return cls(
+            api_key=SecretStr(os.getenv("GROQ_API_KEY", "").strip()),
+            model=model,
+            base_url=base,
+            timeout=timeout,
+            temperature=float(os.getenv("RAG_GENERATION_TEMPERATURE", "0.1")),
+            max_tokens=int(os.getenv("RAG_GENERATION_MAX_TOKENS", "256")),
         )
 
 

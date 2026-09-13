@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 
 from sqlalchemy import select
 
@@ -11,6 +12,8 @@ from app.schemas.flow import Flow, Localized
 from app.services import intake, normalization, red_flags
 from app.services.flow_registry import registry
 from app.services.interview_engine import InterviewEngine, validate_answer
+
+logger = logging.getLogger(__name__)
 
 
 def rows(db, session_id):
@@ -93,6 +96,7 @@ def state(db, session_id, user=None):
     res.covered_domains = covered
     res.missing_required_domains = missing_required_domains
     res.missing_optional_domains = missing_optional_domains
+
     alerts = red_flags.get_session_alerts(db, session_id)
     active_alerts = [a for a in alerts if a.status in ("new", "acknowledged")]
     if active_alerts:
@@ -112,7 +116,8 @@ def state(db, session_id, user=None):
     # Include any previously answered RAG facts into active_answers and history
     rag_facts = []
     norm_map = normalization.for_answers(db, session_id)
-    for row in rows(db, session_id):
+    answer_rows = rows(db, session_id)
+    for row in answer_rows:
         if row.question_id.startswith("rag_followup"):
             stored = json.loads(row.value_json) if row.value_json else {}
             envelope = (
@@ -148,24 +153,51 @@ def state(db, session_id, user=None):
     if (
         not res.is_complete
         and res.question is not None
+        and res.question.question_id != "chief_complaint.description"
+        and "chief_complaint.description" in engine.active
         and res.current_answer is None
         and res.question.question_id in engine.pending
     ):
         try:
-            from app.services.rag_integration import get_known_clinical_context
-            from app.services.rag_interview_planner import plan_next_question
+            from app.services.clinical_domains import ClinicalDomainTracker
+            from app.services.question_planner import QuestionPlanner
 
-            rag_result = plan_next_question(
-                str(session_id),
-                res.revision,
-                session.language,
-                db,
-                flow,
-                engine,
-                get_known_clinical_context(db, str(session_id)),
+            complaint_type = (
+                "chest_pain"
+                if "chest_pain" in flow.flow_id
+                else "headache"
+                if "headache" in flow.flow_id
+                else "general"
             )
-            if rag_result is not None:
-                rag_question, rag_suggestion = rag_result
+            tracker = ClinicalDomainTracker(complaint_type)
+            flow_questions = {q.question_id: q for _, q in flow.questions()}
+            recent_answers = []
+            recent_questions = []
+            persisted_fields = set()
+            for row in answer_rows:
+                if row.question_id.startswith("rag_followup"):
+                    continue
+                question = flow_questions.get(row.question_id)
+                if question is None:
+                    continue
+                persisted_fields.add(row.field)
+                tracker.record_answer(row.question_id, row.field, row.raw_value or "")
+                recent_answers.append(row.raw_value or "")
+                recent_questions.append(question.text.en)
+
+            # Free-text extraction may cover a domain, but it must not masquerade
+            # as a persisted structured field. This keeps required-field completion
+            # deterministic while still letting the planner avoid needless repeats.
+            tracker.answered_fields.intersection_update(persisted_fields)
+            rag_question, rag_suggestion, _ = QuestionPlanner(
+                db, flow, engine, tracker
+            ).plan_next_turn(
+                str(session_id),
+                language=session.language,
+                recent_answers=recent_answers,
+                recent_questions=recent_questions,
+            )
+            if rag_question is not None and rag_suggestion is not None:
                 new_res = res.model_copy()
                 new_res.question = rag_question
                 new_res.rag_suggestions = [rag_suggestion]
@@ -178,8 +210,8 @@ def state(db, session_id, user=None):
                     update={"position": selected_index + 1}
                 )
                 return new_res
-        except Exception:
-            pass
+        except Exception as exc:
+            logger.warning("RAG interview planning failed open: %s", exc)
 
     return res
 
@@ -323,7 +355,12 @@ def submit(db, session_id, payload, user=None):
             "source_answer_id": saved_answer.id if saved_answer is not None else previous.answer_id,
         })
     if not payload.question_id.startswith("rag_followup"):
-        run.cursor = engine_for(db, session_id, flow).after(payload.question_id)
+        updated_engine = engine_for(db, session_id, flow)
+        run.cursor = (
+            updated_engine.pending[0]
+            if current.origin == "rag" and updated_engine.pending
+            else updated_engine.after(payload.question_id)
+        )
     run.revision += 1
     session.updated_at = intake.now()
     db.add(

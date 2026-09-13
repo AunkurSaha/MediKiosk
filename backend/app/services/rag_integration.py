@@ -57,17 +57,49 @@ def get_rag_suggestions(
     top_k: int = 6,
     min_similarity: Optional[float] = None,
 ) -> List[dict]:
-    """Generate RAG-based follow-up question suggestions for a session."""
+    """Generate RAG-based follow-up question suggestions for a session.
+
+    Query construction strategy:
+    1. Normalized facts provide structured clinical signal.
+    2. Free-text answers (associated symptoms, past history, review-of-systems)
+       are appended verbatim so that any conditions the patient mentions
+       (e.g. "I also have diabetes and dizziness") reach the retrieval engine
+       even when normalization hasn't processed them yet.
+    """
     try:
         with _session_scope(db_session_factory) as db:
             normalized = normalization.for_answers(db, session_id)
-        if not normalized:
-            return []
+            # Also load raw answers for free-text fields that may contain mentioned conditions
+            raw_rows = db.scalars(
+                select(models.InterviewAnswer)
+                .where(models.InterviewAnswer.session_id == session_id)
+            ).all()
 
+        # Build query from normalized facts (primary structured signal)
         query_parts = []
         for _, value in normalized.items():
             if value and getattr(value, "original_text", None):
                 query_parts.append(f"{value.canonical_field}: {value.original_text}")
+
+        # Augment with raw free-text answers that may contain mentioned conditions.
+        # These fields commonly contain patient-described conditions and symptoms
+        # that aren't yet in the deterministic flow.
+        FREE_TEXT_FIELDS = {
+            "hpi.associated_details",
+            "past_medical_history.details",
+            "personal_history.context",
+            "review_of_systems.other_details",
+            "chief_complaint.description",
+        }
+        raw_text_parts = []
+        for row in raw_rows:
+            if row.field in FREE_TEXT_FIELDS and row.raw_value and len(row.raw_value.strip()) > 3:
+                raw_text_parts.append(row.raw_value.strip())
+
+        # Combine: normalized first (structured signal), then free-text
+        if raw_text_parts:
+            query_parts.extend(raw_text_parts)
+
         query_text = ". ".join(query_parts) if query_parts else ""
         if not query_text:
             return []
@@ -242,6 +274,33 @@ def get_known_clinical_context(db, session_id: str) -> dict:
                 known_absent_concepts.add("FEVER")
             else:
                 known_present_concepts.add("FEVER")
+
+        # Diabetes
+        if any(term in txt for term in ["diabetes", "diabetic", "high blood sugar"]):
+            if denial_re.search(txt):
+                known_absent_concepts.add("DIABETES")
+                known_concepts.add("DIABETES")
+            else:
+                known_present_concepts.add("DIABETES")
+                known_concepts.add("DIABETES")
+
+        # Hypertension
+        if any(term in txt for term in ["hypertension", "high blood pressure", "htn"]):
+            if denial_re.search(txt):
+                known_absent_concepts.add("HYPERTENSION")
+                known_concepts.add("HYPERTENSION")
+            else:
+                known_present_concepts.add("HYPERTENSION")
+                known_concepts.add("HYPERTENSION")
+
+        # Hyperlipidemia / High cholesterol
+        if any(term in txt for term in ["cholesterol", "hyperlipidemia", "high cholesterol", "ldl", "hdl"]):
+            if denial_re.search(txt):
+                known_absent_concepts.add("HYPERLIPIDEMIA")
+                known_concepts.add("HYPERLIPIDEMIA")
+            else:
+                known_present_concepts.add("HYPERLIPIDEMIA")
+                known_concepts.add("HYPERLIPIDEMIA")
 
     return {
         "answered_fields": answered_fields,

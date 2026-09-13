@@ -68,8 +68,9 @@ def navigate(client, session_id, state, question_id):
 
 def test_registry_all_valid_and_ayush_separate():
     flows = load_flows()
-    assert len(flows) == 7
+    assert len(flows) == 8
     assert len([f for f in flows.values() if f.namespace == "standard"]) == 5
+    assert len([f for f in flows.values() if f.namespace == "other"]) == 1
     ayush = flows["ayush_demo.history"]
     assert len(ayush.questions()) == 11
     assert all(s.section_id == "ayush_demo" for s, _ in ayush.questions())
@@ -281,7 +282,7 @@ def test_consent_selection_and_legacy_endpoint_guards(client):
     assert client.put(url + "/flow", json={"flow_id": "fever"}).status_code == 403
     consent(client, session_id)
     state = client.get(url).json()
-    assert state["selection_required"] and len(state["flows"]) == 6
+    assert state["selection_required"] and len(state["flows"]) == 7
     assert client.put(url + "/flow", json={"flow_id": "legacy.intake"}).status_code == 422
     assert client.put(url + "/flow", json={"flow_id": "missing"}).status_code == 422
     assert (

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+import os
 from contextlib import contextmanager
 from typing import List, Optional, Tuple
 
@@ -278,6 +279,55 @@ class KnowledgeRetrievalService:
                 query = query.filter(models.KnowledgeChunk.topic == topic)
 
             chunks = query.all()
+            if not chunks:
+                from pathlib import Path
+                kb_root = Path(__file__).resolve().parents[3] / "ai" / "knowledge_base"
+                dirs_to_check = []
+                if topic and (kb_root / topic).exists():
+                    dirs_to_check.append(kb_root / topic)
+                else:
+                    dirs_to_check.extend([kb_root / "chest_pain", kb_root / "headache", kb_root / "general"])
+
+                created = False
+                model_name = getattr(self.embedding_provider, "model", active_provider_name) or "mock"
+                with db.no_autoflush:
+                    for t_dir in dirs_to_check:
+                        if t_dir.exists():
+                            cur_topic = t_dir.name
+                            for md_file in t_dir.glob("*.md"):
+                                try:
+                                    content = md_file.read_text(encoding="utf-8")
+                                    cid = f"{cur_topic}-{md_file.stem}-001"
+                                    existing_chk = db.query(models.KnowledgeChunk).filter_by(id=cid).first()
+                                    if not existing_chk:
+                                        file_chk = hashlib.sha256(content.encode("utf-8")).hexdigest()
+                                        kc = models.KnowledgeChunk(
+                                            id=cid,
+                                            source_id=f"{cur_topic}-{md_file.stem}",
+                                            source_title=md_file.stem.replace("_", " ").title(),
+                                            section=md_file.stem,
+                                            content=content,
+                                            topic=cur_topic,
+                                            specialty="clinical",
+                                            language=language,
+                                            document_version="1.0",
+                                            checksum=file_chk,
+                                            embedding_model=model_name,
+                                        )
+                                        emb = await self.embedding_provider.embed_query(content[:300])
+                                        kc.set_embedding(emb, provider=active_provider_name, model=model_name)
+                                        db.add(kc)
+                                        created = True
+                                except Exception as err:
+                                    logger.warning("Failed reading KB file %s: %s", md_file, err)
+                if created:
+                    try:
+                        db.commit()
+                        chunks = query.all()
+                    except Exception as err:
+                        db.rollback()
+                        logger.warning("Auto-seed knowledge base commit failed: %s", err)
+
             scored_chunks = []
 
             for chunk in chunks:
@@ -531,6 +581,128 @@ class RAGGenerationService:
                         "source_section": chunk.section,
                         "chunk_content": chunk.content,
                     })
+
+            # 9. Diabetes and blood sugar management
+            if any(term in content for term in ["diabetes", "blood sugar", "hyperglycemia", "hypoglycemia"]):
+                if "diabetes" not in seen_candidate_ids:
+                    seen_candidate_ids.add("diabetes")
+                    suggestions.append({
+                        "candidate_id": "diabetes",
+                        "question": "How is your blood sugar or diabetes currently managed, and have you checked your levels recently?",
+                        "reason": "Evaluating glycemic control and related complications in the context of reported symptoms.",
+                        "source_chunk_ids": [chunk.id],
+                        "origin": "rag",
+                        "target_field": "past_medical_history.details",
+                        "storage_field": "past_medical_history.details",
+                        "concept": "DIABETES",
+                        "target_concepts": ["DIABETES", "HYPERGLYCEMIA"],
+                        "similarity_score": score,
+                        "source_title": chunk.source_title,
+                        "source_section": chunk.section,
+                        "chunk_content": chunk.content,
+                    })
+
+            # 10. Hypertension and blood pressure
+            if any(term in content for term in ["hypertension", "blood pressure", "high bp"]):
+                if "hypertension" not in seen_candidate_ids:
+                    seen_candidate_ids.add("hypertension")
+                    suggestions.append({
+                        "candidate_id": "hypertension",
+                        "question": "Do you have a history of high blood pressure, and are you currently taking any blood pressure medication?",
+                        "reason": "Assessing cardiovascular risk and baseline blood pressure status.",
+                        "source_chunk_ids": [chunk.id],
+                        "origin": "rag",
+                        "target_field": "past_medical_history.details",
+                        "storage_field": "past_medical_history.details",
+                        "concept": "HYPERTENSION",
+                        "target_concepts": ["HYPERTENSION"],
+                        "similarity_score": score,
+                        "source_title": chunk.source_title,
+                        "source_section": chunk.section,
+                        "chunk_content": chunk.content,
+                    })
+
+            # 11. Asthma and reactive airway disease
+            if any(term in content for term in ["asthma", "wheezing", "inhaler", "bronchitis"]):
+                if "asthma" not in seen_candidate_ids:
+                    seen_candidate_ids.add("asthma")
+                    suggestions.append({
+                        "candidate_id": "asthma",
+                        "question": "Do you have a history of asthma or wheezing, or do you use an inhaler?",
+                        "reason": "Evaluating underlying reactive airway disease or chronic respiratory condition.",
+                        "source_chunk_ids": [chunk.id],
+                        "origin": "rag",
+                        "target_field": "past_medical_history.details",
+                        "storage_field": "past_medical_history.details",
+                        "concept": "ASTHMA",
+                        "target_concepts": ["ASTHMA", "WHEEZING"],
+                        "similarity_score": score,
+                        "source_title": chunk.source_title,
+                        "source_section": chunk.section,
+                        "chunk_content": chunk.content,
+                    })
+
+            # 12. Gastroesophageal reflux / acidity / GERD
+            if any(term in content for term in ["acid reflux", "gerd", "gastritis", "sour taste", "burning in chest or upper abdomen"]):
+                if "gerd" not in seen_candidate_ids:
+                    seen_candidate_ids.add("gerd")
+                    suggestions.append({
+                        "candidate_id": "gerd",
+                        "question": "Does the discomfort feel like burning or acid reflux, especially after meals or when lying down?",
+                        "reason": "Assessing potential gastroesophageal reflux or acid-related symptoms.",
+                        "source_chunk_ids": [chunk.id],
+                        "origin": "rag",
+                        "target_field": "hpi.associated_details",
+                        "storage_field": "hpi.associated_details",
+                        "concept": "GERD",
+                        "target_concepts": ["GERD", "ACID_REFLUX"],
+                        "similarity_score": score,
+                        "source_title": chunk.source_title,
+                        "source_section": chunk.section,
+                        "chunk_content": chunk.content,
+                    })
+
+            # 13. Headache and neurological features
+            if any(term in content for term in ["headache", "migraine", "vision changes", "numbness"]):
+                if "headache" not in seen_candidate_ids:
+                    seen_candidate_ids.add("headache")
+                    suggestions.append({
+                        "candidate_id": "headache",
+                        "question": "Are you having any severe headache, vision changes, or numbness or tingling?",
+                        "reason": "Screening for neurological symptoms or severe blood pressure elevation.",
+                        "source_chunk_ids": [chunk.id],
+                        "origin": "rag",
+                        "target_field": "hpi.associated_details",
+                        "storage_field": "hpi.associated_details",
+                        "concept": "HEADACHE",
+                        "target_concepts": ["HEADACHE", "NEUROLOGICAL"],
+                        "similarity_score": score,
+                        "source_title": chunk.source_title,
+                        "source_section": chunk.section,
+                        "chunk_content": chunk.content,
+                    })
+
+        provider_name = os.getenv("RAG_GENERATION_PROVIDER", "template").strip().lower()
+        if provider_name == "nvidia" and suggestions:
+            try:
+                from app.services.rag_wording_provider import configured_wording_provider
+                provider = configured_wording_provider("nvidia")
+                clinical_context = {
+                    "raw_answer_texts": [str(v) for v in structured_facts.values() if v],
+                }
+                for s in suggestions[:2]:
+                    try:
+                        chunks_for_cand = [c for c, _ in retrieved_chunks if c.id in s.get("source_chunk_ids", [])]
+                        res = provider.word_candidate(s, clinical_context, chunks_for_cand)
+                        if not res.fallback_used:
+                            s["question"] = res.question
+                            s["generation_provider"] = "nvidia"
+                            s["generation_model"] = res.model
+                            s["generation_latency_ms"] = res.latency_ms
+                    except Exception as e:
+                        logger.warning("NVIDIA wording for candidate %s failed safely: %s", s.get("candidate_id"), e)
+            except Exception as e:
+                logger.warning("NVIDIA suggestion wording provider failed safely: %s", e)
 
         return suggestions
 

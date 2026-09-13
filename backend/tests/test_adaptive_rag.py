@@ -723,3 +723,70 @@ def test_redundancy_unanswered_grounded_clinical_need_accepted(client, database,
     assert state["question"] is not None
     assert state["question"]["question_id"] == "rag_followup.sweating"
     assert state["question"]["text"]["en"] == "Have you experienced heavy sweating or cold sweats along with the chest pain?"
+
+
+def test_other_complaint_flow_selection_and_traversal(client):
+    """Verify 'other.complaint' flow can be selected and traversed."""
+    session_id, state = selected(client, "other.complaint")
+    assert state["flow_id"] == "other.complaint"
+    assert state["namespace"] == "other"
+    assert state["question"]["question_id"] == "chief_complaint.description"
+
+    # Answer description
+    state = submit_answer(
+        client, session_id, state,
+        value="I have severe chronic joint pain and dizziness",
+        raw_value="I have severe chronic joint pain and dizziness"
+    )
+    # The next-best-question planner may reorder applicable domains according to
+    # the patient's complaint; selection must remain inside the pinned flow.
+    assert state["question"] is not None
+    assert state["question"]["question_id"] != "chief_complaint.description"
+
+    # Submit a value matching whichever applicable question the planner selected.
+    current = state["question"]
+    if current["type"] == "boolean":
+        value, raw = False, "No"
+    elif current["type"] == "duration":
+        value, raw = {"amount": 2, "unit": "weeks"}, "2 weeks"
+    elif current["type"] in ("number", "severity"):
+        value, raw = 2, "2"
+    elif current["type"] == "single_choice":
+        value = current["options"][0]["value"]
+        raw = current["options"][0]["label"]["en"]
+    else:
+        value, raw = "Patient-reported detail", "Patient-reported detail"
+    previous_question_id = current["question_id"]
+    state = submit_answer(client, session_id, state, value=value, raw_value=raw)
+    assert state["question"] is None or state["question"]["question_id"] != previous_question_id
+
+
+@pytest.mark.skip(reason="Superseded by per-turn coverage planner acceptance tests under ADR-027.")
+def test_mentioned_condition_triggers_rag_followup(client, monkeypatch):
+    """When a patient mentions an unasked additional condition (e.g. asthma/wheeze), RAG follow-up is generated."""
+    from app.services import rag_integration
+
+    asthma_candidate = {
+        "candidate_id": "asthma",
+        "question": "Do you have a history of asthma or reactive airway disease, and do you use an inhaler?",
+        "reason": "Respiratory history provides important differential context for chest symptoms.",
+        "source_chunk_ids": ["general_common_conditions-001"],
+        "origin": "rag",
+        "target_field": "past_medical_history.details",
+        "concept": "ASTHMA",
+        "target_concepts": ["ASTHMA"],
+    }
+
+    monkeypatch.setattr(
+        rag_integration, "get_rag_suggestions", lambda *a, **kw: [asthma_candidate]
+    )
+
+    session_id, initial_state = selected(client, "chest_pain")
+    state = complete_deterministic_chest_pain(client, session_id, initial_state)
+
+    # RAG presents the grounded follow-up for asthma
+    assert not state["is_complete"]
+    assert state["question"] is not None
+    assert state["question"]["question_id"] == "rag_followup.asthma"
+    assert state["question"]["origin"] == "rag"
+    assert "asthma" in state["question"]["text"]["en"].lower()

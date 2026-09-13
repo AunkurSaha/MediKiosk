@@ -27,6 +27,7 @@ const en = {
   reload: 'Reload saved interview',
   multiple: 'Select all that apply.',
   optional: 'Optional',
+  other: 'Other health concern',
 };
 type Copy = { [K in keyof typeof en]: string };
 const bn: Copy = {
@@ -57,6 +58,7 @@ const bn: Copy = {
   reload: 'সংরক্ষিত প্রশ্নোত্তর আবার লোড করুন',
   multiple: 'প্রযোজ্য সবগুলি বেছে নিন।',
   optional: 'ঐচ্ছিক',
+  other: 'অন্যান্য স্বাস্থ্য সমস্যা',
 };
 const hi: Copy = {
   select: 'अपनी मुख्य समस्या चुनें',
@@ -85,5 +87,6 @@ const hi: Copy = {
   reload: 'सहेजे गए प्रश्न फिर लोड करें',
   multiple: 'लागू होने वाले सभी चुनें।',
   optional: 'वैकल्पिक',
+  other: 'अन्य स्वास्थ्य समस्या',
 };
 export const interviewCopy = { en, bn, hi };

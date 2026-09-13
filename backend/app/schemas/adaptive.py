@@ -43,7 +43,7 @@ class Navigation(APIModel):
 class FlowChoice(APIModel):
     flow_id: str
     version: str
-    namespace: Literal["standard", "ayush_demo", "legacy"]
+    namespace: Literal["standard", "ayush_demo", "legacy", "other"]
     label: Localized
 
 
@@ -61,7 +61,6 @@ class Fact(APIModel):
     verification_status: Literal["patient_reported"] = "patient_reported"
     recorded_at: UTCDate
     normalization: Normalization | None = None
-
 
 
 class RAGSuggestion(APIModel):
@@ -96,7 +95,7 @@ class ClinicalHistory(APIModel):
     schema_version: Literal[1] = 1
     flow_id: str
     flow_version: str
-    namespace: Literal["standard", "ayush_demo", "legacy"]
+    namespace: Literal["standard", "ayush_demo", "legacy", "other"]
     selected_complaint: Localized
     selection_source: Literal["patient_selected", "legacy_intake"]
     sections: list[HistorySection]
@@ -113,7 +112,7 @@ class InterviewState(APIModel):
     flows: list[FlowChoice] = Field(default_factory=list)
     flow_id: str | None = None
     flow_version: str | None = None
-    namespace: Literal["standard", "ayush_demo", "legacy"] | None = None
+    namespace: Literal["standard", "ayush_demo", "legacy", "other"] | None = None
     revision: int = 0
     section: Localized | None = None
     question: Question | None = None

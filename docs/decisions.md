@@ -369,3 +369,17 @@ MediKiosk operates in clinical healthcare environments where patients authentica
    - `ProtectedRoute` enforces `allowedRoles`. When unauthorized, it displays a strict "Doctor Access Required" or "Triage Access Required" screen and never renders protected child components or leaks data.
    - Header navigation dynamically filters visible navigation items based on the active role.
    - Direct browser URL changes or page reloads maintain complete role enforcement.
+
+---
+
+## ADR-027 — RAG-driven interview planning over deterministic coverage policy
+
+**Status:** Accepted on 2026-09-13.
+
+**Decision:** The complaint-flow configuration is the authoritative clinical coverage policy, not a fixed script that must be exhausted before retrieval. After deterministic chief-complaint acquisition, each unanswered turn may use one pre-indexed retrieval query (`RAG_TOP_K=3`) and one bounded generation request to select and word exactly one still-applicable flow field. The presented question retains the selected flow question's canonical ID, field, answer type, options, constraints, required flag and branch conditions. Only its patient-facing wording may change.
+
+The backend exposes the selected `target_field` and `target_domain`, source chunk IDs, retrieval score and generation/translation provenance. A generated plan is rejected if it selects a field outside the current missing coverage set, changes field/domain identity, lacks retrieved support, repeats an answered field, is malformed, asks multiple questions, introduces another clinical domain, asserts a diagnosis, recommends treatment/medication, or mentions internal AI/source details. Retrieval, generation, or translation failure never blocks intake: the configured question for the same highest-priority missing field is used immediately.
+
+Deterministic code remains the sole authority for authentication, consent, typed answer validation, branch applicability, answered-field tracking, required completion, red-flag evaluation and priority, persistence/audit, doctor verification and finalization. Generated prose is never the clinical source of truth. No ingestion or re-indexing occurs in the request path, and repeated state/TTS reads reuse the per-revision question cache.
+
+This decision supersedes only the fixed-question-selection statements in ADR-015, ADR-016, ADR-017, and the pinned-only TTS wording statement in ADR-018. Their version pinning, structured normalization, explicit patient confirmation, privacy, provenance, deterministic safety and clinician-control requirements remain in force. Legacy `rag_followup.*` records remain readable for audit compatibility, but the obsolete two-question post-completion RAG layer no longer controls the active interview.

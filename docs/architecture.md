@@ -402,6 +402,24 @@ Each selection pins the validated configuration to prevent later source edits re
 
 ClinicalHistory has typed canonical sections, raw wording, typed values, explicit missing-information status and answer provenance. It is computed during intake and snapshotted in the existing summary JSON column at completion. Future normalization consumes this structure and produces separately validated facts; it must not replace raw source wording or take over deterministic question selection. See ADR-015 and the [Phase 2 status](phase2-implementation-status.md).
 
+### Current RAG-driven interview boundary (supersedes fixed wording/selection above)
+
+ADR-027 changes the active question path while retaining the Phase 2 data and safety boundaries:
+
+```text
+consent + complaint selection
+→ deterministic applicable/answered/missing coverage calculation
+→ deterministic red-flag evaluation over structured facts
+→ one embedding query against pre-indexed complaint knowledge
+→ local top-3 retrieval
+→ one bounded model plan selecting one allowed missing field and wording one question
+→ deterministic plan/grounding/duplicate/safety validation
+→ typed answer validation + persistence + normalization
+→ repeat until configured coverage is complete
+```
+
+`services/rag_interview_planner.py` is allowed to select only an unanswered applicable question from the pinned flow snapshot and to replace only its localized display text. It cannot create fields, change answer types or constraints, satisfy completion, alter branches, produce safety priority, or write facts. `services/adaptive.py` retains the configured `InterviewEngine` question as the fail-safe fallback and exposes covered/missing domain lists for inspection. Legacy `rag_followup.*` facts remain readable but are not the main interview loop.
+
 ## Implemented Phase 3A normalization boundary
 
 Phase 3A now adds a provider-neutral normalization service with a deterministic local mock; real providers remain deferred. The InterviewEngine is unchanged and never reads normalization to choose questions or evaluate conditions.

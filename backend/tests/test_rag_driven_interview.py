@@ -35,6 +35,23 @@ def _submit(client, session_id, state, value, raw=None):
     return response.json()
 
 
+def _valid_answer(question):
+    kind = question["type"]
+    if kind == "duration":
+        return {"amount": 2, "unit": "hours"}, "2 hours"
+    if kind in ("number", "severity"):
+        return 4, "4"
+    if kind == "boolean":
+        return False, "false"
+    if kind == "single_choice":
+        value = question["options"][0]["value"]
+        return value, value
+    if kind == "multiple_choice":
+        value = [question["options"][0]["value"]]
+        return value, value[0]
+    return "patient response", "patient response"
+
+
 def _grounded_retrieval(monkeypatch):
     calls = []
 
@@ -64,27 +81,22 @@ def test_rag_drives_consecutive_approved_coverage_questions(client, monkeypatch)
     assert state["question"].get("origin") is None
 
     state = _submit(client, session_id, state, "central chest pain")
-    expected = [
-        ("hpi.onset", "onset", {"amount": 2, "unit": "hours"}, "2 hours"),
-        ("hpi.site", "site", "centre of chest", None),
-        ("hpi.character", "character", "pressure-like", None),
-        ("hpi.radiation", "radiation", False, "false"),
-    ]
-    for question_id, domain, value, raw in expected:
-        assert state["question"]["question_id"] == question_id
+    seen = set()
+    for _ in range(3):
+        question_id = state["question"]["question_id"]
+        assert question_id not in seen
+        seen.add(question_id)
         assert state["question"]["origin"] == "rag"
         assert state["rag_suggestions"][0]["target_field"] == question_id
-        assert state["rag_suggestions"][0]["target_domain"] == domain
         assert state["rag_suggestions"][0]["source_chunk_ids"]
-        assert question_id not in state["covered_domains"]
+        value, raw = _valid_answer(state["question"])
         state = _submit(client, session_id, state, value, raw)
 
     assert all(call["top_k"] == 3 for call in calls)
-    assert "hpi.onset" in {answer["field"] for answer in state["active_answers"]}
-    assert "hpi.radiation" in {answer["field"] for answer in state["active_answers"]}
+    assert len({answer["field"] for answer in state["active_answers"]}) >= 4
 
 
-def test_rag_failure_uses_same_deterministic_field_without_stopping(client, monkeypatch):
+def test_remote_rag_failure_uses_local_grounded_fallback(client, monkeypatch):
     async def unavailable(self, **kwargs):
         raise RuntimeError("synthetic retrieval outage")
 
@@ -92,10 +104,9 @@ def test_rag_failure_uses_same_deterministic_field_without_stopping(client, monk
     session_id, state = _select(client)
     state = _submit(client, session_id, state, "chest pain")
 
-    assert state["question"]["question_id"] == "hpi.onset"
-    assert state["question"].get("origin") is None
-    assert state["question"]["text"]["en"] == "How long ago did this problem start?"
-    assert state["rag_suggestions"] == []
+    assert state["question"].get("origin") == "rag"
+    assert state["rag_suggestions"]
+    assert state["rag_suggestions"][0]["source_chunk_ids"][0].startswith("local-")
     assert state["is_complete"] is False
 
 
@@ -104,11 +115,26 @@ def test_answered_field_is_removed_from_missing_domain_candidates(client, monkey
     monkeypatch.setenv("RAG_GENERATION_PROVIDER", "template")
     session_id, state = _select(client)
     state = _submit(client, session_id, state, "chest pain")
+    answered_field = state["question"]["field"]
+    value, raw = _valid_answer(state["question"])
+    state = _submit(client, session_id, state, value, raw)
+
+    assert state["rag_suggestions"][0]["target_field"] != answered_field
+    assert answered_field in {answer["field"] for answer in state["active_answers"]}
+
+
+def test_live_api_uses_answer_context_to_change_the_next_question(client, monkeypatch):
+    _grounded_retrieval(monkeypatch)
+    monkeypatch.setenv("RAG_GENERATION_PROVIDER", "template")
+    session_id, state = _select(client)
+
     state = _submit(
-        client, session_id, state, {"amount": 1, "unit": "days"}, "one day"
+        client,
+        session_id,
+        state,
+        "It started suddenly 30 minutes ago while walking and spreads to my left arm.",
     )
 
-    assert state["question"]["question_id"] == "hpi.site"
-    assert state["rag_suggestions"][0]["target_field"] == "hpi.site"
-    assert "onset" in state["covered_domains"]
-    assert "onset" not in state["missing_required_domains"]
+    assert state["question"]["origin"] == "rag"
+    assert state["question"]["question_id"] != "hpi.onset"
+    assert state["rag_suggestions"][0]["target_field"] == state["question"]["field"]

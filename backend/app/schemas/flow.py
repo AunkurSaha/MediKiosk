@@ -104,9 +104,9 @@ class Flow(APIModel):
     schema_version: Literal[1]
     flow_id: str = Field(pattern=r"^[a-z][a-z0-9_.]*$")
     version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
-    namespace: Literal["standard", "ayush_demo", "legacy"]
+    namespace: Literal["standard", "ayush_demo", "legacy", "other"]
     label: Localized
-    applicable_complaint: str
+    applicable_complaint: str | None = None
     content_status: Literal["prototype_unvalidated"]
     traversal: Literal["ordered_applicable"]
     completion: Literal["all_applicable_addressed"]
@@ -123,6 +123,8 @@ class Flow(APIModel):
             sections.add(section.section_id)
             if (section.section_id == "ayush_demo") != (self.namespace == "ayush_demo"):
                 raise ValueError("AYUSH must be isolated in its own namespace and section")
+            if self.namespace == "other" and section.section_id == "ayush_demo":
+                raise ValueError("AYUSH section cannot be in other namespace")
             for q in section.questions:
                 if q.question_id in seen or q.field in fields:
                     raise ValueError("duplicate question ID or canonical field")

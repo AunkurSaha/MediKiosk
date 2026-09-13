@@ -80,7 +80,7 @@ export interface ClinicalHistory {
   schema_version: 1;
   flow_id: string;
   flow_version: string;
-  namespace: 'standard' | 'ayush_demo' | 'legacy';
+  namespace: 'standard' | 'ayush_demo' | 'legacy' | 'other';
   selected_complaint: Localized;
   selection_source: 'patient_selected' | 'legacy_intake';
   sections: { section_id: string; label: Localized; facts: Fact[] }[];

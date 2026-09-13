@@ -111,6 +111,8 @@ def public_config():
         "speech_provider": os.getenv("SPEECH_PROVIDER", "mock"),
         "ocr_provider": os.getenv("OCR_PROVIDER", "mock"),
         "translation_provider": os.getenv("TRANSLATION_PROVIDER", "mock"),
+        "rag_generation_provider": os.getenv("RAG_GENERATION_PROVIDER", "template"),
+        "rag_generation_model": os.getenv("RAG_GENERATION_MODEL"),
     }
 
 
