@@ -93,7 +93,7 @@ Local storage, content validation, typed parser fixtures and doctor review are i
 
 ## Phase 7 — Medical extraction + timeline + discrepancies
 
-Status: complete for deterministic synthetic-fixture scope. Medication/lab materialization, current-fact services, computed timeline, conservative discrepancy checks, additive fact review history, staff-only APIs, doctor UI, and acceptance coverage are implemented. The generic timeline table remains an unused compatibility scaffold. See [Phase 7 report](phase7-implementation-status.md).
+Status: complete for deterministic synthetic-fixture scope. Medication/lab materialization, current-fact services, computed timeline, conservative discrepancy checks, additive fact review history, staff-only APIs, doctor UI, and acceptance coverage are implemented. The generic timeline table remains an unused compatibility scaffold. See [Phase 7 report](implementation-status.md).
 
 Delivered:
 - medication/lab extraction;
@@ -105,7 +105,7 @@ Delivered:
 
 ## Phase 8 — Draft summary
 
-Status: complete for deterministic prototype scope. Clinician-controlled clinical summary drafting, 10 fixed structured sections, explicit unknowns, evidence source attribution, doctor review/edit workspace, optimistic revision history, and immutable confirmation locking are implemented. No LLM or ungrounded generative AI is used. See [Phase 8 report](phase8-implementation-status.md).
+Status: complete for deterministic prototype scope. Clinician-controlled clinical summary drafting, 10 fixed structured sections, explicit unknowns, evidence source attribution, doctor review/edit workspace, optimistic revision history, and immutable confirmation locking are implemented. No LLM or ungrounded generative AI is used. See [Phase 8 report](implementation-status.md).
 
 Delivered:
 - deterministic `ClinicalSummaryService` synthesizing intake answers, normalized facts, medication/lab medical facts, computed timeline, discrepancies, and red-flag alerts;
@@ -119,7 +119,7 @@ Delivered:
 
 ## Phase 9 — Doctor verification hardening
 
-Status: complete for deterministic prototype scope. Granular field-level verification, versioned confirmed-summary clinical amendments, append-only session audit trails, and bidirectional cross-referencing are implemented. See [Phase 9 report](phase9-implementation-status.md).
+Status: complete for deterministic prototype scope. Granular field-level verification, versioned confirmed-summary clinical amendments, append-only session audit trails, and bidirectional cross-referencing are implemented. See [Phase 9 report](implementation-status.md).
 
 Delivered:
 - field-level verification service and badge component supporting granular status tracking (`unverified`, `verified`, `flagged`) with optimistic locking and synchronization to interview answers;
@@ -131,7 +131,7 @@ Delivered:
 
 ## Phase 10 — FHIR export
 
-Status: complete for deterministic prototype scope. Decoupled pure Pydantic v2 HL7 FHIR R4 export architecture, LOINC 34105-7 Composition document bundles, collection bundles, reference integrity validation, non-diagnostic provisional condition guardrails, and doctor export UI with JSON preview and download are implemented. See [Phase 10 report](phase10-implementation-status.md).
+Status: complete for deterministic prototype scope. Decoupled pure Pydantic v2 HL7 FHIR R4 export architecture, LOINC 34105-7 Composition document bundles, collection bundles, reference integrity validation, non-diagnostic provisional condition guardrails, and doctor export UI with JSON preview and download are implemented. See [Phase 10 report](implementation-status.md).
 
 Delivered:
 - decoupled adapter layer (`FHIRAdapterService`) leaving internal relational schemas intact;
@@ -145,7 +145,7 @@ Delivered:
 
 ## Phase 11 — ABDM / HIS demonstration
 
-Status: complete for deterministic prototype scope. National Health Stack M1 ABHA verification, M2 care context linking, M3 FHIR document bundle data exchange, outbound hospital information system (HIS) dispatcher, kiosk inline ABHA verification, and doctor ABDM & HIS hub modal are implemented. See [Phase 11 report](phase11-implementation-status.md).
+Status: complete for deterministic prototype scope. National Health Stack M1 ABHA verification, M2 care context linking, M3 FHIR document bundle data exchange, outbound hospital information system (HIS) dispatcher, kiosk inline ABHA verification, and doctor ABDM & HIS hub modal are implemented. See [Phase 11 report](implementation-status.md).
 
 Delivered:
 - ABDM sandbox & mock gateway engine (`ABDMService`) supporting format validation and simulated OTP/demographic auth for 14-digit ABHA numbers and ABHA handles;
@@ -160,7 +160,7 @@ Delivered:
 
 ## Phase 12 — Demo polish
 
-Status: complete for deterministic prototype scope. Canonical Bengali chest-pain showcase patient seeding, demo management CLI and API endpoints, kiosk full-screen toggle, judge-friendly emergency triage alert presentation, and doctor workspace demo tools are implemented. See [Phase 12 report](phase12-implementation-status.md).
+Status: complete for deterministic prototype scope. Canonical Bengali chest-pain showcase patient seeding, demo management CLI and API endpoints, kiosk full-screen toggle, judge-friendly emergency triage alert presentation, and doctor workspace demo tools are implemented. See [Phase 12 report](implementation-status.md).
 
 Delivered:
 - canonical Bengali (bn) chest-pain showcase patient with all 26 applicable flow answers, 2 deterministic emergency/urgent safety alerts, 2 previewable mock-fixture documents with source-linked facts, ABDM M1/M2/HIS mock state, and a revisioned 10-section clinical summary;
@@ -175,3 +175,4 @@ Delivered:
 ## Priority rule
 
 If a later feature is blocked, preserve the complete flow with a transparent mock rather than pretending the integration works.
+

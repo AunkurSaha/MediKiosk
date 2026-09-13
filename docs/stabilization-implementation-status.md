@@ -1,4 +1,4 @@
-> Historical stabilization evidence: a later user request authorized repair of already-written Phase 7 code. See [Phase 7 report](phase7-implementation-status.md) for current schema and test results. The previously blocked full PostgreSQL restart remains unverified; an intervening Git commit does not establish that it passed.
+> Historical stabilization evidence: a later user request authorized repair of already-written Phase 7 code. See [Phase 7 report](implementation-status.md) for current schema and test results. The previously blocked full PostgreSQL restart remains unverified; an intervening Git commit does not establish that it passed.
 
 # Stabilization implementation status
 
@@ -77,3 +77,4 @@ Local evidence is in ignored `.runtime/stabilization-migrations.json`, `stabiliz
 Windows Application Control must permit `C:\MEDIKIOSK\.runtime\pgsql\bin\pg_ctl.exe` through the owner's normal Windows security policy. Assistance was requested; even the non-mutating version check remains blocked. No bypass is attempted.
 
 After that policy issue is resolved, run `scripts/verify-stabilization-restart.ps1` **without** `-ApplicationOnly`, verify changed database/backend/frontend process IDs and unchanged persisted state/file bytes, then run the browser resume checks and update this matrix. Application-only restart is not a substitute. Stabilization remains **incomplete** on that exact gate. Phases 7–12 were subsequently authorized and completed separately; that later work does not establish PostgreSQL process-restart acceptance.
+

@@ -400,7 +400,7 @@ Branch evaluation proceeds in configuration order and only considers active answ
 
 Each selection pins the validated configuration to prevent later source edits reinterpreting an ongoing record. Request UUID/hash receipts make delayed retries safe even after subsequent corrections. The existing session-row lock serializes mutations. Optimistic interview revisions prevent stale tabs from changing the current answer.
 
-ClinicalHistory has typed canonical sections, raw wording, typed values, explicit missing-information status and answer provenance. It is computed during intake and snapshotted in the existing summary JSON column at completion. Future normalization consumes this structure and produces separately validated facts; it must not replace raw source wording or take over deterministic question selection. See ADR-015 and the [Phase 2 status](phase2-implementation-status.md).
+ClinicalHistory has typed canonical sections, raw wording, typed values, explicit missing-information status and answer provenance. It is computed during intake and snapshotted in the existing summary JSON column at completion. Future normalization consumes this structure and produces separately validated facts; it must not replace raw source wording or take over deterministic question selection. See ADR-015 and the [Phase 2 status](implementation-status.md).
 
 ### Current RAG-driven interview boundary (supersedes fixed wording/selection above)
 
@@ -428,7 +428,7 @@ Eligible short_text + explicit field policy → immutable reported answer → bo
 
 The service uses savepoints so failed enrichment writes/reads do not poison the surrounding patient-answer transaction. Explicit statuses distinguish normalized, unknown, unrecognized and unavailable. Provider exceptions are not echoed/logged with patient text. Persisted results attach to immutable answer IDs; current-source/branch filtering is inherited from Phase 2. No automatic reprocessing/backfill changes existing records.
 
-The future candidate helper returns explicit-confirmation suggestions only and has no caller in the current workflow. Vendor adapters must implement cancellable async I/O, structured output and transport timeouts. See ADR-016 and [Phase 3A verification](phase3a-implementation-status.md).
+The future candidate helper returns explicit-confirmation suggestions only and has no caller in the current workflow. Vendor adapters must implement cancellable async I/O, structured output and transport timeouts. See ADR-016 and [Phase 3A verification](implementation-status.md).
 
 ## Implemented Phase 3B NVIDIA NIM normalization provider
 
@@ -461,7 +461,7 @@ If NVIDIA fails, times out, or returns invalid schema:
 - The raw patient answer remains safely persisted in PostgreSQL.
 - Normalization records an explicit `unavailable` result with the specific failure reason (`timeout`, `network_error`, `authentication_failed`, `rate_limited`, `server_error`, `invalid_result`).
 - The interview continues deterministically without silent fallback to mock.
-- Offline development and CI remain default: `CLINICAL_NORMALIZATION_PROVIDER=mock` runs completely offline without an API key. See ADR-017 and [Phase 3B implementation status](phase3b-implementation-status.md).
+- Offline development and CI remain default: `CLINICAL_NORMALIZATION_PROVIDER=mock` runs completely offline without an API key. See ADR-017 and [Phase 3B implementation status](implementation-status.md).
 
 ## Stabilized Phase 4–6 boundaries
 
@@ -499,7 +499,7 @@ The timeline is computed from current source facts rather than materialized. The
 
 Fact clinical fields remain immutable machine extraction. Clinician corrections are effective overlays stored in append-only `medical_fact_revisions`, with optimistic fact versions and server-owned reviewer identity. Rejected facts and facts from rejected source extractions are excluded from current timeline/discrepancy evaluation while remaining auditable.
 
-Discrepancy IDs and timeline IDs are deterministic UUIDv5 values derived from stable source identifiers and comparison content. The engine does not call an LLM and does not infer diagnosis, adherence, treatment significance, dates, ranges, or normality. See [Phase 7 status](phase7-implementation-status.md).
+Discrepancy IDs and timeline IDs are deterministic UUIDv5 values derived from stable source identifiers and comparison content. The engine does not call an LLM and does not infer diagnosis, adherence, treatment significance, dates, ranges, or normality. See [Phase 7 status](implementation-status.md).
 
 ## Implemented Phase 8 boundary
 
@@ -544,7 +544,7 @@ Key architectural guarantees:
    - Revisions are append-only in `summary_revisions` storing `actor_type` (`SYSTEM` vs `DOCTOR`), `actor_user_id`, `review_notes`, and structured/text snapshots.
    - Draft regeneration requires explicit replacement confirmation (`confirm_replacement=True`) if manual edits exist, preventing accidental data loss.
 5. **Confirmation Locking**: Once confirmed, `confirmed_text` is saved with server-stamped `confirmed_by` and `confirmed_at`. The record is permanently locked against further edits or regeneration (HTTP 409 `CONFIRMED_IMMUTABLE`).
-6. **Non-Diagnostic Boundary**: UI and backend never declare a diagnosis, prescribe treatments, or alter medication regimens. AYUSH pathways display explicit demonstration and supportive documentation disclaimers. See [Phase 8 status](phase8-implementation-status.md).
+6. **Non-Diagnostic Boundary**: UI and backend never declare a diagnosis, prescribe treatments, or alter medication regimens. AYUSH pathways display explicit demonstration and supportive documentation disclaimers. See [Phase 8 status](implementation-status.md).
 
 ## Implemented Phase 9 boundary
 
@@ -576,11 +576,11 @@ Key architectural guarantees:
 1. **Field-Level Provenance & Verification**: Doctors can independently verify or flag discrete patient-reported answers and summary statements without altering the patient's raw report. Each verification action increments version and generates an immutable revision entry.
 2. **Confirmed Record Immutability with Versioned Amendments**: Once confirmed, a clinical summary is never modified in place. Subsequent clinical updates are filed as official amendments with mandatory clinician justification, preserving both the original confirmed text and the timestamped addendum.
 3. **Server-Enforced Actor Provenance**: Client attempts to supply or forge `verified_by` or `amended_by` are rejected; identities are strictly resolved from authenticated session credentials.
-4. **Complete Auditability**: Every intake, verification, summary revision, amendment, and triage alert generates an immutable `AuditLog` entry accessible via dedicated staff APIs. See [Phase 9 status](phase9-implementation-status.md).
+4. **Complete Auditability**: Every intake, verification, summary revision, amendment, and triage alert generates an immutable `AuditLog` entry accessible via dedicated staff APIs. See [Phase 9 status](implementation-status.md).
 
 ## Implemented Phase 10–12 boundary
 
-Phase 10 maps the internal relational source of truth into on-demand Pydantic FHIR R4 document or collection bundles; FHIR is not the persistence model. Phase 11 adds mock/sandbox ABDM identity and care-context state plus a simulated HIS dispatcher, all behind the staff boundary and patient sharing consent. Phase 12 adds no schema: it assembles a deterministic synthetic showcase record through existing models and services, stores content-addressed repository document fixtures in local storage, evaluates the versioned red-flag rules, and generates a clinician-reviewable summary. See the [Phase 10](phase10-implementation-status.md), [Phase 11](phase11-implementation-status.md), and [Phase 12](phase12-implementation-status.md) reports.
+Phase 10 maps the internal relational source of truth into on-demand Pydantic FHIR R4 document or collection bundles; FHIR is not the persistence model. Phase 11 adds mock/sandbox ABDM identity and care-context state plus a simulated HIS dispatcher, all behind the staff boundary and patient sharing consent. Phase 12 adds no schema: it assembles a deterministic synthetic showcase record through existing models and services, stores content-addressed repository document fixtures in local storage, evaluates the versioned red-flag rules, and generates a clinician-reviewable summary. See the [Phase 10](implementation-status.md), [Phase 11](implementation-status.md), and [Phase 12](implementation-status.md) reports.
 
 ## Implemented Sarvam AI Integration Boundary
 
@@ -615,3 +615,4 @@ Key Architectural Invariants:
 Authenticated patient sessions bind a hospital to the visit, never to the patient identity. After the patient selects a configured complaint flow, a deterministic routing table maps that patient-selected health concern to one or more specialty codes. Eligible doctors must be active, accepting patients, actively affiliated with the same hospital, and hold one of the selected specialty codes. The patient chooses from the eligible list; the server revalidates the choice and stores `sessions.selected_doctor_id`.
 
 Consultation queues are represented by `doctor_queue_entries`, separately from the clinical intake/review status. Waiting load is derived with `COUNT` over entries whose status is exactly `WAITING` at the same hospital. Completing intake creates the session's sole queue entry. Doctor clinical access requires both explicit assignment and an active membership at the visit hospital.
+

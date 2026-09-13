@@ -247,7 +247,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify-stabilization
 
 The checker stops/restarts the actual backend and PostgreSQL, requires new PIDs, and compares legacy/Phase 2 confirmed records plus the unfinished Bengali interview (flow, cursor, revision, history and answers). Finally run `npm run test:e2e -- e2e/restart.spec.ts` from frontend to verify browser resume after the real restart.
 
-See [current results](implementation-status.md) and [Phase 2 report](phase2-implementation-status.md). Clinical validation and provider integration are not established by these software tests.
+See [current results](implementation-status.md) and [Phase 2 report](implementation-status.md). Clinical validation and provider integration are not established by these software tests.
 
 ## Phase 3A acceptance
 
@@ -261,7 +261,7 @@ From backend with local PostgreSQL running:
 
 This verifies empty, Phase 1 and Phase 2 upgrades in isolated test schemas, then the real app upgrade; all pre-existing rows are fingerprint-compared. Alembic must report no new upgrade operations. Existing tests/start commands above remain valid.
 
-After the full E2E suite, scripts/verify-stabilization-restart.ps1 compares both confirmed and unfinished Phase 3A source/result/provenance snapshots across real backend and PostgreSQL process restarts. Run `npm run test:e2e -- e2e/restart.spec.ts` afterward for two browser resume checks. Artifacts are stored in ignored .runtime. See [Phase 3A report](phase3a-implementation-status.md) for the reviewed defects and final evidence.
+After the full E2E suite, scripts/verify-stabilization-restart.ps1 compares both confirmed and unfinished Phase 3A source/result/provenance snapshots across real backend and PostgreSQL process restarts. Run `npm run test:e2e -- e2e/restart.spec.ts` afterward for two browser resume checks. Artifacts are stored in ignored .runtime. See [Phase 3A report](implementation-status.md) for the reviewed defects and final evidence.
 
 ## Phase 3B acceptance
 
@@ -367,6 +367,4 @@ Current totals are **340 backend tests** and **73 frontend component tests**.
    - `SummaryAmendmentModal & SummaryWorkspace`: Validates modal launch from confirmed summaries, clinical justification requirement, amendment API interaction, and amendment card rendering.
    - `AuditTrailViewer`: Validates chronological audit event list rendering and client-side actor filtering (`All`, `Doctor`, `Patient`, `System`).
    - `DocumentViewer Cross-References`: Validates rendering of linked clinical facts and summary referenced indicator within the document preview card.
-
-
 
