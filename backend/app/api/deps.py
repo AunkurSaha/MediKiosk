@@ -94,7 +94,9 @@ def require_triage(
     x_demo_triage: str | None = Header(default=None),
 ) -> models.User:
     """Require an authenticated staff member with triage or doctor permission."""
-    user = get_optional_auth_user(request, db, x_demo_doctor=x_demo_doctor, x_demo_triage=x_demo_triage)
+    user = get_optional_auth_user(
+        request, db, x_demo_doctor=x_demo_doctor, x_demo_triage=x_demo_triage
+    )
     if user is None:
         raise WorkflowError("AUTH_REQUIRED", "Triage staff identity is required.", 401)
     if user.role not in ("triage", "doctor"):
@@ -111,7 +113,9 @@ def require_staff(
     x_demo_triage: str | None = Header(default=None),
 ) -> models.User:
     """Require an authenticated staff member (doctor, triage, or admin)."""
-    user = get_optional_auth_user(request, db, x_demo_doctor=x_demo_doctor, x_demo_triage=x_demo_triage)
+    user = get_optional_auth_user(
+        request, db, x_demo_doctor=x_demo_doctor, x_demo_triage=x_demo_triage
+    )
     if user is None:
         raise WorkflowError("AUTH_REQUIRED", "Staff identity is required.", 401)
     if user.role not in ("doctor", "triage", "admin"):
@@ -123,6 +127,21 @@ def require_staff(
 
 def require_patient(user: models.User = Depends(get_current_auth_user)) -> models.User:
     """Require an authenticated patient account."""
+    if user.role != "patient":
+        raise WorkflowError("FORBIDDEN", "Patient access is required.", 403)
+    if not user.is_active:
+        raise WorkflowError("FORBIDDEN", "Account is inactive.", 403)
+    return user
+
+
+def require_patient_or_demo(
+    user: models.User | None = Depends(get_optional_auth_user),
+) -> models.User | None:
+    """Allow an anonymous patient only for an explicitly enabled demo kiosk."""
+    if user is None:
+        if demo_enabled():
+            return None
+        raise WorkflowError("AUTH_REQUIRED", "Authentication is required.", 401)
     if user.role != "patient":
         raise WorkflowError("FORBIDDEN", "Patient access is required.", 403)
     if not user.is_active:

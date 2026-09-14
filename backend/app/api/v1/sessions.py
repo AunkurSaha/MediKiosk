@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app import models, schemas
-from app.api.deps import get_optional_auth_user, require_patient
+from app.api.deps import get_optional_auth_user, require_patient_or_demo
 from app.database import get_db
 from app.services import doctor_routing, intake
 
@@ -16,7 +16,7 @@ def choose_hospital(
     session_id: UUID,
     payload: schemas.HospitalSelection,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_patient),
+    user: models.User | None = Depends(require_patient_or_demo),
 ):
     return doctor_routing.select_hospital(db, str(session_id), payload.hospital_id, user)
 
@@ -25,7 +25,7 @@ def choose_hospital(
 def matched_doctors(
     session_id: UUID,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_patient),
+    user: models.User | None = Depends(require_patient_or_demo),
 ):
     return doctor_routing.matches_for_session(db, str(session_id), user)
 
@@ -35,7 +35,7 @@ def choose_doctor(
     session_id: UUID,
     payload: schemas.DoctorSelection,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_patient),
+    user: models.User | None = Depends(require_patient_or_demo),
 ):
     return doctor_routing.select_doctor(db, str(session_id), payload.doctor_id, user)
 

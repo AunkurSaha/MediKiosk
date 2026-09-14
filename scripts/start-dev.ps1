@@ -3,7 +3,7 @@ param(
     [ValidateSet('mock', 'bhashini', 'sarvam', 'disabled')][string]$SpeechProvider,
     [ValidateSet('mock', 'sarvam', 'disabled')][string]$OcrProvider,
     [ValidateSet('mock', 'sarvam', 'disabled')][string]$TranslationProvider,
-    [switch]$UseRunningDatabase
+    [switch]$SkipSeed
 )
 
 $ErrorActionPreference = 'Stop'
@@ -24,16 +24,17 @@ if ($TranslationProvider) {
 }
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $runtimeRoot = Join-Path $projectRoot '.runtime'
-if (-not $UseRunningDatabase) { & (Join-Path $PSScriptRoot 'setup-postgres.ps1') }
-# UseRunningDatabase only skips cluster control; Alembic below must connect to
-# the existing configured database successfully. It does not start PostgreSQL.
+# Supabase is the only runtime database. The launcher never provisions or
+# starts a local PostgreSQL or SQLite database.
 $pythonPath = Join-Path $projectRoot 'backend\.venv\Scripts\python.exe'
 Push-Location (Join-Path $projectRoot 'backend')
 try {
     & $pythonPath -m alembic upgrade head
     if ($LASTEXITCODE -ne 0) { throw 'Database migration failed.' }
-    & $pythonPath -m app.seed
-    if ($LASTEXITCODE -ne 0) { throw 'Demo doctor seeding failed.' }
+    if (-not $SkipSeed) {
+        & $pythonPath -m app.seed
+        if ($LASTEXITCODE -ne 0) { throw 'Demo doctor seeding failed.' }
+    }
 } finally { Pop-Location }
 $processes = @{}
 if (Test-Path -LiteralPath (Join-Path $runtimeRoot 'dev-processes.json')) {

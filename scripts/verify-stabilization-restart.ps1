@@ -1,4 +1,3 @@
-param([switch]$ApplicationOnly)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $runtimeRoot = Join-Path $projectRoot '.runtime'
@@ -37,19 +36,13 @@ foreach ($entry in @(
 }
 $processPath = Join-Path $runtimeRoot 'dev-processes.json'
 $oldProcesses = Get-Content -Raw -LiteralPath $processPath | ConvertFrom-Json
-$pgPidPath = Join-Path $runtimeRoot 'pgdata\postmaster.pid'
-$oldPgPid = Get-Content -LiteralPath $pgPidPath -TotalCount 1
-if ($ApplicationOnly) { & (Join-Path $PSScriptRoot 'stop-dev.ps1') }
-else { & (Join-Path $PSScriptRoot 'stop-dev.ps1') -Database }
+& (Join-Path $PSScriptRoot 'stop-dev.ps1')
 $responding = $false
 try { $null = Invoke-WebRequest -UseBasicParsing -Uri 'http://127.0.0.1:8010/api/health' -TimeoutSec 2; $responding = $true } catch {}
 if ($responding) { throw 'Backend did not stop; restart evidence is invalid.' }
-if ($ApplicationOnly) { & (Join-Path $PSScriptRoot 'start-dev.ps1') -NormalizationProvider mock -UseRunningDatabase }
-else { & (Join-Path $PSScriptRoot 'start-dev.ps1') -NormalizationProvider mock }
+& (Join-Path $PSScriptRoot 'start-dev.ps1') -NormalizationProvider mock -SkipSeed
 $newProcesses = Get-Content -Raw -LiteralPath $processPath | ConvertFrom-Json
-$newPgPid = Get-Content -LiteralPath $pgPidPath -TotalCount 1
 if ($oldProcesses.backend -eq $newProcesses.backend -or $oldProcesses.frontend -eq $newProcesses.frontend) { throw 'Application process IDs did not change.' }
-if (-not $ApplicationOnly -and $oldPgPid -eq $newPgPid) { throw 'Database process ID did not change.' }
 foreach ($check in $checks) {
     $after = Invoke-RestMethod -Uri $check.Uri -Headers $headers
     if ($check.Before -ne ($after | ConvertTo-Json -Depth 80 -Compress)) { throw ('Persisted API state changed: ' + $check.Name) }
@@ -57,7 +50,7 @@ foreach ($check in $checks) {
 $fileAfter = Join-Path $runtimeRoot 'restart-document-after.png'
 Invoke-WebRequest -UseBasicParsing -Uri $fileUri -Headers $headers -OutFile $fileAfter
 if ((Get-FileHash -LiteralPath $fileAfter -Algorithm SHA256).Hash -ne $fileHash) { throw 'Stored document bytes changed.' }
-$mode = if ($ApplicationOnly) { 'application-only' } else { 'application-and-postgresql' }
-@{mode=$mode; passed=$true; records=@($checks | ForEach-Object { @{reference=$_.Name; session_id=$_.SessionId; api_state_unchanged=$true} }); document_sha256=$fileHash; backend_pid_changed=$true; frontend_pid_changed=$true; database_pid_changed=($oldPgPid -ne $newPgPid); timestamp=(Get-Date).ToString('o')} |
+$mode = 'application-only-supabase'
+@{mode=$mode; passed=$true; records=@($checks | ForEach-Object { @{reference=$_.Name; session_id=$_.SessionId; api_state_unchanged=$true} }); document_sha256=$fileHash; backend_pid_changed=$true; frontend_pid_changed=$true; timestamp=(Get-Date).ToString('o')} |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $runtimeRoot ('stabilization-restart-' + $mode + '.json')) -Encoding UTF8
 Write-Output ('PASS: ' + $mode + ' restart; ' + $checks.Count + ' persisted API snapshots and original document bytes unchanged.')

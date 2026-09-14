@@ -77,7 +77,9 @@ def verify_session_access(db: Session, session: models.Session, user: models.Use
 
     # Unauthenticated caller
     if session.user_id is not None:
-        raise WorkflowError("AUTH_REQUIRED", "Authentication is required to access this session.", 401)
+        raise WorkflowError(
+            "AUTH_REQUIRED", "Authentication is required to access this session.", 401
+        )
 
     if not demo_enabled():
         raise WorkflowError("AUTH_REQUIRED", "Authentication is required.", 401)
@@ -147,7 +149,9 @@ def summary_for(db, session_id):
     )
 
 
-def enrich_summary_schema(summary: models.ClinicalSummary | None, db: Session | None = None) -> schemas.ClinicalSummary | None:
+def enrich_summary_schema(
+    summary: models.ClinicalSummary | None, db: Session | None = None
+) -> schemas.ClinicalSummary | None:
     if summary is None:
         return None
     structured = None
@@ -225,6 +229,7 @@ def detail(db, session_id, doctor=False, user=None):
         for a in alerts
     ]
     from app.services import document_service
+
     docs = document_service.get_session_documents(db, session_id) if doctor else []
     doc_items = [
         schemas.DocumentResponse(
@@ -273,7 +278,6 @@ def detail(db, session_id, doctor=False, user=None):
         alerts=alert_items,
         documents=doc_items,
     )
-
 
 
 def create_session(db, payload, user=None):
@@ -407,7 +411,9 @@ def complete(db, session_id, user=None):
         models.ClinicalSummary(
             session_id=session_id,
             generated_text=draft_text,
-            generated_structured_json=history.model_dump_json() if history else structured_summary.model_dump_json(),
+            generated_structured_json=history.model_dump_json()
+            if history
+            else structured_summary.model_dump_json(),
             reviewed_text=draft_text,
             status="generated",
             draft_provider="deterministic",
@@ -416,7 +422,7 @@ def complete(db, session_id, user=None):
             version=1,
         )
     )
-    if session.user_id is None:
+    if session.user_id is None and not db.get(models.InterviewRun, session_id):
         from app.services.doctor_routing import (
             DEMO_DOCTOR_A,
             DEMO_HOSPITAL_A,
@@ -426,6 +432,12 @@ def complete(db, session_id, user=None):
         ensure_demo_routing_data(db)
         session.hospital_id = session.hospital_id or DEMO_HOSPITAL_A
         session.selected_doctor_id = session.selected_doctor_id or DEMO_DOCTOR_A
+    if not session.hospital_id or not session.selected_doctor_id:
+        raise WorkflowError(
+            "ROUTING_REQUIRED",
+            "Choose a hospital and an available doctor before completing the intake.",
+            409,
+        )
     session.status = "ready_for_review"
     session.completed_at = now()
     from app.services.doctor_routing import enqueue_completed_session
@@ -534,7 +546,10 @@ def regenerate_summary(db, session_id, payload, user) -> schemas.ClinicalSummary
     summary.reviewed_at = now()
     session.status = "under_review"
 
-    notes = getattr(payload, "review_notes", None) or "Regenerated draft from structured clinical sources"
+    notes = (
+        getattr(payload, "review_notes", None)
+        or "Regenerated draft from structured clinical sources"
+    )
     db.add(
         models.SummaryRevision(
             summary_id=summary.id,
@@ -766,4 +781,3 @@ def get_audit_trail(db: Session, session_id: str) -> schemas.AuditTrailResponse:
         total=len(items),
         items=items,
     )
-

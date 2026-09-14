@@ -35,6 +35,69 @@ DEMO_GENERIC_COMPLAINTS = (
     "Patient reports mild abdominal discomfort for routine assessment.",
     "Patient reports mild chest discomfort for routine assessment.",
 )
+DEMO_PATIENT_PROFILES = (
+    (
+        "Symptoms began this morning.",
+        "No regular medicines reported.",
+        "No known allergies reported.",
+        "No long-term conditions reported.",
+    ),
+    (
+        "Symptoms began about two days ago.",
+        "Reports taking metformin regularly.",
+        "Reports a penicillin allergy.",
+        "Reports a history of type 2 diabetes.",
+    ),
+    (
+        "Symptoms have occurred intermittently for one week.",
+        "Medication history is not known.",
+        "Allergy history is not known.",
+        "Past medical history is not known.",
+    ),
+    (
+        "Symptoms began gradually three days ago.",
+        "Reports using an inhaler as previously prescribed.",
+        "No known medicine allergies reported.",
+        "Reports a history of asthma.",
+    ),
+    (
+        "Symptoms started suddenly about six hours ago.",
+        "Reports taking amlodipine regularly.",
+        "Reports an allergy to sulfa medicines.",
+        "Reports a history of high blood pressure.",
+    ),
+    (
+        "Symptoms have been present for about two weeks.",
+        "Reports occasional antacid use.",
+        "No known allergies reported.",
+        "Reports previous acid reflux symptoms.",
+    ),
+    (
+        "Symptoms returned yesterday after improving last week.",
+        "Reports taking a daily thyroid medicine.",
+        "Reports an allergy to ibuprofen.",
+        "Reports a history of hypothyroidism.",
+    ),
+    (
+        "Symptoms began after exertion earlier today.",
+        "Reports low-dose aspirin on a previous clinician's advice.",
+        "Allergy history was not provided.",
+        "Reports a previous cardiac evaluation; details need verification.",
+    ),
+    (
+        "Symptoms have worsened gradually over four days.",
+        "Reports no current prescription medicines.",
+        "Reports a dust allergy.",
+        "Reports seasonal breathing problems.",
+    ),
+    (
+        "Duration is uncertain; symptoms were first noticed this week.",
+        "Medicine names could not be recalled.",
+        "No known food allergies reported.",
+        "Reports a previous hospital admission; reason is not known.",
+    ),
+)
+DEMO_PATIENT_LANGUAGES = ("en", "bn", "hi")
 DEMO_DOCTORS = (
     (
         DEMO_DOCTOR_A,
@@ -199,6 +262,29 @@ def doctor_roster(db: Session, hospital_id: str) -> list[dict]:
 def ensure_demo_routing_data(db: Session) -> None:
     """Idempotent synthetic fixtures for the local demonstration only."""
     if not demo_enabled():
+        return
+    bind = db.get_bind()
+    if getattr(bind, "_medikiosk_demo_routing_ready", False):
+        return
+    # The final deterministic fixture is a completion sentinel. Normal API
+    # requests must not rescan/rewrite the entire 30-patient demo dataset,
+    # especially when PostgreSQL is in a remote Supabase region.
+    final_doctor_id, *_, final_queue_count = DEMO_DOCTORS[-1]
+    final_session_id = str(
+        uuid.uuid5(
+            uuid.NAMESPACE_URL,
+            f"medikiosk:demo-queue:{final_doctor_id}:{final_queue_count - 1}",
+        )
+    )
+    if (
+        db.scalar(
+            select(models.ClinicalSummary.id).where(
+                models.ClinicalSummary.session_id == final_session_id
+            )
+        )
+        is not None
+    ):
+        bind._medikiosk_demo_routing_ready = True
         return
     hospitals = (
         (DEMO_HOSPITAL_A, "DEMO-KOL-01", "MediKiosk City Hospital", "Central Kolkata"),
@@ -368,7 +454,11 @@ def ensure_demo_routing_data(db: Session) -> None:
                     )
                 )
             _ensure_generic_patient_record(db, visit, doctor_id, index)
-    db.commit()
+            # Keep remote demo setup resilient: one patient's fixture is an
+            # independent, idempotent transaction rather than holding all 30
+            # patients in a single long-lived transaction.
+            db.commit()
+    bind._medikiosk_demo_routing_ready = True
 
 
 def _ensure_generic_patient_record(
@@ -378,13 +468,18 @@ def _ensure_generic_patient_record(
     patient_index: int,
 ) -> None:
     """Attach safe, patient-reported demo content to a synthetic queue visit."""
-    complaint_index = (int(doctor_id[-2:]) + patient_index) % len(DEMO_GENERIC_COMPLAINTS)
+    fixture_index = int(doctor_id[-2:]) + patient_index
+    complaint_index = fixture_index % len(DEMO_GENERIC_COMPLAINTS)
+    onset, medications, allergies, past_history = DEMO_PATIENT_PROFILES[
+        fixture_index % len(DEMO_PATIENT_PROFILES)
+    ]
+    visit.language = DEMO_PATIENT_LANGUAGES[fixture_index % len(DEMO_PATIENT_LANGUAGES)]
     answers = (
         ("chief_complaint", DEMO_GENERIC_COMPLAINTS[complaint_index]),
-        ("onset_duration", f"Patient reports symptoms began {patient_index + 1} day(s) ago."),
-        ("medications", "Patient reports no regular medicines."),
-        ("allergies", "Patient reports no known allergies."),
-        ("past_history", "Patient reports no known long-term conditions."),
+        ("onset_duration", onset),
+        ("medications", medications),
+        ("allergies", allergies),
+        ("past_history", past_history),
     )
     for position, (field, raw_value) in enumerate(answers):
         existing = db.scalar(
@@ -403,7 +498,7 @@ def _ensure_generic_patient_record(
                     value_json=json.dumps({"status": "answered", "value": raw_value}),
                     raw_value=raw_value,
                     source="patient_typed",
-                    language="en",
+                    language=visit.language,
                     verification_status="patient_reported",
                 )
             )
@@ -446,11 +541,11 @@ def _ensure_generic_patient_record(
 
 
 def select_hospital(
-    db: Session, session_id: str, hospital_id: str, user: models.User
+    db: Session, session_id: str, hospital_id: str, user: models.User | None
 ) -> models.Session:
     session = intake.get_session(db, session_id)
     intake.verify_session_access(db, session, user)
-    if user.role != "patient":
+    if user is not None and user.role != "patient":
         raise WorkflowError("FORBIDDEN", "Patient access is required.", 403)
     if session.status != "intake" or db.get(models.InterviewRun, session_id):
         raise WorkflowError(
@@ -516,10 +611,10 @@ def _eligible_rows(db: Session, hospital_id: str, specialty_codes: list[str]):
     ).all()
 
 
-def matches_for_session(db: Session, session_id: str, user: models.User) -> DoctorMatches:
+def matches_for_session(db: Session, session_id: str, user: models.User | None) -> DoctorMatches:
     session = intake.get_session(db, session_id)
     intake.verify_session_access(db, session, user)
-    if user.role != "patient":
+    if user is not None and user.role != "patient":
         raise WorkflowError("FORBIDDEN", "Patient access is required.", 403)
     if not session.hospital_id:
         raise WorkflowError("HOSPITAL_REQUIRED", "Choose a hospital before finding a doctor.", 409)
@@ -574,7 +669,7 @@ def matches_for_session(db: Session, session_id: str, user: models.User) -> Doct
 
 
 def select_doctor(
-    db: Session, session_id: str, doctor_id: str, user: models.User
+    db: Session, session_id: str, doctor_id: str, user: models.User | None
 ) -> DoctorAssignment:
     session = intake.get_session(db, session_id)
     intake.verify_session_access(db, session, user)
@@ -642,7 +737,9 @@ def patient_queue_estimate(
         None,
     )
     if position is None:
-        raise WorkflowError("QUEUE_ESTIMATE_UNAVAILABLE", "Queue estimate is not available for this visit.", 409)
+        raise WorkflowError(
+            "QUEUE_ESTIMATE_UNAVAILABLE", "Queue estimate is not available for this visit.", 409
+        )
 
     doctor_name = db.scalar(
         select(models.User.name).where(models.User.id == session.selected_doctor_id)

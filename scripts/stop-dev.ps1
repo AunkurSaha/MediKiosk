@@ -1,4 +1,3 @@
-param([switch]$Database)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $runtimeRoot = Join-Path $projectRoot '.runtime'
@@ -12,8 +11,4 @@ if (Test-Path -LiteralPath $processFile) {
         if ($process -and ($expectedBackend -or $expectedFrontend)) { Stop-Process -Id $process.ProcessId }
     }
 }
-if ($Database) {
-    & (Join-Path $runtimeRoot 'pgsql\bin\pg_ctl.exe') -D (Join-Path $runtimeRoot 'pgdata') -m fast -w stop
-    if ($LASTEXITCODE -ne 0) { throw 'Could not stop the local PostgreSQL instance.' }
-}
-Write-Output 'Stopped the selected local development services. Data is retained.'
+Write-Output 'Stopped the local application services. Supabase data is retained.'

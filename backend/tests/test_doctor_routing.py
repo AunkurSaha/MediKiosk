@@ -5,7 +5,7 @@ import pytest
 from sqlalchemy import func, select
 
 from app import models
-from app.api.deps import require_patient
+from app.api.deps import require_patient_or_demo
 from app.core import security
 from app.main import app
 from app.services import doctor_routing, intake
@@ -69,7 +69,7 @@ def doctor(database, name, hospital_id, specialty="CARDIOLOGY", *, active=True, 
 
 
 def choose_patient(client, user):
-    app.dependency_overrides[require_patient] = lambda: user
+    app.dependency_overrides[require_patient_or_demo] = lambda: user
 
 
 def auth_headers(database, user):
@@ -133,6 +133,20 @@ def test_demo_fixtures_seed_five_doctors_and_visible_patient_load_per_hospital(c
     )
     assert consent_count == 30
 
+    seeded_answers = database.execute(
+        select(
+            models.InterviewAnswer.field,
+            models.InterviewAnswer.raw_value,
+            models.InterviewAnswer.language,
+        ).where(models.InterviewAnswer.session_id.in_(seeded_session_ids))
+    ).all()
+    for field in ("chief_complaint", "onset_duration", "medications", "allergies", "past_history"):
+        values = {
+            raw_value for answer_field, raw_value, _ in seeded_answers if answer_field == field
+        }
+        assert len(values) >= 5
+    assert {language for _, _, language in seeded_answers} == {"en", "bn", "hi"}
+
     triage_user = database.scalar(select(models.User).where(models.User.role == "triage"))
     triage_headers = auth_headers(database, triage_user)
     hospital_queues = []
@@ -184,6 +198,21 @@ def test_demo_fixtures_seed_five_doctors_and_visible_patient_load_per_hospital(c
             assert len(record["answers"]) == 5
             assert record["summary"]["status"] == "generated"
             assert "Patient reports" in record["summary"]["generated_text"]
+
+
+def test_completed_demo_seed_is_cached_for_the_database_binding(database, monkeypatch):
+    doctor_routing.ensure_demo_routing_data(database)
+    calls = 0
+    original_scalar = database.scalar
+
+    def counting_scalar(statement, *args, **kwargs):
+        nonlocal calls
+        calls += 1
+        return original_scalar(statement, *args, **kwargs)
+
+    monkeypatch.setattr(database, "scalar", counting_scalar)
+    doctor_routing.ensure_demo_routing_data(database)
+    assert calls == 0
 
 
 def test_demo_seed_upgrades_legacy_queue_ids_without_collisions(database):
@@ -463,9 +492,11 @@ def test_patient_queue_estimate_uses_only_selected_doctors_waiting_queue(databas
     assert estimate.doctor_name == "Dr. Selected"
     assert estimate.position == 2
     assert estimate.estimated_wait_minutes == 10
-    assert timedelta(minutes=9, seconds=55) <= estimate.expected_meeting_at - datetime.now(
-        timezone.utc
-    ) <= timedelta(minutes=10)
+    assert (
+        timedelta(minutes=9, seconds=55)
+        <= estimate.expected_meeting_at - datetime.now(timezone.utc)
+        <= timedelta(minutes=10)
+    )
 
 
 def test_only_selected_doctor_can_list_view_and_transition_queue(client, database):

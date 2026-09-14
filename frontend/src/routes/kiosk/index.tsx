@@ -278,10 +278,10 @@ export default function Kiosk() {
   if (record?.session.status !== 'intake' && record && step !== 'complete')
     return <Navigate to="/kiosk/complete" replace />;
   if (record?.session.status === 'intake') {
-    if (record.session.user_id && !record.session.hospital_id && step !== 'hospital')
+    if (!record.session.hospital_id && step !== 'hospital')
       return <Navigate to="/kiosk/hospital" replace />;
     if (
-      (!record.session.user_id || record.session.hospital_id) &&
+      record.session.hospital_id &&
       !record.consent?.share_with_doctor &&
       step !== 'consent'
     )
@@ -537,14 +537,11 @@ export default function Kiosk() {
             voiceConsent={Boolean(record.consent?.voice_processing)}
             documentConsent={Boolean(record.consent?.document_processing)}
             selectedDoctorId={record.session.selected_doctor_id}
-            onDoctorSelected={
-              record.session.user_id
-                ? (doctorId) =>
-                    setRecord({
-                      ...record,
-                      session: { ...record.session, selected_doctor_id: doctorId },
-                    })
-                : undefined
+            onDoctorSelected={(doctorId) =>
+              setRecord({
+                ...record,
+                session: { ...record.session, selected_doctor_id: doctorId },
+              })
             }
             onComplete={completeInterview}
             onBusyChange={setBusy}

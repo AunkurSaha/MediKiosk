@@ -17,15 +17,15 @@ Real OCR is not implemented. Sarvam REST ASR/TTS has a successful synthetic Beng
 From PowerShell in the project root:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-dev.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/start-dev.ps1 -SkipSeed
 ```
 
 - App: http://127.0.0.1:5175
 - Doctor workspace: http://127.0.0.1:5175/doctor
 - API docs: http://127.0.0.1:8010/docs
-- Local PostgreSQL: 127.0.0.1:55432
+- Database: configured Supabase project
 
-The launcher starts hidden processes, applies migrations, seeds a demo doctor, and uses the normalization provider selected in `backend/.env`. If a project-owned backend is already running with a different provider, the launcher restarts that backend so `/api/config` reflects the current selection. Use `-NormalizationProvider mock` only for an explicit deterministic override such as offline browser acceptance. Ports 5175/8010 avoid pre-existing services on 5173/8000. Logs, PostgreSQL binaries/data, and generated credentials are in the ignored `.runtime/` directory. App credentials are in ignored `backend/.env`.
+The launcher starts hidden application processes, applies migrations to Supabase, and uses the providers selected in `backend/.env`. Omit `-SkipSeed` only when the synthetic demo fixtures need to be created or refreshed. Ports 5175/8010 avoid pre-existing services on 5173/8000. Logs are in the ignored `.runtime/` directory. Supabase credentials are backend-only in ignored `backend/.env`.
 
 Use fictional patients only. Demo doctor access is explicitly enabled locally; production staff authentication and patient access tokens are not implemented. UUID-based session access is for this local demo, not an authorization scheme.
 
@@ -35,15 +35,7 @@ Stop the app, retaining the database:
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-dev.ps1
 ```
 
-Stop the app and database, retaining all data:
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/stop-dev.ps1 -Database
-```
-
-Windows Application Control currently blocks this machine's PostgreSQL control executable. While an approved database is already running, use `scripts/start-dev.ps1 -UseRunningDatabase` to start only the application services; add `-NormalizationProvider mock` only when that override is intended. Full database restart acceptance remains pending resolution through Windows security policy.
-
-Structured data is in PostgreSQL database `medikiosk`, schema `public`: `patients`, `sessions`, `consents`, interview/answer and normalization tables, `alerts`, `documents`, `document_extractions`, `medication_fact`, `lab_fact`, `medical_fact_revisions`, summaries, and audit records. The timeline is computed from source facts; the older generic `timeline_fact` table is an unused compatibility scaffold. Uploaded file bytes are in the configured local upload directory; PostgreSQL stores their object keys, hashes and metadata. Database files are under ignored `.runtime/pgdata`; inspect records through SQL or a database client rather than editing those files.
+Structured data is in the configured Supabase PostgreSQL database, schema `public`: `patients`, `sessions`, `consents`, interview/answer and normalization tables, `alerts`, `documents`, `document_extractions`, `medication_fact`, `lab_fact`, `medical_fact_revisions`, summaries, and audit records. The timeline is computed from source facts. Uploaded file bytes remain in the configured local upload directory; Supabase stores their object keys, hashes and metadata.
 
 See [setup](docs/setup.md) for fresh installation and manual commands, [testing](docs/testing.md) for acceptance checks, and [implementation status](docs/implementation-status.md) for results and next work.
 

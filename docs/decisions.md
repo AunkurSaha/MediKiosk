@@ -389,3 +389,9 @@ This decision supersedes only the fixed-question-selection statements in ADR-015
 Status: accepted for the synthetic prototype.
 
 Hospital choice is stored on each session because a patient may attend different hospitals on different visits. Complaint-to-specialty routing is deterministic configuration under `ai/routing/complaint_specialties.json`; no language model selects a specialty. Doctors use normalized profile, hospital-membership, and specialty-membership records. Queue load is derived from `WAITING` entries and is never a manually maintained counter. A patient selects an eligible doctor before answering the interview, and a queue entry is created only when intake is submitted. Doctor APIs authorize against the selected doctor and active visit-hospital membership, not specialty alone. Historical unowned fixtures retain direct demo-doctor compatibility only while explicit demo mode is enabled.
+
+## ADR-029: Supabase-only runtime database
+
+Status: accepted on 2026-09-14.
+
+MediKiosk development and production runtime use the configured Supabase PostgreSQL project through a TLS-required backend connection. Runtime startup rejects missing database configuration, SQLite URLs, local PostgreSQL hosts, and non-Supabase PostgreSQL endpoints. Local PostgreSQL provisioning/control scripts and the SQLite application launcher are removed. SQLite remains only as an isolated automated-test database so tests cannot read or mutate Supabase clinical/demo records. Routine application startup may skip the optional bulk synthetic seed after fixtures have been provisioned.
