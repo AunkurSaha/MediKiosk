@@ -72,6 +72,7 @@ class DisabledOcrProvider:
 
 
 _sarvam_ocr_instance = None
+_paddleocr_instance = None
 
 
 def get_ocr_provider() -> OcrProvider:
@@ -88,6 +89,15 @@ def get_ocr_provider() -> OcrProvider:
         if _sarvam_ocr_instance is None or _sarvam_ocr_instance.settings != settings:
             _sarvam_ocr_instance = SarvamOcrProvider(settings)
         return _sarvam_ocr_instance
+    if provider_name == "paddleocr":
+        global _paddleocr_instance
+        from app.services.paddleocr_ocr import PaddleOcrProvider, PaddleOcrSettings
+
+        settings = PaddleOcrSettings.from_environment()
+        if _paddleocr_instance is None or _paddleocr_instance.settings != settings:
+            _paddleocr_instance = PaddleOcrProvider(settings)
+        return _paddleocr_instance
     raise RuntimeError(
-        f"Unsupported OCR_PROVIDER: '{provider_name}'. Allowed: 'mock', 'sarvam', 'disabled'."
+        "Unsupported OCR_PROVIDER: "
+        f"'{provider_name}'. Allowed: 'mock', 'paddleocr', 'sarvam', 'disabled'."
     )

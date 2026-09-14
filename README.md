@@ -10,7 +10,7 @@ Phases 1–12 are implemented for the local synthetic-data prototype: determinis
 
 The draft is a deterministic rendering of saved answers. Back/edit preserves prior source answers; resume uses the pinned flow and cursor. Confirmed records are locked. Doctor review remains separate from machine output.
 
-Real OCR is not implemented. Sarvam REST ASR/TTS has a successful synthetic Bengali TTS-to-ASR loopback, but physical microphone and accent acceptance is not established. BHASHINI live ASR/TTS is not demonstrated. NVIDIA live evidence is mixed and does not establish reliable acceptance. Rules, question wording, translations, extraction fixtures, and discrepancy comparisons are prototype content without clinical validation. See the [current implementation status](docs/implementation-status.md) for evidence and limitations.
+A PaddleOCR AI Studio job adapter is available for document OCR, but live-provider acceptance and production suitability are not established; deterministic fixtures remain the tested offline path. Sarvam REST ASR/TTS has a successful synthetic Bengali TTS-to-ASR loopback, but physical microphone and accent acceptance is not established. BHASHINI live ASR/TTS is not demonstrated. NVIDIA live evidence is mixed and does not establish reliable acceptance. Rules, question wording, translations, extraction fixtures, and discrepancy comparisons are prototype content without clinical validation. See the [current implementation status](docs/implementation-status.md) for evidence and limitations.
 
 ## Run on this configured Windows machine
 

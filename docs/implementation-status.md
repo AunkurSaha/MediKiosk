@@ -22,7 +22,9 @@ seeded demonstration journey.
 
 - This is not a diagnostic or prescribing system and requires clinician review.
 - Clinical rules, translations, fixtures, and question wording are not clinically validated.
-- Arbitrary uploaded documents do not have production OCR; deterministic fixtures are used.
+- Arbitrary uploaded documents can use the optional PaddleOCR AI Studio job adapter, while
+  deterministic fixtures remain the offline tested path. Live-provider and production OCR
+  acceptance have not been established.
 - Live NVIDIA and BHASHINI reliability is not established.
 - Sarvam has synthetic transport evidence only, not physical microphone/accent acceptance.
 - Demo authentication, local storage, process-local WebSockets, and mock interoperability are

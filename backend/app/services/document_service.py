@@ -106,7 +106,11 @@ async def ingest_document(
             # Execute OCR and parsing
             try:
                 ocr_provider = get_ocr_provider()
-                timeout_val = 18.0 if ocr_provider.name == "sarvam" else 5.0
+                timeout_val = getattr(
+                    ocr_provider,
+                    "operation_timeout",
+                    18.0 if ocr_provider.name == "sarvam" else 5.0,
+                )
                 raw_text, confidence, metadata = await asyncio.wait_for(
                     ocr_provider.extract(
                         image_bytes=bytes(data),
@@ -121,7 +125,11 @@ async def ingest_document(
                 doc.document_date = doc_date
                 if metadata.get("fixture_id"):
                     doc.processing_status = "mock_fixture"
-                elif ocr_provider.name == "sarvam" and raw_text and metadata.get("status") == "completed":
+                elif (
+                    ocr_provider.name in ("paddleocr", "sarvam")
+                    and raw_text
+                    and metadata.get("status") == "completed"
+                ):
                     doc.processing_status = "completed"
                 else:
                     doc.processing_status = "unavailable"
@@ -141,7 +149,10 @@ async def ingest_document(
                 )
                 is_valid_extraction = raw_text and (
                     bool(metadata.get("fixture_id"))
-                    or (ocr_provider.name == "sarvam" and metadata.get("status") == "completed")
+                    or (
+                        ocr_provider.name in ("paddleocr", "sarvam")
+                        and metadata.get("status") == "completed"
+                    )
                 )
                 if is_valid_extraction:
                     db.add(extraction)
