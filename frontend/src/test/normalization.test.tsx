@@ -43,7 +43,15 @@ function detail(normalization: Normalization | null, confirmed = false): Detail 
       created_at: '2026-09-09T00:00:00Z',
       completed_at: '2026-09-09T00:00:00Z',
     },
-    patient: { id: 'patient', name: 'Synthetic Patient', demo_abha_id: null },
+    patient: {
+      id: 'patient',
+      name: 'Synthetic Patient',
+      gender: null,
+      age_years: null,
+      height_cm: null,
+      weight_kg: null,
+      demo_abha_id: null,
+    },
     consent: { share_with_doctor: true, voice_processing: false, document_processing: false },
     answers: [],
     summary: {

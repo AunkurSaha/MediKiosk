@@ -32,10 +32,14 @@ Patient identity is not necessarily represented as a `users` login.
 Fields:
 - `id`
 - `name`
+- `gender` — female / male / non-binary / other / prefer not to say
+- `age_years` — 0–120
+- `height_cm` — 30–250
+- `weight_kg` — 1–500
 - `demo_abha_id` nullable
 - timestamps
 
-For the prototype, collect only necessary identification.
+Demographics are nullable in storage for compatibility with existing records, but are required for newly created kiosk intakes and validated by both the API and database constraints.
 
 ### sessions
 
@@ -475,5 +479,4 @@ Schema head `8b4e9c2d1f73` adds the `abdm_records` table to track ABDM National 
 | `abdm_records` | `updated_at` | DateTime(tz=True) | Nullable, onupdate | Record modification timestamp. |
 
 The table is verified with zero model drift (`alembic check` clean) and full downgrade/upgrade migration coverage.
-
 

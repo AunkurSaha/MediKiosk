@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-test('patient selects same-hospital shortest-queue doctor and assignment isolates workspace', async ({ page }) => {
+test('patient selects same-hospital shortest-queue doctor and assignment isolates workspace', async ({
+  page,
+}) => {
   const phone = `98${Date.now().toString().slice(-8)}`;
   await page.goto('/login');
   await page.getByLabel('Mobile Number').fill(phone);
@@ -9,10 +11,16 @@ test('patient selects same-hospital shortest-queue doctor and assignment isolate
   await page.getByRole('button', { name: 'Verify OTP' }).click();
   await page.getByRole('button', { name: /English/ }).click();
   await page.getByLabel('Patient name').fill('Routing Journey Patient');
+  await page.getByLabel('Gender').selectOption('female');
+  await page.getByLabel('Age (years)').fill('36');
+  await page.getByLabel('Height (cm)').fill('163');
+  await page.getByLabel('Weight (kg)').fill('58');
   await page.getByLabel('Hospital token').fill(`ROUTE-${Date.now()}`);
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  await expect(page.getByRole('heading', { name: 'Which hospital are you visiting today?' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Which hospital are you visiting today?' }),
+  ).toBeVisible();
   await page.getByRole('button', { name: /MediKiosk City Hospital/ }).click();
   await page.getByRole('checkbox', { name: 'I agree to store my answers' }).check();
   await page.getByRole('button', { name: 'Start the interview' }).click();

@@ -19,13 +19,23 @@ function detail(): Detail {
     session: {
       id,
       patient_id: 'patient',
+      hospital_id: 'hospital-1',
+      selected_doctor_id: 'doctor-1',
       hospital_token: 'DEMO-104',
       language: 'en',
       status: 'intake',
       created_at: '2026-09-09T00:00:00Z',
       completed_at: null,
     },
-    patient: { id: 'patient', name: 'Synthetic Patient', demo_abha_id: null },
+    patient: {
+      id: 'patient',
+      name: 'Synthetic Patient',
+      gender: null,
+      age_years: null,
+      height_cm: null,
+      weight_kg: null,
+      demo_abha_id: null,
+    },
     consent: { share_with_doctor: true, voice_processing: false, document_processing: false },
     answers: [],
     summary: null,
@@ -47,6 +57,12 @@ function answered(field = questions[0].field, value = 'Synthetic answer'): Answe
 function open(path: string) {
   window.history.replaceState({}, '', path);
   render(<App />);
+}
+async function fillDemographics(user: ReturnType<typeof userEvent.setup>) {
+  await user.selectOptions(screen.getByLabelText('Gender'), 'female');
+  await user.type(screen.getByLabelText('Age (years)'), '34');
+  await user.type(screen.getByLabelText('Height (cm)'), '165');
+  await user.type(screen.getByLabelText('Weight (kg)'), '62');
 }
 beforeEach(() => {
   vi.resetAllMocks();
@@ -106,6 +122,7 @@ describe('Patient intake', () => {
     open('/kiosk/language');
     await user.click(screen.getByRole('button', { name: /English/ }));
     await user.type(screen.getByLabelText('Patient name'), 'Synthetic Patient');
+    await fillDemographics(user);
     await user.type(screen.getByLabelText('Hospital token'), 'DEMO-104');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     const start = await screen.findByRole('button', { name: 'Start the interview' });
@@ -213,6 +230,10 @@ describe('Patient intake', () => {
     vi.mocked(api.session).mockResolvedValue({ ...detail(), consent: null });
     open('/kiosk/identify');
     fireEvent.change(screen.getByLabelText('Patient name'), { target: { value: 'Synthetic' } });
+    fireEvent.change(screen.getByLabelText('Gender'), { target: { value: 'male' } });
+    fireEvent.change(screen.getByLabelText('Age (years)'), { target: { value: '41' } });
+    fireEvent.change(screen.getByLabelText('Height (cm)'), { target: { value: '178' } });
+    fireEvent.change(screen.getByLabelText('Weight (kg)'), { target: { value: '79' } });
     fireEvent.change(screen.getByLabelText('Hospital token'), { target: { value: 'DEMO-104' } });
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     await screen.findByRole('alert');

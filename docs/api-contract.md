@@ -15,11 +15,20 @@ Errors have `{ "error": { "code": "...", "message": "...", "details": null } }`.
 ```json
 {
   "id": "11111111-1111-4111-8111-111111111111",
-  "patient": {"name":"Synthetic Patient","demo_abha_id":null},
+  "patient": {
+    "name":"Synthetic Patient",
+    "gender":"female",
+    "age_years":34,
+    "height_cm":165.0,
+    "weight_kg":62.0,
+    "demo_abha_id":null
+  },
   "hospital_token":"DEMO-104",
   "language":"en"
 }
 ```
+
+New kiosk intake requests require gender, age in completed years, height in centimetres, and weight in kilograms. Existing stored patients may return null demographic values for backward compatibility.
 
 Retain the client UUID before sending. Repeating the same ID/details returns the same session; changed identity data returns `ID_CONFLICT`. There is no patient CRUD/deletion endpoint.
 

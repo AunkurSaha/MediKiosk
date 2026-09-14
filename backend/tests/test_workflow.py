@@ -26,6 +26,32 @@ def create(client, language="en"):
     return response.json()["id"], payload
 
 
+def test_patient_demographics_are_validated_and_persisted(client):
+    payload = {
+        "id": str(uuid4()),
+        "patient": {
+            "name": "Demographic Test Patient",
+            "gender": "prefer_not_to_say",
+            "age_years": 42,
+            "height_cm": 168.5,
+            "weight_kg": 64.2,
+            "demo_abha_id": None,
+        },
+        "hospital_token": "DEMO-DEMOGRAPHICS",
+        "language": "en",
+    }
+    created = client.post("/api/sessions", json=payload)
+    assert created.status_code == 201, created.text
+    patient = client.get(f"/api/sessions/{payload['id']}").json()["patient"]
+    assert patient["gender"] == "prefer_not_to_say"
+    assert patient["age_years"] == 42
+    assert patient["height_cm"] == 168.5
+    assert patient["weight_kg"] == 64.2
+
+    invalid = {**payload, "id": str(uuid4()), "patient": {**payload["patient"], "age_years": 121}}
+    assert client.post("/api/sessions", json=invalid).status_code == 422
+
+
 def consent(client, session_id, agreed=True):
     return client.put(
         f"/api/sessions/{session_id}/consent",

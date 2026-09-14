@@ -11,6 +11,10 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
     await page.goto('/kiosk/language');
     await page.getByRole('button', { name: /English/ }).click();
     await page.getByLabel('Patient name').fill('Emergency Test Patient');
+    await page.getByLabel('Gender').selectOption('female');
+    await page.getByLabel('Age (years)').fill('52');
+    await page.getByLabel('Height (cm)').fill('160');
+    await page.getByLabel('Weight (kg)').fill('67');
     await page.getByLabel('Hospital token').fill(token);
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
 
@@ -117,6 +121,10 @@ test.describe('Phase 5 — Deterministic Red-Flag Safety & Staff Triage Dashboar
     await page.goto('/kiosk/language');
     await page.getByRole('button', { name: /English/ }).click();
     await page.getByLabel('Patient name').fill('Mild Patient');
+    await page.getByLabel('Gender').selectOption('male');
+    await page.getByLabel('Age (years)').fill('31');
+    await page.getByLabel('Height (cm)').fill('178');
+    await page.getByLabel('Weight (kg)').fill('76');
     await page.getByLabel('Hospital token').fill(token);
     await page.getByRole('button', { name: 'Continue', exact: true }).click();
 

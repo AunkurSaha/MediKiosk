@@ -16,6 +16,10 @@ test('Phase 1 regression: legacy intake through doctor confirmation persists in 
   await page.screenshot({ path: '../.runtime/screenshots/kiosk-desktop.png', fullPage: true });
   await page.getByRole('button', { name: /English/ }).click();
   await page.getByLabel('Patient name').fill('Synthetic Browser Patient');
+  await page.getByLabel('Gender').selectOption('male');
+  await page.getByLabel('Age (years)').fill('44');
+  await page.getByLabel('Height (cm)').fill('174');
+  await page.getByLabel('Weight (kg)').fill('72');
   await page.getByLabel('Hospital token').fill(token);
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Start the interview' })).toBeDisabled();

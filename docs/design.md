@@ -52,8 +52,10 @@ For low-confidence speech:
 ```text
 /kiosk/language
 → /kiosk/identify
+→ /kiosk/hospital
 → /kiosk/consent
 → /kiosk/interview
+→ /kiosk/doctor
 → /kiosk/documents       # later phase
 → /kiosk/review          # later phase
 → /kiosk/complete
@@ -72,6 +74,10 @@ Persist language in session/frontend state and preferably in backend session onc
 
 Prototype fields:
 - patient name;
+- gender;
+- age in completed years;
+- height in centimetres;
+- weight in kilograms;
 - hospital token;
 - optional demo ABHA ID.
 

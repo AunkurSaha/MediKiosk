@@ -55,6 +55,10 @@ test('adaptive interview persists branch edits, restores history and reaches doc
   await page.goto('/kiosk/language');
   await page.getByRole('button', { name: /English/ }).click();
   await page.getByLabel('Patient name').fill('Synthetic Adaptive Patient');
+  await page.getByLabel('Gender').selectOption('prefer_not_to_say');
+  await page.getByLabel('Age (years)').fill('39');
+  await page.getByLabel('Height (cm)').fill('166');
+  await page.getByLabel('Weight (kg)').fill('63');
   await page.getByLabel('Hospital token').fill(token);
   await page.getByRole('button', { name: 'Continue', exact: true }).click();
   await page.getByRole('checkbox', { name: /agree to store/i }).check();

@@ -138,6 +138,10 @@ describe('Phase 12 Demo Polish & Showcase Seeding Components', () => {
         patient: {
           id: 'patient-001',
           name: 'Sunita Sharma (সুমিতা শর্মা)',
+          gender: null,
+          age_years: null,
+          height_cm: null,
+          weight_kg: null,
           demo_abha_id: 'patient@abdm',
         },
         consent: {

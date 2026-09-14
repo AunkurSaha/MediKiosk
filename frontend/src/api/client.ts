@@ -72,6 +72,10 @@ export interface Answer {
 export interface Patient {
   id: string;
   name: string;
+  gender: 'female' | 'male' | 'non_binary' | 'other' | 'prefer_not_to_say' | null;
+  age_years: number | null;
+  height_cm: number | null;
+  weight_kg: number | null;
   demo_abha_id: string | null;
 }
 export interface EvidenceReference {
@@ -711,7 +715,14 @@ export const api = {
     }>('/config'),
   create: (body: {
     id: string;
-    patient: { name: string; demo_abha_id: string | null };
+    patient: {
+      name: string;
+      gender: 'female' | 'male' | 'non_binary' | 'other' | 'prefer_not_to_say';
+      age_years: number;
+      height_cm: number;
+      weight_kg: number;
+      demo_abha_id: string | null;
+    };
     hospital_token: string;
     language: Language;
   }) => request<Session>('/sessions', 'POST', body),

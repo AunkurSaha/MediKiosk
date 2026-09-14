@@ -290,6 +290,10 @@ def create_session(db, payload, user=None):
             existing.hospital_token != payload.hospital_token
             or existing.language != payload.language
             or patient.name != payload.patient.name
+            or patient.gender != payload.patient.gender
+            or patient.age_years != payload.patient.age_years
+            or patient.height_cm != payload.patient.height_cm
+            or patient.weight_kg != payload.patient.weight_kg
             or patient.demo_abha_id != payload.patient.demo_abha_id
         ):
             raise WorkflowError("ID_CONFLICT", "This intake ID is already in use.")

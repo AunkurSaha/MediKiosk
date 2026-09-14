@@ -84,6 +84,10 @@ export default function Kiosk() {
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [name, setName] = useState('');
+  const [gender, setGender] = useState('');
+  const [age, setAge] = useState('');
+  const [height, setHeight] = useState('');
+  const [weight, setWeight] = useState('');
   const [token, setToken] = useState('');
   const [abha, setAbha] = useState('');
   const [abhaVerified, setAbhaVerified] = useState(false);
@@ -207,6 +211,10 @@ export default function Kiosk() {
     setQueueEstimateError(false);
     setQueueEstimateAttempt(0);
     setName('');
+    setGender('');
+    setAge('');
+    setHeight('');
+    setWeight('');
     setToken('');
     setAbha('');
     setAbhaVerified(false);
@@ -221,14 +229,21 @@ export default function Kiosk() {
   }
   function identify(event: FormEvent) {
     event.preventDefault();
-    if (!name.trim() || !token.trim()) return;
+    if (!name.trim() || !token.trim() || !gender || !age || !height || !weight) return;
     void action(async () => {
       const id = pendingId.current || crypto.randomUUID();
       pendingId.current = id;
       sessionStorage.setItem(sessionKey, id);
       await api.create({
         id,
-        patient: { name: name.trim(), demo_abha_id: abha.trim() || null },
+        patient: {
+          name: name.trim(),
+          gender: gender as 'female' | 'male' | 'non_binary' | 'other' | 'prefer_not_to_say',
+          age_years: Number(age),
+          height_cm: Number(height),
+          weight_kg: Number(weight),
+          demo_abha_id: abha.trim() || null,
+        },
         hospital_token: token.trim(),
         language,
       });
@@ -280,11 +295,7 @@ export default function Kiosk() {
   if (record?.session.status === 'intake') {
     if (!record.session.hospital_id && step !== 'hospital')
       return <Navigate to="/kiosk/hospital" replace />;
-    if (
-      record.session.hospital_id &&
-      !record.consent?.share_with_doctor &&
-      step !== 'consent'
-    )
+    if (record.session.hospital_id && !record.consent?.share_with_doctor && step !== 'consent')
       return <Navigate to="/kiosk/consent" replace />;
     if (record.consent?.share_with_doctor && !['consent', 'interview'].includes(step))
       return <Navigate to="/kiosk/interview" replace />;
@@ -362,6 +373,57 @@ export default function Kiosk() {
               maxLength={120}
               required
               autoComplete="off"
+              disabled={busy}
+            />
+            <label htmlFor="gender">{t.gender}</label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              required
+              disabled={busy}
+            >
+              <option value="">{t.selectGender}</option>
+              <option value="female">{t.female}</option>
+              <option value="male">{t.male}</option>
+              <option value="non_binary">{t.nonBinary}</option>
+              <option value="other">{t.otherGender}</option>
+              <option value="prefer_not_to_say">{t.preferNotToSay}</option>
+            </select>
+            <label htmlFor="age">{t.age}</label>
+            <input
+              id="age"
+              type="number"
+              min="0"
+              max="120"
+              step="1"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              required
+              disabled={busy}
+            />
+            <label htmlFor="height">{t.height}</label>
+            <input
+              id="height"
+              type="number"
+              min="30"
+              max="250"
+              step="0.1"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+              required
+              disabled={busy}
+            />
+            <label htmlFor="weight">{t.weight}</label>
+            <input
+              id="weight"
+              type="number"
+              min="1"
+              max="500"
+              step="0.1"
+              value={weight}
+              onChange={(e) => setWeight(e.target.value)}
+              required
               disabled={busy}
             />
             <label htmlFor="token">{t.token}</label>
@@ -443,7 +505,11 @@ export default function Kiosk() {
               >
                 {t.back}
               </button>
-              <button disabled={busy || !name.trim() || !token.trim()}>
+              <button
+                disabled={
+                  busy || !name.trim() || !token.trim() || !gender || !age || !height || !weight
+                }
+              >
                 {busy ? t.saving : t.continue}
               </button>
             </div>
