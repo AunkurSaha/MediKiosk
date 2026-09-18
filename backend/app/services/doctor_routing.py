@@ -16,6 +16,9 @@ from app.services import intake
 
 DEMO_HOSPITAL_A = "10000000-0000-4000-8000-000000000001"
 DEMO_HOSPITAL_B = "10000000-0000-4000-8000-000000000002"
+DEMO_HOSPITAL_C = "10000000-0000-4000-8000-000000000003"
+DEMO_HOSPITAL_D = "10000000-0000-4000-8000-000000000004"
+DEMO_HOSPITAL_E = "10000000-0000-4000-8000-000000000005"
 DEMO_DOCTOR_A = "00000000-0000-4000-8000-000000000001"
 DEMO_DOCTOR_B = "20000000-0000-4000-8000-000000000002"
 DEMO_DOCTOR_D = "20000000-0000-4000-8000-000000000004"
@@ -286,11 +289,74 @@ def ensure_demo_routing_data(db: Session) -> None:
     ):
         bind._medikiosk_demo_routing_ready = True
         return
-    hospitals = (
-        (DEMO_HOSPITAL_A, "DEMO-KOL-01", "MediKiosk City Hospital", "Central Kolkata"),
-        (DEMO_HOSPITAL_B, "DEMO-KOL-02", "MediKiosk Lake Medical Centre", "South Kolkata"),
-    )
-    for hospital_id, code, name, address in hospitals:
+    hospitals = [
+        (
+            DEMO_HOSPITAL_A,
+            "DEMO-KOL-01",
+            "MediKiosk City Hospital",
+            "Central Kolkata",
+            True,
+            "22.5726",
+            "88.3639",
+            "General Medicine,Cardiology,Emergency,ICU,Imaging",
+            "demo_facilities_v1",
+            "Kolkata",
+            True,
+        ),
+        (
+            DEMO_HOSPITAL_B,
+            "DEMO-KOL-02",
+            "MediKiosk Lake Medical Centre",
+            "South Kolkata",
+            True,
+            "22.5448",
+            "88.3218",
+            "General Medicine,Dermatology",
+            "demo_facilities_v1",
+            "Kolkata",
+            True,
+        ),
+        (
+            DEMO_HOSPITAL_C,
+            "DEMO-KOL-03",
+            "MediKiosk Ortho Specialist",
+            "West Kolkata",
+            True,
+            "22.5872",
+            "88.3456",
+            "Orthopedics,Surgery,Imaging",
+            "demo_facilities_v1",
+            "Kolkata",
+            True,
+        ),
+        (
+            DEMO_HOSPITAL_D,
+            "DEMO-KOL-04",
+            "MediKiosk Pulmo Care",
+            "East Kolkata",
+            True,
+            "22.5632",
+            "88.3987",
+            "Pulmonology,Emergency,ICU",
+            "demo_facilities_v1",
+            "Kolkata",
+            True,
+        ),
+        (
+            DEMO_HOSPITAL_E,
+            "DEMO-KOL-05",
+            "MediKiosk General Clinic",
+            "North Kolkata",
+            True,
+            "22.6012",
+            "88.3109",
+            "General Medicine",
+            "demo_facilities_v1",
+            "Kolkata",
+            True,
+        ),
+    ]
+    for hospital_id, code, name, address, is_demo, latitude, longitude, capabilities, directory_version, city, active in hospitals:
         if db.get(models.Hospital, hospital_id) is None:
             db.add(
                 models.Hospital(
@@ -298,8 +364,13 @@ def ensure_demo_routing_data(db: Session) -> None:
                     code=code,
                     name=name,
                     address=address,
-                    city="Kolkata",
-                    active=True,
+                    city=city,
+                    active=active,
+                    is_demo=is_demo,
+                    latitude=latitude,
+                    longitude=longitude,
+                    capabilities=capabilities,
+                    directory_version=directory_version,
                 )
             )
         db.flush()

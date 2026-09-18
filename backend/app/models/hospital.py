@@ -15,3 +15,9 @@ class Hospital(Base):
     city = Column(String(100), nullable=True)
     active = Column(Boolean, nullable=False, default=True, server_default="1")
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=text("CURRENT_TIMESTAMP"))
+    # Fields added for facility directory (Unit 1)
+    is_demo = Column(Boolean, nullable=False, default=False, server_default="0")
+    latitude = Column(String, nullable=True)  # Storing as string to be consistent with address/city, or could use Float
+    longitude = Column(String, nullable=True)
+    capabilities = Column(String, nullable=True)  # Comma-separated list of capabilities
+    directory_version = Column(String, nullable=True)
