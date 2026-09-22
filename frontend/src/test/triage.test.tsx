@@ -77,7 +77,8 @@ describe('AlertCard', () => {
     render(<AlertCard alert={mockAlert} onAcknowledge={onAcknowledge} />);
 
     expect(screen.getByText('EMERGENCY')).toBeInTheDocument();
-    expect(screen.getByText('DEMO-999')).toBeInTheDocument();
+    expect(screen.getByText('Intake')).toBeInTheDocument();
+    expect(screen.queryByText('DEMO-999')).not.toBeInTheDocument();
     expect(screen.getByText('Fatima Begum')).toBeInTheDocument();
     expect(screen.getByText('RF-CHEST-001')).toBeInTheDocument();
     expect(
@@ -176,7 +177,8 @@ describe('Triage Dashboard', () => {
     render(<Triage />);
 
     expect(await screen.findByText('Waiting patient queue (1)')).toBeInTheDocument();
-    expect(screen.getByText(/Synthetic Patient 01-1/)).toBeInTheDocument();
+    expect(screen.getByText(/^1\. Patient$/)).toBeInTheDocument();
+    expect(screen.queryByText('DEMO-Q-0001-1')).not.toBeInTheDocument();
     expect(triageApi.getQueue).toHaveBeenCalledWith('mock-hosp-1');
   });
 

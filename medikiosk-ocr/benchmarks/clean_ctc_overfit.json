@@ -1,0 +1,47 @@
+{
+  "samples": 6,
+  "epochs": 175,
+  "initial_loss": 130.76589965820312,
+  "final_loss": 0.1947428435087204,
+  "mean_cer": 0.0,
+  "target_cer": 0.01,
+  "passed": true,
+  "augmentation": false,
+  "model_dropout_during_training": false,
+  "ctc_blank_index": 14,
+  "blank_probability": 0.5439203381538391,
+  "predictions": [
+    {
+      "truth": "PCM 650 SOS",
+      "prediction": "PCM 650 SOS",
+      "cer": 0.0
+    },
+    {
+      "truth": "PCM 500 SOS",
+      "prediction": "PCM 500 SOS",
+      "cer": 0.0
+    },
+    {
+      "truth": "Tab PCM 650",
+      "prediction": "Tab PCM 650",
+      "cer": 0.0
+    },
+    {
+      "truth": "Tab PCM 500",
+      "prediction": "Tab PCM 500",
+      "cer": 0.0
+    },
+    {
+      "truth": "PCM 650 HS",
+      "prediction": "PCM 650 HS",
+      "cer": 0.0
+    },
+    {
+      "truth": "PCM 500 HS",
+      "prediction": "PCM 500 HS",
+      "cer": 0.0
+    }
+  ],
+  "elapsed_seconds": 346.2177625999975,
+  "checkpoint": "models\\clean_ctc_flor.weights.h5"
+}

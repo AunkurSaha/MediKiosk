@@ -1,0 +1,690 @@
+[
+  {
+    "id": "test_00192",
+    "renderer": "times",
+    "truth": "Paracetamol 250 g 1-1-1 x 7d",
+    "prediction": "Pacetamol 250 g 1-1 x 3d",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.17857142857142858,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 28,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 28,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.571428571428571,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine internal deletion",
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00156",
+    "renderer": "times",
+    "truth": "Inj  PCM  10  mcg  1-0-0",
+    "prediction": "Inj  PCM  10  mcg  -1",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.16666666666666666,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 24,
+    "adjacent_repeat_count": 4,
+    "minimum_ctc_steps": 28,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.571428571428571,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00119",
+    "renderer": "trebuc",
+    "truth": "PCM  250  mg  0-1-0",
+    "prediction": "PCM  250  mg  -1",
+    "original_requested_font_size": 24,
+    "final_font_size": 24,
+    "fitted": false,
+    "cer": 0.15789473684210525,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 19,
+    "adjacent_repeat_count": 3,
+    "minimum_ctc_steps": 22,
+    "output_time_steps": 128,
+    "alignment_ratio": 5.818181818181818,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00102",
+    "renderer": "times",
+    "truth": "Inj PCM 650 ml 0-0-1",
+    "prediction": "Inj PCM 650 ml 1-1",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.15,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 20,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 20,
+    "output_time_steps": 128,
+    "alignment_ratio": 6.4,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00197",
+    "renderer": "trebuc",
+    "truth": "Syp PCM 5 g 1-1-1 for 5 days",
+    "prediction": "Syp PCM 5 g 1-1 for days",
+    "original_requested_font_size": 24,
+    "final_font_size": 24,
+    "fitted": false,
+    "cer": 0.14285714285714285,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 28,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 28,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.571428571428571,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00184",
+    "renderer": "times",
+    "truth": "Amoxicillin 10 g 1-0-0",
+    "prediction": "Amoxicillin 10 g 0-1",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.13636363636363635,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 22,
+    "adjacent_repeat_count": 1,
+    "minimum_ctc_steps": 23,
+    "output_time_steps": 128,
+    "alignment_ratio": 5.565217391304348,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00111",
+    "renderer": "trebuc",
+    "truth": "Tab  PCM  40  ml  1-0-0",
+    "prediction": "Tab  PCM  40  ml  0-1",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.13043478260869565,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 23,
+    "adjacent_repeat_count": 4,
+    "minimum_ctc_steps": 27,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.7407407407407405,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00009",
+    "renderer": "trebuc",
+    "truth": "Cetirizine  5  mg  1-1-1  for 5 days",
+    "prediction": "Cetirizine  5  mg  1-1  for days",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.1111111111111111,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 36,
+    "adjacent_repeat_count": 4,
+    "minimum_ctc_steps": 40,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.2,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00069",
+    "renderer": "trebuc",
+    "truth": "Metformin 625 g OD",
+    "prediction": "Metformin 625 g S",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.1111111111111111,
+    "buckets": [
+      "medication",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 18,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 18,
+    "output_time_steps": 128,
+    "alignment_ratio": 7.111111111111111,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "other substitution/insertion/deletion"
+    ]
+  },
+  {
+    "id": "test_00093",
+    "renderer": "trebuc",
+    "truth": "Syp Metformin 40 mg 1-0-0 for 5 days",
+    "prediction": "Syp Metformin 40  mg 1-0-0  for days",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.1111111111111111,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 36,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 36,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.5555555555555554,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "other substitution/insertion/deletion"
+    ]
+  },
+  {
+    "id": "test_00054",
+    "renderer": "times",
+    "truth": "Syp Amoxicillin 650 ml 1-0-0",
+    "prediction": "Syp Amoxicillin 650 ml 0-1",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.10714285714285714,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 28,
+    "adjacent_repeat_count": 1,
+    "minimum_ctc_steps": 29,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.413793103448276,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00103",
+    "renderer": "trebuc",
+    "truth": "Syp  Metformin  5  mg  1-0-0",
+    "prediction": "Syp  Metformin  5  mg  0-1",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.10714285714285714,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 28,
+    "adjacent_repeat_count": 4,
+    "minimum_ctc_steps": 32,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.0,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00185",
+    "renderer": "trebuc",
+    "truth": "Syrup Metformin 10 mcg 1-0-1",
+    "prediction": "Syrup Metformin  10 mcg 0-1",
+    "original_requested_font_size": 24,
+    "final_font_size": 24,
+    "fitted": false,
+    "cer": 0.10714285714285714,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 28,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 28,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.571428571428571,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00010",
+    "renderer": "times",
+    "truth": "Tab Cetirizine 5 g 1-1-1 x 7d",
+    "prediction": "Tab Cetirizine 5 g 1-1 x 3d",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.10344827586206896,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 29,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 29,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.413793103448276,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00181",
+    "renderer": "trebuc",
+    "truth": "Tab  Amoxicillin  40  ml  SOS",
+    "prediction": "Tab  Amoxicillin  40  ml S",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.10344827586206896,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 29,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 34,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.764705882352941,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "other substitution/insertion/deletion"
+    ]
+  },
+  {
+    "id": "test_00066",
+    "renderer": "times",
+    "truth": "Syrup Metformin 10 mcg 1-1-1 for 7 days",
+    "prediction": "Syrup Metformin 10 mcg 1-1 for days",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.10256410256410256,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 39,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 39,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.282051282051282,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00001",
+    "renderer": "trebuc",
+    "truth": "Syrup Paracetamol 250 mcg 1-0-0",
+    "prediction": "Syrup Paracetamol 250 mcg  0-1",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.0967741935483871,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 31,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 31,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.129032258064516,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00105",
+    "renderer": "trebuc",
+    "truth": "Amoxicillin 10 g SOS for 7 days",
+    "prediction": "Amoxicillin  10 g SOS for days",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.0967741935483871,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 31,
+    "adjacent_repeat_count": 1,
+    "minimum_ctc_steps": 32,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.0,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "other substitution/insertion/deletion"
+    ]
+  },
+  {
+    "id": "test_00199",
+    "renderer": "trebuc",
+    "truth": "Inj  Paracetamol  40  mg  1-0-0",
+    "prediction": "Inj  Paracetamol  40  mg  0-1",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.0967741935483871,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 31,
+    "adjacent_repeat_count": 4,
+    "minimum_ctc_steps": 35,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.657142857142857,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "numeric substitution",
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00198",
+    "renderer": "times",
+    "truth": "PCM 20 mcg 1-1-1 x 5d",
+    "prediction": "PCM 20 mcg 1-1 x 5d",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.09523809523809523,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 21,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 21,
+    "output_time_steps": 128,
+    "alignment_ratio": 6.095238095238095,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00045",
+    "renderer": "trebuc",
+    "truth": "Cap  Pantoprazole  10  g  1-1-1  for 5 days",
+    "prediction": "Cap  Pantoprazole  10  g  1-1  for days",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.09302325581395349,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 43,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 48,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.6666666666666665,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00017",
+    "renderer": "trebuc",
+    "truth": "Capsule PCM 650 mg QID",
+    "prediction": "Capsule PCM 650 mg D",
+    "original_requested_font_size": 24,
+    "final_font_size": 24,
+    "fitted": false,
+    "cer": 0.09090909090909091,
+    "buckets": [
+      "medication",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 22,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 22,
+    "output_time_steps": 128,
+    "alignment_ratio": 5.818181818181818,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "other substitution/insertion/deletion"
+    ]
+  },
+  {
+    "id": "test_00149",
+    "renderer": "trebuc",
+    "truth": "Metformin  5  g  1-0-1",
+    "prediction": "Metformin  5  g  0-1",
+    "original_requested_font_size": 24,
+    "final_font_size": 24,
+    "fitted": false,
+    "cer": 0.09090909090909091,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 22,
+    "adjacent_repeat_count": 3,
+    "minimum_ctc_steps": 25,
+    "output_time_steps": 128,
+    "alignment_ratio": 5.12,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  },
+  {
+    "id": "test_00098",
+    "renderer": "times",
+    "truth": "Tablet Amoxicillin 10 g 1-1-1 x 5d before food",
+    "prediction": "Tablet Amoxicillin 10 g 1-1 x 5d befor fod",
+    "original_requested_font_size": 24,
+    "final_font_size": 24,
+    "fitted": false,
+    "cer": 0.08695652173913043,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 46,
+    "adjacent_repeat_count": 2,
+    "minimum_ctc_steps": 48,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.6666666666666665,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "adjacent repeated glyph deletion",
+      "hyphen loss",
+      "schedule mismatch/truncation",
+      "instruction mismatch/deletion"
+    ]
+  },
+  {
+    "id": "test_00169",
+    "renderer": "trebuc",
+    "truth": "Syrup Pantoprazole 10 ml 1-1-1 x 3d",
+    "prediction": "Syrup Pantoprazole  10 ml 1-1 x 3d",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.08571428571428572,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 35,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 35,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.657142857142857,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss",
+      "schedule mismatch/truncation"
+    ]
+  }
+]

@@ -1,12 +1,14 @@
 import type {
   AnswerValue,
   ClinicalHistory,
+  CoverageResponse,
   InterviewState,
   SpeechSynthesisResponse,
   Submission,
   TranscriptionResponse,
 } from './interview';
 export type Language = 'en' | 'bn' | 'hi';
+export type JourneyMode = 'PRE_ARRIVAL' | 'ON_SITE';
 export type FieldName =
   'chief_complaint' | 'onset_duration' | 'medications' | 'allergies' | 'past_history';
 export type IntakeStatus =
@@ -22,6 +24,121 @@ export interface Session {
   user_id?: string | null;
   hospital_id?: string | null;
   selected_doctor_id?: string | null;
+  journey_mode?: JourneyMode;
+}
+export type ComplaintCategory =
+  | 'CHEST_DISCOMFORT'
+  | 'FEVER'
+  | 'HEADACHE'
+  | 'BREATHING_DIFFICULTY'
+  | 'ABDOMINAL_PAIN'
+  | 'COUGH'
+  | 'SKIN_PROBLEM'
+  | 'INJURY'
+  | 'JOINT_PAIN'
+  | 'OTHER';
+export interface RapidRoutingState {
+  phase: 'chief_complaint' | 'confirm_complaint' | 'rapid_interview' | 'result';
+  revision: number;
+  mapping?: {
+    original_text: string;
+    translated_text?: string | null;
+    language: Language;
+    source: 'card' | 'typed' | 'voice';
+    candidate_category: ComplaintCategory;
+    mapping_provider: string;
+    patient_confirmed: boolean;
+  } | null;
+  chief_complaint?: ComplaintCategory | null;
+  question?: {
+    question_id: string;
+    concept_code: string;
+    target_field: string;
+    prompt: Record<Language, string>;
+    input_type: 'boolean' | 'severity' | 'single_choice' | 'number';
+    options: { value: string; label: Record<Language, string> }[];
+    required_for_safety: boolean;
+    required_for_routing: boolean;
+    equivalent_fields: string[];
+    version: string;
+  } | null;
+  questions_asked: string[];
+  questions_skipped: string[];
+  result?: {
+    id: string;
+    session_id: string;
+    chief_complaint: ComplaintCategory;
+    routing_state: 'EMERGENCY' | 'URGENT' | 'ROUTINE_OPD' | 'TELECONSULT_MAY_BE_SUITABLE';
+    suggested_specialty: string;
+    triggered_red_flags: string[];
+    supporting_evidence_ids: string[];
+    questions_asked: string[];
+    questions_skipped: string[];
+    completed_at: string;
+    routing_protocol_version: string;
+  } | null;
+}
+export interface RoutingLocation {
+  id: string;
+  session_id: string;
+  patient_id: string;
+  source: string;
+  latitude: number | null;
+  longitude: number | null;
+  locality: string | null;
+  postal_code: string | null;
+  precision: string | null;
+  revision: number;
+  captured_at: string;
+}
+export interface MediRouteResponse {
+  id: string;
+  session_id: string;
+  clinical_routing_result_id: string;
+  status: string;
+  routing_state: string;
+  suggested_specialty: string;
+  directory_version: string;
+  protocol_version: string;
+  required_specialty: string;
+  required_capabilities: string[];
+  preferred_capabilities: string[];
+  generated_at: string;
+  recommendations: {
+    facility_id: string;
+    facility_name: string;
+    rank: number;
+    distance_km: number | null;
+    eligibility_reasons: string[];
+    ranking_reasons: string[];
+    capabilities: string[];
+    emergency_available: boolean;
+  }[];
+}
+export interface DoctorMatchResponse {
+  id: string;
+  session_id: string;
+  facility_id: string;
+  required_specialty: string;
+  directory_version: string;
+  protocol_version: string;
+  status: 'COMPLETED' | 'NO_ELIGIBLE_DOCTOR' | 'DOCTOR_MATCHING_BYPASSED_EMERGENCY';
+  selected_doctor_id: string | null;
+  generated_at: string;
+  recommendations: {
+    doctor_id: string;
+    name: string;
+    qualification: string | null;
+    primary_specialty: string;
+    expertise_tags: string[];
+    languages: string[];
+    availability_status: string;
+    years_of_experience: number;
+    rank: number;
+    recommended: boolean;
+    eligibility_reasons: string[];
+    ranking_reasons: string[];
+  }[];
 }
 export interface Hospital {
   id: string;
@@ -44,9 +161,34 @@ export interface PatientQueueEstimate {
   session_id: string;
   doctor_id: string;
   doctor_name: string;
-  position: number;
+  hospital_id: string;
+  hospital_name: string;
+  service_date: string | null;
+  visit_token: string | null;
+  status: 'WAITING' | 'CALLED' | 'IN_CONSULTATION' | 'COMPLETED' | 'CANCELLED';
+  position: number | null;
+  patients_ahead: number;
   estimated_wait_minutes: number;
-  expected_meeting_at: string;
+  is_estimate: true;
+  calculation_basis: string;
+  policy_version: string;
+}
+export interface PacketMetadata {
+  packet_id: string;
+  session_id: string;
+  packet_version: string;
+  status: 'ACTIVE' | 'EXPIRED' | 'REVOKED';
+  created_at: string;
+  expires_at: string;
+}
+export interface PacketView extends PacketMetadata {
+  snapshot: Record<string, unknown>;
+  live_queue: { status: string; visit_token: string | null } | null;
+}
+export interface HandoffTokenIssued extends PacketMetadata {
+  handoff_token: string;
+  handoff_url: string;
+  handoff_token_expires_at: string;
 }
 export interface DoctorRosterItem {
   doctor_id: string;
@@ -93,6 +235,31 @@ export interface EvidenceReference {
   source_id: string;
   source_text: string;
   source_metadata: Record<string, unknown>;
+  status?:
+    | 'patient_reported'
+    | 'patient_confirmed'
+    | 'clinician_verified'
+    | 'document_unverified'
+    | 'conflicting'
+    | 'normalized_unverified'
+    | 'safety_rule'
+    | 'timeline'
+    | 'not_reported';
+  badge?: string;
+  evidence_refs?: string[];
+  source_summary?: string[];
+  provenance_explanation?: string[];
+}
+
+export interface SummaryCoverage {
+  session_id: string;
+  required: number;
+  confirmed: number;
+  document_supported_unconfirmed: number;
+  conflicted: number;
+  missing: number;
+  not_applicable: number;
+  fields: Record<string, unknown>[];
 }
 
 export interface StructuredSummarySection {
@@ -111,6 +278,7 @@ export interface StructuredClinicalSummary {
   sections: StructuredSummarySection[];
   evidence_references: EvidenceReference[];
   disclaimer: string | null;
+  coverage?: SummaryCoverage | null;
 }
 
 export interface SummaryRevisionRecord {
@@ -145,6 +313,8 @@ export interface Summary {
   confirmed_at: string | null;
   structured_summary?: StructuredClinicalSummary | null;
   evidence?: EvidenceReference[] | null;
+  coverage?: SummaryCoverage | null;
+  pre_arrival_packet?: Record<string, unknown> | null;
 }
 import type { AlertItem } from './triage';
 
@@ -305,6 +475,7 @@ export interface SessionList {
     patient_name: string;
     queue_status?: string | null;
     queue_joined_at?: string | null;
+    visit_token?: string | null;
   })[];
 }
 
@@ -407,6 +578,27 @@ export interface DiscrepancyRecord {
 }
 export interface DiscrepancyResponse {
   items: DiscrepancyRecord[];
+}
+export interface PatientEvidenceSearchResult {
+  fact_id: string;
+  fact_type: 'medication' | 'lab';
+  label: string;
+  details: Record<string, string | null>;
+  verification_status: VerificationStatus;
+  patient_confirmation: string;
+  source_document_id: string | null;
+  source_filename: string | null;
+  source_extraction_id: string | null;
+  source_text: string | null;
+  source_location: string | null;
+  score: number;
+}
+export interface PatientEvidenceSearchResponse {
+  query: string;
+  retrieval_mode: 'deterministic_patient_scoped';
+  fallback_used: true;
+  disclaimer: string;
+  results: PatientEvidenceSearchResult[];
 }
 export interface FHIROperationOutcomeIssue {
   severity: 'fatal' | 'error' | 'warning' | 'information';
@@ -671,7 +863,7 @@ async function request<T>(
   body?: unknown,
   doctor = false,
   externalSignal?: AbortSignal,
-  timeoutMs = 15000,
+  timeoutMs = 60000,
 ): Promise<T> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
@@ -725,7 +917,11 @@ export const api = {
     };
     hospital_token: string;
     language: Language;
+    journey_mode?: JourneyMode;
+    hospital_id?: string;
   }) => request<Session>('/sessions', 'POST', body),
+  updateJourneyMode: (id: string, journeyMode: JourneyMode) =>
+    request<Session>(`/sessions/${id}/journey-mode`, 'PUT', { journey_mode: journeyMode }),
   hospitals: () => request<{ items: Hospital[] }>('/hospitals'),
   hospitalDoctors: (hospitalId: string) =>
     request<{ items: DoctorRosterItem[] }>(`/hospitals/${encodeURIComponent(hospitalId)}/doctors`),
@@ -738,6 +934,11 @@ export const api = {
       'PUT',
       { doctor_id: doctorId },
     ),
+  doctorMatch: (id: string) => request<DoctorMatchResponse>(`/sessions/${id}/doctor-match`),
+  selectDoctorMatch: (id: string, doctorId: string) =>
+    request<DoctorMatchResponse>(`/sessions/${id}/doctor-match/selection`, 'PUT', {
+      doctor_id: doctorId,
+    }),
   session: (id: string) => request<Detail>('/sessions/' + id),
   consent: (id: string, agreed: boolean, voiceProcessing = false, documentProcessing = false) =>
     request<Detail['consent']>('/sessions/' + id + '/consent', 'PUT', {
@@ -764,6 +965,8 @@ export const api = {
       'GET',
       undefined,
       true,
+      undefined,
+      30000,
     ),
   documentDetail: (id: string, documentId: string) =>
     request<DocumentRecord>(`/sessions/${id}/documents/${documentId}`, 'GET', undefined, true),
@@ -830,6 +1033,7 @@ export const api = {
     }),
   interview: (id: string) =>
     request<InterviewState>(`/sessions/${id}/interview`, 'GET', undefined, false, undefined, 60000),
+  coverage: (id: string) => request<CoverageResponse>(`/sessions/${id}/coverage`, 'GET'),
   selectFlow: (id: string, flow_id: string) =>
     request<InterviewState>(`/sessions/${id}/interview/flow`, 'PUT', { flow_id }),
   interviewAnswer: (id: string, body: Submission) =>
@@ -846,9 +1050,61 @@ export const api = {
       question_id,
       expected_revision,
     }),
+  rapidRouting: (id: string) => request<RapidRoutingState>(`/sessions/${id}/rapid-routing`),
+  mapComplaint: (
+    id: string,
+    body: {
+      original_text: string;
+      translated_text?: string;
+      language: Language;
+      source: 'card' | 'typed' | 'voice';
+      voice_candidate?: string;
+    },
+  ) => request<RapidRoutingState>(`/sessions/${id}/rapid-routing/complaint/map`, 'POST', body),
+  confirmComplaint: (id: string, category: ComplaintCategory, expected_revision: number) =>
+    request<RapidRoutingState>(`/sessions/${id}/rapid-routing/complaint`, 'PUT', {
+      category,
+      confirmed: true,
+      expected_revision,
+    }),
+  rapidAnswer: (
+    id: string,
+    body: {
+      question_id: string;
+      value: boolean | number | string;
+      raw_value: string;
+      source: 'typed' | 'touch' | 'voice';
+      language: Language;
+      expected_revision: number;
+      voice_candidate?: string;
+    },
+  ) => request<RapidRoutingState>(`/sessions/${id}/rapid-routing/answers`, 'POST', body),
+  routingLocation: (id: string) =>
+    request<RoutingLocation | null>(`/sessions/${id}/routing-location`),
+  saveRoutingLocation: (
+    id: string,
+    body: {
+      source: string;
+      latitude?: number;
+      longitude?: number;
+      locality?: string;
+      postal_code?: string;
+      precision?: string;
+    },
+  ) => request<RoutingLocation>(`/sessions/${id}/routing-location`, 'PUT', body),
+  mediroute: (id: string) => request<MediRouteResponse>(`/sessions/${id}/mediroute`),
+  selectFacility: (id: string, facility_id: string) =>
+    request<Session>(`/sessions/${id}/mediroute/facility`, 'PUT', { facility_id }),
   complete: (id: string) => request<Session>('/sessions/' + id + '/complete', 'POST'),
   queueEstimate: (id: string) =>
     request<PatientQueueEstimate>(`/sessions/${id}/queue-estimate`, 'GET'),
+  createPacket: (id: string) => request<PacketMetadata>(`/sessions/${id}/packet`, 'POST'),
+  packet: (id: string) => request<PacketView>(`/sessions/${id}/packet`),
+  issueHandoffToken: (id: string) =>
+    request<HandoffTokenIssued>(`/sessions/${id}/packet/handoff-token`, 'POST'),
+  revokePacket: (id: string) => request<PacketMetadata>(`/sessions/${id}/packet/revoke`, 'POST'),
+  resolveHandoff: (token: string) =>
+    request<PacketView | { status: 'AUTH_REQUIRED' }>(`/handoff/${encodeURIComponent(token)}`),
   sessions: (hospitalId?: string) =>
     request<SessionList>(
       '/doctor/sessions' + (hospitalId ? `?hospital_id=${encodeURIComponent(hospitalId)}` : ''),
@@ -868,6 +1124,13 @@ export const api = {
     request<TimelineResponse>(`/doctor/sessions/${id}/timeline`, 'GET', undefined, true),
   discrepancies: (id: string) =>
     request<DiscrepancyResponse>(`/doctor/sessions/${id}/discrepancies`, 'GET', undefined, true),
+  searchPatientEvidence: (id: string, query: string, topK = 5) =>
+    request<PatientEvidenceSearchResponse>(
+      `/doctor/sessions/${id}/evidence-search`,
+      'POST',
+      { query, top_k: topK },
+      true,
+    ),
   reviewMedicationFact: (
     id: string,
     factId: string,

@@ -13,13 +13,20 @@ import { useOptionalAuth } from '../../context/AuthContext';
 import NormalizationPanel from '../../components/doctor/NormalizationPanel';
 import DocumentViewer from '../../components/doctor/DocumentViewer';
 import ClinicalEvidencePanel from '../../components/doctor/ClinicalEvidencePanel';
+import ClinicalCoveragePanel from '../../components/doctor/ClinicalCoveragePanel';
 import SummaryWorkspace from '../../components/doctor/SummaryWorkspace';
+import PreConsultationBrief from '../../components/doctor/PreConsultationBrief';
 import { FieldVerificationBadge } from '../../components/doctor/FieldVerificationBadge';
 import { AuditTrailViewer } from '../../components/doctor/AuditTrailViewer';
 import { FHIRExportModal } from '../../components/doctor/FHIRExportModal';
 import { ABDMHISModal } from '../../components/doctor/ABDMHISModal';
+import PatientEvidenceSearch from '../../components/doctor/PatientEvidenceSearch';
 
 const t = copy.en;
+
+function recordingPatientName(name: string, presentationMode: boolean) {
+  return presentationMode && /^(synthetic|demo) patient\b/i.test(name.trim()) ? 'Patient' : name;
+}
 
 function alertStatusText(alert: NonNullable<Detail['alerts']>[number]) {
   if (alert.status === 'acknowledged') {
@@ -42,6 +49,7 @@ export default function Doctor() {
   const [loggingIn, setLoggingIn] = useState(false);
   const [error, setError] = useState<unknown>(null);
   const [attempt, setAttempt] = useState(0);
+  const [demoPresentation, setDemoPresentation] = useState(false);
   const [fhirModalOpen, setFhirModalOpen] = useState(false);
   const [abdmModalOpen, setAbdmModalOpen] = useState(false);
   const [translations, setTranslations] = useState<Record<string, TranslationResult>>({});
@@ -57,6 +65,10 @@ export default function Doctor() {
   });
 
   useEffect(() => {
+    const configRequest = api.config();
+    if (configRequest && typeof configRequest.then === 'function') {
+      configRequest.then((config) => setDemoPresentation(config.demo_mode)).catch(() => {});
+    }
     if (typeof api.hospitals === 'function') {
       const p = api.hospitals();
       if (p && typeof p.then === 'function') {
@@ -281,9 +293,9 @@ export default function Doctor() {
                 }
               }}
               disabled={loggingIn}
-              title="Sign in as Demo Doctor to restore access"
+              title="Sign in as a clinician to restore access"
             >
-              {loggingIn ? 'Signing in…' : '🔐 Demo Doctor Login'}
+              {loggingIn ? 'Signing in…' : 'Clinician sign in'}
             </button>
           </div>
         </div>
@@ -309,18 +321,19 @@ export default function Doctor() {
           {list.items.map((session) => (
             <Link className="session-card" key={session.id} to={'/doctor/sessions/' + session.id}>
               <span className="avatar" aria-hidden="true">
-                {session.patient_name.charAt(0).toUpperCase()}
+                {recordingPatientName(session.patient_name, demoPresentation)
+                  .charAt(0)
+                  .toUpperCase()}
               </span>
               <div>
-                <h2>{session.patient_name}</h2>
-                <p className="muted">
-                  {session.hospital_token} · {session.language.toUpperCase()}
-                </p>
+                <h2>{recordingPatientName(session.patient_name, demoPresentation)}</h2>
+                <p className="muted">{session.language.toUpperCase()}</p>
               </div>
               <span className={'badge ' + session.status}>{t[session.status]}</span>
               {session.queue_status && (
                 <span className="badge">Queue: {session.queue_status.replaceAll('_', ' ')}</span>
               )}
+              {session.visit_token && <span className="badge">Token: {session.visit_token}</span>}
               <span className="review-link">{t.open} →</span>
             </Link>
           ))}
@@ -333,22 +346,39 @@ export default function Doctor() {
           </Link>
           <div className="patient-heading">
             <div>
-              <h2>{detail.patient.name}</h2>
+              <h2>{recordingPatientName(detail.patient.name, demoPresentation)}</h2>
               <p className="muted">
                 {detail.session.hospital_token} · {detail.session.language.toUpperCase()}
               </p>
+              <span className="badge" data-testid="journey-mode-badge">
+                {detail.session.journey_mode === 'ON_SITE' ? 'On-site' : 'Pre-arrival'}
+              </span>
             </div>
             <div className="doctor-header-actions">
-              <button
-                type="button"
-                className="secondary"
-                onClick={async () => {
-                  await api.updateQueue(detail.session.id, 'IN_CONSULTATION');
-                  refresh();
-                }}
-              >
-                Start consultation
-              </button>
+              {!demoPresentation && (
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={async () => {
+                    await api.updateQueue(detail.session.id, 'CALLED');
+                    refresh();
+                  }}
+                >
+                  Call patient
+                </button>
+              )}
+              {!demoPresentation && (
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={async () => {
+                    await api.updateQueue(detail.session.id, 'IN_CONSULTATION');
+                    refresh();
+                  }}
+                >
+                  Start consultation
+                </button>
+              )}
               <button
                 type="button"
                 className="secondary"
@@ -403,6 +433,16 @@ export default function Doctor() {
               </button>
               <span className={'badge ' + detail.session.status}>{t[detail.session.status]}</span>
             </div>
+          </div>
+          <nav className="doctor-section-nav" aria-label="Patient workspace sections">
+            <a href="#workspace-overview">Overview</a>
+            <a href="#workspace-history">History</a>
+            <a href="#document-viewer-panel">Documents</a>
+            <a href="#workspace-evidence">Evidence</a>
+            <a href="#workspace-summary">Summary</a>
+          </nav>
+          <div id="workspace-overview">
+            <PreConsultationBrief detail={detail} />
           </div>
           {detail.alerts && detail.alerts.length > 0 && (
             <section
@@ -468,7 +508,7 @@ export default function Doctor() {
             </section>
           )}
           <div className="review-grid">
-            <section className="card history">
+            <section id="workspace-history" className="card history">
               <h2>{t.detailTitle}</h2>
               <p className="eyebrow">{t.patientReported}</p>
               {detail.history ? (
@@ -478,7 +518,7 @@ export default function Doctor() {
                     {detail.history.flow_version}
                   </p>
                   {detail.history.namespace === 'ayush_demo' && (
-                    <p className="notice">AYUSH demonstration only. No interpretation.</p>
+                    <p className="notice">AYUSH self-reported history. No interpretation.</p>
                   )}
                   {detail.history.sections
                     .filter((section) => section.facts.length > 0)
@@ -726,29 +766,31 @@ export default function Doctor() {
               )}
             </section>
             {summary ? (
-              <SummaryWorkspace
-                sessionId={detail.session.id}
-                initialSummary={summary}
-                onSummaryUpdated={(updatedSummary) => {
-                  setDetail((prev) =>
-                    prev
-                      ? {
-                          ...prev,
-                          summary: updatedSummary,
-                          session: {
-                            ...prev.session,
-                            status:
-                              updatedSummary.status === 'confirmed'
-                                ? 'confirmed'
-                                : updatedSummary.status === 'reviewed'
-                                  ? 'under_review'
-                                  : prev.session.status,
-                          },
-                        }
-                      : prev,
-                  );
-                }}
-              />
+              <div id="workspace-summary">
+                <SummaryWorkspace
+                  sessionId={detail.session.id}
+                  initialSummary={summary}
+                  onSummaryUpdated={(updatedSummary) => {
+                    setDetail((prev) =>
+                      prev
+                        ? {
+                            ...prev,
+                            summary: updatedSummary,
+                            session: {
+                              ...prev.session,
+                              status:
+                                updatedSummary.status === 'confirmed'
+                                  ? 'confirmed'
+                                  : updatedSummary.status === 'reviewed'
+                                    ? 'under_review'
+                                    : prev.session.status,
+                            },
+                          }
+                        : prev,
+                    );
+                  }}
+                />
+              </div>
             ) : (
               <section className="card editor">
                 <h2>{t.reviewed}</h2>
@@ -756,11 +798,17 @@ export default function Doctor() {
               </section>
             )}
           </div>
-          <ClinicalEvidencePanel
-            key={detail.session.id}
-            sessionId={detail.session.id}
-            locked={detail.session.status === 'confirmed' || detail.session.status === 'cancelled'}
-          />
+          <div id="workspace-evidence">
+            <ClinicalEvidencePanel
+              key={detail.session.id}
+              sessionId={detail.session.id}
+              locked={
+                detail.session.status === 'confirmed' || detail.session.status === 'cancelled'
+              }
+            />
+          </div>
+          <ClinicalCoveragePanel sessionId={detail.session.id} />
+          <PatientEvidenceSearch sessionId={detail.session.id} />
           {detail.documents && detail.documents.length > 0 && (
             <DocumentViewer
               locked={
@@ -784,10 +832,12 @@ export default function Doctor() {
               }}
             />
           )}
-          <AuditTrailViewer
-            key={`audit-trail-${detail.session.id}`}
-            sessionId={detail.session.id}
-          />
+          {!demoPresentation && (
+            <AuditTrailViewer
+              key={`audit-trail-${detail.session.id}`}
+              sessionId={detail.session.id}
+            />
+          )}
           <FHIRExportModal
             isOpen={fhirModalOpen}
             onClose={() => setFhirModalOpen(false)}

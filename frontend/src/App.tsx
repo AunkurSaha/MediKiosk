@@ -12,6 +12,7 @@ import Kiosk from './routes/kiosk';
 import Login from './routes/login';
 import StaffLogin from './routes/staff-login';
 import Triage from './routes/triage';
+import Handoff from './routes/handoff';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { copy } from './i18n';
@@ -63,6 +64,7 @@ export function Shell() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/staff/login" element={<StaffLogin />} />
+          <Route path="/handoff/p/:token" element={<Handoff />} />
           <Route path="/management/login" element={<Navigate to="/staff/login" replace />} />
           <Route
             path="/kiosk/*"

@@ -1,0 +1,202 @@
+{
+  "samples": 700,
+  "cer": 0.11655634584549603,
+  "wer": 0.15150300601202404,
+  "exact_line_accuracy": 0.2042857142857143,
+  "whitespace_normalized": {
+    "samples": 700,
+    "cer": 0.07815734989648034,
+    "wer": 0.15150300601202404,
+    "exact_line_accuracy": 0.31142857142857144
+  },
+  "fields": {
+    "medicines": {
+      "overall_accuracy": 0.47714285714285715,
+      "present_count": 700,
+      "absent_count": 0,
+      "present_accuracy": 0.47714285714285715
+    },
+    "doses": {
+      "overall_accuracy": 0.9514285714285714,
+      "present_count": 700,
+      "absent_count": 0,
+      "present_accuracy": 0.9514285714285714
+    },
+    "frequencies": {
+      "overall_accuracy": 0.82,
+      "present_count": 700,
+      "absent_count": 0,
+      "present_accuracy": 0.82
+    },
+    "durations": {
+      "overall_accuracy": 0.9742857142857143,
+      "present_count": 493,
+      "absent_count": 207,
+      "present_accuracy": 0.9634888438133874
+    },
+    "forms": {
+      "overall_accuracy": 0.9757142857142858,
+      "present_count": 508,
+      "absent_count": 192,
+      "present_accuracy": 0.9665354330708661
+    },
+    "instructions": {
+      "overall_accuracy": 0.77,
+      "present_count": 243,
+      "absent_count": 457,
+      "present_accuracy": 0.3374485596707819
+    }
+  },
+  "buckets": {
+    "long_line": {
+      "samples": 201,
+      "cer": 0.15280061383316892,
+      "wer": 0.22442057659694742,
+      "exact_line_accuracy": 0.03482587064676617
+    },
+    "medication": {
+      "samples": 700,
+      "cer": 0.11655634584549603,
+      "wer": 0.15150300601202404,
+      "exact_line_accuracy": 0.2042857142857143
+    },
+    "medium_line": {
+      "samples": 396,
+      "cer": 0.096271606852182,
+      "wer": 0.1130820399113082,
+      "exact_line_accuracy": 0.23484848484848486
+    },
+    "numeric_schedule": {
+      "samples": 263,
+      "cer": 0.1431368507831822,
+      "wer": 0.19745897300158813,
+      "exact_line_accuracy": 0.11406844106463879
+    },
+    "punctuation_hyphen": {
+      "samples": 263,
+      "cer": 0.1431368507831822,
+      "wer": 0.19745897300158813,
+      "exact_line_accuracy": 0.11406844106463879
+    },
+    "repeated_character": {
+      "samples": 451,
+      "cer": 0.14758254361079254,
+      "wer": 0.1832572298325723,
+      "exact_line_accuracy": 0.037694013303769404
+    },
+    "short_line": {
+      "samples": 103,
+      "cer": 0.08655937364071335,
+      "wer": 0.1029126213592233,
+      "exact_line_accuracy": 0.4174757281553398
+    },
+    "spacing": {
+      "samples": 700,
+      "cer": 0.11655634584549603,
+      "wer": 0.15150300601202404,
+      "exact_line_accuracy": 0.2042857142857143
+    }
+  },
+  "non_whitespace_adjacent_repeat": {
+    "samples": 296,
+    "cer": 0.13472348141432458,
+    "wer": 0.21085688649618664,
+    "exact_line_accuracy": 0.057432432432432436
+  },
+  "special_exact": {
+    "Amoxicillin": {
+      "N": 127,
+      "accuracy": 0.0
+    },
+    "Cetirizine": {
+      "N": 113,
+      "accuracy": 0.0
+    },
+    "Paracetamol": {
+      "N": 120,
+      "accuracy": 0.0
+    },
+    "1-1-1": {
+      "N": 64,
+      "accuracy": 0.109375
+    }
+  },
+  "fitted_subgroups": {
+    "False": {
+      "samples": 589,
+      "cer": 0.1009322431123379,
+      "wer": 0.1169284467713787,
+      "exact_line_accuracy": 0.23599320882852293
+    },
+    "True": {
+      "samples": 111,
+      "cer": 0.1751269035532995,
+      "wer": 0.2931562819203269,
+      "exact_line_accuracy": 0.036036036036036036
+    }
+  },
+  "renderers": {
+    "arial": {
+      "samples": 100,
+      "cer": 0.10120888389091931,
+      "wer": 0.13324175824175824,
+      "exact_line_accuracy": 0.18
+    },
+    "calibri": {
+      "samples": 100,
+      "cer": 0.11195114858970631,
+      "wer": 0.13617021276595745,
+      "exact_line_accuracy": 0.21
+    },
+    "cambria": {
+      "samples": 100,
+      "cer": 0.09141681363903587,
+      "wer": 0.10084033613445378,
+      "exact_line_accuracy": 0.31
+    },
+    "comic": {
+      "samples": 100,
+      "cer": 0.09698403311649911,
+      "wer": 0.12056737588652482,
+      "exact_line_accuracy": 0.23
+    },
+    "consola": {
+      "samples": 100,
+      "cer": 0.13194240376138702,
+      "wer": 0.1642651296829971,
+      "exact_line_accuracy": 0.18
+    },
+    "cour": {
+      "samples": 100,
+      "cer": 0.16853318765364655,
+      "wer": 0.273224043715847,
+      "exact_line_accuracy": 0.15
+    },
+    "georgia": {
+      "samples": 100,
+      "cer": 0.11066398390342053,
+      "wer": 0.12921348314606743,
+      "exact_line_accuracy": 0.17
+    }
+  },
+  "font_bands": {
+    "14-17": {
+      "samples": 22,
+      "cer": 0.3259127337488869,
+      "wer": 0.6121495327102804,
+      "exact_line_accuracy": 0.0
+    },
+    "18-21": {
+      "samples": 59,
+      "cer": 0.14812058057312988,
+      "wer": 0.22485207100591717,
+      "exact_line_accuracy": 0.01694915254237288
+    },
+    "22-24": {
+      "samples": 619,
+      "cer": 0.10096036659679228,
+      "wer": 0.11970016397282736,
+      "exact_line_accuracy": 0.2294022617124394
+    }
+  }
+}

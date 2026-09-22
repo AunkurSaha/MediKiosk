@@ -1,0 +1,2460 @@
+{
+  "greedy": [
+    {
+      "id": "validation_00000",
+      "truth": "Syrup Paracetamol 5 mcg AC x 3d",
+      "prediction": "Syrup Panetazol  5 mcg AC x 3d",
+      "cer": 0.16129032258064516,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00001",
+      "truth": "Syp PCM 625 mcg OD with water",
+      "prediction": "Syp  PCM  625 mRcg O with water",
+      "cer": 0.13793103448275862,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00002",
+      "truth": "Cap  Amoxicillin  10  ml  AC",
+      "prediction": "Cap  Amoxilin  10  ml  C",
+      "cer": 0.14285714285714285,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00003",
+      "truth": "Tab  Amoxicillin  40  mcg  0-1-0  x 3d  before food",
+      "prediction": "Inj  Amoxilin  40  mcg  0-0  x 3d  bfor fd",
+      "cer": 0.23529411764705882,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00004",
+      "truth": "PCM 625 mg 1-0-0 for 5 days after food",
+      "prediction": "PCM  625 650 1-0-0 for 5 days aftr food",
+      "cer": 0.13157894736842105,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00005",
+      "truth": "Syrup  Cetirizine  500  mg  PC  for 7 days  before food",
+      "prediction": "Syrup  Cetirizine  65  mg  PC  for 7 days  bfore fd",
+      "cer": 0.10909090909090909,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00006",
+      "truth": "Syrup Cetirizine 650 g TDS x 3d",
+      "prediction": "Syrup Cetirizine 650 g TDS x 3d",
+      "cer": 0.0,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00007",
+      "truth": "Cap Cetirizine 5 mcg 1-0-0 x 7d",
+      "prediction": "Cap  Cetirizine  5 mcg 1-0-0 x 3d",
+      "cer": 0.0967741935483871,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00008",
+      "truth": "Cap  Amoxicillin  650  mcg  1-1-1",
+      "prediction": "Cap  Amoxillin  500  QRcg  1-1",
+      "cer": 0.24242424242424243,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00009",
+      "truth": "Tab PCM 20 mcg BD",
+      "prediction": "Tab  PCM 20 mcg  D",
+      "cer": 0.11764705882352941,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00010",
+      "truth": "Syrup Pantoprazole 20 mg BD x 7d at bedtime",
+      "prediction": "Syrup  Pantoprazole 20 mcg BD x 7d at etime",
+      "cer": 0.09302325581395349,
+      "buckets": [
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00011",
+      "truth": "Syrup  Pantoprazole  40  ml  HS  x 7d  as needed",
+      "prediction": "Syrp  Pantoprazole  40  ml  HS  x 3d  at ned",
+      "cer": 0.125,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00012",
+      "truth": "Tablet PCM 10 mcg QID",
+      "prediction": "Tablet PCM 10 mcg  S",
+      "cer": 0.14285714285714285,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00013",
+      "truth": "Inj Paracetamol 500 mcg SOS",
+      "prediction": "Inj  Pacetamole 65 mc S",
+      "cer": 0.37037037037037035,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00014",
+      "truth": "Cap Paracetamol 40 mcg OD for 5 days",
+      "prediction": "Cap Pacetazol 40 mRcg SOD for days",
+      "cer": 0.19444444444444445,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00015",
+      "truth": "PCM 10 mg 0-1-0 x 7d",
+      "prediction": "PCM 10 mcg 0-1-0 x 3d",
+      "cer": 0.1,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00016",
+      "truth": "Syrup Cetirizine 625 ml 1-1-1 x 5d",
+      "prediction": "Syrup Cetirizine  625 ml 1-1 x 5d",
+      "cer": 0.08823529411764706,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00017",
+      "truth": "Inj  Metformin  650  mg  AC  x 3d",
+      "prediction": "Inj  Metformin  650  mcg  ACD  x 3d",
+      "cer": 0.06060606060606061,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00018",
+      "truth": "Cap Cetirizine 5 ml HS",
+      "prediction": "Cap  Cetirizine 5 ml S",
+      "cer": 0.09090909090909091,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00019",
+      "truth": "PCM 250 g 1-0-0 x 5d",
+      "prediction": "PCM 250 g 1-0 -0 x 5d",
+      "cer": 0.05,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00020",
+      "truth": "Cap Amoxicillin 250 g HS",
+      "prediction": "Cap Amoxillin 250 g S",
+      "cer": 0.125,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00021",
+      "truth": "Tab  Pantoprazole  5  ml  HS",
+      "prediction": "Tab  Pantoprazole  5  ml  S",
+      "cer": 0.03571428571428571,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00022",
+      "truth": "Amoxicillin  10  ml  0-0-1  for 7 days  with water",
+      "prediction": "Amoxilin  10  ml  0-0-1  for 7 days  wit water",
+      "cer": 0.08,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00023",
+      "truth": "Cap Paracetamol 40 mcg TDS for 7 days",
+      "prediction": "Cap Pacetazol 40 Qmcg TDS for 7 days",
+      "cer": 0.10810810810810811,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00024",
+      "truth": "Inj Metformin 10 ml SOS x 7d",
+      "prediction": "Inj Metformin 10 ml SOS x 3d",
+      "cer": 0.03571428571428571,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00025",
+      "truth": "Capsule Amoxicillin 10 g QID",
+      "prediction": "Capsule Amoxillin 10 g D",
+      "cer": 0.14285714285714285,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00026",
+      "truth": "Cap  Metformin  40  mg  1-1-1",
+      "prediction": "Cap  Metformin  40  mcg  1-1",
+      "cer": 0.10344827586206896,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00027",
+      "truth": "Pantoprazole  40  ml  HS  before food",
+      "prediction": "Pantoprazole  40  ml  HS  before fod",
+      "cer": 0.02702702702702703,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00028",
+      "truth": "Tab Pantoprazole 10 ml 1-0-1 with water",
+      "prediction": "Tab Pantoprazole 10 ml 1-0-1 wi wter",
+      "cer": 0.07692307692307693,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00029",
+      "truth": "Cetirizine 250 mg OD x 7d at bedtime",
+      "prediction": "Cetirizine 250 mOcg O x 3d at bedtime",
+      "cer": 0.1111111111111111,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00030",
+      "truth": "PCM  650  mcg  1-1-1  for 5 days",
+      "prediction": "PCM  650  mcg  1-1  for days",
+      "cer": 0.125,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00031",
+      "truth": "Capsule  PCM  650  mcg  1-0-0  for 7 days",
+      "prediction": "Capsule  PCM  650  mcg  1-0-0  for 7 days",
+      "cer": 0.0,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00032",
+      "truth": "Tab  Metformin  5  mg  OD  as needed",
+      "prediction": "Tab  Metformin  5  6mc  OD  at eted",
+      "cer": 0.16666666666666666,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00033",
+      "truth": "Tab Metformin 250 ml OD",
+      "prediction": "Tab Metformin 250 ml S",
+      "cer": 0.08695652173913043,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00034",
+      "truth": "Syp PCM 40 ml 0-0-1 for 5 days after food",
+      "prediction": "Syp  PCM 40 ml 0-0-1 for 5 days aftr food",
+      "cer": 0.04878048780487805,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00035",
+      "truth": "Inj Metformin 250 mcg HS for 5 days",
+      "prediction": "Inj Metformin 250 mcg HS for days",
+      "cer": 0.05714285714285714,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00036",
+      "truth": "Metformin  625  ml  0-1-0  for 7 days",
+      "prediction": "Metformin  625  ml  0-1-0  for days",
+      "cer": 0.05405405405405406,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00037",
+      "truth": "Syrup  Amoxicillin  10  mg  TDS",
+      "prediction": "Syrup  Amoxillin  10  mcg  S",
+      "cer": 0.16129032258064516,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00038",
+      "truth": "Paracetamol 10 mcg PC",
+      "prediction": "Pancetazole 10 Qmcg  PN",
+      "cer": 0.3333333333333333,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00039",
+      "truth": "Metformin  650  ml  BD  x 7d",
+      "prediction": "Metformin  650  ml  BD  x 3d",
+      "cer": 0.03571428571428571,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00040",
+      "truth": "Capsule Cetirizine 5 ml AC x 5d after food",
+      "prediction": "Capsule Cetirizine  5 ml AC x 3d  aft food",
+      "cer": 0.11904761904761904,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00041",
+      "truth": "Tablet Metformin 40 g 0-1-0 at bedtime",
+      "prediction": "Tablet Metformin  40 g 0-1-0 at bedtime",
+      "cer": 0.02631578947368421,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00042",
+      "truth": "Tab Paracetamol 250 mcg PRN x 3d",
+      "prediction": "Tab Pacetazole 250 mcg  PRN x 3d",
+      "cer": 0.15625,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00043",
+      "truth": "Tablet  Paracetamol  20  g  SOS  for 5 days  as needed",
+      "prediction": "Tablet  Pacetazol  20  g  SOS  for 5 days  at ted",
+      "cer": 0.14814814814814814,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00044",
+      "truth": "Metformin  500  mg  0-0-1  x 5d",
+      "prediction": "Metformin  65  Ocg  0-0-1  x 5d",
+      "cer": 0.16129032258064516,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00045",
+      "truth": "Syrup Metformin 625 ml BD x 3d at bedtime",
+      "prediction": "Syrup Metformin  625 ml BD x 3d a time",
+      "cer": 0.12195121951219512,
+      "buckets": [
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00046",
+      "truth": "Cap Paracetamol 40 mg SOS",
+      "prediction": "Cap  Pacetazol  40 Oc S",
+      "cer": 0.36,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00047",
+      "truth": "Tab Paracetamol 20 g 1-0-0",
+      "prediction": "Tab Panetiazole  20 g  -1",
+      "cer": 0.4230769230769231,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00048",
+      "truth": "Syrup PCM 10 g PRN x 7d",
+      "prediction": "Syrup  PCM 10 g  PRN x 3d",
+      "cer": 0.13043478260869565,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00049",
+      "truth": "Paracetamol  650  mg  PRN",
+      "prediction": "Pacetazole  650  mOcg PN",
+      "cer": 0.32,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00050",
+      "truth": "Syrup Pantoprazole 10 ml SOS x 5d at bedtime",
+      "prediction": "Syrup Pantoprazole 10 ml SOS x 3d at beime",
+      "cer": 0.06818181818181818,
+      "buckets": [
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00051",
+      "truth": "Tab Pantoprazole 625 g 1-0-1 before food",
+      "prediction": "Tab Pantoprazole  625 g 1-0-1  before food",
+      "cer": 0.05,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00052",
+      "truth": "Syp Pantoprazole 650 mg 0-1-0 x 5d",
+      "prediction": "Syp  Pantoprazole  650 mcg 0-1-0 x 5d",
+      "cer": 0.08823529411764706,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00053",
+      "truth": "Paracetamol 40 ml TDS x 5d",
+      "prediction": "Pantiazole 40 ml TDS x 5d",
+      "cer": 0.2692307692307692,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00054",
+      "truth": "Syrup Paracetamol 40 ml QID after food",
+      "prediction": "Syrup Panetazol 40 ml QID after fod",
+      "cer": 0.13157894736842105,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00055",
+      "truth": "Syp  Metformin  40  ml  0-1-0  at bedtime",
+      "prediction": "Syp  Metformin  40  ml  0-1-0  at edtime",
+      "cer": 0.024390243902439025,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00056",
+      "truth": "Capsule Pantoprazole 5 g 1-0-1 x 3d",
+      "prediction": "Capsule Pantoprazole  5 g  1-0-1 x 3d",
+      "cer": 0.05714285714285714,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00057",
+      "truth": "Capsule Metformin 5 g BD",
+      "prediction": "Capsule Metformin  5 g C",
+      "cer": 0.125,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00058",
+      "truth": "Cap  Cetirizine  500  g  1-0-0  for 7 days",
+      "prediction": "Cap  Cetirizine  650  g  1-0-0  for 7 days",
+      "cer": 0.047619047619047616,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00059",
+      "truth": "Tablet  Pantoprazole  650  ml  0-1-0  x 5d  with water",
+      "prediction": "Tabet  Pantoprazole  650  ml  0-0  x 3d  wit water",
+      "cer": 0.09259259259259259,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00060",
+      "truth": "Tab  Cetirizine  500  mg  BD  x 3d",
+      "prediction": "Tab  Cetirizine  50  mcg  BD  x 3d",
+      "cer": 0.058823529411764705,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00061",
+      "truth": "Tab Cetirizine 500 g BD for 7 days with water",
+      "prediction": "Tab Cetirizine 500 g BD for 7 days wi water",
+      "cer": 0.044444444444444446,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00062",
+      "truth": "Tablet PCM 5 mg PC as needed",
+      "prediction": "Tablet PCM  5  mcg PRDS at ned",
+      "cer": 0.35714285714285715,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00063",
+      "truth": "Inj Pantoprazole 20 mcg QID x 7d",
+      "prediction": "Inj  Pantoprazole 20 mcg  QID x 3d",
+      "cer": 0.09375,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00064",
+      "truth": "Inj Pantoprazole 40 mcg QID for 5 days",
+      "prediction": "Inj  Pantoprazole 40 mcg QID for days",
+      "cer": 0.07894736842105263,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00065",
+      "truth": "Capsule  Paracetamol  40  mg  0-0-1  for 5 days  at bedtime",
+      "prediction": "Capsule  Panetamol  40  mg  0-0-1  for 5 ays  ath nted",
+      "cer": 0.1864406779661017,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00066",
+      "truth": "Tablet Metformin 10 ml 0-1-0 x 3d",
+      "prediction": "Tablet Metformin 10 ml 0-1-0 x 3d",
+      "cer": 0.0,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00067",
+      "truth": "Inj PCM 625 mcg OD for 7 days",
+      "prediction": "Inj  PCM  625 6mRcg OD for days",
+      "cer": 0.20689655172413793,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00068",
+      "truth": "Inj PCM 250 mg PC",
+      "prediction": "Inj  PCM 250 mcg  PN",
+      "cer": 0.23529411764705882,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00069",
+      "truth": "Paracetamol  500  mcg  1-1-1  after food",
+      "prediction": "Panetazole  50  Qmcg  1-1  aftr food",
+      "cer": 0.25,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00070",
+      "truth": "Tablet Pantoprazole 500 mg SOS after food",
+      "prediction": "Tablet Pantoprazole 50 mcg SOS afte food",
+      "cer": 0.07317073170731707,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00071",
+      "truth": "Cap Amoxicillin 10 ml SOS for 7 days",
+      "prediction": "Cap Amoxillin  10 ml SOS fofor days",
+      "cer": 0.16666666666666666,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00072",
+      "truth": "Syrup  PCM  20  mg  HS  for 7 days",
+      "prediction": "Syrup  PCM  20  mcg  HS  for days",
+      "cer": 0.08823529411764706,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00073",
+      "truth": "Pantoprazole 625 ml HS",
+      "prediction": "Pantoprazole  625 ml S",
+      "cer": 0.09090909090909091,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00074",
+      "truth": "Syrup  Paracetamol  10  ml  0-1-0  x 3d  before food",
+      "prediction": "Syrup  Pancetazol  40  ml  0-1-0  x 3d  bfor fod",
+      "cer": 0.1346153846153846,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00075",
+      "truth": "Syp  Metformin  40  mg  1-1-1",
+      "prediction": "Syp  Metformin  40  mcg  -1",
+      "cer": 0.13793103448275862,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00076",
+      "truth": "Cap  Pantoprazole  500  g  PRN  x 7d  with water",
+      "prediction": "Cap  Pantoprazole  6500  g  PRN  x 3d  wi water",
+      "cer": 0.08333333333333333,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00077",
+      "truth": "Syrup Metformin 20 mg AC",
+      "prediction": "Syrup Metformin 20 mcg C",
+      "cer": 0.08333333333333333,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00078",
+      "truth": "Capsule  Pantoprazole  625  ml  0-1-0  with water",
+      "prediction": "Capsule  Pantoprazole  625  ml  0-0  wit water",
+      "cer": 0.061224489795918366,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00079",
+      "truth": "Paracetamol 20 g 1-0-1 at bedtime",
+      "prediction": "Pacetazol  20 g  1-0-1  at bedtime",
+      "cer": 0.18181818181818182,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00080",
+      "truth": "Cetirizine  20  g  HS  x 7d",
+      "prediction": "Cetirizine  250  g  HS  x 3d",
+      "cer": 0.07407407407407407,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00081",
+      "truth": "Capsule  Cetirizine  5  g  AC  x 5d  before food",
+      "prediction": "Capsule  Cetirizine  5  g  AC  x 3d  before fod",
+      "cer": 0.041666666666666664,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00082",
+      "truth": "Cap  PCM  40  ml  TDS  x 5d  as needed",
+      "prediction": "Cap  PCM  40  ml  TDS  x 5d  at neted",
+      "cer": 0.07894736842105263,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00083",
+      "truth": "Metformin  500  ml  QID  for 5 days",
+      "prediction": "Metformin  65  ml  QID  for days",
+      "cer": 0.14285714285714285,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00084",
+      "truth": "Cap  Metformin  250  g  BD  x 5d  at bedtime",
+      "prediction": "Cap  Metformin  250  g  BD  x 3d  at edtime",
+      "cer": 0.045454545454545456,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00085",
+      "truth": "Syp Amoxicillin 10 g 1-0-0 with water",
+      "prediction": "Syp Amoxillin 10 g 1-0-0 with water",
+      "cer": 0.05405405405405406,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00086",
+      "truth": "PCM 20 mcg SOS x 5d before food",
+      "prediction": "PCM 250 Qcg SOS x 5d before fd",
+      "cer": 0.12903225806451613,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00087",
+      "truth": "Syrup Pantoprazole 250 mg OD",
+      "prediction": "Syrup Pantoprazole 250 mcg  D",
+      "cer": 0.07142857142857142,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00088",
+      "truth": "Syp Cetirizine 10 mcg AC x 7d as needed",
+      "prediction": "Syp  Cetirizine 10 QRcg Ao x 3d at ded",
+      "cer": 0.23076923076923078,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00089",
+      "truth": "Capsule Amoxicillin 250 mg PC x 7d before food",
+      "prediction": "Capsule Amoxilin 250 mg PC x 7d before fod",
+      "cer": 0.08695652173913043,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00090",
+      "truth": "Tab  Amoxicillin  5  mcg  BD  for 5 days  before food",
+      "prediction": "Tab  Amoxilin  5  mcg  BD  for 5 days  bfor fd",
+      "cer": 0.1320754716981132,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00091",
+      "truth": "Inj  Paracetamol  250  mg  0-0-1  for 5 days",
+      "prediction": "Inj  Panetiazol  250  mg  0-0-1  for 5 days",
+      "cer": 0.11363636363636363,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00092",
+      "truth": "Cap Paracetamol 5 g BD x 5d at bedtime",
+      "prediction": "Cap  Pacetazol  5 g OD x 5d at time",
+      "cer": 0.23684210526315788,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00093",
+      "truth": "Tablet Amoxicillin 5 ml 1-0-0 before food",
+      "prediction": "Tablet Amoxillin  5 ml 1-0-0 befor fod",
+      "cer": 0.12195121951219512,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00094",
+      "truth": "Tab Paracetamol 20 ml QID",
+      "prediction": "Tab Pacetazol  20 ml  S",
+      "cer": 0.28,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00095",
+      "truth": "Inj  Metformin  250  mg  OD  for 5 days",
+      "prediction": "Inj  Metformin  250  mcg  OD  for 5 days",
+      "cer": 0.02564102564102564,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00096",
+      "truth": "Metformin 500 g 0-1-0 after food",
+      "prediction": "Metformin  650 g 0-1-0 after fod",
+      "cer": 0.125,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00097",
+      "truth": "PCM 10 ml HS x 7d",
+      "prediction": "PCM 10 ml HS x 3d",
+      "cer": 0.058823529411764705,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00098",
+      "truth": "Syrup Amoxicillin 500 ml 1-0-0",
+      "prediction": "Syrup Amoxilin  65 ml 0-1",
+      "cer": 0.3,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00099",
+      "truth": "Metformin 10 ml OD x 3d",
+      "prediction": "Metformin 10 ml OD x 3d",
+      "cer": 0.0,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    }
+  ],
+  "beam50": [
+    {
+      "id": "validation_00000",
+      "truth": "Syrup Paracetamol 5 mcg AC x 3d",
+      "prediction": "Syrup  Panetazol  5  mcg AC x 3d",
+      "cer": 0.22580645161290322,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00001",
+      "truth": "Syp PCM 625 mcg OD with water",
+      "prediction": "Syp  PCM  625 6mcg O with water",
+      "cer": 0.13793103448275862,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00002",
+      "truth": "Cap  Amoxicillin  10  ml  AC",
+      "prediction": "Cap  Amoxillin  10  ml  C",
+      "cer": 0.10714285714285714,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00003",
+      "truth": "Tab  Amoxicillin  40  mcg  0-1-0  x 3d  before food",
+      "prediction": "Inj  Amoxilin  40  mcg  0-1-0  x 3d  bfor fod",
+      "cer": 0.17647058823529413,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00004",
+      "truth": "PCM 625 mg 1-0-0 for 5 days after food",
+      "prediction": "PCM  625 650 1-0-0 for 5 days after food",
+      "cer": 0.10526315789473684,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00005",
+      "truth": "Syrup  Cetirizine  500  mg  PC  for 7 days  before food",
+      "prediction": "Syrup  Cetirizine  650  mg  PC  for 7 days  bfor fod",
+      "cer": 0.09090909090909091,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00006",
+      "truth": "Syrup Cetirizine 650 g TDS x 3d",
+      "prediction": "Syrup Cetirizine 650 g TDS x 3d",
+      "cer": 0.0,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00007",
+      "truth": "Cap Cetirizine 5 mcg 1-0-0 x 7d",
+      "prediction": "Cap  Cetirizine  5 mcg 1-0-0 x 3d",
+      "cer": 0.0967741935483871,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00008",
+      "truth": "Cap  Amoxicillin  650  mcg  1-1-1",
+      "prediction": "Cap  Amoxillin  500  QRcg  1-1",
+      "cer": 0.24242424242424243,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00009",
+      "truth": "Tab PCM 20 mcg BD",
+      "prediction": "Tab  PCM  20 mcg  D",
+      "cer": 0.17647058823529413,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00010",
+      "truth": "Syrup Pantoprazole 20 mg BD x 7d at bedtime",
+      "prediction": "Syrup  Pantoprazole 20 mcg BD x 7d at etime",
+      "cer": 0.09302325581395349,
+      "buckets": [
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00011",
+      "truth": "Syrup  Pantoprazole  40  ml  HS  x 7d  as needed",
+      "prediction": "Syrup  Pantoprazole  40  ml  HS  x 3d  at neted",
+      "cer": 0.08333333333333333,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00012",
+      "truth": "Tablet PCM 10 mcg QID",
+      "prediction": "Tablet PCM 10 mcg  S",
+      "cer": 0.14285714285714285,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00013",
+      "truth": "Inj Paracetamol 500 mcg SOS",
+      "prediction": "Inj  Pacetamole  650 mc S",
+      "cer": 0.37037037037037035,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00014",
+      "truth": "Cap Paracetamol 40 mcg OD for 5 days",
+      "prediction": "Cap  Pacetazol 40 mcg OD for days",
+      "cer": 0.16666666666666666,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00015",
+      "truth": "PCM 10 mg 0-1-0 x 7d",
+      "prediction": "PCM 10 mcg 0-1-0 x 3d",
+      "cer": 0.1,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00016",
+      "truth": "Syrup Cetirizine 625 ml 1-1-1 x 5d",
+      "prediction": "Syrup  Cetirizine  625 ml 1-1-1 x 5d",
+      "cer": 0.058823529411764705,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00017",
+      "truth": "Inj  Metformin  650  mg  AC  x 3d",
+      "prediction": "Inj  Metformin  650  mcg  AC  x 3d",
+      "cer": 0.030303030303030304,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00018",
+      "truth": "Cap Cetirizine 5 ml HS",
+      "prediction": "Cap  Cetirizine  5 ml S",
+      "cer": 0.13636363636363635,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00019",
+      "truth": "PCM 250 g 1-0-0 x 5d",
+      "prediction": "PCM 250 g 1-0-0 x 5d",
+      "cer": 0.0,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00020",
+      "truth": "Cap Amoxicillin 250 g HS",
+      "prediction": "Cap Amoxicillin 250 g S",
+      "cer": 0.041666666666666664,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00021",
+      "truth": "Tab  Pantoprazole  5  ml  HS",
+      "prediction": "Tab  Pantoprazole  5  ml  S",
+      "cer": 0.03571428571428571,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00022",
+      "truth": "Amoxicillin  10  ml  0-0-1  for 7 days  with water",
+      "prediction": "Amoxilin  10  ml  0-0-1  for 7 days  wit water",
+      "cer": 0.08,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00023",
+      "truth": "Cap Paracetamol 40 mcg TDS for 7 days",
+      "prediction": "Cap Pacetazol 40 Qcg TDS for 7 days",
+      "cer": 0.10810810810810811,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00024",
+      "truth": "Inj Metformin 10 ml SOS x 7d",
+      "prediction": "Inj Metformin 10 ml SOS x 3d",
+      "cer": 0.03571428571428571,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00025",
+      "truth": "Capsule Amoxicillin 10 g QID",
+      "prediction": "Capsule Amoxicillin 10 g D",
+      "cer": 0.07142857142857142,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00026",
+      "truth": "Cap  Metformin  40  mg  1-1-1",
+      "prediction": "Cap  Metformin  40  mcg  1-1",
+      "cer": 0.10344827586206896,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00027",
+      "truth": "Pantoprazole  40  ml  HS  before food",
+      "prediction": "Pantoprazole  40  ml  HS  before fod",
+      "cer": 0.02702702702702703,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00028",
+      "truth": "Tab Pantoprazole 10 ml 1-0-1 with water",
+      "prediction": "Tab Pantoprazole 10 ml 1-0-1 wi wter",
+      "cer": 0.07692307692307693,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00029",
+      "truth": "Cetirizine 250 mg OD x 7d at bedtime",
+      "prediction": "Cetirizine 250 mcg O x 3d  at bedtime",
+      "cer": 0.1111111111111111,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00030",
+      "truth": "PCM  650  mcg  1-1-1  for 5 days",
+      "prediction": "PCM  650  mcg  1-1-1  for days",
+      "cer": 0.0625,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00031",
+      "truth": "Capsule  PCM  650  mcg  1-0-0  for 7 days",
+      "prediction": "Capsule  PCM  650  mcg  1-0-0  for 7 days",
+      "cer": 0.0,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00032",
+      "truth": "Tab  Metformin  5  mg  OD  as needed",
+      "prediction": "Tab  Metformin  5  6mc0  OD  at eted",
+      "cer": 0.19444444444444445,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00033",
+      "truth": "Tab Metformin 250 ml OD",
+      "prediction": "Tab Metformin 250 ml S",
+      "cer": 0.08695652173913043,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00034",
+      "truth": "Syp PCM 40 ml 0-0-1 for 5 days after food",
+      "prediction": "Syp  PCM 40 ml 0-0-1 for 5 days aftr food",
+      "cer": 0.04878048780487805,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00035",
+      "truth": "Inj Metformin 250 mcg HS for 5 days",
+      "prediction": "Inj Metformin 250 mcg HS for days",
+      "cer": 0.05714285714285714,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00036",
+      "truth": "Metformin  625  ml  0-1-0  for 7 days",
+      "prediction": "Metformilin  625  ml  0-1-1-0  for days",
+      "cer": 0.16216216216216217,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00037",
+      "truth": "Syrup  Amoxicillin  10  mg  TDS",
+      "prediction": "Syrup  Amoxicillin  10  mcg  S",
+      "cer": 0.0967741935483871,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00038",
+      "truth": "Paracetamol 10 mcg PC",
+      "prediction": "Panetazole  10 Qmcg  PN",
+      "cer": 0.42857142857142855,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00039",
+      "truth": "Metformin  650  ml  BD  x 7d",
+      "prediction": "Metformin  650  ml  BD  x 3d",
+      "cer": 0.03571428571428571,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00040",
+      "truth": "Capsule Cetirizine 5 ml AC x 5d after food",
+      "prediction": "Capsule  Cetirizine  5 ml AC x 3d  aft food",
+      "cer": 0.14285714285714285,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00041",
+      "truth": "Tablet Metformin 40 g 0-1-0 at bedtime",
+      "prediction": "Tablet Metformin  40 g 0-1-0 at bedtime",
+      "cer": 0.02631578947368421,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00042",
+      "truth": "Tab Paracetamol 250 mcg PRN x 3d",
+      "prediction": "Tab Pacetazole 250 mcg  PRN x 3d",
+      "cer": 0.15625,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00043",
+      "truth": "Tablet  Paracetamol  20  g  SOS  for 5 days  as needed",
+      "prediction": "Tablet  Pacetazol  20  g  SOS  for 5 days  at ted",
+      "cer": 0.14814814814814814,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00044",
+      "truth": "Metformin  500  mg  0-0-1  x 5d",
+      "prediction": "Metformin  50  Ocg  0-0-1  x 5d",
+      "cer": 0.0967741935483871,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00045",
+      "truth": "Syrup Metformin 625 ml BD x 3d at bedtime",
+      "prediction": "Syrup Metformin  625 ml BD x 3d a etime",
+      "cer": 0.0975609756097561,
+      "buckets": [
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00046",
+      "truth": "Cap Paracetamol 40 mg SOS",
+      "prediction": "Cap  Pacetazol  40 Oc S",
+      "cer": 0.36,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00047",
+      "truth": "Tab Paracetamol 20 g 1-0-0",
+      "prediction": "Tab Panetirazole  20 g  -1",
+      "cer": 0.46153846153846156,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00048",
+      "truth": "Syrup PCM 10 g PRN x 7d",
+      "prediction": "Syrup  PCM 10 g  PRN x 3d",
+      "cer": 0.13043478260869565,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00049",
+      "truth": "Paracetamol  650  mg  PRN",
+      "prediction": "Pacetazole  650  Ocg PRN",
+      "cer": 0.28,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00050",
+      "truth": "Syrup Pantoprazole 10 ml SOS x 5d at bedtime",
+      "prediction": "Syrup Pantoprazole 10 ml SOS x 3d at beime",
+      "cer": 0.06818181818181818,
+      "buckets": [
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00051",
+      "truth": "Tab Pantoprazole 625 g 1-0-1 before food",
+      "prediction": "Tab Pantoprazole  625 g 1-0-1  before food",
+      "cer": 0.05,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00052",
+      "truth": "Syp Pantoprazole 650 mg 0-1-0 x 5d",
+      "prediction": "Syp  Pantoprazole  650 mcg 0-1-1-0 x 5d",
+      "cer": 0.14705882352941177,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00053",
+      "truth": "Paracetamol 40 ml TDS x 5d",
+      "prediction": "Pantiazole 40 ml TDS x 5d",
+      "cer": 0.2692307692307692,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00054",
+      "truth": "Syrup Paracetamol 40 ml QID after food",
+      "prediction": "Syrup Panetazol 40 ml QID after food",
+      "cer": 0.10526315789473684,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00055",
+      "truth": "Syp  Metformin  40  ml  0-1-0  at bedtime",
+      "prediction": "Syp  Metformin  40  ml  0-1-0  at edtime",
+      "cer": 0.024390243902439025,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00056",
+      "truth": "Capsule Pantoprazole 5 g 1-0-1 x 3d",
+      "prediction": "Capsule Pantoprazole  5  g  1-0-1 x 3d",
+      "cer": 0.08571428571428572,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00057",
+      "truth": "Capsule Metformin 5 g BD",
+      "prediction": "Capsule Metformin  5 g  C",
+      "cer": 0.125,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00058",
+      "truth": "Cap  Cetirizine  500  g  1-0-0  for 7 days",
+      "prediction": "Cap  Cetirizine  650  g  1-0-0  for 7 days",
+      "cer": 0.047619047619047616,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00059",
+      "truth": "Tablet  Pantoprazole  650  ml  0-1-0  x 5d  with water",
+      "prediction": "Tablet  Pantoprazole  650  ml  0-1-0  x 3d  wit water",
+      "cer": 0.037037037037037035,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00060",
+      "truth": "Tab  Cetirizine  500  mg  BD  x 3d",
+      "prediction": "Tab  Cetirizine  50  mcg  BD  x 3d",
+      "cer": 0.058823529411764705,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00061",
+      "truth": "Tab Cetirizine 500 g BD for 7 days with water",
+      "prediction": "Tab Cetirizine 500 g BD for 7 days wi water",
+      "cer": 0.044444444444444446,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00062",
+      "truth": "Tablet PCM 5 mg PC as needed",
+      "prediction": "Tablet  PCM  5  mcg PRDS at need",
+      "cer": 0.35714285714285715,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00063",
+      "truth": "Inj Pantoprazole 20 mcg QID x 7d",
+      "prediction": "Inj  Pantoprazole 20 mcg  QID x 3d",
+      "cer": 0.09375,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00064",
+      "truth": "Inj Pantoprazole 40 mcg QID for 5 days",
+      "prediction": "Inj  Pantoprazole  40 mcg QID for days",
+      "cer": 0.10526315789473684,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00065",
+      "truth": "Capsule  Paracetamol  40  mg  0-0-1  for 5 days  at bedtime",
+      "prediction": "Capsule  Panetamol  40  mg  0-0-1  for 5 ays  ath nted",
+      "cer": 0.1864406779661017,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00066",
+      "truth": "Tablet Metformin 10 ml 0-1-0 x 3d",
+      "prediction": "Tablet Metformin 10 ml 0-1-1-0 x 3d",
+      "cer": 0.06060606060606061,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00067",
+      "truth": "Inj PCM 625 mcg OD for 7 days",
+      "prediction": "Inj  PCM  625 6mcg OD for days",
+      "cer": 0.1724137931034483,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00068",
+      "truth": "Inj PCM 250 mg PC",
+      "prediction": "Inj  PCM 250 mcg  PRN",
+      "cer": 0.29411764705882354,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00069",
+      "truth": "Paracetamol  500  mcg  1-1-1  after food",
+      "prediction": "Panetazol  50  Qmcg  1-1-1  aftr food",
+      "cer": 0.175,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00070",
+      "truth": "Tablet Pantoprazole 500 mg SOS after food",
+      "prediction": "Tablet Pantoprazole 500 mcg SOS afte food",
+      "cer": 0.04878048780487805,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00071",
+      "truth": "Cap Amoxicillin 10 ml SOS for 7 days",
+      "prediction": "Cap Amoxicillin  10 ml SOS fofor days",
+      "cer": 0.1111111111111111,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00072",
+      "truth": "Syrup  PCM  20  mg  HS  for 7 days",
+      "prediction": "Syrup  PCM  20  mcg  HS  for days",
+      "cer": 0.08823529411764706,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00073",
+      "truth": "Pantoprazole 625 ml HS",
+      "prediction": "Pantoprazole  625 ml S",
+      "cer": 0.09090909090909091,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00074",
+      "truth": "Syrup  Paracetamol  10  ml  0-1-0  x 3d  before food",
+      "prediction": "Syrup  Pacetazol  40  ml  0-1-0  x 3d  bfor fod",
+      "cer": 0.1346153846153846,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00075",
+      "truth": "Syp  Metformin  40  mg  1-1-1",
+      "prediction": "Syp  Metformin  40  mcg  -1",
+      "cer": 0.13793103448275862,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00076",
+      "truth": "Cap  Pantoprazole  500  g  PRN  x 7d  with water",
+      "prediction": "Cap  Pantoprazole  650  g  PRN  x 3d  wi water",
+      "cer": 0.10416666666666667,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00077",
+      "truth": "Syrup Metformin 20 mg AC",
+      "prediction": "Syrup Metformin  20 mcg C",
+      "cer": 0.125,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00078",
+      "truth": "Capsule  Pantoprazole  625  ml  0-1-0  with water",
+      "prediction": "Capsule  Pantoprazole  625  ml  0-1-0  wit water",
+      "cer": 0.02040816326530612,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00079",
+      "truth": "Paracetamol 20 g 1-0-1 at bedtime",
+      "prediction": "Pacetazol  20 g  1-0-1  at bedtime",
+      "cer": 0.18181818181818182,
+      "buckets": [
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00080",
+      "truth": "Cetirizine  20  g  HS  x 7d",
+      "prediction": "Cetirizine  250  g  HS  x 3d",
+      "cer": 0.07407407407407407,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00081",
+      "truth": "Capsule  Cetirizine  5  g  AC  x 5d  before food",
+      "prediction": "Capsule  Cetirizine  5  g  AC  x 3d  before fod",
+      "cer": 0.041666666666666664,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00082",
+      "truth": "Cap  PCM  40  ml  TDS  x 5d  as needed",
+      "prediction": "Cap  PCM  40  ml  TDS  x 5d  at neted",
+      "cer": 0.07894736842105263,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00083",
+      "truth": "Metformin  500  ml  QID  for 5 days",
+      "prediction": "Metformin  65  ml  QID  for days",
+      "cer": 0.14285714285714285,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00084",
+      "truth": "Cap  Metformin  250  g  BD  x 5d  at bedtime",
+      "prediction": "Cap  Metformin  250  g  BD  x 3d  at edtime",
+      "cer": 0.045454545454545456,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00085",
+      "truth": "Syp Amoxicillin 10 g 1-0-0 with water",
+      "prediction": "Syp Amoxicillin 10 g 1-0-0 with water",
+      "cer": 0.0,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00086",
+      "truth": "PCM 20 mcg SOS x 5d before food",
+      "prediction": "PCM  20  Qcg  SOS x 5d  before fod",
+      "cer": 0.1935483870967742,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00087",
+      "truth": "Syrup Pantoprazole 250 mg OD",
+      "prediction": "Syrup  Pantoprazole 250 mcg  D",
+      "cer": 0.10714285714285714,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00088",
+      "truth": "Syp Cetirizine 10 mcg AC x 7d as needed",
+      "prediction": "Syp  Cetirizine 10 QRcg Ao x 3d at eded",
+      "cer": 0.20512820512820512,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00089",
+      "truth": "Capsule Amoxicillin 250 mg PC x 7d before food",
+      "prediction": "Capsule Amoxilin 250 mg PC x 7d before fod",
+      "cer": 0.08695652173913043,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00090",
+      "truth": "Tab  Amoxicillin  5  mcg  BD  for 5 days  before food",
+      "prediction": "Tab  Amoxilin  5  mcg  BD  for 5 days  bfor fod",
+      "cer": 0.11320754716981132,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00091",
+      "truth": "Inj  Paracetamol  250  mg  0-0-1  for 5 days",
+      "prediction": "Inj  Panetiazol  250  mg  0-0-1  for 5 days",
+      "cer": 0.11363636363636363,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00092",
+      "truth": "Cap Paracetamol 5 g BD x 5d at bedtime",
+      "prediction": "Cap  Pacetazol  5 g OD x 5d at edtime",
+      "cer": 0.18421052631578946,
+      "buckets": [
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00093",
+      "truth": "Tablet Amoxicillin 5 ml 1-0-0 before food",
+      "prediction": "Tablet Amoxicillin  5 ml 1-0-0 befor food",
+      "cer": 0.04878048780487805,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "long_line"
+      ]
+    },
+    {
+      "id": "validation_00094",
+      "truth": "Tab Paracetamol 20 ml QID",
+      "prediction": "Tab Pacetazol  20 ml  S",
+      "cer": 0.28,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00095",
+      "truth": "Inj  Metformin  250  mg  OD  for 5 days",
+      "prediction": "Inj  Metformin  250  mcg  OD  for 5 days",
+      "cer": 0.02564102564102564,
+      "buckets": [
+        "repeated_character",
+        "medication",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00096",
+      "truth": "Metformin 500 g 0-1-0 after food",
+      "prediction": "Metformin  650 g 0-1-0 after fod",
+      "cer": 0.125,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00097",
+      "truth": "PCM 10 ml HS x 7d",
+      "prediction": "PCM 10 ml HS x 3d",
+      "cer": 0.058823529411764705,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    },
+    {
+      "id": "validation_00098",
+      "truth": "Syrup Amoxicillin 500 ml 1-0-0",
+      "prediction": "Syrup Amoxicillin  650 ml 0-1",
+      "cer": 0.2,
+      "buckets": [
+        "repeated_character",
+        "numeric_schedule",
+        "medication",
+        "punctuation_hyphen",
+        "spacing",
+        "medium_line"
+      ]
+    },
+    {
+      "id": "validation_00099",
+      "truth": "Metformin 10 ml OD x 3d",
+      "prediction": "Metformin 10 ml OD x 3d",
+      "cer": 0.0,
+      "buckets": [
+        "medication",
+        "spacing",
+        "short_line"
+      ]
+    }
+  ]
+}

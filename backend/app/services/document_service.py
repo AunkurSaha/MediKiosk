@@ -120,6 +120,9 @@ async def ingest_document(
                     timeout=timeout_val,
                 )
                 inferred_type, doc_date, structured = parse_document(raw_text, filename)
+                if metadata.get("structured_document"):
+                    structured = metadata["structured_document"]
+                    inferred_type = metadata.get("document_type") or inferred_type
 
                 doc.document_type = document_type or inferred_type
                 doc.document_date = doc_date
@@ -138,7 +141,7 @@ async def ingest_document(
                     id=str(uuid.uuid4()),
                     document_id=doc.id,
                     session_id=session_id,
-                    extractor=ocr_provider.name,
+                    extractor=metadata.get("provider_name", ocr_provider.name),
                     extractor_version=ocr_provider.version,
                     raw_text=raw_text,
                     structured_json=StructuredDocument.model_validate(structured).model_dump(

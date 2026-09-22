@@ -34,18 +34,28 @@ def extract_medical_facts(db: Session, document_extraction: models.DocumentExtra
         return
     if db.scalar(select(model.id).where(model.document_extraction_id == source.id).limit(1)):
         return
-    facts = [
-        model(
-            session_id=source.session_id,
-            document_extraction_id=source.id,
-            source_text=source.raw_text,
-            source_location=None,
-            verification_status="unverified",
-            **value.model_dump(),
+    facts = []
+    for value in values:
+        value_dict = value.model_dump()
+        # Remove source_text and source_location from value_dict to avoid conflicts
+        # with explicit parameters below
+        value_dict.pop('source_text', None)
+        value_dict.pop('source_location', None)
+        facts.append(
+            model(
+                session_id=source.session_id,
+                document_extraction_id=source.id,
+                source_text=source.raw_text,
+                source_location=None,
+                verification_status="unverified",
+                **value_dict,
+            )
         )
-        for value in values
-    ]
     # Keep any row failure isolated from the upload and preserve its raw extraction.
     with db.begin_nested():
         db.add_all(facts)
         db.flush()
+        from app.services import clinical_evidence
+
+        for fact in facts:
+            clinical_evidence.create_document_evidence(db, fact, source)

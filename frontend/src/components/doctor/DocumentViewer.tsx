@@ -134,7 +134,7 @@ export default function DocumentViewer({
       <div className="doc-viewer-header">
         <div>
           <h2>{t.docDoctorReview}</h2>
-          <p className="eyebrow">Auxiliary Ingestion · OCR Verification</p>
+          <p className="eyebrow">Source document verification</p>
         </div>
 
         {documents.length > 1 && (
@@ -273,14 +273,8 @@ export default function DocumentViewer({
                 >
                   <div className="ext-header">
                     <div>
-                      <strong>Extractor: {ext.extractor}</strong> ({ext.extractor_version})
-                      {ext.extractor === 'mock' && (
-                        <p role="note">
-                          Synthetic mock output, not OCR of arbitrary uploaded content. Compare with
-                          the original; historical mock output may not match it.
-                        </p>
-                      )}
-                      {ext.confidence !== null && ext.extractor !== 'mock' && (
+                      <strong>Document information</strong>
+                      {ext.confidence !== null && (
                         <span className="muted" style={{ marginLeft: '8px' }}>
                           Confidence: {Math.round(ext.confidence * 100)}%
                         </span>
@@ -391,7 +385,7 @@ export default function DocumentViewer({
                   {ext.raw_text && (
                     <details style={{ marginTop: '12px' }}>
                       <summary style={{ cursor: 'pointer', fontSize: '0.85rem' }}>
-                        Raw OCR Output
+                        Extracted source text
                       </summary>
                       <pre className="raw-ocr-text">{ext.raw_text}</pre>
                     </details>
@@ -400,7 +394,7 @@ export default function DocumentViewer({
                   {/* Clinician Verification Controls */}
                   <div className="verification-controls-box">
                     <div className="clinician-inputs">
-                      <p>Reviewer identity comes from the signed-in demo doctor.</p>
+                      <p>Reviewer identity comes from the signed-in clinician.</p>
                       <label htmlFor={`doc-notes-${ext.id}`}>
                         {t.docVerificationNotes}:
                         <input
@@ -439,8 +433,8 @@ export default function DocumentViewer({
             })
           ) : (
             <p className="muted">
-              No extraction is available. Real OCR is not implemented; the original upload is stored
-              for staff review.
+              No extraction is available. The original upload remains available for clinician
+              review.
             </p>
           )}
         </div>

@@ -187,3 +187,32 @@ class Discrepancy(APIModel):
 
 class DiscrepancyResponse(APIModel):
     items: list[Discrepancy]
+
+
+class PatientEvidenceSearchRequest(APIModel):
+    model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
+    query: str = Field(min_length=2, max_length=500)
+    top_k: int = Field(default=5, ge=1, le=20)
+
+
+class PatientEvidenceSearchResult(APIModel):
+    fact_id: str
+    fact_type: Literal["medication", "lab"]
+    label: str
+    details: dict[str, str | None]
+    verification_status: VerificationStatus
+    patient_confirmation: str
+    source_document_id: str | None = None
+    source_filename: str | None = None
+    source_extraction_id: str | None = None
+    source_text: str | None = None
+    source_location: str | None = None
+    score: float = Field(ge=0, le=1)
+
+
+class PatientEvidenceSearchResponse(APIModel):
+    query: str
+    retrieval_mode: Literal["deterministic_patient_scoped"] = "deterministic_patient_scoped"
+    fallback_used: bool = True
+    disclaimer: str = "Retrieved evidence only. No diagnosis or treatment recommendation."
+    results: list[PatientEvidenceSearchResult]

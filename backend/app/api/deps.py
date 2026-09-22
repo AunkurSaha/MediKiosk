@@ -42,11 +42,11 @@ def get_optional_auth_user(
 
     # Fallback to demo doctor/triage headers when demo mode is enabled
     if demo_enabled():
-        if x_demo_doctor == "true":
+        if x_demo_doctor and x_demo_doctor.lower() == "true":
             user = db.get(models.User, DEMO_DOCTOR_ID)
             if user and user.is_active:
                 return user
-        if x_demo_triage == "true":
+        if x_demo_triage and x_demo_triage.lower() == "true":
             user = db.get(models.User, DEMO_TRIAGE_ID)
             if user and user.is_active:
                 return user

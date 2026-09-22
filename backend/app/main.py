@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
 from app.api.v1.routers import api_router
-from app.core.config import CORS_ORIGINS, demo_enabled
+from app.core.config import APP_ENV, CORS_ORIGINS, demo_enabled
 from app.core.errors import WorkflowError
 from app.database import get_db
 from app.services.flow_registry import registry
@@ -81,12 +81,13 @@ async def conflict_error(request: Request, exc: IntegrityError):
     return error_response(409, "CONFLICT", "The record changed. Reload and retry.")
 
 
+logger = logging.getLogger(__name__)
+
+
 @app.exception_handler(SQLAlchemyError)
 async def database_error(request: Request, exc: SQLAlchemyError):
+    logger.error("Database error on %s %s: %s", request.method, request.url.path, exc)
     return error_response(503, "DATABASE_UNAVAILABLE", "Could not save or load data. Please retry.")
-
-
-logger = logging.getLogger(__name__)
 
 
 @app.exception_handler(Exception)
@@ -104,7 +105,9 @@ def health(db: Session = Depends(get_db)):
 @app.get("/api/config")
 def public_config():
     return {
+        "app_env": APP_ENV,
         "demo_mode": demo_enabled(),
+        "local_e2e_mode": APP_ENV == "e2e",
         "phase": "12",
         "languages": ["en", "bn", "hi"],
         "normalization_provider": os.getenv("CLINICAL_NORMALIZATION_PROVIDER", "mock"),

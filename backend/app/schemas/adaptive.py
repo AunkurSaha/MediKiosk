@@ -5,6 +5,8 @@ from pydantic import ConfigDict, Field, StrictBool, StrictFloat, StrictInt, Stri
 
 from .alert import AlertSummary
 from .common import APIModel, Language, UTCDate
+from .continuity import ContinuityReconfirmationContext
+from .coverage import DocumentConfirmationContext
 from .flow import Localized, Question, SectionID
 from .normalization import Normalization
 
@@ -129,3 +131,5 @@ class InterviewState(APIModel):
     history: ClinicalHistory | None = None
     rag_suggestions: list[RAGSuggestion] = Field(default_factory=list)
     red_flag_alert: AlertSummary | None = None
+    document_confirmation: DocumentConfirmationContext | None = None
+    continuity_reconfirmation: ContinuityReconfirmationContext | None = None

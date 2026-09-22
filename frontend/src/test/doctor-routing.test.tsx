@@ -13,13 +13,36 @@ describe('doctor routing UI', () => {
 
   it('renders queue order, recommendation, and selects a doctor', async () => {
     vi.mocked(api.matchedDoctors).mockResolvedValue({
-      specialty_codes: ['CARDIOLOGY'], fallback_used: false,
+      specialty_codes: ['CARDIOLOGY'],
+      fallback_used: false,
       items: [
-        { doctor_id: 'a', name: 'Dr A', qualification: 'MD', specialties: ['CARDIOLOGY'], matched_specialty: 'CARDIOLOGY', waiting_count: 2, recommended: true, fallback: false },
-        { doctor_id: 'b', name: 'Dr B', qualification: 'MD', specialties: ['CARDIOLOGY'], matched_specialty: 'CARDIOLOGY', waiting_count: 5, recommended: false, fallback: false },
+        {
+          doctor_id: 'a',
+          name: 'Dr A',
+          qualification: 'MD',
+          specialties: ['CARDIOLOGY'],
+          matched_specialty: 'CARDIOLOGY',
+          waiting_count: 2,
+          recommended: true,
+          fallback: false,
+        },
+        {
+          doctor_id: 'b',
+          name: 'Dr B',
+          qualification: 'MD',
+          specialties: ['CARDIOLOGY'],
+          matched_specialty: 'CARDIOLOGY',
+          waiting_count: 5,
+          recommended: false,
+          fallback: false,
+        },
       ],
     });
-    vi.mocked(api.selectDoctor).mockResolvedValue({ session_id: 's', hospital_id: 'h', doctor_id: 'a' });
+    vi.mocked(api.selectDoctor).mockResolvedValue({
+      session_id: 's',
+      hospital_id: 'h',
+      doctor_id: 'a',
+    });
     const selected = vi.fn();
     render(<DoctorSelector sessionId="s" onSelected={selected} />);
     expect(await screen.findByText('2 patients waiting')).toBeInTheDocument();
@@ -30,7 +53,11 @@ describe('doctor routing UI', () => {
   });
 
   it('shows the safe empty state and API retry state', async () => {
-    vi.mocked(api.matchedDoctors).mockResolvedValue({ specialty_codes: ['CARDIOLOGY'], fallback_used: false, items: [] });
+    vi.mocked(api.matchedDoctors).mockResolvedValue({
+      specialty_codes: ['CARDIOLOGY'],
+      fallback_used: false,
+      items: [],
+    });
     const view = render(<DoctorSelector sessionId="s" onSelected={vi.fn()} />);
     expect(await screen.findByText(/No suitable doctor/)).toBeInTheDocument();
     view.unmount();

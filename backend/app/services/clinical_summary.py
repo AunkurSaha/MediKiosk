@@ -14,6 +14,7 @@ prescriptions, no invented dates, no fabricated clinical conclusions).
 import uuid
 from datetime import datetime, timezone
 
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app import models
@@ -24,6 +25,7 @@ from app.schemas.clinical_summary import (
 )
 from app.services import (
     adaptive,
+    clinical_coverage,
     intake,
     medical_facts,
     red_flags,
@@ -40,6 +42,59 @@ STATEMENT_NAMESPACE = uuid.UUID("3d4b6c89-2e1f-4a5b-9c7d-8e0f1a2b3c4d")
 
 def _statement_id(*parts: object) -> str:
     return str(uuid.uuid5(STATEMENT_NAMESPACE, "|".join(str(part) for part in parts)))
+
+
+def _document_evidence_metadata(db: Session, session_id: str, fact) -> dict:
+    """Resolve source detail without copying the full evidence/document record."""
+    row = db.scalar(
+        select(models.ClinicalEvidence).where(
+            models.ClinicalEvidence.session_id == session_id,
+            models.ClinicalEvidence.source_type == "DOCUMENT",
+            models.ClinicalEvidence.source_id == fact.id,
+        )
+    )
+    metadata = dict(row.metadata_json or {}) if row else {}
+    location = metadata.get("source_location") or fact.source.source_location
+    page_number = None
+    bounding_box = None
+    if isinstance(location, dict):
+        page_number = location.get("page") or location.get("page_number")
+        bounding_box = location.get("bounding_box") or location.get("bbox")
+    elif isinstance(location, str):
+        import re
+
+        match = re.search(r"page\s*(\d+)", location, re.IGNORECASE)
+        page_number = int(match.group(1)) if match else None
+
+    confirmation = next(
+        (
+            item
+            for item in db.scalars(
+                select(models.ClinicalEvidence).where(
+                    models.ClinicalEvidence.session_id == session_id,
+                    models.ClinicalEvidence.verification_status == "PATIENT_CONFIRMED",
+                )
+            )
+            if (item.metadata_json or {}).get("source_fact_id") == fact.id
+        ),
+        None,
+    )
+    evidence_refs = [row.id] if row else []
+    if confirmation:
+        evidence_refs.append(confirmation.id)
+    return {
+        "document_id": fact.source.document_id or metadata.get("document_id"),
+        "document_filename": fact.source.document_filename,
+        "extraction_id": fact.source.extraction_id or metadata.get("extraction_id"),
+        "page_number": page_number,
+        "bounding_box": bounding_box,
+        "ocr_provider": metadata.get("ocr_provider"),
+        "ocr_model": metadata.get("ocr_provider_version"),
+        "original_extracted_value": row.original_text if row else fact.source.raw_text,
+        "verification_status": fact.verification_status,
+        "patient_confirmed": confirmation is not None,
+        "evidence_refs": evidence_refs,
+    }
 
 
 class ClinicalSummaryService:
@@ -182,9 +237,7 @@ class ClinicalSummaryService:
                 for fact in hpi_sec.facts:
                     norm_label = ""
                     if fact.normalization and fact.normalization.facts:
-                        concepts = ", ".join(
-                            f.normalized_display for f in fact.normalization.facts
-                        )
+                        concepts = ", ".join(f.normalized_display for f in fact.normalization.facts)
                         norm_label = f" [Machine-normalized: {concepts} (Needs clinician review)]"
                     line = f"- {fact.label.en}: {fact.raw_value} (Reported via {fact.source}){norm_label}"
                     hpi_lines.append(line)
@@ -346,6 +399,7 @@ class ClinicalSummaryService:
                 )
                 med_lines.append(line)
 
+                doc_meta = _document_evidence_metadata(db, session_id, m)
                 ev = EvidenceReference(
                     statement_id=_statement_id("med_doc", m.id),
                     section="current_medications",
@@ -353,11 +407,10 @@ class ClinicalSummaryService:
                     source_type="medical_fact",
                     source_id=m.id,
                     source_text=m.source.raw_text or curr.name,
-                    source_metadata={
-                        "document_id": m.source.document_id,
-                        "document_filename": m.source.document_filename,
-                        "verification_status": m.verification_status,
-                    },
+                    source_metadata=doc_meta,
+                    status="patient_confirmed" if doc_meta.get("patient_confirmed") else "document_unverified",
+                    badge="Patient Confirmed" if doc_meta.get("patient_confirmed") else "Document",
+                    evidence_refs=doc_meta.get("evidence_refs", []),
                 )
                 med_evidence.append(ev)
 
@@ -405,9 +458,7 @@ class ClinicalSummaryService:
                     source_id=lab_item.id,
                     source_text=lab_item.source.raw_text or curr.test_name,
                     source_metadata={
-                        "document_id": lab_item.source.document_id,
-                        "document_filename": lab_item.source.document_filename,
-                        "verification_status": lab_item.verification_status,
+                        **_document_evidence_metadata(db, session_id, lab_item),
                         "flag": curr.flag,
                     },
                 )
@@ -435,9 +486,7 @@ class ClinicalSummaryService:
             for entry in timeline.known_date:
                 ts_str = entry.event_timestamp.strftime("%Y-%m-%d") if entry.event_timestamp else ""
                 doc_str = (
-                    f" [{entry.source.document_filename}]"
-                    if entry.source.document_filename
-                    else ""
+                    f" [{entry.source.document_filename}]" if entry.source.document_filename else ""
                 )
                 line = f"  - {ts_str}: {entry.canonical_label}{doc_str} (Status: {entry.verification_status})"
                 tl_lines.append(line)
@@ -445,12 +494,16 @@ class ClinicalSummaryService:
                     statement_id=_statement_id("timeline", entry.id),
                     section="clinical_timeline",
                     statement_text=line,
-                    source_type=entry.source.source_type,
+                    source_type="timeline",
                     source_id=entry.source.source_id,
                     source_text=entry.canonical_label,
                     source_metadata={
                         "date_status": entry.date_status,
                         "verification_status": entry.verification_status,
+                        "origin_source_type": entry.source.source_type,
+                        "document_id": entry.source.document_id,
+                        "document_filename": entry.source.document_filename,
+                        "source_location": entry.source.source_location,
                     },
                 )
                 tl_evidence.append(ev)
@@ -459,9 +512,7 @@ class ClinicalSummaryService:
             tl_lines.append("Undated / Historical Observations:")
             for entry in timeline.unknown_date:
                 doc_str = (
-                    f" [{entry.source.document_filename}]"
-                    if entry.source.document_filename
-                    else ""
+                    f" [{entry.source.document_filename}]" if entry.source.document_filename else ""
                 )
                 line = f"  - [Undated]: {entry.canonical_label}{doc_str} (Status: {entry.verification_status})"
                 tl_lines.append(line)
@@ -469,10 +520,17 @@ class ClinicalSummaryService:
                     statement_id=_statement_id("timeline_undated", entry.id),
                     section="clinical_timeline",
                     statement_text=line,
-                    source_type=entry.source.source_type,
+                    source_type="timeline",
                     source_id=entry.source.source_id,
                     source_text=entry.canonical_label,
-                    source_metadata={"date_status": "unknown"},
+                    source_metadata={
+                        "date_status": "unknown",
+                        "verification_status": entry.verification_status,
+                        "origin_source_type": entry.source.source_type,
+                        "document_id": entry.source.document_id,
+                        "document_filename": entry.source.document_filename,
+                        "source_location": entry.source.source_location,
+                    },
                 )
                 tl_evidence.append(ev)
 
@@ -513,6 +571,7 @@ class ClinicalSummaryService:
                         "rule_id": al.rule_id,
                         "category": al.category,
                         "status": al.status,
+                        "triggering_facts": al.triggering_facts_json or [],
                     },
                 )
                 alert_evidence.append(ev)
@@ -538,8 +597,8 @@ class ClinicalSummaryService:
             for d in discrepancies.items:
                 line = (
                     f"- ⚡ [REQUIRES CLINICIAN REVIEW] {d.type.replace('_', ' ').title()}: {d.reason}\n"
-                    f"    Source A ({d.source_a.label}): \"{d.source_a.displayed_value}\"\n"
-                    f"    Source B ({d.source_b.label}): \"{d.source_b.displayed_value}\""
+                    f'    Source A ({d.source_a.label}): "{d.source_a.displayed_value}"\n'
+                    f'    Source B ({d.source_b.label}): "{d.source_b.displayed_value}"'
                 )
                 disc_lines.append(line)
                 ev = EvidenceReference(
@@ -553,6 +612,11 @@ class ClinicalSummaryService:
                         "type": d.type,
                         "source_a_type": d.source_a.source_type,
                         "source_b_type": d.source_b.source_type,
+                        "source_a_id": d.source_a.source_id,
+                        "source_b_id": d.source_b.source_id,
+                        "source_a_value": d.source_a.displayed_value,
+                        "source_b_value": d.source_b.displayed_value,
+                        "evidence_refs": [d.source_a.source_id, d.source_b.source_id],
                     },
                 )
                 disc_evidence.append(ev)
@@ -576,11 +640,7 @@ class ClinicalSummaryService:
         # ---------------------------------------------------------------------
         unk_lines: list[str] = []
         unk_evidence: list[EvidenceReference] = []
-        unknown_answers = [
-            a
-            for a in answers
-            if a.status in ("unknown", "not_reported", "skipped")
-        ]
+        unknown_answers = [a for a in answers if a.status in ("unknown", "not_reported", "skipped")]
         for ua in unknown_answers:
             label = ua.field.replace("_", " ").title()
             line = f"- {label}: Patient reported {ua.status.replace('_', ' ')}"
@@ -622,6 +682,15 @@ class ClinicalSummaryService:
 
         draft_text = "\n".join(draft_parts).strip()
 
+        from app.services.summary_provenance import resolve_all
+
+        all_evidence = resolve_all(all_evidence)
+        evidence_by_statement = {item.statement_id: item for item in all_evidence}
+        for section in sections:
+            section.evidence = [
+                evidence_by_statement.get(item.statement_id, item) for item in section.evidence
+            ]
+
         structured = StructuredClinicalSummary(
             session_id=session_id,
             generated_at=datetime.now(timezone.utc),
@@ -630,6 +699,7 @@ class ClinicalSummaryService:
             sections=sections,
             evidence_references=all_evidence,
             disclaimer=disclaimer,
+            coverage=(clinical_coverage.coverage(db, session_id) if run else None),
         )
 
         return draft_text, structured

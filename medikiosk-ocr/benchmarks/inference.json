@@ -1,0 +1,10 @@
+{
+  "device": "cpu",
+  "cold_start_ms": 3903.3215000017663,
+  "warm_median_ms": 3413.4049999993294,
+  "warm_average_ms": 3561.8213599991577,
+  "runs": 5,
+  "truth": "Cap Cetirizine 250 mg PC",
+  "prediction": " ",
+  "model_version": "flor-tiny-synthetic-v0"
+}

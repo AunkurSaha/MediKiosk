@@ -13,9 +13,11 @@ from app.schemas.medical_fact import (
     MedicalFactsResponse,
     MedicationFactRecord,
     MedicationFactReview,
+    PatientEvidenceSearchRequest,
+    PatientEvidenceSearchResponse,
     TimelineResponse,
 )
-from app.services import discrepancies, medical_facts, timeline
+from app.services import discrepancies, medical_facts, patient_evidence_retrieval, timeline
 
 router = APIRouter()
 
@@ -45,6 +47,16 @@ def read_discrepancies(
     user: models.User = Depends(require_assigned_doctor_session),
 ):
     return discrepancies.get_discrepancies(db, str(session_id))
+
+
+@router.post("/{session_id}/evidence-search", response_model=PatientEvidenceSearchResponse)
+def search_patient_document_evidence(
+    session_id: UUID,
+    payload: PatientEvidenceSearchRequest,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_assigned_doctor_session),
+):
+    return patient_evidence_retrieval.search(db, str(session_id), payload.query, payload.top_k)
 
 
 @router.patch(

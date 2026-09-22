@@ -83,7 +83,7 @@ describe('Staff & Specialist Password Login System', () => {
       </MemoryRouter>,
     );
 
-    const docFillBtn = await screen.findByRole('button', { name: /Demo doctor Dr\. Ananya Sen/i });
+    const docFillBtn = await screen.findByRole('button', { name: /Clinician Dr\. Ananya Sen/i });
     fireEvent.click(docFillBtn);
 
     const idInput = screen.getByLabelText(/Phone Number or Staff ID/i) as HTMLInputElement;
@@ -109,7 +109,7 @@ describe('Staff & Specialist Password Login System', () => {
     const lakeHospital = screen.getByRole('button', {
       name: /MediKiosk Lake Medical Centre.*South Kolkata/i,
     });
-    expect(cityGroup.querySelectorAll('button[aria-label^="Demo doctor"]')).toHaveLength(5);
+    expect(cityGroup.querySelectorAll('button[aria-label^="Clinician"]')).toHaveLength(5);
     expect(
       screen.getByRole('button', { name: /Dr\. Rahul Das, 5 waiting patients/i }),
     ).toBeInTheDocument();
@@ -117,7 +117,7 @@ describe('Staff & Specialist Password Login System', () => {
     fireEvent.click(lakeHospital);
 
     expect(lakeHospital).toHaveAttribute('aria-pressed', 'true');
-    expect(cityGroup.querySelectorAll('button[aria-label^="Demo doctor"]')).toHaveLength(5);
+    expect(cityGroup.querySelectorAll('button[aria-label^="Clinician"]')).toHaveLength(5);
     const lakeDoctor = await screen.findByRole('button', {
       name: /Dr\. Priyanka Pal, 5 waiting patients/i,
     });

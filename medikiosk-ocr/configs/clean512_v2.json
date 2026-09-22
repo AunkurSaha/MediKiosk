@@ -1,0 +1,15 @@
+{
+  "version": "clean512_v2",
+  "generation_seed": 41,
+  "canvas_width": 512,
+  "canvas_height": 64,
+  "margin_left": 4,
+  "margin_right": 8,
+  "margin_top": 8,
+  "margin_bottom": 8,
+  "minimum_font_size": 14,
+  "maximum_font_size": 24,
+  "background": 255,
+  "ink": 0,
+  "anchor": "la"
+}

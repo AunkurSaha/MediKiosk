@@ -390,8 +390,33 @@ Status: accepted for the synthetic prototype.
 
 Hospital choice is stored on each session because a patient may attend different hospitals on different visits. Complaint-to-specialty routing is deterministic configuration under `ai/routing/complaint_specialties.json`; no language model selects a specialty. Doctors use normalized profile, hospital-membership, and specialty-membership records. Queue load is derived from `WAITING` entries and is never a manually maintained counter. A patient selects an eligible doctor before answering the interview, and a queue entry is created only when intake is submitted. Doctor APIs authorize against the selected doctor and active visit-hospital membership, not specialty alone. Historical unowned fixtures retain direct demo-doctor compatibility only while explicit demo mode is enabled.
 
+### ADR-031 — Daily doctor queue reservation and explainable ETA
+
+2026-09-20: Reuse `doctor_queue_entries` as the sole queue model. Create its unique per-session reservation in the intake-completion transaction, excluding emergency routing. Scope ordering and token sequences by facility, selected doctor, and UTC service date. Allocate under a facility-row transaction lock and enforce a unique daily sequence constraint. Persist only assignment/token/state; derive position and ETA at read time. Use the versioned deterministic ETA policy under `ai/queue/`, expose no exact appointment time, and freeze doctor/facility assignment after submission. Queue metadata is operational and is excluded from clinical evidence, summaries, FHIR, and ABDM.
+
+### ADR-032 — Document-aware deterministic clinical coverage
+
+2026-09-20: Derive interview coverage at read time from the pinned flow, current patient answers, existing Clinical Evidence Graph, and discrepancy service. Limit the first deterministic document mapping to medication mentions. Document evidence remains unverified and cannot satisfy required patient-history fields by itself. An explicit document-confirmation turn creates separate linked patient-answer evidence; it never mutates OCR evidence. Confirmed canonical fields suppress redundant generic questions. Laboratory evidence remains visible to clinicians and does not ask patients for clinical interpretation. RAG may word approved questions but cannot select the field, alter answer type, establish truth, or affect deterministic safety routing.
+
 ## ADR-029: Supabase-only runtime database
 
 Status: accepted on 2026-09-14.
 
 MediKiosk development and production runtime use the configured Supabase PostgreSQL project through a TLS-required backend connection. Runtime startup rejects missing database configuration, SQLite URLs, local PostgreSQL hosts, and non-Supabase PostgreSQL endpoints. Local PostgreSQL provisioning/control scripts and the SQLite application launcher are removed. SQLite remains only as an isolated automated-test database so tests cannot read or mutate Supabase clinical/demo records. Routine application startup may skip the optional bulk synthetic seed after fixtures have been provisioned.
+
+## ADR-030: Explicit local SQLite E2E exception
+
+Status: accepted for synthetic Phase 4 verification.
+
+`APP_ENV=e2e` is an explicit, localhost-only exception to ADR-029. The database layer accepts SQLite in this mode only when its resolved path is exactly the repository's ignored `.runtime/e2e.sqlite`; it rejects a Supabase or arbitrary database URL. `scripts/start-e2e.ps1` sets this URL and offline providers before running Alembic or seeding, and does not invoke the normal Supabase launcher. The seed contains synthetic facilities and doctor profiles only and is idempotent. This mode is not suitable for real patient data or deployment. Normal development and production remain Supabase-only.
+# ADR-033: Evidence-linked summaries use persisted snapshots
+
+Phase 7 extends the existing `ClinicalSummary` structured JSON instead of introducing another summary model. Provenance explanations are deterministic mappings over source types and verification states. Reads deserialize the stored snapshot, while explicit regeneration creates a new draft/revision. This preserves clinician edits and confirmed-summary immutability. The pre-arrival packet is embedded as a doctor-authorized, read-only response contract. QR image generation is deferred; only an opaque packet reference is defined.
+
+# ADR-034: Persisted pre-arrival packet and opaque handoff credential
+
+Phase 8 retains the Phase 7 `PreArrivalPacket` as the immutable structured clinical snapshot and adds a separate persisted lifecycle record. Patient-owned creation is idempotent per session and packet version. A QR contains only a short-lived random credential URL; the database stores its SHA-256 hash, rotation invalidates the prior credential, and revocation is immediate. Anonymous resolution discloses only that authentication is required. The clinical snapshot is released only to the visit's assigned doctor with active facility membership; triage and other doctors are denied. Packet expiry defaults to 24 hours and handoff credential expiry to 60 minutes, both configurable. Queue state is read live and remains operational rather than clinical evidence. The legacy `mkp:` reference is compatibility metadata only and is never an access credential.
+
+# ADR-035: Read-only continuity analysis preserves encounter authority
+
+Phase 9A derives continuity from same-patient, prior completed encounters and the existing append-only Clinical Evidence Graph. Historical evidence is returned by reference with its source session and provenance; it is never cloned into a new encounter or silently promoted to current clinical truth. Deterministic comparison may label a fact new, unchanged, changed, resolved, conflicted, or historical-only, but it performs no clinical inference. Explicit current evidence remains necessary for any current-state conclusion. The Phase 9A API is read-only and reuses patient ownership plus assigned-doctor/facility authorization. Reconfirmation questions and UI are intentionally deferred to Phase 9B.

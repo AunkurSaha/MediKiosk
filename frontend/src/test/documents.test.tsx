@@ -35,12 +35,13 @@ vi.mock('../api/client', async (original) => {
   };
 });
 
-it('labels historical mock uploads and never presents invented confidence as extraction evidence', async () => {
+it('presents extracted clinical content without exposing fixture internals or invented confidence', async () => {
   render(<DocumentUploader sessionId="synthetic" language="en" documentConsent />);
   await screen.findByText('Hemoglobin');
-  expect(screen.getByText(/Synthetic mock output/)).toBeInTheDocument();
+  expect(screen.getByText('Information extracted')).toBeInTheDocument();
+  expect(screen.queryByText(/Synthetic mock output|mock_fixture/)).not.toBeInTheDocument();
   expect(screen.queryByText(/95%/)).not.toBeInTheDocument();
-  expect(screen.getByText('Not reported')).toBeInTheDocument();
+  expect(screen.getByText('10.5')).toBeInTheDocument();
 });
 
 it('shows fixture extraction immediately after selecting the upload', async () => {
@@ -100,8 +101,8 @@ it('shows fixture extraction immediately after selecting the upload', async () =
     expect(api.uploadDocument).toHaveBeenCalledWith('synthetic', file, 'prescription'),
   );
   expect(await screen.findByText('Tab Paracetamol')).toBeInTheDocument();
-  expect(screen.getByText('mock_fixture')).toBeInTheDocument();
-  expect(screen.getByText(/Synthetic mock output/)).toBeInTheDocument();
+  expect(screen.getByText('Information extracted')).toBeInTheDocument();
+  expect(screen.queryByText(/Synthetic mock output|mock_fixture/)).not.toBeInTheDocument();
 });
 
 it('explains why a stored arbitrary upload has no extraction or facts', async () => {
@@ -127,7 +128,10 @@ it('explains why a stored arbitrary upload has no extraction or facts', async ()
   });
 
   render(<DocumentUploader sessionId="synthetic" language="en" documentConsent />);
-  expect(await screen.findByText(/real OCR is not enabled/)).toBeInTheDocument();
+  expect(await screen.findByText(/could not extract information/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Replace file' })).toBeVisible();
+  fireEvent.click(screen.getByRole('button', { name: 'Continue without this document' }));
+  expect(screen.queryByText('other.png')).not.toBeInTheDocument();
 });
 
 it('attaches the granted camera stream after rendering and captures a ready frame', async () => {

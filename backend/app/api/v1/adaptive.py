@@ -8,9 +8,38 @@ from app import models
 from app.api.deps import get_optional_auth_user
 from app.database import get_db
 from app.schemas.adaptive import InterviewState, Navigation, Selection, Submission
-from app.services import adaptive
+from app.schemas.coverage import CoverageResponse, DocumentAwareDemoMetrics
+from app.services import adaptive, clinical_coverage, intake
 
 router = APIRouter()
+
+
+@router.get("/{session_id}/coverage", response_model=CoverageResponse)
+def get_coverage(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User | None = Depends(get_optional_auth_user),
+):
+    session = intake.get_session(db, str(session_id))
+    intake.verify_session_access(db, session, user)
+    intake.require_consent(db, str(session_id))
+    return clinical_coverage.coverage(db, str(session_id))
+
+
+@router.get("/{session_id}/coverage/demo-metrics", response_model=DocumentAwareDemoMetrics)
+def get_document_aware_demo_metrics(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User | None = Depends(get_optional_auth_user),
+):
+    from app.core.config import demo_enabled
+    from app.core.errors import WorkflowError
+
+    if not demo_enabled():
+        raise WorkflowError("FORBIDDEN", "Demo evaluation metrics are disabled.", 403)
+    session = intake.get_session(db, str(session_id))
+    intake.verify_session_access(db, session, user)
+    return clinical_coverage.demo_metrics(db, str(session_id))
 
 
 @router.get("/{session_id}/interview", response_model=InterviewState)

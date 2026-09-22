@@ -8,7 +8,7 @@ from app import models
 from app.core.errors import WorkflowError
 from app.schemas.adaptive import Fact, FlowChoice, InterviewState
 from app.schemas.alert import AlertSummary
-from app.schemas.flow import Flow, Localized
+from app.schemas.flow import Flow, Localized, Option, Question
 from app.services import intake, normalization, red_flags
 from app.services.flow_registry import registry
 from app.services.interview_engine import InterviewEngine, validate_answer
@@ -16,12 +16,41 @@ from app.services.interview_engine import InterviewEngine, validate_answer
 logger = logging.getLogger(__name__)
 
 
+def _enforce_non_emergency_patient_path(db, session_id, user=None):
+    result = db.scalar(
+        select(models.ClinicalRoutingResult).where(
+            models.ClinicalRoutingResult.session_id == session_id
+        )
+    )
+    if (
+        result is not None
+        and result.routing_state == "EMERGENCY"
+        and not (user and user.role in ("doctor", "triage"))
+    ):
+        raise WorkflowError(
+            "EMERGENCY_BYPASS_REQUIRED",
+            "Potential emergency symptoms detected. Immediate in-person clinical assessment is recommended.",
+            409,
+        )
+    session = db.get(models.Session, session_id)
+    if (
+        result is not None
+        and result.routing_state != "EMERGENCY"
+        and session is not None
+        and not session.hospital_id
+        and not (user and user.role in ("doctor", "triage"))
+    ):
+        raise WorkflowError(
+            "FACILITY_REQUIRED",
+            "Select an eligible care facility before starting the full interview.",
+            409,
+        )
+
+
 def rows(db, session_id):
-    return db.scalars(
-        select(models.InterviewAnswer)
-        .where(models.InterviewAnswer.session_id == session_id)
-        .order_by(models.InterviewAnswer.created_at, models.InterviewAnswer.id)
-    ).all()
+    from app.services import continuity
+
+    return continuity.authoritative_interview_answers(db, session_id)
 
 
 def flow_for(db, session_id):
@@ -35,12 +64,19 @@ def flow_for(db, session_id):
 
 def engine_for(db, session_id, flow):
     questions = {q.question_id: q for _, q in flow.questions()}
+    questions_by_field = {q.field: q for _, q in flow.questions()}
     facts = {}
     normalized = normalization.for_answers(db, session_id)
     for row in rows(db, session_id):
-        if row.question_id.startswith("rag_followup"):
+        if row.question_id.startswith(("rag_followup", "document_confirmation.", "continuity.")):
             continue
-        question = questions.get(row.question_id)
+        question = (
+            questions_by_field.get(row.field)
+            if row.question_id.startswith("rapid.")
+            else questions.get(row.question_id)
+        )
+        if row.question_id.startswith("rapid.") and question is None:
+            continue
         if question is None:
             raise WorkflowError(
                 "FLOW_DATA_MISMATCH", "Saved answer is absent from the pinned flow."
@@ -54,10 +90,10 @@ def engine_for(db, session_id, flow):
                 "value": stored,
             }
         )
-        facts[row.question_id] = Fact(
+        facts[question.question_id] = Fact(
             answer_id=row.id,
-            question_id=row.question_id,
-            field=row.field,
+            question_id=question.question_id,
+            field=question.field,
             label=question.text,
             status=envelope["status"],
             value=envelope["value"],
@@ -74,6 +110,7 @@ def state(db, session_id, user=None):
     session = intake.get_session(db, session_id)
     intake.verify_session_access(db, session, user)
     intake.require_consent(db, session_id)
+    _enforce_non_emergency_patient_path(db, session_id, user)
     flow, run = flow_for(db, session_id)
     if flow is None:
         return InterviewState(
@@ -87,9 +124,49 @@ def state(db, session_id, user=None):
             ],
         )
     engine = engine_for(db, session_id, flow)
-    res = engine.state(
-        run.cursor if run else None, run.revision if run else 0
-    )
+    res = engine.state(run.cursor if run else None, run.revision if run else 0)
+    if run is not None and run.cursor and run.cursor.startswith("continuity."):
+        from app.services import continuity
+
+        resolved = continuity.reconfirmation_context_for_question(db, session_id, run.cursor)
+        if resolved is not None:
+            evidence, context = resolved
+            question = continuity.build_reconfirmation_question(evidence, context)
+            latest = next(
+                (
+                    row
+                    for row in reversed(rows(db, session_id))
+                    if row.question_id == question.question_id
+                ),
+                None,
+            )
+            current_answer = None
+            if latest is not None:
+                stored = json.loads(latest.value_json) if latest.value_json else {}
+                envelope = (
+                    stored
+                    if isinstance(stored, dict) and "status" in stored
+                    else {"status": "answered", "value": stored}
+                )
+                current_answer = Fact(
+                    answer_id=latest.id,
+                    question_id=latest.question_id,
+                    field=latest.field,
+                    label=question.text,
+                    status=envelope["status"],
+                    value=envelope["value"],
+                    raw_value=latest.raw_value,
+                    source=latest.source,
+                    language=latest.language,
+                    recorded_at=latest.created_at,
+                )
+            return res.model_copy(
+                update={
+                    "question": question,
+                    "continuity_reconfirmation": context,
+                    "current_answer": current_answer,
+                }
+            )
     from app.services.rag_interview_planner import coverage_domains
 
     covered, missing_required_domains, missing_optional_domains = coverage_domains(engine)
@@ -129,7 +206,9 @@ def state(db, session_id, user=None):
                 answer_id=row.id,
                 question_id=row.question_id,
                 field=row.field,
-                label=Localized(en="Clinical follow-up", bn="ক্লিনিক্যাল ফলো-আপ", hi="चिकित्सीय अनुवर्ती"),
+                label=Localized(
+                    en="Clinical follow-up", bn="ক্লিনিক্যাল ফলো-আপ", hi="चिकित्सीय अनुवर्ती"
+                ),
                 status=envelope.get("status", "answered"),
                 value=envelope.get("value", row.raw_value),
                 raw_value=row.raw_value or "",
@@ -147,6 +226,108 @@ def state(db, session_id, user=None):
             if target_sec is None:
                 target_sec = res.history.sections[0]
             target_sec.facts.extend(rag_facts)
+
+    # Historical facts are never made current automatically.  At the matching
+    # configured history target, offer one explicit, stable reconfirmation turn.
+    if (
+        not res.is_complete
+        and res.question is not None
+        and res.question.field in ("medications.details", "allergies.details")
+        and res.current_answer is None
+    ):
+        from app.services import continuity
+
+        pending_continuity = continuity.pending_reconfirmation(db, session_id, res.question.field)
+        if pending_continuity is not None:
+            evidence, context = pending_continuity
+            display = str(context.historical_value)
+            is_allergy = context.target_field.startswith("allergies")
+            question = Question(
+                question_id=continuity.continuity_question_id(evidence.id),
+                field=context.target_field,
+                type="single_choice",
+                required=True,
+                allow_unknown=True,
+                origin="continuity",
+                text=Localized(
+                    en=(
+                        f"At your previous visit, you reported an allergy to {display}. Is that still correct?"
+                        if is_allergy
+                        else f"At your previous visit, you reported taking {display}. Are you still taking it?"
+                    ),
+                    bn=(
+                        f"আপনার আগের ভিজিটে {display} অ্যালার্জির কথা জানিয়েছিলেন। এটি কি এখনও সঠিক?"
+                        if is_allergy
+                        else f"আপনার আগের ভিজিটে {display} নেওয়ার কথা জানিয়েছিলেন। আপনি কি এখনও এটি নিচ্ছেন?"
+                    ),
+                    hi=(
+                        f"आपने पिछले दौरे में {display} से एलर्जी बताई थी। क्या यह अभी भी सही है?"
+                        if is_allergy
+                        else f"आपने पिछले दौरे में {display} लेने की बात बताई थी। क्या आप अभी भी इसे ले रहे हैं?"
+                    ),
+                ),
+                options=[
+                    Option(value="yes", label=Localized(en="Yes", bn="হ্যাঁ", hi="हाँ")),
+                    Option(value="no", label=Localized(en="No", bn="না", hi="नहीं")),
+                    *(
+                        []
+                        if is_allergy
+                        else [
+                            Option(
+                                value="changed",
+                                label=Localized(en="Changed", bn="পরিবর্তিত", hi="बदल गया"),
+                            )
+                        ]
+                    ),
+                    Option(
+                        value="not_sure",
+                        label=Localized(en="Not sure", bn="নিশ্চিত নই", hi="पक्का नहीं"),
+                    ),
+                ],
+            )
+            return res.model_copy(
+                update={"question": question, "continuity_reconfirmation": context}
+            )
+
+    # Document facts remain unverified evidence until this explicit patient turn.
+    if (
+        not res.is_complete
+        and res.question is not None
+        and res.question.question_id not in ("chief_complaint.description", "chief_complaint")
+        and any(
+            question_id in engine.active
+            for question_id in ("chief_complaint.description", "chief_complaint")
+        )
+        and res.current_answer is None
+    ):
+        from app.services import clinical_coverage
+
+        pending_confirmation = clinical_coverage.pending_medication_confirmation(db, session_id)
+        if pending_confirmation is not None:
+            evidence, context = pending_confirmation
+            display = context.original_extracted_value
+            question = Question(
+                question_id=clinical_coverage.confirmation_question_id(evidence.id),
+                field="medications.details",
+                type="single_choice",
+                required=True,
+                allow_unknown=True,
+                origin="document_confirmation",
+                text=Localized(
+                    en=f"Your uploaded document mentions {display}. Are you currently taking this medicine?",
+                    bn=f"আপনার আপলোড করা নথিতে {display} উল্লেখ আছে। আপনি কি বর্তমানে এই ওষুধটি গ্রহণ করছেন?",
+                    hi=f"आपके अपलोड किए गए दस्तावेज़ में {display} लिखा है। क्या आप अभी यह दवा ले रहे हैं?",
+                ),
+                options=[
+                    Option(value="yes", label=Localized(en="Yes", bn="হ্যাঁ", hi="हाँ")),
+                    Option(value="no", label=Localized(en="No", bn="না", hi="नहीं")),
+                    Option(
+                        value="not_sure",
+                        label=Localized(en="Not sure", bn="নিশ্চিত নই", hi="पक्का नहीं"),
+                    ),
+                ],
+            )
+            return res.model_copy(update={"question": question, "document_confirmation": context})
 
     # RAG plans the next approved coverage field after chief-complaint acquisition.
     # The deterministic question already in ``res`` is the fail-safe fallback.
@@ -220,6 +401,7 @@ def editable(db, session_id, user=None):
     session = intake.get_session(db, session_id)
     intake.verify_session_access(db, session, user)
     intake.require_consent(db, session_id)
+    _enforce_non_emergency_patient_path(db, session_id, user)
     if session.status != "intake":
         raise WorkflowError("SESSION_LOCKED", "Completed answers cannot be changed.")
     return session
@@ -228,7 +410,9 @@ def editable(db, session_id, user=None):
 def select_flow(db, session_id, payload, user=None):
     session = editable(db, session_id, user=user)
     if user is not None and user.role == "patient" and not session.hospital_id:
-        raise WorkflowError("HOSPITAL_REQUIRED", "Choose a hospital before selecting a health concern.", 409)
+        raise WorkflowError(
+            "HOSPITAL_REQUIRED", "Choose a hospital before selecting a health concern.", 409
+        )
     flow, run = flow_for(db, session_id)
     if flow is not None:
         if flow.flow_id != payload.flow_id:
@@ -286,8 +470,6 @@ def check_revision(run, expected):
 
 def submit(db, session_id, payload, user=None):
     session = editable(db, session_id, user=user)
-    if user is not None and user.role == "patient" and not session.selected_doctor_id:
-        raise WorkflowError("DOCTOR_REQUIRED", "Choose a doctor before continuing the interview.", 409)
     flow, run = require_run(db, session_id)
     hashed_payload = payload.model_dump(mode="json")
     if hashed_payload["voice_candidate"] is None:
@@ -313,9 +495,14 @@ def submit(db, session_id, payload, user=None):
     candidate = None
     if payload.source == "voice":
         from app.services.voice_candidates import verify
+
         candidate = verify(db, session_id, payload, current)
     elif payload.voice_candidate is not None:
-        raise WorkflowError("INVALID_VOICE_CANDIDATE", "Edited answers must be submitted as typed text without a voice token.", 422)
+        raise WorkflowError(
+            "INVALID_VOICE_CANDIDATE",
+            "Edited answers must be submitted as typed text without a voice token.",
+            422,
+        )
     validate_answer(current, payload)
     value = payload.model_dump(mode="json")["value"]
     previous = engine.answers.get(payload.question_id)
@@ -346,23 +533,97 @@ def submit(db, session_id, payload, user=None):
             metadata={
                 "field": current.field,
                 "flow_version": flow.version,
-                "origin": "rag"
-                if current.origin == "rag" or current.question_id.startswith("rag_followup")
-                else "flow",
+                "origin": (
+                    "continuity"
+                    if current.origin == "continuity"
+                    else "document_confirmation"
+                    if current.origin == "document_confirmation"
+                    else "rag"
+                    if current.origin == "rag" or current.question_id.startswith("rag_followup")
+                    else "flow"
+                ),
             },
         )
         db.flush()
+        from app.services import clinical_evidence
+
+        evidence_value = (
+            active_state.continuity_reconfirmation.historical_value
+            if current.origin == "continuity"
+            and value == "yes"
+            and active_state.continuity_reconfirmation is not None
+            else value
+        )
+        clinical_evidence.create_patient_answer_evidence(
+            db,
+            saved_answer,
+            value=evidence_value,
+            answer_status=payload.status,
+            relationship_metadata=(
+                {
+                    "historical_evidence_id": active_state.continuity_reconfirmation.evidence_id,
+                    "historical_source_session_id": active_state.continuity_reconfirmation.source_session_id,
+                    "historical_value": active_state.continuity_reconfirmation.historical_value,
+                    "canonical_field": active_state.continuity_reconfirmation.canonical_field,
+                    "question_source": "CONTINUITY_RECONFIRMATION",
+                    "continuity_decision": value,
+                }
+                if active_state.continuity_reconfirmation is not None
+                else {
+                    "document_evidence_id": active_state.document_confirmation.evidence_id,
+                    "source_document_id": active_state.document_confirmation.source_document_id,
+                    "source_fact_id": active_state.document_confirmation.source_fact_id,
+                    "question_source": "DOCUMENT_CONFIRMATION",
+                    "confirmation_decision": value,
+                }
+                if active_state.document_confirmation is not None
+                else None
+            ),
+            voice_metadata=(
+                {
+                    "asr_candidate_id": candidate["id"],
+                    "asr_provider": candidate["provider"],
+                    "asr_model": candidate["model"],
+                }
+                if candidate is not None
+                else None
+            ),
+        )
     if candidate is not None:
-        intake.audit(db, "voice_candidate_confirmed", session_id, user=user, metadata={
-            "candidate_id": candidate["id"], "provider": candidate["provider"], "model": candidate["model"],
-            "question_id": current.question_id, "language": payload.language,
-            "source_answer_id": saved_answer.id if saved_answer is not None else previous.answer_id,
-        })
+        intake.audit(
+            db,
+            "voice_candidate_confirmed",
+            session_id,
+            user=user,
+            metadata={
+                "candidate_id": candidate["id"],
+                "provider": candidate["provider"],
+                "model": candidate["model"],
+                "question_id": current.question_id,
+                "language": payload.language,
+                "source_answer_id": saved_answer.id
+                if saved_answer is not None
+                else previous.answer_id,
+            },
+        )
+    if current.origin == "document_confirmation" and value == "yes":
+        _persist_confirmed_document_medication(
+            db,
+            session,
+            flow,
+            active_state.document_confirmation,
+            saved_answer,
+        )
+    if current.origin == "continuity":
+        _persist_continuity_resolution(
+            db, session, flow, active_state.continuity_reconfirmation, saved_answer, value
+        )
     if not payload.question_id.startswith("rag_followup"):
         updated_engine = engine_for(db, session_id, flow)
         run.cursor = (
             updated_engine.pending[0]
-            if current.origin == "rag" and updated_engine.pending
+            if current.origin in ("rag", "document_confirmation", "continuity")
+            and updated_engine.pending
             else updated_engine.after(payload.question_id)
         )
     run.revision += 1
@@ -384,8 +645,12 @@ def submit(db, session_id, payload, user=None):
             question_id=r.question_id,
             field=r.field,
             label=Localized(en="Clinical follow-up", bn="ক্লিনিক্যাল ফলো-আপ", hi="चिकित्सीय अनुवर्ती"),
-            status=json.loads(r.value_json).get("status", "answered") if r.value_json else "answered",
-            value=json.loads(r.value_json).get("value", r.raw_value) if r.value_json else r.raw_value,
+            status=json.loads(r.value_json).get("status", "answered")
+            if r.value_json
+            else "answered",
+            value=json.loads(r.value_json).get("value", r.raw_value)
+            if r.value_json
+            else r.raw_value,
             raw_value=r.raw_value or "",
             source=r.source,
             language=r.language,
@@ -405,13 +670,133 @@ def submit(db, session_id, payload, user=None):
     return state(db, session_id, user=user)
 
 
+def _persist_continuity_resolution(db, session, flow, context, confirmation_answer, decision):
+    """Project an explicit continuity decision into current flow fields only.
+
+    The source evidence remains historical.  These new patient-answer rows are
+    intentionally ordinary current-session answers so coverage and summaries do
+    not treat prior data as current merely because it exists.
+    """
+    if context is None or confirmation_answer is None or decision not in ("yes", "no"):
+        return
+    from app.services import clinical_evidence
+
+    questions = {question.field: question for _, question in flow.questions()}
+    is_allergy = context.target_field.startswith("allergies")
+    projections = (
+        (
+            (
+                "allergies.details",
+                context.historical_value if decision == "yes" else "no",
+                str(context.historical_value),
+            ),
+        )
+        if is_allergy
+        else (
+            (
+                "medications.details",
+                context.historical_value if decision == "yes" else "no",
+                str(context.historical_value),
+            ),
+        )
+    )
+    for field, value, raw_value in projections:
+        question = questions.get(field)
+        if question is None:
+            continue
+        answer = models.InterviewAnswer(
+            session_id=session.id,
+            question_id=question.question_id,
+            field=field,
+            value_json=json.dumps({"status": "answered", "value": value}, ensure_ascii=False),
+            raw_value=raw_value,
+            source="touch",
+            language=session.language,
+            verification_status="patient_reported",
+            created_at=intake.now(),
+        )
+        db.add(answer)
+        db.flush()
+        clinical_evidence.create_patient_answer_evidence(
+            db,
+            answer,
+            value=value,
+            relationship_metadata={
+                "historical_evidence_id": context.evidence_id,
+                "historical_source_session_id": context.source_session_id,
+                "historical_value": context.historical_value,
+                "canonical_field": context.canonical_field,
+                "question_source": "CONTINUITY_RECONFIRMATION",
+                "continuity_decision": decision,
+                "confirmation_answer_id": confirmation_answer.id,
+            },
+        )
+
+
+def _persist_confirmed_document_medication(db, session, flow, context, confirmation_answer):
+    """Project an explicit yes into canonical flow answers without altering OCR evidence."""
+    if context is None or confirmation_answer is None:
+        return
+    from app.services import clinical_evidence
+
+    questions = {question.field: question for _, question in flow.questions()}
+    evidence = db.get(models.ClinicalEvidence, context.evidence_id)
+    display = context.original_extracted_value
+    for field, value, raw_value in (
+        ("medications.any", True, "Yes"),
+        ("medications.details", display, display),
+        ("medications", display, display),
+    ):
+        question = questions.get(field)
+        if question is None:
+            continue
+        existing = next(
+            (row for row in rows(db, session.id) if row.question_id == question.question_id), None
+        )
+        if existing is not None:
+            continue
+        answer = models.InterviewAnswer(
+            session_id=session.id,
+            question_id=question.question_id,
+            field=field,
+            value_json=json.dumps({"status": "answered", "value": value}, ensure_ascii=False),
+            raw_value=raw_value,
+            source="touch",
+            language=session.language,
+            verification_status="patient_reported",
+            created_at=intake.now(),
+        )
+        db.add(answer)
+        db.flush()
+        clinical_evidence.create_patient_answer_evidence(
+            db,
+            answer,
+            value=value,
+            relationship_metadata={
+                "document_evidence_id": evidence.id,
+                "source_document_id": context.source_document_id,
+                "source_fact_id": context.source_fact_id,
+                "question_source": "DOCUMENT_CONFIRMATION",
+                "confirmation_decision": "yes",
+                "confirmation_answer_id": confirmation_answer.id,
+            },
+        )
+
+
 def navigate(db, session_id, payload, user=None):
     editable(db, session_id, user=user)
     flow, run = require_run(db, session_id)
     check_revision(run, payload.expected_revision)
     engine = engine_for(db, session_id, flow)
     allowed = set(engine.active) | set(engine.pending[:1])
-    if payload.question_id not in allowed:
+    synthetic = None
+    if payload.question_id.startswith("continuity."):
+        from app.services import continuity
+
+        synthetic = continuity.reconfirmation_context_for_question(
+            db, session_id, payload.question_id
+        )
+    if payload.question_id not in allowed and synthetic is None:
         raise WorkflowError(
             "QUESTION_NOT_ACTIVE",
             "Only active saved answers or the next pending question may be opened.",

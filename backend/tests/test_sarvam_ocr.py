@@ -199,6 +199,24 @@ Rx:
     assert cetirizine["frequency"] == "HS"
 
 
+def test_parse_prescription_retains_frequency_from_following_instruction_line():
+    from app.services.document_parser import parse_prescription
+
+    parsed = parse_prescription(
+        "PRESCRIPTION\nMetformin 500 mg\nTake one tablet twice daily\n"
+    )
+
+    assert parsed["medications"] == [
+        {
+            "name": "Metformin",
+            "dosage": "500 mg",
+            "frequency": "Twice Daily",
+            "duration": None,
+            "instructions": "Take one tablet twice daily",
+        }
+    ]
+
+
 def test_parse_lab_report_sarvam_html_table():
     from app.services.document_parser import parse_lab_report
 

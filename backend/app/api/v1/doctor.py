@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import case, select
 from sqlalchemy.orm import Session
 
 from app import models, schemas
@@ -54,6 +54,7 @@ def read_doctor_sessions(
             models.Patient.name,
             models.DoctorQueueEntry.status,
             models.DoctorQueueEntry.joined_at,
+            models.DoctorQueueEntry.visit_token,
         )
         .join(models.Patient, models.Patient.id == models.Session.patient_id)
         .join(models.Consent, models.Consent.session_id == models.Session.id)
@@ -69,9 +70,14 @@ def read_doctor_sessions(
 
     rows = db.execute(
         query.order_by(
-            models.DoctorQueueEntry.status != "WAITING",
+            case(
+                (models.DoctorQueueEntry.status == "IN_CONSULTATION", 0),
+                (models.DoctorQueueEntry.status == "CALLED", 1),
+                (models.DoctorQueueEntry.status == "WAITING", 2),
+                else_=3,
+            ),
             models.DoctorQueueEntry.joined_at.asc(),
-            models.Session.id,
+            models.DoctorQueueEntry.sequence_number,
         )
     ).all()
     return schemas.SessionList(
@@ -81,8 +87,9 @@ def read_doctor_sessions(
                 patient_name=name,
                 queue_status=queue_status,
                 queue_joined_at=joined_at,
+                visit_token=visit_token,
             )
-            for s, name, queue_status, joined_at in rows
+            for s, name, queue_status, joined_at, visit_token in rows
         ]
     )
 

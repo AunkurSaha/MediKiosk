@@ -1,0 +1,13 @@
+{
+  "samples": 24,
+  "device": "cpu",
+  "epochs": 12,
+  "initial_loss": 443.4657287597656,
+  "final_loss": 128.6627960205078,
+  "truth": "Cap Cetirizine 250 mg PC",
+  "prediction": " ",
+  "cer": 0.9583333333333334,
+  "elapsed_seconds": 527.2221983999989,
+  "checkpoint": "models\\tiny_flor.weights.h5",
+  "model_version": "flor-tiny-synthetic-v0"
+}

@@ -163,21 +163,23 @@ def persist(db, answer, question, flow, answer_status="answered"):
             else:
                 result = normalize(answer, flow=flow)
             result.id = str(uuid4())
-            db.add(
-                models.NormalizationResult(
-                    id=result.id,
-                    session_id=answer.session_id,
-                    source_answer_id=answer.id,
-                    provider=result.provider,
-                    provider_version=result.provider_version,
-                    schema_version=result.schema_version,
-                    policy_version=result.policy_version,
-                    status=result.status,
-                    result_json=result.model_dump(mode="json"),
-                    created_at=result.created_at,
-                )
+            normalization_row = models.NormalizationResult(
+                id=result.id,
+                session_id=answer.session_id,
+                source_answer_id=answer.id,
+                provider=result.provider,
+                provider_version=result.provider_version,
+                schema_version=result.schema_version,
+                policy_version=result.policy_version,
+                status=result.status,
+                result_json=result.model_dump(mode="json"),
+                created_at=result.created_at,
             )
+            db.add(normalization_row)
             db.flush()
+            from app.services import clinical_evidence
+
+            clinical_evidence.project_normalization_evidence(db, normalization_row)
     except SQLAlchemyError:
         logger.warning("Normalization storage unavailable; source answer retained")
 

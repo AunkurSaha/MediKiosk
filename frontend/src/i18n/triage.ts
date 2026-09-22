@@ -51,7 +51,7 @@ const en: TriageCopy = {
   patientAlertMessage:
     'Potential emergency symptoms were detected. Medical staff should assess you promptly.',
   patientAlertStaffNotified:
-    'Please contact medical staff directly; this prototype does not guarantee notification.',
+    'Please contact medical staff directly; electronic notification is not guaranteed.',
 
   dashboardTitle: 'Staff Triage & Safety Dashboard',
   dashboardSubtitle: 'Deterministic red-flag safety screening & clinical queue escalation',

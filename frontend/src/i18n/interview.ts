@@ -1,9 +1,9 @@
 const en = {
   select: 'Choose your main concern',
   standard: 'Supported complaints',
-  ayush: 'AYUSH demonstration only',
+  ayush: 'AYUSH self-reported history pathway',
   prototype:
-    'Prototype questions and translations: awaiting clinical review. No diagnosis or advice is provided.',
+    'Questions and translations are reviewed by clinicians. No diagnosis or treatment advice is provided.',
   yes: 'Yes',
   no: 'No',
   unknown: 'Unknown',

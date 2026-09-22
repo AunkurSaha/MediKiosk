@@ -1,0 +1,143 @@
+{
+  "train": {
+    "n": 493,
+    "beam_correct": 316,
+    "greedy_correct": 315,
+    "transitions": [
+      {
+        "truth": "x 5d",
+        "prediction": "x 5d",
+        "n": 99
+      },
+      {
+        "truth": "x 3d",
+        "prediction": "x 3d",
+        "n": 98
+      },
+      {
+        "truth": "for 7 days",
+        "prediction": "for days",
+        "n": 61
+      },
+      {
+        "truth": "x 7d",
+        "prediction": "x 3d",
+        "n": 60
+      },
+      {
+        "truth": "for 5 days",
+        "prediction": "for days",
+        "n": 52
+      },
+      {
+        "truth": "for 5 days",
+        "prediction": "for 5 days",
+        "n": 48
+      },
+      {
+        "truth": "for 7 days",
+        "prediction": "for 7 days",
+        "n": 48
+      },
+      {
+        "truth": "x 7d",
+        "prediction": "x 7d",
+        "n": 23
+      },
+      {
+        "truth": "x 7d",
+        "prediction": " x 3d",
+        "n": 2
+      },
+      {
+        "truth": "for 7 days",
+        "prediction": "for f days",
+        "n": 1
+      },
+      {
+        "truth": "x 3d",
+        "prediction": " x 3d",
+        "n": 1
+      }
+    ],
+    "edit_counts": {
+      "digit_deletion": 113,
+      "other_deletion": 113,
+      "digit_substitution": 63,
+      "insertion": 3
+    },
+    "prefix_deleted": 0,
+    "suffix_deleted": 0,
+    "multi_character_deletion": 113
+  },
+  "validation": {
+    "n": 60,
+    "beam_correct": 33,
+    "greedy_correct": 33,
+    "transitions": [
+      {
+        "truth": "x 7d",
+        "prediction": "x 3d",
+        "n": 12
+      },
+      {
+        "truth": "x 3d",
+        "prediction": "x 3d",
+        "n": 11
+      },
+      {
+        "truth": "x 5d",
+        "prediction": "x 5d",
+        "n": 8
+      },
+      {
+        "truth": "for 5 days",
+        "prediction": "for 5 days",
+        "n": 6
+      },
+      {
+        "truth": "for 7 days",
+        "prediction": "for 7 days",
+        "n": 6
+      },
+      {
+        "truth": "for 5 days",
+        "prediction": "for days",
+        "n": 5
+      },
+      {
+        "truth": "x 5d",
+        "prediction": "x 3d",
+        "n": 5
+      },
+      {
+        "truth": "for 7 days",
+        "prediction": "for days",
+        "n": 3
+      },
+      {
+        "truth": "x 7d",
+        "prediction": "x 7d",
+        "n": 2
+      },
+      {
+        "truth": "for 5 days",
+        "prediction": "for 5 ays",
+        "n": 1
+      },
+      {
+        "truth": "for 7 days",
+        "prediction": "fofor days",
+        "n": 1
+      }
+    ],
+    "edit_counts": {
+      "digit_substitution": 18,
+      "digit_deletion": 8,
+      "other_deletion": 9
+    },
+    "prefix_deleted": 0,
+    "suffix_deleted": 0,
+    "multi_character_deletion": 8
+  }
+}

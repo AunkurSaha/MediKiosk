@@ -81,6 +81,9 @@ async function injectMockMediaRecorder(page: Page) {
 }
 
 async function prepare(page: Page, language: 'bn' | 'en') {
+  expect(
+    (await page.request.post('/api/auth/demo-login', { data: { role: 'patient' } })).ok(),
+  ).toBeTruthy();
   const id = crypto.randomUUID();
   expect(
     (

@@ -1,0 +1,31 @@
+{
+  "status": "blocked_before_training",
+  "training_executed": false,
+  "inference_executed": false,
+  "reason": "Historical selected checkpoint followed an interrupted run and a weights-only restart. Original source epoch and exact original epoch budget are not recoverable from the retained report. A fresh uninterrupted run cannot reproduce this restart policy without an explicit revised protocol.",
+  "comparison": [
+    {"field":"input_height","historical_setting":64,"clean512_setting":64,"equal":true,"evidence/source":"models/generalization_continued_flor.weights.json:image_shape"},
+    {"field":"input_width","historical_setting":512,"clean512_setting":512,"equal":true,"evidence/source":"models/generalization_continued_flor.weights.json:image_shape"},
+    {"field":"batch_size","historical_setting":32,"clean512_setting":32,"equal":true,"evidence/source":"benchmarks/generalization.json:batch_size; prior generated command's batch size 8 is NOT historically matched"},
+    {"field":"seed","historical_setting":41,"clean512_setting":41,"equal":true,"evidence/source":"models/generalization_continued_flor.weights.json:seed"},
+    {"field":"dropout_enabled","historical_setting":true,"clean512_setting":true,"equal":true,"evidence/source":"benchmarks/generalization.json:dropout_enabled"},
+    {"field":"augmentation","historical_setting":"light_augmentation.json; training only","clean512_setting":"light_augmentation.json; training only","equal":true,"evidence/source":"benchmarks/generalization.json:augmentation_preset; benchmarks/SYNTHETIC_BASELINE.md"},
+    {"field":"maximum_epochs_original_run","historical_setting":null,"clean512_setting":null,"equal":null,"evidence/source":"Original run interrupted; retained report describes continuation only (10 requested, 9 completed, labels 11–19). Current default 20 is not evidence of original invocation."},
+    {"field":"initialization_restart_policy","historical_setting":"Unknown number of initial epochs, then weights-only warm restart with fresh optimizer","clean512_setting":"From scratch, as requested","equal":false,"evidence/source":"benchmarks/generalization.json:warm_restart=true, optimizer_state_restored=false, source_checkpoint_epoch=null; benchmarks/SYNTHETIC_BASELINE.md"},
+    {"field":"checkpoint_selection","historical_setting":"Minimum validation CER; continuation selected label 14","clean512_setting":"Minimum validation CER","equal":true,"evidence/source":"benchmarks/generalization.json:best_epoch,best_validation_cer; scripts/train_generalization.py"},
+    {"field":"optimizer","historical_setting":"Not recorded in resolved historical config; current code AdamW","clean512_setting":"AdamW, pending provenance verification","equal":null,"evidence/source":"scripts/train_generalization.py (current implementation, not a saved historical invocation/config)"},
+    {"field":"learning_rate","historical_setting":null,"clean512_setting":0.001,"equal":null,"evidence/source":"Current CLI default only; historical report does not record learning rate"},
+    {"field":"beta1","historical_setting":null,"clean512_setting":0.5,"equal":null,"evidence/source":"Current scripts/train_generalization.py only"},
+    {"field":"beta2","historical_setting":null,"clean512_setting":0.99,"equal":null,"evidence/source":"Current scripts/train_generalization.py only"},
+    {"field":"weight_decay","historical_setting":null,"clean512_setting":0.01,"equal":null,"evidence/source":"Current scripts/train_generalization.py only"},
+    {"field":"clipnorm","historical_setting":null,"clean512_setting":5.0,"equal":null,"evidence/source":"Current scripts/train_generalization.py only"},
+    {"field":"early_stopping_patience","historical_setting":5,"clean512_setting":5,"equal":true,"evidence/source":"benchmarks/SYNTHETIC_BASELINE.md: five non-improving continuation epochs"},
+    {"field":"early_stopping_min_delta","historical_setting":null,"clean512_setting":0.002,"equal":null,"evidence/source":"Current CLI default only; not saved in historical report"},
+    {"field":"shuffle_behavior","historical_setting":null,"clean512_setting":"numpy default_rng(seed), permutation each epoch","equal":null,"evidence/source":"Current scripts/train_generalization.py only; RNG restart state from original run unknown"},
+    {"field":"CTC_preprocessing","historical_setting":"Final class blank 48; characters indexed 1..47; zero padding","clean512_setting":"Final class blank 48; characters indexed 1..47; zero padding","equal":true,"evidence/source":"Historical checkpoint metadata, existing CTC regression tests and current encode implementation"},
+    {"field":"architecture","historical_setting":"Flor","clean512_setting":"Unchanged Flor","equal":true,"evidence/source":"Historical model metadata model_version; unchanged upstream Flor source"},
+    {"field":"downsampling","historical_setting":"Known output length 128 for 64x512 input","clean512_setting":"Unchanged output length 128","equal":true,"evidence/source":"benchmarks/ctc_audit/REPORT.md; unchanged Flor pooling (2,2),(2,1),(2,1),(2,2),(2,1),(2,1), aggregate vertical64/horizontal4"},
+    {"field":"dataset_path","historical_setting":"datasets/synthetic/generalization","clean512_setting":"datasets/synthetic/clean512_v2","equal":false,"evidence/source":"Intentional authorized dataset repair"},
+    {"field":"checkpoint_output_path","historical_setting":"models/generalization_continued_flor.weights.h5","clean512_setting":"models/clean512_v2_flor.weights.h5 (not created)","equal":false,"evidence/source":"Intentional authorized new output location"}
+  ]
+}

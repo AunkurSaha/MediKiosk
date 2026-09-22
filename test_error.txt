@@ -1,0 +1,27 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-9.1.1, pluggy-1.6.0 -- C:\MEDIKIOSK\backend\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\MEDIKIOSK\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collecting ... collected 1 item
+
+backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[chest_pain] FAILED [100%]
+
+================================== FAILURES ===================================
+E   AssertionError: assert 500 == 422
+     +  where 500 = <Response [500 Internal Server Error]>.status_code
+     +    where <Response [500 Internal Server Error]> = post('/api/sessions/35187b10-a5d4-4298-90c4-7cc533692364/complete')
+     +      where post = <starlette.testclient.TestClient object at 0x000001CCC541DE80>.post
+------------------------------ Captured log call ------------------------------
+ERROR    app.main:main.py:94 Unhandled application error: UnboundLocalError
+C:\MEDIKIOSK\backend\tests\test_adaptive.py:164: AssertionError: assert 500 == 422
+============================== warnings summary ===============================
+backend\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\MEDIKIOSK\backend\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[chest_pain]
+======================== 1 failed, 1 warning in 0.47s =========================

@@ -62,3 +62,33 @@ def verify(db, session_id, payload, question):
             "Confirm a current ASR candidate, or submit edited text as typed.",
             422,
         ) from None
+
+
+def verify_rapid_complaint(db, session_id, payload, expected_revision):
+    """Validate a signed ASR candidate for the rapid chief-complaint prompt."""
+    consent = intake.consent_for(db, session_id)
+    if not consent or not consent.voice_processing:
+        raise WorkflowError("VOICE_CONSENT_REQUIRED", "Voice processing consent is required.", 403)
+    try:
+        data, signature = (payload.voice_candidate or "").split(".")
+        if not hmac.compare_digest(
+            signature, hmac.new(_key, data.encode(), hashlib.sha256).hexdigest()
+        ):
+            raise ValueError()
+        body = json.loads(base64.urlsafe_b64decode(data))
+        if not (
+            body["expires"] > time.time()
+            and body["session"] == session_id
+            and body["question"] == "rapid.chief_complaint"
+            and body["revision"] == expected_revision
+            and body["language"] == payload.language
+            and body["text"] == payload.original_text
+        ):
+            raise ValueError()
+        return body
+    except (ValueError, KeyError, TypeError):
+        raise WorkflowError(
+            "INVALID_VOICE_CANDIDATE",
+            "Confirm a current ASR candidate, or submit edited text as typed.",
+            422,
+        ) from None

@@ -1,0 +1,25 @@
+{
+  "epoch": 4,
+  "train_loss": 86.77983197298917,
+  "validation_loss": 79.7647705078125,
+  "validation": {
+    "cer": 0.9433853264009243,
+    "wer": 1.0,
+    "exact_line_accuracy": 0.0,
+    "medicine": 0.0,
+    "dose": 0.0,
+    "frequency": 0.0,
+    "duration": 0.4
+  },
+  "learning_rate": 0.0010000000474974513,
+  "checkpoint_improved": true,
+  "patience_counter": 0,
+  "elapsed_seconds": 919.2476368999924,
+  "pattern_counts": {
+    "0-1-0": 53,
+    "0-0-1": 53,
+    "1-1-1": 53,
+    "1-0-1": 52,
+    "1-0-0": 52
+  }
+}

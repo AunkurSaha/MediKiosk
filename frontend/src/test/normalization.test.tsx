@@ -123,7 +123,8 @@ beforeEach(() => {
 it('shows original Bengali wording, canonical label and unverified provenance separately', async () => {
   vi.spyOn(api, 'doctorDetail').mockResolvedValue(detail(result));
   render(<App />);
-  expect(await screen.findByText(raw)).toHaveAttribute('lang', 'bn');
+  const rawElements = await screen.findAllByText(raw);
+  expect(rawElements.some((el) => el.getAttribute('lang') === 'bn')).toBe(true);
   const panel = screen.getByLabelText('Machine normalization');
   expect(within(panel).getByText('Chest pain')).toBeVisible();
   expect(within(panel).getByText('Machine output — not clinician verified')).toBeVisible();
@@ -145,7 +146,7 @@ it.each(['unavailable', 'unrecognized', 'unknown'] as const)(
       }),
     );
     render(<App />);
-    expect(await screen.findByText(raw)).toBeVisible();
+    expect((await screen.findAllByText(raw))[0]).toBeVisible();
     const panel = screen.getByLabelText('Machine normalization');
     expect(within(panel).queryByText('Chest pain')).not.toBeInTheDocument();
     expect(
@@ -170,7 +171,7 @@ it('summary confirmation does not relabel machine facts as clinician verified', 
 it('does not show normalization controls for deterministic typed facts', async () => {
   vi.spyOn(api, 'doctorDetail').mockResolvedValue(detail(null));
   render(<App />);
-  await screen.findByText(raw);
+  expect((await screen.findAllByText(raw))[0]).toBeVisible();
   expect(screen.queryByLabelText('Machine normalization')).not.toBeInTheDocument();
 });
 
@@ -199,7 +200,7 @@ it.each(['present', 'absent'] as const)(
     expect(within(panel).getByText(/google\/gemma-4-31b-it/)).toBeVisible();
     expect(within(panel).getByText(/nvidia-1.0/)).toBeVisible();
     expect(within(panel).getByText('Machine output — not clinician verified')).toBeVisible();
-    expect(await screen.findByText(raw)).toBeVisible();
+    expect((await screen.findAllByText(raw))[0]).toBeVisible();
   },
 );
 

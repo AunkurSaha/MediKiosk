@@ -18,6 +18,7 @@ export default function DocumentUploader({
 }: DocumentUploaderProps) {
   const t = copy[language];
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
+  const [dismissedDocuments, setDismissedDocuments] = useState<Set<string>>(new Set());
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [docType, setDocType] = useState<'prescription' | 'lab_report' | 'other'>('prescription');
@@ -112,7 +113,13 @@ export default function DocumentUploader({
     api
       .documents(sessionId)
       .then((res) => {
-        if (active) setDocuments(res.documents);
+        if (active) {
+          setDocuments((prev) => {
+            const fetchedIds = new Set(res.documents.map((d) => d.id));
+            const pendingOrLocal = prev.filter((d) => !fetchedIds.has(d.id));
+            return [...pendingOrLocal, ...res.documents];
+          });
+        }
       })
       .catch(() => {
         // Silently tolerate list failure on load
@@ -183,8 +190,17 @@ export default function DocumentUploader({
   return (
     <div className="document-uploader" data-testid="document-uploader">
       <div className="document-uploader-header">
-        <h3>{t.docUploadTitle}</h3>
-        <p className="muted">{t.docUploadSubtitle}</p>
+        <p className="eyebrow">Medical records</p>
+        <h3>Upload a medical document</h3>
+        <p className="muted">
+          Add a clear photo or PDF. You will review every detail before it becomes part of your
+          history.
+        </p>
+        <div className="document-supported-types" aria-label="Supported documents">
+          <span>Prescription</span>
+          <span>Lab report</span>
+          <span>Discharge document</span>
+        </div>
       </div>
 
       <div className="document-immutability-notice" role="note">
@@ -227,7 +243,7 @@ export default function DocumentUploader({
           onClick={() => fileInputRef.current?.click()}
           data-testid="upload-document-btn"
         >
-          {uploading ? t.docUploading : `📎 ${t.docUploadBtn}`}
+          {uploading ? 'Analyzing document…' : t.docUploadBtn}
         </button>
 
         <button
@@ -238,7 +254,7 @@ export default function DocumentUploader({
           style={{ marginLeft: '1rem' }}
           data-testid="open-camera-btn"
         >
-          📸 Open Camera
+          Use camera
         </button>
       </div>
 
@@ -286,99 +302,226 @@ export default function DocumentUploader({
       )}
 
       {error && (
-        <p className="error" role="alert" style={{ marginTop: '0.5rem' }}>
-          {error}
+        <div className="error document-upload-error" role="alert">
+          <strong>We could not process this document.</strong>
+          <p>{error}</p>
+          <div className="inline-actions">
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              Try another file
+            </button>
+            <button type="button" className="text-button" onClick={() => setError(null)}>
+              Skip for now
+            </button>
+          </div>
+        </div>
+      )}
+
+      {uploading && (
+        <p className="document-analysis-state" role="status">
+          Analyzing document…
         </p>
       )}
 
       {documents.length > 0 && (
         <div className="uploaded-documents-list" data-testid="uploaded-documents-list">
-          {documents.map((doc) => (
-            <div key={doc.id} className="uploaded-document-card" data-testid={`doc-card-${doc.id}`}>
-              <div className="doc-card-header">
-                <div>
-                  <strong className="doc-filename">{doc.original_filename}</strong>
-                  <span className="doc-badge doc-type-badge">{doc.document_type}</span>
+          {documents
+            .filter((doc) => !dismissedDocuments.has(doc.id))
+            .map((doc) => (
+              <div
+                key={doc.id}
+                className="uploaded-document-card"
+                data-testid={`doc-card-${doc.id}`}
+              >
+                <div className="doc-card-header">
+                  <div>
+                    <strong className="doc-filename">{doc.original_filename}</strong>
+                    <span className="doc-badge doc-type-badge">{doc.document_type}</span>
+                  </div>
+                  <span className={`doc-badge status-${doc.processing_status}`}>
+                    {doc.processing_status === 'mock_fixture' ||
+                    doc.processing_status === 'completed'
+                      ? 'Information extracted'
+                      : doc.processing_status === 'processing'
+                        ? 'Analyzing'
+                        : doc.processing_status === 'unavailable'
+                          ? 'Review needed'
+                          : doc.processing_status}
+                  </span>
                 </div>
-                <span className={`doc-badge status-${doc.processing_status}`}>
-                  {doc.processing_status}
-                </span>
-              </div>
 
-              {doc.extractions && doc.extractions.length > 0 && (
-                <div className="doc-extractions-summary">
-                  {doc.extractions.map((ext) => {
-                    const meds = ext.structured_json.medications;
-                    const labs = ext.structured_json.observations;
-                    return (
-                      <div key={ext.id} className="extraction-content">
-                        {ext.extractor === 'mock' && (
-                          <p role="note">
-                            Synthetic mock output. This is fixture data and may not describe the
-                            uploaded record.
-                          </p>
-                        )}
-                        <div className="extraction-meta">
-                          <span className="badge-unverified">{t.docPendingVerification}</span>
-                          {ext.extractor !== 'mock' && ext.confidence !== null && (
-                            <span className="muted">
-                              Confidence: {Math.round(ext.confidence * 100)}%
-                            </span>
-                          )}
-                        </div>
-
-                        {meds && meds.length > 0 && (
-                          <div className="extracted-meds-list">
-                            <strong>{t.docExtractedMedications}:</strong>
-                            <ul>
-                              {meds.map((m, idx) => (
-                                <li key={idx}>
-                                  <b>{m.name}</b> {m.dosage ? `· ${m.dosage}` : ''}{' '}
-                                  {m.frequency ? `· ${m.frequency}` : ''}{' '}
-                                  {m.duration ? `· ${m.duration}` : ''}
-                                </li>
-                              ))}
-                            </ul>
+                {doc.extractions && doc.extractions.length > 0 && (
+                  <div className="doc-extractions-summary">
+                    {doc.extractions.map((ext) => {
+                      const meds = ext.structured_json.medications;
+                      const labs = ext.structured_json.observations;
+                      const details = ext.structured_json as typeof ext.structured_json & {
+                        patient_name?: string;
+                        patient_age?: string;
+                        patient_weight?: string;
+                        complaint?: string;
+                        advice?: string[];
+                      };
+                      return (
+                        <div key={ext.id} className="extraction-content">
+                          <div className="extraction-meta">
+                            <div>
+                              <p className="eyebrow">Document information extracted</p>
+                              <h4>
+                                {doc.document_type === 'prescription'
+                                  ? 'Information found in your prescription'
+                                  : 'Information found in your report'}
+                              </h4>
+                            </div>
+                            <span className="badge-unverified">Needs your review</span>
+                            {ext.extractor !== 'mock' && ext.confidence !== null && (
+                              <span className="muted">
+                                Confidence: {Math.round(ext.confidence * 100)}%
+                              </span>
+                            )}
                           </div>
-                        )}
 
-                        {labs && labs.length > 0 && (
-                          <div className="extracted-labs-list">
-                            <strong>{t.docExtractedLabs}:</strong>
-                            <ul>
+                          {(details.patient_name || details.complaint) && (
+                            <div className="document-context-grid">
+                              {details.patient_name && (
+                                <div>
+                                  <span>Patient</span>
+                                  <strong>{details.patient_name}</strong>
+                                </div>
+                              )}
+                              {details.patient_age && (
+                                <div>
+                                  <span>Age</span>
+                                  <strong>{details.patient_age}</strong>
+                                </div>
+                              )}
+                              {details.patient_weight && (
+                                <div>
+                                  <span>Weight</span>
+                                  <strong>{details.patient_weight}</strong>
+                                </div>
+                              )}
+                              {details.complaint && (
+                                <div className="wide">
+                                  <span>Reason noted</span>
+                                  <strong>{details.complaint}</strong>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {meds && meds.length > 0 && (
+                            <div className="extracted-meds-list extracted-information-grid">
+                              {meds.map((m, idx) => (
+                                <article key={idx} className="extracted-information-card">
+                                  <div>
+                                    <span>Medication</span>
+                                    <strong>{m.name}</strong>
+                                  </div>
+                                  <div>
+                                    <span>Strength</span>
+                                    <strong>{m.dosage || 'Not stated'}</strong>
+                                  </div>
+                                  <div>
+                                    <span>How often</span>
+                                    <strong>{m.frequency || 'Not stated'}</strong>
+                                  </div>
+                                  <div>
+                                    <span>Duration</span>
+                                    <strong>{m.duration || 'Not stated'}</strong>
+                                  </div>
+                                  {m.instructions && (
+                                    <div className="wide">
+                                      <span>Instructions</span>
+                                      <strong>{m.instructions}</strong>
+                                    </div>
+                                  )}
+                                </article>
+                              ))}
+                            </div>
+                          )}
+
+                          {labs && labs.length > 0 && (
+                            <div className="extracted-labs-list extracted-information-grid">
                               {labs.map((l, idx) => (
-                                <li key={idx}>
-                                  <b>{l.test_name}</b>: {l.value} {l.unit || ''}{' '}
-                                  {l.reference_range ? `(${l.reference_range})` : ''}{' '}
+                                <article
+                                  key={idx}
+                                  className="extracted-information-card lab-result-card"
+                                >
+                                  <div>
+                                    <span>Test</span>
+                                    <strong>{l.test_name}</strong>
+                                  </div>
+                                  <div>
+                                    <span>Result</span>
+                                    <strong>
+                                      {l.value} {l.unit || ''}
+                                    </strong>
+                                  </div>
+                                  <div className="wide">
+                                    <span>Reference range</span>
+                                    <strong>{l.reference_range || 'Not stated'}</strong>
+                                  </div>
                                   {l.flag && l.flag.toLowerCase() !== 'normal' ? (
                                     <span className="badge-abnormal">{l.flag.toUpperCase()}</span>
-                                  ) : !l.flag ? (
-                                    <span className="muted">Not reported</span>
                                   ) : null}
-                                </li>
+                                </article>
                               ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {doc.processing_status === 'unavailable' && doc.extractions.length === 0 && (
-                <p className="muted" role="status">
-                  The original file is stored, but extraction is unavailable. This prototype only
-                  extracts its explicitly identified synthetic fixtures; real OCR is not enabled.
-                </p>
-              )}
-              {doc.processing_status === 'failed' && (
-                <p className="error" role="alert">
-                  The original file was stored, but document processing failed. Clinical facts were
-                  not created.
-                </p>
-              )}
-            </div>
-          ))}
+                            </div>
+                          )}
+
+                          {details.advice && details.advice.length > 0 && (
+                            <div className="extracted-advice">
+                              <strong>Advice written on the document</strong>
+                              <ul>
+                                {details.advice.map((item) => (
+                                  <li key={item}>{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                {doc.processing_status === 'unavailable' && doc.extractions.length === 0 && (
+                  <div className="document-recovery" role="status">
+                    <p className="muted">
+                      We stored the original file, but could not extract information from it. Try a
+                      clearer image or continue without document extraction.
+                    </p>
+                    <div className="inline-actions">
+                      <button
+                        type="button"
+                        className="secondary"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        Replace file
+                      </button>
+                      <button
+                        type="button"
+                        className="text-button"
+                        onClick={() =>
+                          setDismissedDocuments((current) => new Set(current).add(doc.id))
+                        }
+                      >
+                        Continue without this document
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {doc.processing_status === 'failed' && (
+                  <p className="error" role="alert">
+                    The original file was stored, but document processing failed. Clinical facts
+                    were not created.
+                  </p>
+                )}
+              </div>
+            ))}
         </div>
       )}
     </div>

@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 
 from pydantic import Field
@@ -85,9 +86,17 @@ class PatientQueueEstimate(APIModel):
     session_id: str
     doctor_id: str
     doctor_name: str
-    position: int = Field(ge=1)
-    estimated_wait_minutes: int = Field(ge=5)
-    expected_meeting_at: UTCDate
+    hospital_id: str
+    hospital_name: str
+    service_date: date | None = None
+    visit_token: str | None = None
+    status: QueueStatus
+    position: int | None = Field(default=None, ge=1)
+    patients_ahead: int = Field(ge=0)
+    estimated_wait_minutes: int = Field(ge=0)
+    is_estimate: bool
+    calculation_basis: str
+    policy_version: str
 
 
 class QueueTransition(APIModel):

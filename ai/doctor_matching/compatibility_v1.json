@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "specialties": {
+    "GENERAL_MEDICINE": {"eligible": ["GENERAL_MEDICINE"]},
+    "CARDIOLOGY": {"eligible": ["CARDIOLOGY"]},
+    "PULMONOLOGY": {"eligible": ["PULMONOLOGY"]},
+    "GASTROENTEROLOGY": {"eligible": ["GASTROENTEROLOGY"]},
+    "NEUROLOGY": {"eligible": ["NEUROLOGY"]},
+    "DERMATOLOGY": {"eligible": ["DERMATOLOGY"]},
+    "ORTHOPEDICS": {"eligible": ["ORTHOPEDICS"]},
+    "PEDIATRICS": {"eligible": ["PEDIATRICS"]},
+    "GYNECOLOGY": {"eligible": ["GYNECOLOGY"]},
+    "SURGERY": {"eligible": ["SURGERY"]},
+    "AYUSH": {"eligible": ["AYUSH"]}
+  },
+  "complaint_expertise": {
+    "CHEST_DISCOMFORT": ["CHEST_PAIN", "ARRHYTHMIA"],
+    "BREATHING_DIFFICULTY": ["RESPIRATORY_SYMPTOMS"],
+    "COUGH": ["RESPIRATORY_SYMPTOMS"],
+    "FEVER": ["FEVER"],
+    "HEADACHE": ["HEADACHE"],
+    "ABDOMINAL_PAIN": ["ABDOMINAL_PAIN"],
+    "JOINT_PAIN": ["MUSCULOSKELETAL"],
+    "SKIN_PROBLEM": ["SKIN_CONDITIONS"],
+    "INJURY": ["INJURY"]
+  }
+}

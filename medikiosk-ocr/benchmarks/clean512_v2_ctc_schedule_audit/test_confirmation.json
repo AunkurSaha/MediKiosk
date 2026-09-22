@@ -1,0 +1,5 @@
+{
+  "status": "not run",
+  "reason": "Optional confirmation omitted; no test predictions inspected or test inference executed in this audit",
+  "hypotheses_and_metrics_frozen_in": "audit_config.json"
+}

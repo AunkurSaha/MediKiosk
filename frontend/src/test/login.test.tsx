@@ -125,7 +125,7 @@ describe('Login Component & Auth Flow', () => {
     });
   });
 
-  it('supports quick demo login when demo mode is enabled', async () => {
+  it('supports quick clinician access without exposing demo copy', async () => {
     vi.spyOn(api, 'demoLogin').mockResolvedValue({
       success: true,
       user: {
@@ -139,8 +139,9 @@ describe('Login Component & Auth Flow', () => {
     });
 
     renderLogin();
-    const demoDoctorBtn = await screen.findByRole('button', { name: 'Quick Demo Doctor Login' });
+    const demoDoctorBtn = await screen.findByRole('button', { name: 'Continue as clinician' });
     expect(demoDoctorBtn).toBeVisible();
+    expect(screen.queryByText(/demo patient|demo doctor/i)).not.toBeInTheDocument();
 
     fireEvent.click(demoDoctorBtn);
     await waitFor(() => {

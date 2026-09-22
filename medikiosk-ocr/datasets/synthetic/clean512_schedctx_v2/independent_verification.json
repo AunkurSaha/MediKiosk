@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "contexts": 263,
+  "variants": 1315,
+  "original_identity_exact": 263,
+  "outside_region_diff_total": 0,
+  "stored_overlap_total": 0,
+  "rotation_epochs": 20,
+  "clean_snapshot_files": 1005
+}

@@ -3,6 +3,7 @@ param(
     [ValidateSet('mock', 'bhashini', 'sarvam', 'disabled')][string]$SpeechProvider,
     [ValidateSet('mock', 'sarvam', 'disabled')][string]$OcrProvider,
     [ValidateSet('mock', 'sarvam', 'disabled')][string]$TranslationProvider,
+    [string]$PythonPath,
     [switch]$SkipSeed
 )
 
@@ -26,7 +27,25 @@ $projectRoot = Split-Path -Parent $PSScriptRoot
 $runtimeRoot = Join-Path $projectRoot '.runtime'
 # Supabase is the only runtime database. The launcher never provisions or
 # starts a local PostgreSQL or SQLite database.
-$pythonPath = Join-Path $projectRoot 'backend\.venv\Scripts\python.exe'
+$pythonPath = if ($PythonPath) { $PythonPath } else { Join-Path $projectRoot 'backend\.venv\Scripts\python.exe' }
+$pythonUsable = $false
+try {
+    & $pythonPath --version *> $null
+    $pythonUsable = $LASTEXITCODE -eq 0
+} catch {
+    $pythonUsable = $false
+}
+if (-not $pythonUsable) {
+    $fallbackPython = Join-Path $env:USERPROFILE '.local\bin\python3.11.exe'
+    $fallbackPackages = Join-Path $runtimeRoot 'evidence-pydeps'
+    if (-not (Test-Path -LiteralPath $fallbackPython) -or -not (Test-Path -LiteralPath $fallbackPackages)) {
+        throw 'The backend Python environment is unavailable and no local fallback runtime was found.'
+    }
+    $pythonPath = $fallbackPython
+    $pythonPathParts = @($fallbackPackages, (Join-Path $projectRoot 'backend'), $env:PYTHONPATH) |
+        Where-Object { $_ }
+    $env:PYTHONPATH = [string]::Join(';', $pythonPathParts)
+}
 Push-Location (Join-Path $projectRoot 'backend')
 try {
     & $pythonPath -m alembic upgrade head
@@ -46,11 +65,14 @@ function Test-HttpReady([string]$url) {
     catch { return $false }
 }
 $desiredProvider = $null
+$desiredAppEnv = $null
 $desiredSpeechProvider = $null
 $desiredOcrProvider = $null
 $desiredTranslationProvider = $null
 Push-Location (Join-Path $projectRoot 'backend')
 try {
+    $desiredAppEnv = (& $pythonPath -c "from app.core import config; print(config.APP_ENV)").Trim()
+    if ($LASTEXITCODE -ne 0 -or -not $desiredAppEnv) { throw 'Could not resolve the configured app environment.' }
     $desiredProvider = (& $pythonPath -c "from app.core import config; from app.services.normalization_provider import configured_provider; print(configured_provider().name)").Trim()
     if ($LASTEXITCODE -ne 0 -or -not $desiredProvider) { throw 'Could not resolve the configured normalization provider.' }
     $desiredSpeechProvider = (& $pythonPath -c "from app.core import config; print(config.SPEECH_PROVIDER.strip().lower())").Trim()
@@ -65,21 +87,23 @@ try {
 if (Test-HttpReady 'http://127.0.0.1:8010/api/health') {
     try {
         $runningConfig = Invoke-RestMethod -Uri 'http://127.0.0.1:8010/api/config' -TimeoutSec 2
+        $runningAppEnv = $runningConfig.app_env
         $runningProvider = $runningConfig.normalization_provider
         $runningSpeechProvider = $runningConfig.speech_provider
         $runningOcrProvider = $runningConfig.ocr_provider
         $runningTranslationProvider = $runningConfig.translation_provider
     } catch {
+        $runningAppEnv = $null
         $runningProvider = $null
         $runningSpeechProvider = $null
         $runningOcrProvider = $null
         $runningTranslationProvider = $null
     }
-    if ($runningProvider -ne $desiredProvider -or $runningSpeechProvider -ne $desiredSpeechProvider -or ($desiredOcrProvider -and $runningOcrProvider -ne $desiredOcrProvider) -or ($desiredTranslationProvider -and $runningTranslationProvider -ne $desiredTranslationProvider)) {
+    if ($runningAppEnv -ne $desiredAppEnv -or $runningProvider -ne $desiredProvider -or $runningSpeechProvider -ne $desiredSpeechProvider -or ($desiredOcrProvider -and $runningOcrProvider -ne $desiredOcrProvider) -or ($desiredTranslationProvider -and $runningTranslationProvider -ne $desiredTranslationProvider)) {
         $listener = Get-NetTCPConnection -LocalPort 8010 -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
         $running = if ($listener) { Get-CimInstance Win32_Process -Filter ("ProcessId = " + $listener.OwningProcess) } else { $null }
         if (-not $running -or $running.CommandLine -notlike ('*' + (Join-Path $projectRoot 'backend') + '*')) {
-            throw "Port 8010 is serving normalization provider '$runningProvider', but it is not the recorded MediKiosk backend."
+            throw "Port 8010 is serving app environment '$runningAppEnv', but it is not the recorded MediKiosk backend."
         }
         Stop-Process -Id $running.ProcessId -ErrorAction Stop
         $processes.Remove('backend')

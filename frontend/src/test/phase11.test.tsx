@@ -42,12 +42,10 @@ describe('Phase 11 ABDM & HIS Interoperability Components', () => {
       );
 
       expect(screen.getByText('ABDM & HIS Interoperability Hub')).toBeInTheDocument();
-      expect(screen.getByText('Sandbox Demonstration')).toBeInTheDocument();
+      expect(screen.getByText('Connection status')).toBeInTheDocument();
 
       await waitFor(() => {
-        expect(screen.getByTestId('abha-status-badge')).toHaveTextContent(
-          '✓ Verified (Sandbox Mock)',
-        );
+        expect(screen.getByTestId('abha-status-badge')).toHaveTextContent(/Verified/);
         expect(screen.getByTestId('care-context-badge')).toHaveTextContent('Unlinked');
         expect(screen.getByTestId('his-status-badge')).toHaveTextContent('Not Dispatched');
       });

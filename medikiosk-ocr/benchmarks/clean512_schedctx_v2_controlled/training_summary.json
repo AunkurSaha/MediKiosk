@@ -1,0 +1,510 @@
+{
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 164.14677810668945,
+      "validation_loss": 110.87871170043945,
+      "validation": {
+        "cer": 1.0,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 235.98599859999376,
+      "pattern_counts": {
+        "1-1-1": 53,
+        "1-0-1": 53,
+        "1-0-0": 53,
+        "0-1-0": 52,
+        "0-0-1": 52
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 113.82912167635831,
+      "validation_loss": 106.34439849853516,
+      "validation": {
+        "cer": 0.9910456383593299,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 448.7679826999956,
+      "pattern_counts": {
+        "1-0-1": 53,
+        "1-0-0": 53,
+        "0-1-0": 53,
+        "0-0-1": 52,
+        "1-1-1": 52
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 101.17226964777166,
+      "validation_loss": 85.73184013366699,
+      "validation": {
+        "cer": 0.9956672443674177,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "patience_counter": 1,
+      "elapsed_seconds": 678.6747687000025,
+      "pattern_counts": {
+        "1-0-0": 53,
+        "0-1-0": 53,
+        "0-0-1": 53,
+        "1-1-1": 52,
+        "1-0-1": 52
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 86.77983197298917,
+      "validation_loss": 79.7647705078125,
+      "validation": {
+        "cer": 0.9433853264009243,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 919.2476368999924,
+      "pattern_counts": {
+        "0-1-0": 53,
+        "0-0-1": 53,
+        "1-1-1": 53,
+        "1-0-1": 52,
+        "1-0-0": 52
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 75.90891231190075,
+      "validation_loss": 65.93285751342773,
+      "validation": {
+        "cer": 0.866262276140959,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 1129.2634069999913,
+      "pattern_counts": {
+        "0-0-1": 53,
+        "1-1-1": 53,
+        "1-0-1": 53,
+        "1-0-0": 52,
+        "0-1-0": 52
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 64.28256555037065,
+      "validation_loss": 60.390944480895996,
+      "validation": {
+        "cer": 0.8365106874638937,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 1336.4057389999798,
+      "pattern_counts": {
+        "1-1-1": 53,
+        "1-0-1": 53,
+        "1-0-0": 53,
+        "0-1-0": 52,
+        "0-0-1": 52
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 54.439123847267844,
+      "validation_loss": 49.004493713378906,
+      "validation": {
+        "cer": 0.7192374350086655,
+        "wer": 0.9786324786324786,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.05,
+        "dose": 0.0,
+        "frequency": 0.01,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 1541.8691030000045,
+      "pattern_counts": {
+        "1-0-1": 53,
+        "1-0-0": 53,
+        "0-1-0": 53,
+        "0-0-1": 52,
+        "1-1-1": 52
+      }
+    },
+    {
+      "epoch": 8,
+      "train_loss": 45.75567262822931,
+      "validation_loss": 46.650301933288574,
+      "validation": {
+        "cer": 0.6484690930098209,
+        "wer": 0.9458689458689459,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.08,
+        "dose": 0.0,
+        "frequency": 0.01,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 1748.8304593999928,
+      "pattern_counts": {
+        "1-0-0": 53,
+        "0-1-0": 53,
+        "0-0-1": 53,
+        "1-1-1": 52,
+        "1-0-1": 52
+      }
+    },
+    {
+      "epoch": 9,
+      "train_loss": 38.172612710432574,
+      "validation_loss": 40.856292724609375,
+      "validation": {
+        "cer": 0.5869439630271519,
+        "wer": 0.8660968660968661,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.06,
+        "dose": 0.07,
+        "frequency": 0.02,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 1996.0944917000015,
+      "pattern_counts": {
+        "0-1-0": 53,
+        "0-0-1": 53,
+        "1-1-1": 53,
+        "1-0-1": 52,
+        "1-0-0": 52
+      }
+    },
+    {
+      "epoch": 10,
+      "train_loss": 31.609834584322844,
+      "validation_loss": 50.647990226745605,
+      "validation": {
+        "cer": 0.5704794916233391,
+        "wer": 0.8190883190883191,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.12,
+        "dose": 0.12,
+        "frequency": 0.01,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 2217.9023429999943,
+      "pattern_counts": {
+        "0-0-1": 53,
+        "1-1-1": 53,
+        "1-0-1": 53,
+        "1-0-0": 52,
+        "0-1-0": 52
+      }
+    },
+    {
+      "epoch": 11,
+      "train_loss": 26.086200367320668,
+      "validation_loss": 57.17012691497803,
+      "validation": {
+        "cer": 0.5470826112073945,
+        "wer": 0.8304843304843305,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.09,
+        "dose": 0.12,
+        "frequency": 0.04,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 2494.708354400005,
+      "pattern_counts": {
+        "1-1-1": 53,
+        "1-0-1": 53,
+        "1-0-0": 53,
+        "0-1-0": 52,
+        "0-0-1": 52
+      }
+    },
+    {
+      "epoch": 12,
+      "train_loss": 21.85505372827703,
+      "validation_loss": 32.65146446228027,
+      "validation": {
+        "cer": 0.3567302137492779,
+        "wer": 0.6695156695156695,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.18,
+        "dose": 0.21,
+        "frequency": 0.22,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 2841.616501599987,
+      "pattern_counts": {
+        "1-0-1": 53,
+        "1-0-0": 53,
+        "0-1-0": 53,
+        "0-0-1": 52,
+        "1-1-1": 52
+      }
+    },
+    {
+      "epoch": 13,
+      "train_loss": 17.86689454858953,
+      "validation_loss": 77.69733810424805,
+      "validation": {
+        "cer": 0.46360485268630847,
+        "wer": 0.7293447293447294,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.14,
+        "dose": 0.07,
+        "frequency": 0.18,
+        "duration": 0.42
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "patience_counter": 1,
+      "elapsed_seconds": 3225.1020691999875,
+      "pattern_counts": {
+        "1-0-0": 53,
+        "0-1-0": 53,
+        "0-0-1": 53,
+        "1-1-1": 52,
+        "1-0-1": 52
+      }
+    },
+    {
+      "epoch": 14,
+      "train_loss": 14.841850237412887,
+      "validation_loss": 36.6483097076416,
+      "validation": {
+        "cer": 0.2960716348931254,
+        "wer": 0.5954415954415955,
+        "exact_line_accuracy": 0.01,
+        "medicine": 0.36,
+        "dose": 0.11,
+        "frequency": 0.34,
+        "duration": 0.41
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 3666.0965382999857,
+      "pattern_counts": {
+        "0-1-0": 53,
+        "0-0-1": 53,
+        "1-1-1": 53,
+        "1-0-1": 52,
+        "1-0-0": 52
+      }
+    },
+    {
+      "epoch": 15,
+      "train_loss": 12.947484926743941,
+      "validation_loss": 29.6788010597229,
+      "validation": {
+        "cer": 0.255632582322357,
+        "wer": 0.5242165242165242,
+        "exact_line_accuracy": 0.01,
+        "medicine": 0.34,
+        "dose": 0.31,
+        "frequency": 0.36,
+        "duration": 0.48
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 3979.2134307999804,
+      "pattern_counts": {
+        "0-0-1": 53,
+        "1-1-1": 53,
+        "1-0-1": 53,
+        "1-0-0": 52,
+        "0-1-0": 52
+      }
+    },
+    {
+      "epoch": 16,
+      "train_loss": 10.400516206567938,
+      "validation_loss": 31.538312911987305,
+      "validation": {
+        "cer": 0.2530329289428076,
+        "wer": 0.49002849002849,
+        "exact_line_accuracy": 0.02,
+        "medicine": 0.33,
+        "dose": 0.22,
+        "frequency": 0.55,
+        "duration": 0.57
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "patience_counter": 0,
+      "elapsed_seconds": 4192.6704849999805,
+      "pattern_counts": {
+        "1-1-1": 53,
+        "1-0-1": 53,
+        "1-0-0": 53,
+        "0-1-0": 52,
+        "0-0-1": 52
+      }
+    },
+    {
+      "epoch": 17,
+      "train_loss": 8.513744657689875,
+      "validation_loss": 78.44385528564453,
+      "validation": {
+        "cer": 0.37030618139803584,
+        "wer": 0.5584045584045584,
+        "exact_line_accuracy": 0.01,
+        "medicine": 0.17,
+        "dose": 0.18,
+        "frequency": 0.48,
+        "duration": 0.61
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "patience_counter": 1,
+      "elapsed_seconds": 4331.9844132,
+      "pattern_counts": {
+        "1-0-1": 53,
+        "1-0-0": 53,
+        "0-1-0": 53,
+        "0-0-1": 52,
+        "1-1-1": 52
+      }
+    },
+    {
+      "epoch": 18,
+      "train_loss": 8.298177870837124,
+      "validation_loss": 48.87928247451782,
+      "validation": {
+        "cer": 0.3093587521663778,
+        "wer": 0.5071225071225072,
+        "exact_line_accuracy": 0.02,
+        "medicine": 0.3,
+        "dose": 0.38,
+        "frequency": 0.56,
+        "duration": 0.64
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "patience_counter": 2,
+      "elapsed_seconds": 4491.615898899996,
+      "pattern_counts": {
+        "1-0-0": 53,
+        "0-1-0": 53,
+        "0-0-1": 53,
+        "1-1-1": 52,
+        "1-0-1": 52
+      }
+    },
+    {
+      "epoch": 19,
+      "train_loss": 7.049091122367165,
+      "validation_loss": 74.65979957580566,
+      "validation": {
+        "cer": 0.3535528596187175,
+        "wer": 0.5769230769230769,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.17,
+        "dose": 0.2,
+        "frequency": 0.46,
+        "duration": 0.53
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "patience_counter": 3,
+      "elapsed_seconds": 4651.732089099998,
+      "pattern_counts": {
+        "0-1-0": 53,
+        "0-0-1": 53,
+        "1-1-1": 53,
+        "1-0-1": 52,
+        "1-0-0": 52
+      }
+    },
+    {
+      "epoch": 20,
+      "train_loss": 5.918356570330533,
+      "validation_loss": 40.68823719024658,
+      "validation": {
+        "cer": 0.2634315424610052,
+        "wer": 0.4658119658119658,
+        "exact_line_accuracy": 0.01,
+        "medicine": 0.22,
+        "dose": 0.12,
+        "frequency": 0.63,
+        "duration": 0.8
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "patience_counter": 4,
+      "elapsed_seconds": 4811.073476799997,
+      "pattern_counts": {
+        "0-0-1": 53,
+        "1-1-1": 53,
+        "1-0-1": 53,
+        "1-0-0": 52,
+        "0-1-0": 52
+      }
+    }
+  ],
+  "best_epoch": 16,
+  "best_validation_greedy_cer": 0.2530329289428076,
+  "stop_epoch": 20,
+  "early_stopping": false,
+  "checkpoint_sha256": "c94f5f6f76e15a77077b4cef6d43e3c81c2f68d790380450124e37673b2b00a5",
+  "test_inference": false
+}

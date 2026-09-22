@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "flow_id": "joint_pain",
+  "version": "1.0.0",
+  "namespace": "standard",
+  "label": {"en": "Joint pain", "bn": "Joint pain", "hi": "Joint pain"},
+  "applicable_complaint": "joint_pain",
+  "content_status": "prototype_unvalidated",
+  "traversal": "ordered_applicable",
+  "completion": "all_applicable_addressed",
+  "sections": [
+    {"section_id":"chief_complaint","label":{"en":"Main concern","bn":"Main concern","hi":"Main concern"},"questions":[
+      {"question_id":"chief_complaint.description","field":"chief_complaint.description","type":"short_text","required":true,"allow_unknown":true,"text":{"en":"In your own words, describe the joint pain.","bn":"In your own words, describe the joint pain.","hi":"In your own words, describe the joint pain."}}
+    ]},
+    {"section_id":"hpi","label":{"en":"Joint pain details","bn":"Joint pain details","hi":"Joint pain details"},"questions":[
+      {"question_id":"hpi.joint","field":"hpi.joint","type":"short_text","required":true,"allow_unknown":true,"text":{"en":"Which joint is affected?","bn":"Which joint is affected?","hi":"Which joint is affected?"}},
+      {"question_id":"hpi.onset","field":"hpi.onset","type":"duration","required":true,"allow_unknown":true,"text":{"en":"When did the pain start?","bn":"When did the pain start?","hi":"When did the pain start?"},"constraints":{"minimum":0,"maximum":1000}},
+      {"question_id":"hpi.start_pattern","field":"hpi.start_pattern","type":"single_choice","required":true,"allow_unknown":true,"text":{"en":"Did it start suddenly or gradually?","bn":"Did it start suddenly or gradually?","hi":"Did it start suddenly or gradually?"},"options":[{"value":"sudden","label":{"en":"Suddenly","bn":"Suddenly","hi":"Suddenly"}},{"value":"gradual","label":{"en":"Gradually","bn":"Gradually","hi":"Gradually"}}]},
+      {"question_id":"hpi.inflammation","field":"hpi.inflammation","type":"boolean","required":true,"allow_unknown":true,"text":{"en":"Is there swelling, redness, or warmth?","bn":"Is there swelling, redness, or warmth?","hi":"Is there swelling, redness, or warmth?"}},
+      {"question_id":"hpi.injury","field":"hpi.injury","type":"boolean","required":true,"allow_unknown":true,"text":{"en":"Was there an injury, fall, or twisting?","bn":"Was there an injury, fall, or twisting?","hi":"Was there an injury, fall, or twisting?"}},
+      {"question_id":"hpi.movement","field":"hpi.movement","type":"boolean","required":true,"allow_unknown":true,"text":{"en":"Is the pain worse while walking or moving?","bn":"Is the pain worse while walking or moving?","hi":"Is the pain worse while walking or moving?"}},
+      {"question_id":"hpi.morning_stiffness","field":"hpi.morning_stiffness","type":"boolean","required":true,"allow_unknown":true,"text":{"en":"Do you have morning stiffness?","bn":"Do you have morning stiffness?","hi":"Do you have morning stiffness?"}},
+      {"question_id":"hpi.stiffness_duration","field":"hpi.stiffness_duration","type":"duration","required":true,"allow_unknown":true,"text":{"en":"How long does the morning stiffness last?","bn":"How long does the morning stiffness last?","hi":"How long does the morning stiffness last?"},"constraints":{"minimum":0,"maximum":1000},"depends_on":["hpi.morning_stiffness"],"when":[{"question_id":"hpi.morning_stiffness","operator":"equals","value":true}]},
+      {"question_id":"hpi.fever","field":"hpi.fever","type":"boolean","required":true,"allow_unknown":true,"text":{"en":"Do you have fever along with the joint pain?","bn":"Do you have fever along with the joint pain?","hi":"Do you have fever along with the joint pain?"}},
+      {"question_id":"hpi.previous","field":"hpi.previous","type":"boolean","required":true,"allow_unknown":true,"text":{"en":"Have you had this problem before?","bn":"Have you had this problem before?","hi":"Have you had this problem before?"}}
+    ]},
+    {"section_id":"medications","label":{"en":"Current medicines","bn":"Current medicines","hi":"Current medicines"},"questions":[
+      {"question_id":"medications.any","field":"medications.any","type":"boolean","required":true,"allow_unknown":true,"text":{"en":"Are you taking any pain medicine currently?","bn":"Are you taking any pain medicine currently?","hi":"Are you taking any pain medicine currently?"}},
+      {"question_id":"medications.details","field":"medications.details","type":"short_text","required":true,"allow_unknown":true,"text":{"en":"Please list its name and how often you take it, if known.","bn":"Please list its name and how often you take it, if known.","hi":"Please list its name and how often you take it, if known."},"depends_on":["medications.any"],"when":[{"question_id":"medications.any","operator":"equals","value":true}]}
+    ]}
+  ]
+}

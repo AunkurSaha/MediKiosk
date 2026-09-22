@@ -1,0 +1,126 @@
+{
+  "status": "training",
+  "history": [
+    {
+      "epoch": 11,
+      "loss": 16.577861005609687,
+      "validation": {
+        "cer": 0.3012709416522241,
+        "wer": 0.49572649572649574,
+        "exact_line_accuracy": 0.01,
+        "medicine": 0.22,
+        "dose": 0.55,
+        "frequency": 0.49,
+        "duration": 0.72
+      }
+    },
+    {
+      "epoch": 12,
+      "loss": 13.828498276797207,
+      "validation": {
+        "cer": 0.23830155979202772,
+        "wer": 0.41025641025641024,
+        "exact_line_accuracy": 0.04,
+        "medicine": 0.39,
+        "dose": 0.47,
+        "frequency": 0.54,
+        "duration": 0.78
+      }
+    },
+    {
+      "epoch": 13,
+      "loss": 12.085040482607754,
+      "validation": {
+        "cer": 0.23830155979202772,
+        "wer": 0.3660968660968661,
+        "exact_line_accuracy": 0.03,
+        "medicine": 0.43,
+        "dose": 0.5,
+        "frequency": 0.64,
+        "duration": 0.88
+      }
+    },
+    {
+      "epoch": 14,
+      "loss": 10.480393929914994,
+      "validation": {
+        "cer": 0.2004621606008088,
+        "wer": 0.30626780626780625,
+        "exact_line_accuracy": 0.1,
+        "medicine": 0.61,
+        "dose": 0.45,
+        "frequency": 0.78,
+        "duration": 0.82
+      }
+    },
+    {
+      "epoch": 15,
+      "loss": 9.496057943864303,
+      "validation": {
+        "cer": 0.2616984402079723,
+        "wer": 0.4415954415954416,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.39,
+        "dose": 0.4,
+        "frequency": 0.52,
+        "duration": 0.81
+      }
+    },
+    {
+      "epoch": 16,
+      "loss": 8.828662742267955,
+      "validation": {
+        "cer": 0.27671865973425763,
+        "wer": 0.42592592592592593,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.35,
+        "dose": 0.4,
+        "frequency": 0.56,
+        "duration": 0.86
+      }
+    },
+    {
+      "epoch": 17,
+      "loss": 7.78063807704232,
+      "validation": {
+        "cer": 0.24321201617562102,
+        "wer": 0.4202279202279202,
+        "exact_line_accuracy": 0.01,
+        "medicine": 0.36,
+        "dose": 0.43,
+        "frequency": 0.51,
+        "duration": 0.86
+      }
+    },
+    {
+      "epoch": 18,
+      "loss": 6.864401427182284,
+      "validation": {
+        "cer": 0.20826112073945696,
+        "wer": 0.37037037037037035,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.49,
+        "dose": 0.51,
+        "frequency": 0.72,
+        "duration": 0.89
+      }
+    },
+    {
+      "epoch": 19,
+      "loss": 5.923104372891513,
+      "validation": {
+        "cer": 0.2657423454650491,
+        "wer": 0.3789173789173789,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.45,
+        "dose": 0.4,
+        "frequency": 0.81,
+        "duration": 0.75
+      }
+    }
+  ],
+  "best_epoch": 14,
+  "best_validation_cer": 0.2004621606008088,
+  "warm_restart": true,
+  "batch_size": 32
+}

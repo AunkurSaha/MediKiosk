@@ -53,3 +53,9 @@ docker-data/
 
 # Local Claude Code settings
 .claude/settings.local.json
+
+# Python uv cache
+.uv-cache/
+
+# Large generated OCR benchmark trace
+medikiosk-ocr/benchmarks/clean512_v2_ctc_schedule_audit/posterior_traces.jsonl

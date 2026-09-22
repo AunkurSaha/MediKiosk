@@ -1,0 +1,73 @@
+....................FFFFFF...F.............................F..ssF.s..... [ 12%]
+.ss.s.........................................FFF....................... [ 24%]
+........................................................................ [ 37%]
+......................................FFFFFFFFFF..F..................... [ 49%]
+.............FFFFFFFF.......F........................................... [ 61%]
+....................FFF..FF............................................. [ 74%]
+....................FFF................................................. [ 86%]
+................FF........................................F..F.......... [ 99%]
+.....                                                                    [100%]
+============================== warnings summary ===============================
+backend\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\MEDIKIOSK\backend\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+backend\.venv\Lib\site-packages\requests\__init__.py:86
+  C:\MEDIKIOSK\backend\.venv\Lib\site-packages\requests\__init__.py:86: RequestsDependencyWarning: Unable to find acceptable character detection dependency (chardet or charset_normalizer).
+    warnings.warn(
+
+tests/test_phone_otp_auth.py::test_verify_valid_otp
+tests/test_phone_otp_auth.py::test_logout_invalidates_session
+tests/test_phone_otp_auth.py::test_logout_invalidates_session
+tests/test_phone_otp_auth.py::test_logout_invalidates_session
+tests/test_phone_otp_auth.py::test_role_separation_patient_cannot_access_doctor
+  C:\MEDIKIOSK\backend\.venv\Lib\site-packages\starlette\testclient.py:455: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return super().request(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[chest_pain]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[abdominal_pain]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[fever]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[headache]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[cough_breathlessness]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[ayush_demo.history]
+FAILED backend\tests\test_adaptive.py::test_legacy_resume_uses_server_config_and_preserves_original
+FAILED backend\tests\test_adaptive.py::test_latest_answers_stay_in_configuration_order_after_correction
+FAILED backend\tests\test_adaptive_rag.py::test_red_flag_always_outranks_rag
+FAILED backend\tests\test_demo_polish.py::test_seed_showcase_patient_service
+FAILED backend\tests\test_demo_polish.py::test_reset_demo_data_service - Name...
+FAILED backend\tests\test_demo_polish.py::test_demo_api_endpoints - assert 50...
+FAILED backend\tests\test_normalization.py::test_typed_and_explicit_unknown_answers_bypass_provider
+FAILED backend\tests\test_normalization.py::test_source_edit_history_cache_and_flow_authority
+FAILED backend\tests\test_normalization.py::test_inactive_normalization_is_historical_and_reactivation_reuses_snapshot
+FAILED backend\tests\test_normalization.py::test_provider_failures_are_persisted_and_interview_continues[unavailable]
+FAILED backend\tests\test_normalization.py::test_provider_failures_are_persisted_and_interview_continues[timeout]
+FAILED backend\tests\test_normalization.py::test_provider_failures_are_persisted_and_interview_continues[malformed]
+FAILED backend\tests\test_normalization.py::test_provider_failures_are_persisted_and_interview_continues[disabled]
+FAILED backend\tests\test_normalization.py::test_normalization_storage_failure_does_not_rollback_patient_answer[insert]
+FAILED backend\tests\test_normalization.py::test_normalization_storage_failure_does_not_rollback_patient_answer[select]
+FAILED backend\tests\test_normalization.py::test_completion_snapshot_and_confirmation_never_promote_machine_facts
+FAILED backend\tests\test_nvidia_normalization.py::test_source_commit_precedes_provider_and_optional_commit_failure_preserves_answer
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[401-authentication_failed]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[403-authentication_failed]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[429-rate_limited]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[500-server_error]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[503-server_error]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[202-provider_unavailable]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[302-provider_unavailable]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[422-provider_unavailable]
+FAILED backend\tests\test_nvidia_normalization.py::test_live_source_edit_branch_reactivation_and_confirmed_immutability
+FAILED backend\tests\test_rag_multilingual_speech.py::test_bengali_rag_question_presentation_and_tts
+FAILED backend\tests\test_rag_multilingual_speech.py::test_hindi_rag_question_presentation_and_tts
+FAILED backend\tests\test_rag_multilingual_speech.py::test_english_rag_question_presentation_and_tts
+FAILED backend\tests\test_rag_multilingual_speech.py::test_template_fallback_passes_through_translation
+FAILED backend\tests\test_rag_multilingual_speech.py::test_validated_english_wording_translated_not_template
+FAILED backend\tests\test_red_flags.py::test_interview_submission_triggers_red_flag_in_state
+FAILED backend\tests\test_red_flags.py::test_triage_api_list_and_acknowledge
+FAILED backend\tests\test_red_flags.py::test_triage_websocket_feed - Assertio...
+FAILED backend\tests\test_stabilization_alerts.py::test_offline_explicit_symptom_triggers_existing_rule
+FAILED backend\tests\test_stabilization_alerts.py::test_answer_commit_delivers_creation_event
+FAILED backend\tests\test_workflow.py::test_full_intake_review_confirm_preserves_draft_and_audit
+FAILED backend\tests\test_workflow.py::test_idempotent_session_consent_answers_completion
+44 failed, 531 passed, 6 skipped, 7 warnings in 152.42s (0:02:32)

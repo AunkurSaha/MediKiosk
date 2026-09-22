@@ -1,0 +1,10 @@
+{
+  "validation_cer": {
+    "greedy": 0.18110918544194107,
+    "beam50": 0.15222414789139227
+  },
+  "preferred": "beam50",
+  "tie_rule": "greedy",
+  "test_inference_has_started": false,
+  "qualification": "validation-preferred under the renderer-conditioned validation split"
+}

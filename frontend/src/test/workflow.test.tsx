@@ -79,6 +79,14 @@ beforeEach(() => {
   );
   vi.spyOn(window, 'confirm').mockReturnValue(true);
   vi.mocked(api.session).mockResolvedValue(detail());
+  vi.mocked(api.createPacket).mockResolvedValue({
+    packet_id: 'packet-1',
+    session_id: id,
+    packet_version: '1.0',
+    status: 'ACTIVE',
+    created_at: '2026-09-09T00:00:00Z',
+    expires_at: '2026-09-10T00:00:00Z',
+  });
   vi.mocked(api.interview).mockImplementation(async () => {
     const record = await api.session(id);
     return legacyState(record.answers.length);
@@ -86,14 +94,112 @@ beforeEach(() => {
   vi.mocked(api.interviewAnswer).mockImplementation(async (_id, submission) =>
     legacyState(questions.findIndex((q) => q.question_id === submission.question_id) + 1),
   );
+  vi.mocked(api.rapidRouting).mockResolvedValue({
+    phase: 'result',
+    revision: 1,
+    questions_asked: [],
+    questions_skipped: [],
+    result: {
+      id: 'routing-1',
+      session_id: id,
+      chief_complaint: 'FEVER',
+      routing_state: 'ROUTINE_OPD',
+      suggested_specialty: 'GENERAL_MEDICINE',
+      triggered_red_flags: [],
+      supporting_evidence_ids: [],
+      questions_asked: [],
+      questions_skipped: [],
+      completed_at: '2026-09-09T00:00:00Z',
+      routing_protocol_version: '1.0.0',
+    },
+  });
+  vi.mocked(api.routingLocation).mockResolvedValue({
+    id: 'location-1',
+    session_id: id,
+    patient_id: 'patient',
+    source: 'MANUAL_LOCALITY',
+    latitude: null,
+    longitude: null,
+    locality: 'Kolkata',
+    postal_code: null,
+    precision: null,
+    revision: 1,
+    captured_at: '2026-09-09T00:00:00Z',
+  });
+  vi.mocked(api.mediroute).mockResolvedValue({
+    id: 'mediroute-1',
+    session_id: id,
+    clinical_routing_result_id: 'routing-1',
+    status: 'COMPLETED',
+    routing_state: 'ROUTINE_OPD',
+    suggested_specialty: 'GENERAL_MEDICINE',
+    directory_version: 'demo_facilities_v1',
+    protocol_version: '1.0.0',
+    required_specialty: 'GENERAL_MEDICINE',
+    required_capabilities: [],
+    preferred_capabilities: ['LAB'],
+    generated_at: '2026-09-09T00:00:00Z',
+    recommendations: [
+      {
+        facility_id: 'hospital-1',
+        facility_name: 'MediKiosk City Hospital',
+        rank: 1,
+        distance_km: null,
+        eligibility_reasons: ['REQUIRED_SPECIALTY_AVAILABLE'],
+        ranking_reasons: ['OPEN'],
+        capabilities: ['GENERAL_MEDICINE'],
+        emergency_available: true,
+      },
+    ],
+  });
+  vi.mocked(api.selectFacility).mockResolvedValue(detail().session);
+  vi.mocked(api.doctorMatch).mockResolvedValue({
+    id: 'doctor-match-1',
+    session_id: id,
+    facility_id: 'hospital-1',
+    required_specialty: 'GENERAL_MEDICINE',
+    directory_version: 'demo_doctors_v1',
+    protocol_version: '1.0.0',
+    status: 'COMPLETED',
+    selected_doctor_id: null,
+    generated_at: '2026-09-09T00:00:00Z',
+    recommendations: [
+      {
+        doctor_id: 'doctor-1',
+        name: 'Dr. Demo',
+        qualification: 'MD',
+        primary_specialty: 'GENERAL_MEDICINE',
+        expertise_tags: ['FEVER'],
+        languages: ['en'],
+        availability_status: 'AVAILABLE',
+        years_of_experience: 10,
+        rank: 1,
+        recommended: true,
+        eligibility_reasons: ['SPECIALTY_MATCH'],
+        ranking_reasons: ['RELEVANT_EXPERTISE', 'AVAILABLE_FOR_CONSULTATION'],
+      },
+    ],
+  });
+  vi.mocked(api.selectDoctorMatch).mockImplementation(async () => ({
+    ...(await api.doctorMatch(id)),
+    selected_doctor_id: 'doctor-1',
+  }));
   vi.mocked(api.complete).mockResolvedValue({ ...detail().session, status: 'ready_for_review' });
   vi.mocked(api.queueEstimate).mockResolvedValue({
     session_id: id,
     doctor_id: 'doctor-1',
     doctor_name: 'Dr. Queue',
+    hospital_id: 'hospital-1',
+    hospital_name: 'Synthetic Hospital',
+    service_date: '2026-09-09',
+    visit_token: 'MK-GENE-003',
+    status: 'WAITING',
     position: 3,
-    estimated_wait_minutes: 15,
-    expected_meeting_at: '2026-09-09T00:15:00Z',
+    patients_ahead: 2,
+    estimated_wait_minutes: 24,
+    is_estimate: true,
+    calculation_basis: '2 patients ahead × 12 min average consultation',
+    policy_version: '1.0',
   });
   vi.mocked(api.medicalFacts).mockResolvedValue({
     medications: [],
@@ -113,7 +219,7 @@ beforeEach(() => {
   vi.mocked(api.getFieldVerifications).mockResolvedValue({ items: [] });
 });
 describe('Patient intake', () => {
-  it('records consent, saves all answers, completes and clears the kiosk', async () => {
+  it('records consent, completes, and retains the queue reservation for reload', async () => {
     const user = userEvent.setup();
     const initial = { ...detail(), consent: null };
     vi.mocked(api.create).mockResolvedValue(initial.session);
@@ -121,56 +227,51 @@ describe('Patient intake', () => {
     vi.mocked(api.consent).mockResolvedValue(detail().consent);
     open('/kiosk/language');
     await user.click(screen.getByRole('button', { name: /English/ }));
+    await user.click(screen.getByRole('button', { name: /Planning my visit/ }));
     await user.type(screen.getByLabelText('Patient name'), 'Synthetic Patient');
     await fillDemographics(user);
-    await user.type(screen.getByLabelText('Hospital token'), 'DEMO-104');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
     const start = await screen.findByRole('button', { name: 'Start the interview' });
     expect(start).toBeDisabled();
     expect(api.interviewAnswer).not.toHaveBeenCalled();
     await user.click(screen.getByRole('checkbox', { name: /agree to store/i }));
     await user.click(start);
+    await user.click(await screen.findByRole('button', { name: 'Find a suitable facility' }));
+    await user.click(await screen.findByRole('button', { name: 'Select facility' }));
+    await user.click(await screen.findByRole('button', { name: 'Select Doctor' }));
     for (let i = 0; i < questions.length; i++) {
       await screen.findByRole('heading', { name: questions[i].text.en });
       await user.type(screen.getByLabelText('Your answer'), 'Answer ' + i);
       await user.click(screen.getByRole('button', { name: 'Save and continue' }));
     }
     await user.click(await screen.findByRole('button', { name: 'Finish intake' }));
-    await screen.findByRole('heading', { name: 'Ready for your doctor' });
-    expect(await screen.findByText('15 minutes')).toBeVisible();
-    expect(screen.getByText('Estimated total wait time:')).toBeVisible();
+    await screen.findByRole('heading', { name: 'Your pre-consultation intake is ready' });
+    expect(await screen.findByText(/MK-GENE-003/)).toBeVisible();
+    expect(screen.getByLabelText('Visit queue reservation')).toHaveTextContent('WAITING');
+    expect(screen.getByLabelText('Visit queue reservation')).toHaveTextContent('24 minutes');
     expect(api.interviewAnswer).toHaveBeenCalledTimes(5);
     expect(api.complete).toHaveBeenCalledTimes(1);
-    expect(sessionStorage.getItem('medikiosk.session')).toBeNull();
+    expect(sessionStorage.getItem('medikiosk.session')).toBeTruthy();
     await user.click(screen.getByRole('button', { name: 'Start a new intake' }));
     await user.click(screen.getByRole('button', { name: /English/ }));
+    await user.click(screen.getByRole('button', { name: /Planning my visit/ }));
     expect(screen.getByLabelText('Patient name')).toHaveValue('');
-    expect(screen.getByLabelText('Hospital token')).toHaveValue('');
+    expect(screen.getByText(/No hospital token is needed/i)).toBeVisible();
   });
 
-  it('explains a temporary wait-time failure and retries the estimate', async () => {
+  it('restores the same queue reservation on completed-intake reload', async () => {
     const completed = {
       ...detail(),
       session: { ...detail().session, status: 'ready_for_review' as const },
     };
     sessionStorage.setItem('medikiosk.session', id);
     vi.mocked(api.session).mockResolvedValue(completed);
-    vi.mocked(api.queueEstimate)
-      .mockRejectedValueOnce(new ApiError('NETWORK_ERROR', 0))
-      .mockResolvedValueOnce({
-        session_id: id,
-        doctor_id: 'doctor-1',
-        doctor_name: 'Dr. Queue',
-        position: 2,
-        estimated_wait_minutes: 10,
-        expected_meeting_at: '2026-09-09T00:10:00Z',
-      });
-
     open('/kiosk/complete');
-    expect(await screen.findByText(/wait-time estimate could not be loaded/i)).toBeVisible();
-    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText('10 minutes')).toBeVisible();
-    expect(api.queueEstimate).toHaveBeenCalledTimes(2);
+    expect(
+      await screen.findByRole('heading', { name: 'Your pre-consultation intake is ready' }),
+    ).toBeVisible();
+    expect(await screen.findByText(/MK-GENE-003/)).toBeVisible();
+    expect(api.queueEstimate).toHaveBeenCalledWith(id);
   });
 
   it('resumes the retained session at the first missing question without creating a patient', async () => {
@@ -219,7 +320,8 @@ describe('Patient intake', () => {
   it.each(['বাংলা', 'हिन्दी'])('offers localized identification for %s', async (language) => {
     open('/kiosk/language');
     fireEvent.click(screen.getByRole('button', { name: new RegExp(language) }));
-    await waitFor(() => expect(screen.getAllByRole('textbox')).toHaveLength(3));
+    fireEvent.click(screen.getByRole('button', { name: /Planning my visit/ }));
+    await waitFor(() => expect(screen.getAllByRole('textbox')).toHaveLength(2));
     expect(screen.queryByLabelText('Patient name')).not.toBeInTheDocument();
   });
 
@@ -234,7 +336,6 @@ describe('Patient intake', () => {
     fireEvent.change(screen.getByLabelText('Age (years)'), { target: { value: '41' } });
     fireEvent.change(screen.getByLabelText('Height (cm)'), { target: { value: '178' } });
     fireEvent.change(screen.getByLabelText('Weight (kg)'), { target: { value: '79' } });
-    fireEvent.change(screen.getByLabelText('Hospital token'), { target: { value: 'DEMO-104' } });
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));
     await screen.findByRole('alert');
     fireEvent.click(screen.getByRole('button', { name: 'Continue' }));

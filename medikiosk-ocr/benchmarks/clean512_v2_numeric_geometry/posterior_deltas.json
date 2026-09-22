@@ -1,0 +1,182 @@
+[
+  {
+    "sample_id": "train_00000",
+    "pattern": "1-1-1",
+    "primary_peak": 0.1066012577083475,
+    "primary_local_peak": 0.006906872526712737,
+    "primary_space_probability": 1.8220567645310336e-07,
+    "target_log_probability": 0.2694140821355955,
+    "viterbi_log_probability": -0.23268520229624734
+  },
+  {
+    "sample_id": "train_00007",
+    "pattern": "1-1-1",
+    "primary_peak": 0.06613129694520223,
+    "primary_local_peak": -0.41925864341169417,
+    "primary_space_probability": 1.3093871688381242e-07,
+    "target_log_probability": 0.4566602035654195,
+    "viterbi_log_probability": 0.359460991632055
+  },
+  {
+    "sample_id": "train_00014",
+    "pattern": "1-1-1",
+    "primary_peak": 0.07953075363629195,
+    "primary_local_peak": 0.0008990936952685269,
+    "primary_space_probability": 2.0145726977103842e-07,
+    "target_log_probability": 0.21765138156957908,
+    "viterbi_log_probability": -0.15458972477145316
+  },
+  {
+    "sample_id": "train_00018",
+    "pattern": "1-1-1",
+    "primary_peak": 0.08232731001447122,
+    "primary_local_peak": 0.0017860413284738197,
+    "primary_space_probability": 1.1688970376644089e-07,
+    "target_log_probability": 0.06685163121996007,
+    "viterbi_log_probability": -0.21094175193281295
+  },
+  {
+    "sample_id": "train_00061",
+    "pattern": "1-1-1",
+    "primary_peak": 0.06407166123204705,
+    "primary_local_peak": 0.0017519604985933857,
+    "primary_space_probability": 4.1389804544306766e-08,
+    "target_log_probability": -0.13655132827292427,
+    "viterbi_log_probability": 0.1557583272925669
+  },
+  {
+    "sample_id": "train_00084",
+    "pattern": "1-1-1",
+    "primary_peak": 0.06739052819742197,
+    "primary_local_peak": -0.031412135757185156,
+    "primary_space_probability": 1.2860433010472597e-07,
+    "target_log_probability": 0.1665981132869243,
+    "viterbi_log_probability": -0.40462472978155795
+  },
+  {
+    "sample_id": "train_00085",
+    "pattern": "1-1-1",
+    "primary_peak": 0.008596491034125076,
+    "primary_local_peak": -0.017246823188473148,
+    "primary_space_probability": 1.9686409489243633e-08,
+    "target_log_probability": -0.5900231728185608,
+    "viterbi_log_probability": -0.6811751290060659
+  },
+  {
+    "sample_id": "train_00095",
+    "pattern": "1-1-1",
+    "primary_peak": 0.0006734246633118279,
+    "primary_local_peak": 0.0011855917215018996,
+    "primary_space_probability": -2.43444297258104e-09,
+    "target_log_probability": 0.006705157410601181,
+    "viterbi_log_probability": 0.03394161459537415
+  },
+  {
+    "sample_id": "train_00104",
+    "pattern": "1-0-0",
+    "primary_peak": -9.013566788829142e-05,
+    "primary_local_peak": -0.0016563160429227397,
+    "primary_space_probability": -5.234637399108571e-10,
+    "target_log_probability": -0.03698969574818456,
+    "viterbi_log_probability": -0.06619685201145487
+  },
+  {
+    "sample_id": "train_00159",
+    "pattern": "1-0-0",
+    "primary_peak": 0.00017090430951596097,
+    "primary_local_peak": 0.00046679905542162947,
+    "primary_space_probability": 2.1906347222328784e-09,
+    "target_log_probability": -0.0028634547902557372,
+    "viterbi_log_probability": -0.05571026889484543
+  },
+  {
+    "sample_id": "train_00385",
+    "pattern": "1-0-0",
+    "primary_peak": 0.00017308265068644718,
+    "primary_local_peak": -0.0011609861631668716,
+    "primary_space_probability": 3.0840735854522356e-09,
+    "target_log_probability": -0.0200011713402084,
+    "viterbi_log_probability": -0.06755226088348998
+  },
+  {
+    "sample_id": "train_00443",
+    "pattern": "1-0-0",
+    "primary_peak": 7.135074181549572e-05,
+    "primary_local_peak": -0.0003020463869266299,
+    "primary_space_probability": 6.260072866680777e-10,
+    "target_log_probability": -0.01627395016949773,
+    "viterbi_log_probability": -0.0005562908472391825
+  },
+  {
+    "sample_id": "train_00010",
+    "pattern": "for 5 days",
+    "primary_peak": -0.00371070373014519,
+    "primary_local_peak": -0.00371070373014519,
+    "primary_space_probability": 0.007337582513116336,
+    "target_log_probability": -0.051895752488039903,
+    "viterbi_log_probability": -0.7248700743598313
+  },
+  {
+    "sample_id": "train_00028",
+    "pattern": "for 5 days",
+    "primary_peak": -0.0003100169254498502,
+    "primary_local_peak": -0.0003100169254498502,
+    "primary_space_probability": 0.000476168625118345,
+    "target_log_probability": 0.02422590610118247,
+    "viterbi_log_probability": -0.20921889864067822
+  },
+  {
+    "sample_id": "train_00039",
+    "pattern": "for 5 days",
+    "primary_peak": -0.0002637180883546461,
+    "primary_local_peak": -0.0002637180883546461,
+    "primary_space_probability": 0.00047221915534578773,
+    "target_log_probability": 0.005517823260490662,
+    "viterbi_log_probability": 0.1364635421621987
+  },
+  {
+    "sample_id": "train_00044",
+    "pattern": "for 5 days",
+    "primary_peak": -0.00013406583083831226,
+    "primary_local_peak": -0.00013406583083831226,
+    "primary_space_probability": 0.00022225940437148317,
+    "target_log_probability": -0.007972442652476541,
+    "viterbi_log_probability": 0.07426105881913969
+  },
+  {
+    "sample_id": "train_00009",
+    "pattern": "for 7 days",
+    "primary_peak": -0.00015031413004523708,
+    "primary_local_peak": -0.00015031413004523708,
+    "primary_space_probability": 0.0005960006530649764,
+    "target_log_probability": 0.01924869021595832,
+    "viterbi_log_probability": 0.036557396169406786
+  },
+  {
+    "sample_id": "train_00042",
+    "pattern": "for 7 days",
+    "primary_peak": -2.838148357180853e-05,
+    "primary_local_peak": -2.838148357180853e-05,
+    "primary_space_probability": 3.998033793661815e-05,
+    "target_log_probability": -0.005142667180881855,
+    "viterbi_log_probability": 0.020226527376088654
+  },
+  {
+    "sample_id": "train_00050",
+    "pattern": "for 7 days",
+    "primary_peak": -1.3483838926725729e-05,
+    "primary_local_peak": -1.3483838926725729e-05,
+    "primary_space_probability": 2.5646802804701885e-05,
+    "target_log_probability": -0.011995922853650143,
+    "viterbi_log_probability": 0.09650712664987182
+  },
+  {
+    "sample_id": "train_00051",
+    "pattern": "for 7 days",
+    "primary_peak": -3.54005799666976e-05,
+    "primary_local_peak": -3.54005799666976e-05,
+    "primary_space_probability": 0.00014636516886423756,
+    "target_log_probability": -0.0016215058883464195,
+    "viterbi_log_probability": 0.1254546071393463
+  }
+]

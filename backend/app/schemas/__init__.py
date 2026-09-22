@@ -33,6 +33,7 @@ from .clinical_summary import (
     ClinicalSummary,
     ClinicalSummaryUpdate,
     EvidenceReference,
+    PreArrivalPacket,
     StructuredClinicalSummary,
     StructuredSummarySection,
     SummaryAmendRequest,
@@ -41,6 +42,14 @@ from .clinical_summary import (
     SummaryRevisionRecord,
 )
 from .consent import Consent, ConsentUpdate
+from .continuity import (
+    ContinuityChangeSet,
+    ContinuityEvidenceRef,
+    ContinuityItem,
+    ContinuityReconfirmationContext,
+    ContinuitySnapshot,
+    PriorEncounter,
+)
 from .cross_reference import CrossReferenceResponse, DocumentCrossReference, DocumentFactLink
 from .document import (
     DocumentExtractionResponse,
@@ -71,7 +80,13 @@ from .medical_fact import (
     MedicationFactReview,
     TimelineResponse,
 )
+from .mediroute import FacilityRecommendation, FacilitySelection, MediRouteResponse
 from .patient import Patient, PatientCreate
+from .patient_routing_location import (
+    PatientRoutingLocationCreate,
+    PatientRoutingLocationResponse,
+)
+from .pre_arrival_packet import HandoffResolution, HandoffTokenIssued, PacketMetadata, PacketView
 from .routing import (
     DoctorAssignment,
     DoctorMatch,
@@ -84,7 +99,14 @@ from .routing import (
     QueueEntryResponse,
     QueueTransition,
 )
-from .session import Session, SessionCreate, SessionDetail, SessionList, SessionListItem
+from .session import (
+    JourneyModeUpdate,
+    Session,
+    SessionCreate,
+    SessionDetail,
+    SessionList,
+    SessionListItem,
+)
 from .showcase import DemoResetResponse, ShowcaseSeedResponse
 from .translation import (
     LanguageIdentificationRequest,
@@ -125,6 +147,7 @@ __all__ = [
     "ClinicalSummary",
     "ClinicalSummaryUpdate",
     "EvidenceReference",
+    "PreArrivalPacket",
     "StructuredClinicalSummary",
     "StructuredSummarySection",
     "SummaryConfirm",
@@ -132,6 +155,12 @@ __all__ = [
     "SummaryRevisionRecord",
     "Consent",
     "ConsentUpdate",
+    "ContinuityChangeSet",
+    "ContinuityEvidenceRef",
+    "ContinuityItem",
+    "ContinuityReconfirmationContext",
+    "ContinuitySnapshot",
+    "PriorEncounter",
     "DocumentResponse",
     "DocumentListResponse",
     "DocumentExtractionResponse",
@@ -155,6 +184,7 @@ __all__ = [
     "SessionDetail",
     "SessionList",
     "SessionListItem",
+    "JourneyModeUpdate",
     "SummaryAmendRequest",
     "AuditTrailItem",
     "AuditTrailResponse",
@@ -185,4 +215,13 @@ __all__ = [
     "TransliterationRequest",
     "TransliterationResponse",
     "User",
+    "FacilityRecommendation",
+    "FacilitySelection",
+    "MediRouteResponse",
+    "PatientRoutingLocationCreate",
+    "PatientRoutingLocationResponse",
+    "PacketMetadata",
+    "HandoffTokenIssued",
+    "HandoffResolution",
+    "PacketView",
 ]

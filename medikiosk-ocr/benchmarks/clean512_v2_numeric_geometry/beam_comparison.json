@@ -1,0 +1,1342 @@
+[
+  {
+    "sample_id": "train_00000",
+    "original": {
+      "beam50": "PCM 625 ml 1-1 for 5 days after fod",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "PCM 625 ml 1-1 for 5 days after fod",
+          "log_probability": -1.9677422046661377
+        },
+        {
+          "rank": 2,
+          "prediction": "PCM 625 ml 1-1-1 for 5 days after fod",
+          "log_probability": -2.160006523132324
+        },
+        {
+          "rank": 3,
+          "prediction": "PCM 625 ml 1-1 for 5 days after food",
+          "log_probability": -2.423285961151123
+        },
+        {
+          "rank": 4,
+          "prediction": "PCM 625 ml 1-1-1 for 5 days after food",
+          "log_probability": -2.6155505180358887
+        },
+        {
+          "rank": 5,
+          "prediction": "PCM 625 ml 1-1 for 5 days after fd",
+          "log_probability": -2.7589292526245117
+        }
+      ],
+      "exact_token_rank_top5": 2,
+      "exact_target_rank_top5": 4
+    },
+    "counterfactual": {
+      "beam50": "PCM 625 ml 1-1-1 for 5 days after fod",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "PCM 625 ml 1-1-1 for 5 days after fod",
+          "log_probability": -1.9018815755844116
+        },
+        {
+          "rank": 2,
+          "prediction": "PCM 625 ml 1-1 for 5 days after fod",
+          "log_probability": -2.0960209369659424
+        },
+        {
+          "rank": 3,
+          "prediction": "PCM 625 ml 1-1-1 for 5 days after food",
+          "log_probability": -2.346015453338623
+        },
+        {
+          "rank": 4,
+          "prediction": "PCM 625 ml 1-1 for 5 days after food",
+          "log_probability": -2.5401546955108643
+        },
+        {
+          "rank": 5,
+          "prediction": "PCM 625 ml 1-1-1 for 5 days after fd",
+          "log_probability": -2.7048988342285156
+        }
+      ],
+      "exact_token_rank_top5": 1,
+      "exact_target_rank_top5": 3
+    }
+  },
+  {
+    "sample_id": "train_00007",
+    "original": {
+      "beam50": "Tab PCM 625 g 1-1 for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab PCM 625 g 1-1 for days",
+          "log_probability": -1.1633929014205933
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab PCM 625 g 1-1-1 for days",
+          "log_probability": -1.5161535739898682
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab PCM 625 g 1-1  for days",
+          "log_probability": -2.306950330734253
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab PCM 625 g 1-1-1  for days",
+          "log_probability": -2.659318447113037
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab PCM 625 g 1-1-1-1 for days",
+          "log_probability": -3.364628553390503
+        }
+      ],
+      "exact_token_rank_top5": 2,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Tab PCM 625 g 1-1-1 for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab PCM 625 g 1-1-1 for days",
+          "log_probability": -1.0499731302261353
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab PCM 625 g 1-1 for days",
+          "log_probability": -1.1955991983413696
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab PCM 625 g 1-1-1-1 for days",
+          "log_probability": -2.433861255645752
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab PCM 625 g 1-1-1 for 7 days",
+          "log_probability": -3.278881549835205
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab PCM 625 g 1-1 for 7 days",
+          "log_probability": -3.4245078563690186
+        }
+      ],
+      "exact_token_rank_top5": 1,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00014",
+    "original": {
+      "beam50": "Syp PCM 500 g 1-1 x 3d",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp PCM 500 g 1-1 x 3d",
+          "log_probability": -1.2979084253311157
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp PCM 500 g 1-1-1 x 3d",
+          "log_probability": -1.7482657432556152
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp PCM 500 g 1-1 x 7d",
+          "log_probability": -2.5980300903320312
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp PCM 50 g 1-1 x 3d",
+          "log_probability": -2.9988021850585938
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp PCM 500 g 1-1-1 x 7d",
+          "log_probability": -3.0483877658843994
+        }
+      ],
+      "exact_token_rank_top5": 2,
+      "exact_target_rank_top5": 2
+    },
+    "counterfactual": {
+      "beam50": "Syp PCM 500 g 1-1-1 x 3d",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp PCM 500 g 1-1-1 x 3d",
+          "log_probability": -1.5306386947631836
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp PCM 500 g 1-1 x 3d",
+          "log_probability": -1.5863230228424072
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp PCM 500 g 1-1-1 x 7d",
+          "log_probability": -2.82108736038208
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp PCM 500 g 1-1-1-1 x 3d",
+          "log_probability": -2.8642425537109375
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp PCM 500 g 1-1 x 7d",
+          "log_probability": -2.876770496368408
+        }
+      ],
+      "exact_token_rank_top5": 1,
+      "exact_target_rank_top5": 1
+    }
+  },
+  {
+    "sample_id": "train_00018",
+    "original": {
+      "beam50": "Pantoprazole 5 mg 1-1 x 3d",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Pantoprazole 5 mg 1-1 x 3d",
+          "log_probability": -1.4229459762573242
+        },
+        {
+          "rank": 2,
+          "prediction": "Pantoprazole 5 mg 1-1-1 x 3d",
+          "log_probability": -1.531306266784668
+        },
+        {
+          "rank": 3,
+          "prediction": "Pantoprazole 5 mg 1-1 x 7d",
+          "log_probability": -2.202625036239624
+        },
+        {
+          "rank": 4,
+          "prediction": "Pantoprazole 5 mg 1-1-1 x 7d",
+          "log_probability": -2.310986280441284
+        },
+        {
+          "rank": 5,
+          "prediction": "Pantoprazole 5 mg 1-1-1-1 x 3d",
+          "log_probability": -2.90470814704895
+        }
+      ],
+      "exact_token_rank_top5": 2,
+      "exact_target_rank_top5": 4
+    },
+    "counterfactual": {
+      "beam50": "Pantoprazole 5 mg 1-1-1 x 3d",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Pantoprazole 5 mg 1-1-1 x 3d",
+          "log_probability": -1.4654415845870972
+        },
+        {
+          "rank": 2,
+          "prediction": "Pantoprazole 5 mg 1-1 x 3d",
+          "log_probability": -1.5710893869400024
+        },
+        {
+          "rank": 3,
+          "prediction": "Pantoprazole 5 mg 1-1-1 x 7d",
+          "log_probability": -2.244131088256836
+        },
+        {
+          "rank": 4,
+          "prediction": "Pantoprazole 5 mg 1-1 x 7d",
+          "log_probability": -2.3497676849365234
+        },
+        {
+          "rank": 5,
+          "prediction": "Pantoprazole 5 mg 1-1-1-1 x 3d",
+          "log_probability": -2.6229488849639893
+        }
+      ],
+      "exact_token_rank_top5": 1,
+      "exact_target_rank_top5": 3
+    }
+  },
+  {
+    "sample_id": "train_00061",
+    "original": {
+      "beam50": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ed",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ed",
+          "log_probability": -5.259449005126953
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp  Cetirizine  500  mcg  1-1  for 5 days  as ed",
+          "log_probability": -5.348748683929443
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as eded",
+          "log_probability": -5.6875715255737305
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ned",
+          "log_probability": -5.7343010902404785
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1-1  for 5 days  as ed",
+          "log_probability": -5.737279415130615
+        }
+      ],
+      "exact_token_rank_top5": 5,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ed",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ed",
+          "log_probability": -5.647640705108643
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp  Cetirizine  500  mcg  1-1  for 5 days  as ed",
+          "log_probability": -5.747717380523682
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1-1  for 5 days  as ed",
+          "log_probability": -5.8891191482543945
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp  Cetirizine  500  mcg  1-1-1  for 5 days  as ed",
+          "log_probability": -5.988827228546143
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as eded",
+          "log_probability": -6.166023254394531
+        }
+      ],
+      "exact_token_rank_top5": 3,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00084",
+    "original": {
+      "beam50": "Syrup PCM 625 mcg 1-1 for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syrup PCM 625 mcg 1-1 for days",
+          "log_probability": -1.002490520477295
+        },
+        {
+          "rank": 2,
+          "prediction": "Syrup PCM 625 mcg 1-1-1 for days",
+          "log_probability": -1.1564230918884277
+        },
+        {
+          "rank": 3,
+          "prediction": "Syrup PCM 625 mcg 1-1-1-1 for days",
+          "log_probability": -3.0046169757843018
+        },
+        {
+          "rank": 4,
+          "prediction": "Syrup PCM 625 mcg 1-1 for 7 days",
+          "log_probability": -3.213157892227173
+        },
+        {
+          "rank": 5,
+          "prediction": "Syrup PCM 625 mcg 1-1-1 for 7 days",
+          "log_probability": -3.3670904636383057
+        }
+      ],
+      "exact_token_rank_top5": 2,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Syrup PCM 625 mcg 1-1-1 for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syrup PCM 625 mcg 1-1-1 for days",
+          "log_probability": -0.9731124043464661
+        },
+        {
+          "rank": 2,
+          "prediction": "Syrup PCM 625 mcg 1-1 for days",
+          "log_probability": -1.3059028387069702
+        },
+        {
+          "rank": 3,
+          "prediction": "Syrup PCM 625 mcg 1-1-1-1 for days",
+          "log_probability": -2.321524143218994
+        },
+        {
+          "rank": 4,
+          "prediction": "Syrup PCM 625 mcg 1-1-1 for 7 days",
+          "log_probability": -3.1954891681671143
+        },
+        {
+          "rank": 5,
+          "prediction": "Syrup PCM 625 mcg 1-1-1 for 5 days",
+          "log_probability": -3.4732069969177246
+        }
+      ],
+      "exact_token_rank_top5": 1,
+      "exact_target_rank_top5": 5
+    }
+  },
+  {
+    "sample_id": "train_00085",
+    "original": {
+      "beam50": "Cap Cetirizine 10 mcg 1-1 as need",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Cap Cetirizine 10 mcg 1-1 as need",
+          "log_probability": -2.8475351333618164
+        },
+        {
+          "rank": 2,
+          "prediction": "Cap Cetirizine 10 mcg 1-1 as needed",
+          "log_probability": -2.851551055908203
+        },
+        {
+          "rank": 3,
+          "prediction": "Cap Cetirizine 10 mcg 1-1 as neded",
+          "log_probability": -2.9162375926971436
+        },
+        {
+          "rank": 4,
+          "prediction": "Cap Cetirizine 10 mcg 1-1-1 as need",
+          "log_probability": -3.0198822021484375
+        },
+        {
+          "rank": 5,
+          "prediction": "Cap Cetirizine 10 mcg 1-1-1 as needed",
+          "log_probability": -3.0325443744659424
+        }
+      ],
+      "exact_token_rank_top5": 4,
+      "exact_target_rank_top5": 5
+    },
+    "counterfactual": {
+      "beam50": "Cap Cetirizine 10 mcg 1-1 as need",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Cap Cetirizine 10 mcg 1-1 as need",
+          "log_probability": -3.2260754108428955
+        },
+        {
+          "rank": 2,
+          "prediction": "Cap Cetirizine 10 mcg 1-1 as needed",
+          "log_probability": -3.2377448081970215
+        },
+        {
+          "rank": 3,
+          "prediction": "Cap Cetirizine 10 mcg 1-1 as neded",
+          "log_probability": -3.335503101348877
+        },
+        {
+          "rank": 4,
+          "prediction": "Cap Cetirizine 10 mcg 1-1-1 as needed",
+          "log_probability": -3.6308329105377197
+        },
+        {
+          "rank": 5,
+          "prediction": "Cap Cetirizine 10 mcg 1-1-1 as need",
+          "log_probability": -3.667006731033325
+        }
+      ],
+      "exact_token_rank_top5": 4,
+      "exact_target_rank_top5": 4
+    }
+  },
+  {
+    "sample_id": "train_00095",
+    "original": {
+      "beam50": "Tab Paracetamol 650 g 1-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab Paracetamol 650 g 1-1",
+          "log_probability": -2.501643419265747
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab Paracetamol 650 g 0-1",
+          "log_probability": -2.6003353595733643
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab Paracetamol 650 g -1",
+          "log_probability": -2.7551257610321045
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab Pararacetamol 650 g 1-1",
+          "log_probability": -3.88228440284729
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab Pararacetamol 650 g 0-1",
+          "log_probability": -3.9909286499023438
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Tab Paracetamol 650 g 1-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab Paracetamol 650 g 1-1",
+          "log_probability": -2.4988019466400146
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab Paracetamol 650 g 0-1",
+          "log_probability": -2.6269545555114746
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab Paracetamol 650 g -1",
+          "log_probability": -2.729799747467041
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab Pararacetamol 650 g 1-1",
+          "log_probability": -3.879913806915283
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab Pararacetamol 650 g 0-1",
+          "log_probability": -4.01803731918335
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00104",
+    "original": {
+      "beam50": "Pantoprazole  5  g  0-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Pantoprazole  5  g  0-1",
+          "log_probability": -2.176903486251831
+        },
+        {
+          "rank": 2,
+          "prediction": "Pantoprazole  5  g  1-1",
+          "log_probability": -2.2911183834075928
+        },
+        {
+          "rank": 3,
+          "prediction": "Pantoprazole  5  g  -1",
+          "log_probability": -2.36470103263855
+        },
+        {
+          "rank": 4,
+          "prediction": "Pantoprazole  5  g  -0-1",
+          "log_probability": -3.583071708679199
+        },
+        {
+          "rank": 5,
+          "prediction": "Pantoprazole  5  g  -1-1",
+          "log_probability": -3.7088723182678223
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Pantoprazole  5  g  0-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Pantoprazole  5  g  0-1",
+          "log_probability": -2.195369005203247
+        },
+        {
+          "rank": 2,
+          "prediction": "Pantoprazole  5  g  -1",
+          "log_probability": -2.309163808822632
+        },
+        {
+          "rank": 3,
+          "prediction": "Pantoprazole  5  g  1-1",
+          "log_probability": -2.3134896755218506
+        },
+        {
+          "rank": 4,
+          "prediction": "Pantoprazole  5  g  -0-1",
+          "log_probability": -3.528163433074951
+        },
+        {
+          "rank": 5,
+          "prediction": "Pantoprazole  5  g  -1-1",
+          "log_probability": -3.669131278991699
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00159",
+    "original": {
+      "beam50": "Tab  PCM  40  mg  0-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab  PCM  40  mg  0-1",
+          "log_probability": -2.433819532394409
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab  PCM  40  mg  1-1",
+          "log_probability": -2.450875759124756
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab  PCM  40  mg  -1",
+          "log_probability": -2.9809091091156006
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab  PCM  40  mg  0-1-1",
+          "log_probability": -3.8658971786499023
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab  PCM  40  mg  1-1-1",
+          "log_probability": -3.915860176086426
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Tab  PCM  40  mg  0-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab  PCM  40  mg  0-1",
+          "log_probability": -2.4437642097473145
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab  PCM  40  mg  1-1",
+          "log_probability": -2.459825038909912
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab  PCM  40  mg  -1",
+          "log_probability": -2.9903039932250977
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab  PCM  40  mg  0-1-1",
+          "log_probability": -3.9095542430877686
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab  PCM  40  mg  1-1-1",
+          "log_probability": -3.922844171524048
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00385",
+    "original": {
+      "beam50": "Tab Pantoprazole 625 g 0-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab Pantoprazole 625 g 0-1",
+          "log_probability": -1.9120723009109497
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab Pantoprazole 625 g 1-1",
+          "log_probability": -2.250826835632324
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab Pantoprazole 625 g -1",
+          "log_probability": -2.603323221206665
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab Pantoprazole 625 g 0-0-1",
+          "log_probability": -3.304823875427246
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab Pantoprazole 625 g 0-1-1",
+          "log_probability": -3.5394768714904785
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Tab Pantoprazole 625 g 0-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab Pantoprazole 625 g 0-1",
+          "log_probability": -1.9105812311172485
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab Pantoprazole 625 g 1-1",
+          "log_probability": -2.259279727935791
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab Pantoprazole 625 g -1",
+          "log_probability": -2.585979461669922
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab Pantoprazole 625 g 0-0-1",
+          "log_probability": -3.300556182861328
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab Pantoprazole 625 g 0-1-1",
+          "log_probability": -3.5367941856384277
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00443",
+    "original": {
+      "beam50": "Syrup  Pantoprazole  650  mcg  0-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-1",
+          "log_probability": -2.3826870918273926
+        },
+        {
+          "rank": 2,
+          "prediction": "Syrup  Pantoprazole  650  mcg  -1",
+          "log_probability": -2.817777156829834
+        },
+        {
+          "rank": 3,
+          "prediction": "Syrup  Pantoprazole  650  mcg  1-1",
+          "log_probability": -2.82327938079834
+        },
+        {
+          "rank": 4,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-0-1",
+          "log_probability": -3.698577404022217
+        },
+        {
+          "rank": 5,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-0",
+          "log_probability": -3.8683364391326904
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Syrup  Pantoprazole  650  mcg  0-1",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-1",
+          "log_probability": -2.3829174041748047
+        },
+        {
+          "rank": 2,
+          "prediction": "Syrup  Pantoprazole  650  mcg  -1",
+          "log_probability": -2.801280975341797
+        },
+        {
+          "rank": 3,
+          "prediction": "Syrup  Pantoprazole  650  mcg  1-1",
+          "log_probability": -2.836874008178711
+        },
+        {
+          "rank": 4,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-0-1",
+          "log_probability": -3.698746681213379
+        },
+        {
+          "rank": 5,
+          "prediction": "Syrup  Pantoprazole  650  mcg  -0-1",
+          "log_probability": -3.8690097332000732
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00010",
+    "original": {
+      "beam50": "Capsule Amoxicillin 20 mcg PRN for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Capsule Amoxicillin 20 mcg PRN for days",
+          "log_probability": -1.916670322418213
+        },
+        {
+          "rank": 2,
+          "prediction": "Capsule Amoxicilllin 20 mcg PRN for days",
+          "log_probability": -2.647880792617798
+        },
+        {
+          "rank": 3,
+          "prediction": "Capsule  Amoxicillin 20 mcg PRN for days",
+          "log_probability": -2.8043577671051025
+        },
+        {
+          "rank": 4,
+          "prediction": "Capsule Amoxicilin 20 mcg PRN for days",
+          "log_probability": -2.958479404449463
+        },
+        {
+          "rank": 5,
+          "prediction": "Capsule Amoxicillin 20 mcg PRN for 7 days",
+          "log_probability": -3.0087058544158936
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Capsule Amoxicillin 20 mcg PRN for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Capsule Amoxicillin 20 mcg PRN for days",
+          "log_probability": -1.8811160326004028
+        },
+        {
+          "rank": 2,
+          "prediction": "Capsule Amoxicilllin 20 mcg PRN for days",
+          "log_probability": -2.613028049468994
+        },
+        {
+          "rank": 3,
+          "prediction": "Capsule  Amoxicillin 20 mcg PRN for days",
+          "log_probability": -2.760779857635498
+        },
+        {
+          "rank": 4,
+          "prediction": "Capsule Amoxicilin 20 mcg PRN for days",
+          "log_probability": -2.923165798187256
+        },
+        {
+          "rank": 5,
+          "prediction": "Capsule Amoxicillin 20 mcg PRN for 7 days",
+          "log_probability": -3.0338191986083984
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00028",
+    "original": {
+      "beam50": "Inj  Metformin  40  mg  BD  for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Inj  Metformin  40  mg  BD  for days",
+          "log_probability": -1.3509992361068726
+        },
+        {
+          "rank": 2,
+          "prediction": "Inj  Metformin  40  mg  OD  for days",
+          "log_probability": -1.5951608419418335
+        },
+        {
+          "rank": 3,
+          "prediction": "Inj  Metformin  40  mg  BD  for 7 days",
+          "log_probability": -3.4275100231170654
+        },
+        {
+          "rank": 4,
+          "prediction": "Inj  Metformin  40  mg  BD for days",
+          "log_probability": -3.432347536087036
+        },
+        {
+          "rank": 5,
+          "prediction": "Inj  Metformin  40  mg  OD  for 7 days",
+          "log_probability": -3.6716716289520264
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Inj  Metformin  40  mg  BD  for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Inj  Metformin  40  mg  BD  for days",
+          "log_probability": -1.3036249876022339
+        },
+        {
+          "rank": 2,
+          "prediction": "Inj  Metformin  40  mg  OD  for days",
+          "log_probability": -1.5817927122116089
+        },
+        {
+          "rank": 3,
+          "prediction": "Inj  Metformin  40  mg  BD  for 7 days",
+          "log_probability": -3.3965795040130615
+        },
+        {
+          "rank": 4,
+          "prediction": "Inj  Metformin  40  mg  BD  for 5 days",
+          "log_probability": -3.6477088928222656
+        },
+        {
+          "rank": 5,
+          "prediction": "Inj  Metformin  40  mg  OD  for 7 days",
+          "log_probability": -3.6747474670410156
+        }
+      ],
+      "exact_token_rank_top5": 4,
+      "exact_target_rank_top5": 4
+    }
+  },
+  {
+    "sample_id": "train_00039",
+    "original": {
+      "beam50": "Inj Cetirizine 625 mcg AC for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Inj Cetirizine 625 mcg AC for days",
+          "log_probability": -2.1047699451446533
+        },
+        {
+          "rank": 2,
+          "prediction": "Inj Cetirizine  625 mcg AC for days",
+          "log_probability": -2.6829423904418945
+        },
+        {
+          "rank": 3,
+          "prediction": "Inj  Cetirizine 625 mcg AC for days",
+          "log_probability": -3.080428123474121
+        },
+        {
+          "rank": 4,
+          "prediction": "Inj Cetirizine 625 mcg  AC for days",
+          "log_probability": -3.166370391845703
+        },
+        {
+          "rank": 5,
+          "prediction": "Inj Cetirizine 625 mcg AC for 7 days",
+          "log_probability": -3.380648374557495
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Inj Cetirizine 625 mcg AC for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Inj Cetirizine 625 mcg AC for days",
+          "log_probability": -2.0919642448425293
+        },
+        {
+          "rank": 2,
+          "prediction": "Inj Cetirizine  625 mcg AC for days",
+          "log_probability": -2.6769025325775146
+        },
+        {
+          "rank": 3,
+          "prediction": "Inj  Cetirizine 625 mcg AC for days",
+          "log_probability": -3.0841004848480225
+        },
+        {
+          "rank": 4,
+          "prediction": "Inj Cetirizine 625 mcg  AC for days",
+          "log_probability": -3.157869338989258
+        },
+        {
+          "rank": 5,
+          "prediction": "Inj Cetirizine 625 mcg AC for 7 days",
+          "log_probability": -3.3727502822875977
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00044",
+    "original": {
+      "beam50": "PCM 10 ml QID for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "PCM 10 ml QID for days",
+          "log_probability": -0.33212828636169434
+        },
+        {
+          "rank": 2,
+          "prediction": "PCM 10 ml QID for 7 days",
+          "log_probability": -2.5541670322418213
+        },
+        {
+          "rank": 3,
+          "prediction": "PCM 10 ml QID for 5 days",
+          "log_probability": -2.975785970687866
+        },
+        {
+          "rank": 4,
+          "prediction": "PCM  10 ml QID for days",
+          "log_probability": -3.103224992752075
+        },
+        {
+          "rank": 5,
+          "prediction": "PCM 10 ml QOID for days",
+          "log_probability": -4.585755348205566
+        }
+      ],
+      "exact_token_rank_top5": 3,
+      "exact_target_rank_top5": 3
+    },
+    "counterfactual": {
+      "beam50": "PCM 10 ml QID for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "PCM 10 ml QID for days",
+          "log_probability": -0.3304412364959717
+        },
+        {
+          "rank": 2,
+          "prediction": "PCM 10 ml QID for 7 days",
+          "log_probability": -2.558668851852417
+        },
+        {
+          "rank": 3,
+          "prediction": "PCM 10 ml QID for 5 days",
+          "log_probability": -2.983734369277954
+        },
+        {
+          "rank": 4,
+          "prediction": "PCM  10 ml QID for days",
+          "log_probability": -3.1022214889526367
+        },
+        {
+          "rank": 5,
+          "prediction": "PCM 10 ml QOID for days",
+          "log_probability": -4.579881191253662
+        }
+      ],
+      "exact_token_rank_top5": 3,
+      "exact_target_rank_top5": 3
+    }
+  },
+  {
+    "sample_id": "train_00009",
+    "original": {
+      "beam50": "Tablet  Paracetamol  40  mcg  1-0-0  for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tablet  Paracetamol  40  mcg  1-0-0  for days",
+          "log_probability": -2.1053810119628906
+        },
+        {
+          "rank": 2,
+          "prediction": "Tablet Paracetamol  40  mcg  1-0-0  for days",
+          "log_probability": -2.3053455352783203
+        },
+        {
+          "rank": 3,
+          "prediction": "Tablet  Paracetamol 40  mcg  1-0-0  for days",
+          "log_probability": -3.2420971393585205
+        },
+        {
+          "rank": 4,
+          "prediction": "Tablet  Paracetamol  40  mcg  1-0-0  for 7 days",
+          "log_probability": -3.3936827182769775
+        },
+        {
+          "rank": 5,
+          "prediction": "Tablet Paracetamol 40  mcg  1-0-0  for days",
+          "log_probability": -3.44206166267395
+        }
+      ],
+      "exact_token_rank_top5": 4,
+      "exact_target_rank_top5": 4
+    },
+    "counterfactual": {
+      "beam50": "Tablet  Paracetamol  40  mcg  1-0-0  for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tablet  Paracetamol  40  mcg  1-0-0  for days",
+          "log_probability": -2.0816047191619873
+        },
+        {
+          "rank": 2,
+          "prediction": "Tablet Paracetamol  40  mcg  1-0-0  for days",
+          "log_probability": -2.282475233078003
+        },
+        {
+          "rank": 3,
+          "prediction": "Tablet  Paracetamol 40  mcg  1-0-0  for days",
+          "log_probability": -3.2172048091888428
+        },
+        {
+          "rank": 4,
+          "prediction": "Tablet  Paracetamol  40  mcg  1-0-0  for 7 days",
+          "log_probability": -3.3744518756866455
+        },
+        {
+          "rank": 5,
+          "prediction": "Tablet Paracetamol 40  mcg  1-0-0  for days",
+          "log_probability": -3.418073892593384
+        }
+      ],
+      "exact_token_rank_top5": 4,
+      "exact_target_rank_top5": 4
+    }
+  },
+  {
+    "sample_id": "train_00042",
+    "original": {
+      "beam50": "Syp Pantoprazole 40 mg AC for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp Pantoprazole 40 mg AC for days",
+          "log_probability": -0.2975476086139679
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp Pantoprazole 40 mg AC for 7 days",
+          "log_probability": -2.4153666496276855
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp Pantoprazole 40 mg AC for 5 days",
+          "log_probability": -2.709374189376831
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp Pantoprazole 40 mg AC for dayays",
+          "log_probability": -4.972384452819824
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp Pantoprazole 40 mg AC for 5 7 days",
+          "log_probability": -5.344048976898193
+        }
+      ],
+      "exact_token_rank_top5": 2,
+      "exact_target_rank_top5": 2
+    },
+    "counterfactual": {
+      "beam50": "Syp Pantoprazole 40 mg AC for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp Pantoprazole 40 mg AC for days",
+          "log_probability": -0.2953062653541565
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp Pantoprazole 40 mg AC for 7 days",
+          "log_probability": -2.4205167293548584
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp Pantoprazole 40 mg AC for 5 days",
+          "log_probability": -2.722125291824341
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp Pantoprazole 40 mg AC for dayays",
+          "log_probability": -4.969307899475098
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp Pantoprazole 40 mg AC for 5 7 days",
+          "log_probability": -5.3650126457214355
+        }
+      ],
+      "exact_token_rank_top5": 2,
+      "exact_target_rank_top5": 2
+    }
+  },
+  {
+    "sample_id": "train_00050",
+    "original": {
+      "beam50": "Amoxicillin 40 mcg SOS for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Amoxicillin 40 mcg SOS for days",
+          "log_probability": -1.3818254470825195
+        },
+        {
+          "rank": 2,
+          "prediction": "Amoxicilllin 40 mcg SOS for days",
+          "log_probability": -2.144193410873413
+        },
+        {
+          "rank": 3,
+          "prediction": "Amoxicilin 40 mcg SOS for days",
+          "log_probability": -2.7515013217926025
+        },
+        {
+          "rank": 4,
+          "prediction": "Amoxicicillin 40 mcg SOS for days",
+          "log_probability": -3.1987249851226807
+        },
+        {
+          "rank": 5,
+          "prediction": "Amoxicillin 40 mcg SOSOS for days",
+          "log_probability": -3.2092487812042236
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    },
+    "counterfactual": {
+      "beam50": "Amoxicillin 40 mcg SOS for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Amoxicillin 40 mcg SOS for days",
+          "log_probability": -1.377506971359253
+        },
+        {
+          "rank": 2,
+          "prediction": "Amoxicilllin 40 mcg SOS for days",
+          "log_probability": -2.139625310897827
+        },
+        {
+          "rank": 3,
+          "prediction": "Amoxicilin 40 mcg SOS for days",
+          "log_probability": -2.7479708194732666
+        },
+        {
+          "rank": 4,
+          "prediction": "Amoxicicillin 40 mcg SOS for days",
+          "log_probability": -3.1919283866882324
+        },
+        {
+          "rank": 5,
+          "prediction": "Amoxicillin 40 mcg SOSOS for days",
+          "log_probability": -3.2020936012268066
+        }
+      ],
+      "exact_token_rank_top5": null,
+      "exact_target_rank_top5": null
+    }
+  },
+  {
+    "sample_id": "train_00051",
+    "original": {
+      "beam50": "Amoxicillin 10 mcg AC for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Amoxicillin 10 mcg AC for days",
+          "log_probability": -1.063640832901001
+        },
+        {
+          "rank": 2,
+          "prediction": "Amoxicilllin 10 mcg AC for days",
+          "log_probability": -2.0106418132781982
+        },
+        {
+          "rank": 3,
+          "prediction": "Amoxicilin 10 mcg AC for days",
+          "log_probability": -2.2461650371551514
+        },
+        {
+          "rank": 4,
+          "prediction": "Amoxicicillin 10 mcg AC for days",
+          "log_probability": -2.9473884105682373
+        },
+        {
+          "rank": 5,
+          "prediction": "Amoxicillin 10 mcg AC for 7 days",
+          "log_probability": -3.338329315185547
+        }
+      ],
+      "exact_token_rank_top5": 5,
+      "exact_target_rank_top5": 5
+    },
+    "counterfactual": {
+      "beam50": "Amoxicillin 10 mcg AC for days",
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Amoxicillin 10 mcg AC for days",
+          "log_probability": -1.0627179145812988
+        },
+        {
+          "rank": 2,
+          "prediction": "Amoxicilllin 10 mcg AC for days",
+          "log_probability": -2.0097179412841797
+        },
+        {
+          "rank": 3,
+          "prediction": "Amoxicilin 10 mcg AC for days",
+          "log_probability": -2.245548963546753
+        },
+        {
+          "rank": 4,
+          "prediction": "Amoxicicillin 10 mcg AC for days",
+          "log_probability": -2.946777582168579
+        },
+        {
+          "rank": 5,
+          "prediction": "Amoxicillin 10 mcg AC for 7 days",
+          "log_probability": -3.3399441242218018
+        }
+      ],
+      "exact_token_rank_top5": 5,
+      "exact_target_rank_top5": 5
+    }
+  }
+]

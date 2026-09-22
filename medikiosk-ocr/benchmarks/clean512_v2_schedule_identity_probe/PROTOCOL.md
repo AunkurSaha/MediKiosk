@@ -1,0 +1,7 @@
+# Frozen schedule identity probe
+
+TRAIN only; exactly6 prior 1-1-1 failures and6 1-0-0 failures. Retain the four prior selected 1-0-0 sources, then add exactly two frozen TRAIN failures in ascending sample-ID order under identical eligibility. This amendment exists because the previous selected source pool contained only four 1-0-0 lines. No posterior/error/renderer-based selection. Freeze selection before model creation/inference; stop if quotas fail.
+
+One counterpart per source: 1-1-1↔1-0-0. Preserve isolated schedule slot centers, original rasters for unchanged symbols, and render changed digits alone using the same frozen font/font size/baseline. Center replacement ink on the original ink-band center with deterministic round-half-up integer placement. Do not rerender the line, intentionally alter spacing, move other pixels, or sweep placement. Require exact original reconstruction, five isolated source bands, no non-schedule overlap, safe bounds, and changes only within old/new schedule bbox union.
+
+Evaluate original against its true full-line target and counterpart against the substituted synthetic counterfactual full-line target. Primary descriptive comparisons: five assigned peaks/local±3 peaks/argmax/frame spans, exact forward target logP, Viterbi score, locked projected schedule, exact schedule rank top5. Analyze directions separately; no validation/test/training/tuning.

@@ -6,7 +6,6 @@ import { copy, errorText } from '../../i18n';
 import { interviewCopy } from '../../i18n/interview';
 import { getTriageCopy } from '../../i18n/triage';
 import DocumentUploader from './DocumentUploader';
-import DoctorSelector from './DoctorSelector';
 import QuestionRenderer from './QuestionRenderer';
 import type { ResponseInput } from './QuestionRenderer';
 
@@ -19,8 +18,6 @@ export default function Interview({
   onComplete,
   onBusyChange,
   onManageConsent,
-  selectedDoctorId,
-  onDoctorSelected,
 }: {
   sessionId: string;
   language: Language;
@@ -30,17 +27,21 @@ export default function Interview({
   onComplete: () => Promise<void>;
   onBusyChange?: (busy: boolean) => void;
   onManageConsent?: () => void;
-  selectedDoctorId?: string | null;
-  onDoctorSelected?: (doctorId: string) => void;
 }) {
   const [state, setState] = useState<InterviewState | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [medicationHistoryOptimized, setMedicationHistoryOptimized] = useState(false);
   const pending = useRef<Submission | null>(null);
   const t = copy[language];
   const u = interviewCopy[language];
   const triageCopy = getTriageCopy(language);
+  const clinicalBoundaryNotice = {
+    en: 'Questions and translations are reviewed by clinicians. No diagnosis or treatment advice is provided.',
+    bn: 'প্রশ্ন ও অনুবাদ চিকিৎসকদের পর্যালোচনাধীন। এখানে রোগ নির্ণয় বা চিকিৎসার পরামর্শ দেওয়া হয় না।',
+    hi: 'प्रश्नों और अनुवादों की चिकित्सकों द्वारा समीक्षा की जाती है। यहाँ निदान या उपचार की सलाह नहीं दी जाती।',
+  }[language];
   useEffect(() => {
     let active = true;
     api
@@ -74,6 +75,8 @@ export default function Interview({
   }
   function save(answer: ResponseInput) {
     if (!state?.question) return;
+    const answeredQuestion = state.question;
+    const answeredDocumentConfirmation = state.document_confirmation;
     const candidate: Submission = {
       ...answer,
       request_id: '',
@@ -90,6 +93,25 @@ export default function Interview({
     void action(async () => {
       const result = await api.interviewAnswer(sessionId, request);
       pending.current = null;
+      if (
+        answeredDocumentConfirmation?.target_field === 'medications.details' ||
+        answeredQuestion.origin === 'document_confirmation'
+      ) {
+        let confirmedAndSkipped = false;
+        if (answer.value === 'yes') {
+          const medicationDomainCovered = result.covered_domains?.some((domain) =>
+            domain.toLowerCase().includes('medication'),
+          );
+          confirmedAndSkipped =
+            Boolean(medicationDomainCovered) &&
+            !['medications.any', 'medications.details', 'medications'].includes(
+              result.question?.field || '',
+            );
+        }
+        setMedicationHistoryOptimized(confirmedAndSkipped);
+      } else {
+        setMedicationHistoryOptimized(false);
+      }
       return result;
     });
   }
@@ -100,9 +122,39 @@ export default function Interview({
   const conflict =
     error instanceof ApiError &&
     ['INTERVIEW_CONFLICT', 'QUESTION_NOT_CURRENT'].includes(error.code);
+  const reviewSections = state?.active_answers.reduce<Record<string, typeof state.active_answers>>(
+    (groups, answer) => {
+      const field = answer.field.toLowerCase();
+      const section =
+        field.includes('chief') || field.includes('concern')
+          ? 'Main concern'
+          : field.includes('medication')
+            ? 'Medications'
+            : field.includes('allerg')
+              ? 'Allergies'
+              : field.includes('history') || field.includes('medical') || field.includes('surgery')
+                ? 'Medical history'
+                : field.includes('symptom') ||
+                    field.includes('pain') ||
+                    field.includes('fever') ||
+                    field.includes('onset') ||
+                    field.includes('duration')
+                  ? 'Symptoms'
+                  : 'Additional information';
+      groups[section] = [...(groups[section] || []), answer];
+      return groups;
+    },
+    {},
+  );
+  const currentField = state?.question?.field || '';
+  const medicationHistoryCovered = Boolean(
+    state?.covered_domains?.some((domain) => domain.toLowerCase().includes('medication')) &&
+    !state.document_confirmation &&
+    !['medications.any', 'medications.details', 'medications'].includes(currentField),
+  );
   return (
     <div className="adaptive-interview">
-      <p className="notice">{u.prototype}</p>
+      <p className="notice">{clinicalBoundaryNotice}</p>
       {(!voiceConsent || !documentConsent) && onManageConsent && (
         <div className="notice" role="note">
           <p>
@@ -144,8 +196,8 @@ export default function Interview({
                   {namespace === 'standard'
                     ? u.standard
                     : namespace === 'other'
-                    ? (u.other || 'Other health concern')
-                    : u.ayush}
+                      ? u.other || 'Other health concern'
+                      : u.ayush}
                 </h2>
                 <div className="language-grid">
                   {flows.map((flow) => (
@@ -166,10 +218,6 @@ export default function Interview({
       )}
       {state?.flow_id && (
         <>
-          {!selectedDoctorId && onDoctorSelected ? (
-            <DoctorSelector sessionId={sessionId} onSelected={onDoctorSelected} />
-          ) : (
-          <>
           {state.namespace === 'ayush_demo' && <h2>{u.ayush}</h2>}
           <p className="eyebrow">{state.section?.[language]}</p>
           <p className="muted">
@@ -185,7 +233,48 @@ export default function Interview({
               sessionId={sessionId}
               language={language}
               documentConsent={documentConsent}
+              onUploadComplete={() => setAttempt((value) => value + 1)}
             />
+          )}
+          {state.document_confirmation && (
+            <aside className="notice" role="note" data-testid="document-confirmation-notice">
+              <strong>We found information in your uploaded document.</strong>
+              <p>
+                We’ll confirm this detail so you don’t have to repeat information unnecessarily.
+              </p>
+              <p className="muted">
+                Source: {state.document_confirmation.document_filename || 'uploaded document'}
+                {state.document_confirmation.page_number
+                  ? `, page ${state.document_confirmation.page_number}`
+                  : ''}
+                {' · '}Needs your confirmation
+              </p>
+            </aside>
+          )}
+          {(medicationHistoryOptimized || medicationHistoryCovered) && (
+            <aside
+              className="history-optimized"
+              role="status"
+              data-testid="medication-history-optimized"
+            >
+              <span className="history-optimized-icon" aria-hidden="true">
+                ✓
+              </span>
+              <div>
+                <strong>History optimized</strong>
+                <p>Medication confirmed by you from your prescription.</p>
+                <p>Medication history is covered, so we won’t ask the same questions again.</p>
+              </div>
+            </aside>
+          )}
+          {state.continuity_reconfirmation && (
+            <aside className="notice" role="note" data-testid="continuity-reconfirmation-notice">
+              <strong>From your previous visit</strong>
+              <p>
+                We found information from your previous visit. We’ll confirm what is still current
+                so you don’t have to repeat everything.
+              </p>
+            </aside>
           )}
           {state.red_flag_alert && (
             <aside
@@ -232,23 +321,43 @@ export default function Interview({
               <>
                 <h1>{u.review}</h1>
                 <p>{u.reviewNote}</p>
-                <div className="answer-review">
-                  {state.active_answers.map((a) => (
-                    <div className="saved-answer" key={a.question_id}>
-                      <strong>{a.label[language]}</strong>
-                      <p lang={a.language}>{a.raw_value}</p>
-                      <button
-                        className="secondary"
-                        disabled={busy}
-                        onClick={() => navigate(a.question_id)}
-                        aria-label={`${u.edit}: ${a.label[language]}`}
-                      >
-                        {u.edit}
-                      </button>
-                    </div>
+                <div className="answer-review grouped-review">
+                  {Object.entries(reviewSections || {}).map(([section, answers]) => (
+                    <section className="review-section" key={section}>
+                      <h2>{section}</h2>
+                      {answers.map((a) => (
+                        <div className="review-answer-row" key={a.question_id}>
+                          <div>
+                            <strong>{a.label[language]}</strong>
+                            <p lang={a.language}>{a.raw_value}</p>
+                          </div>
+                          <button
+                            className="text-button"
+                            disabled={busy}
+                            onClick={() => navigate(a.question_id)}
+                            aria-label={`${u.edit}: ${a.label[language]}`}
+                          >
+                            {u.edit}
+                          </button>
+                        </div>
+                      ))}
+                    </section>
                   ))}
+                  {documentConsent && (
+                    <section className="review-section">
+                      <h2>Documents</h2>
+                      <p>
+                        Uploaded documents and your confirmations are included in the clinical
+                        evidence.
+                      </p>
+                    </section>
+                  )}
                 </div>
-                <button disabled={busy} onClick={() => void action(onComplete)}>
+                <button
+                  className="finish-intake-button"
+                  disabled={busy}
+                  onClick={() => void action(onComplete)}
+                >
                   {busy ? t.saving : u.finish}
                 </button>
               </>
@@ -262,8 +371,6 @@ export default function Interview({
             >
               {t.back}
             </button>
-          )}
-          </>
           )}
         </>
       )}

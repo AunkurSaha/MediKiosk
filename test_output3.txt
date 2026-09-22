@@ -1,0 +1,13 @@
+ImportError while loading conftest 'C:\MEDIKIOSK\backend\tests\conftest.py'.
+backend\tests\conftest.py:30: in <module>
+    from app.main import app  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+backend\app\main.py:14: in <module>
+    from app.api.v1.routers import api_router
+backend\app\api\v1\routers.py:3: in <module>
+    from . import (
+backend\app\api\v1\adaptive.py:11: in <module>
+    from app.services import adaptive
+backend\app\services\adaptive.py:14: in <module>
+    from app.services.rapid_routing import RapidRoutingRun, FLOW_BY_COMPLAINT
+E   ImportError: cannot import name 'RapidRoutingRun' from 'app.services.rapid_routing' (C:\MEDIKIOSK\backend\app\services\rapid_routing.py)

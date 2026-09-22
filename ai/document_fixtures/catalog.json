@@ -13,5 +13,78 @@
     "fixture_id": "lab_missing_flag",
     "raw_text": "SYNTHETIC MOCK FIXTURE - NOT A PATIENT RECORD\nLab report - missing source flag demonstration\nDate: 2026-09-10\n\nTest Name                 Result      Unit         Reference Range\nHemoglobin                10.5        g/dL         12.0 - 15.5\n",
     "document_type": "lab_report"
+  },
+  "ab3d31f4296c83d2fc1e82d91205049adf22fbf3757db87fca6d816b6b872410": {
+    "fixture_id": "golden_metformin_prescription",
+    "raw_text": "SYNTHETIC DEMO FIXTURE - NOT A PATIENT RECORD\nDEMO COMMUNITY CLINIC\nDate: 20 September 2026\nPatient: Demo Patient\n\nPRESCRIPTION\nMetformin 500 mg\nTake one tablet twice daily\n\nFor demonstration only\n",
+    "document_type": "prescription"
+  },
+  "c4d5c8259d8a456687777acb939fb5d2da2cc93ea9614bd35a3d28bfadafdf92": {
+    "fixture_id": "golden_fasting_glucose_lab",
+    "raw_text": "SYNTHETIC DEMO FIXTURE - NOT A PATIENT RECORD\nDEMO DIAGNOSTIC LABORATORY\nDate: 20 September 2026\nPatient: Demo Patient\n\nLABORATORY REPORT\nTest: Fasting glucose\nResult: 146 mg/dL\n\nDocument evidence - requires clinician verification\nFor demonstration only\n",
+    "document_type": "lab_report"
+  },
+  "2c9b320a8d7d0612c54f61e4dd2bdd5b56bede525d4431367fb67f300bb3fa1b": {
+    "fixture_id": "recording_lab_report_ayan_bera",
+    "provider": "deterministic_document_fixture",
+    "document_type": "lab_report",
+    "raw_text": "Clinical Laboratory - A Well Equipped Referral Path Lab\nPatient Name: MASTER. AYAN BERA.\nReport Date & Time: 02/12/2014 - 8:10 PM\nCollection Date: 02/12/2014\nAge: 13 Y. 6 M.\nSex: Male\nReferred by: DR. T. K. BISWAS, MS (KOL)\nReport on: Blood for haematological examination\n\nTest Name | Result | Unit | Reference Range\nHb (Hemoglobin) | 13.9 | g/dL | Males: 13-18 g/dL; Females: 11.5-16.5 g/dL\nR.B.C Count | 4.8 | million/c.mm | 4.5-6.5 million/c.mm\nTC (Total Leucocyte Count) | 6.9 | thousands/c.mm | 4-11 thousands/c.mm\nNeutrophils | 51 | % | 40-75%\nLymphocytes | 46 | % | 20-45%\nEosinophils | 02 | % | 1-6%\nMonocytes | 01 | % | 2-10%\nBasophils | 00 | % | 0-2%\nE.S.R. (Westergren), 1st Hr. | 20 | mm | Males: 0-10 mm/1 hr (17-50 yrs), 0-14 mm/1 hr (>50 yrs); Females: 0-12 mm/1 hr (17-50 yrs), 0-20 mm/1 hr (>50 yrs)\n",
+    "structured_document": {
+      "document_type": "lab_report",
+      "document_date": "2014-12-02T00:00:00Z",
+      "patient_name": "Master Ayan Bera",
+      "patient_age": "13 years 6 months",
+      "patient_sex": "Male",
+      "investigations": ["Blood for haematological examination"],
+      "raw_excerpt": "Haematology report from Clinical Laboratory dated 2 December 2014.",
+      "medications": [],
+      "observations": [
+        {"test_name": "Hemoglobin", "value": "13.9", "unit": "g/dL", "reference_range": "Males: 13-18 g/dL; Females: 11.5-16.5 g/dL", "source_text": "Hb (Hemoglobin) 13.9 g/dL"},
+        {"test_name": "R.B.C Count", "value": "4.8", "unit": "million/c.mm", "reference_range": "4.5-6.5 million/c.mm", "source_text": "R.B.C Count 4.8 million/c.mm"},
+        {"test_name": "Total Leucocyte Count", "value": "6.9", "unit": "thousands/c.mm", "reference_range": "4-11 thousands/c.mm", "source_text": "TC (Total Leucocyte Count) 6.9 thousands/c.mm"},
+        {"test_name": "Neutrophils", "value": "51", "unit": "%", "reference_range": "40-75%", "source_text": "Neutrophils 51%"},
+        {"test_name": "Lymphocytes", "value": "46", "unit": "%", "reference_range": "20-45%", "source_text": "Lymphocytes 46%"},
+        {"test_name": "Eosinophils", "value": "02", "unit": "%", "reference_range": "1-6%", "source_text": "Eosinophils 02%"},
+        {"test_name": "Monocytes", "value": "01", "unit": "%", "reference_range": "2-10%", "source_text": "Monocytes 01%"},
+        {"test_name": "Basophils", "value": "00", "unit": "%", "reference_range": "0-2%", "source_text": "Basophils 00%"},
+        {"test_name": "E.S.R. (Westergren), 1st Hr.", "value": "20", "unit": "mm", "reference_range": "Males: 0-10 mm/1 hr (17-50 yrs), 0-14 mm/1 hr (>50 yrs); Females: 0-12 mm/1 hr (17-50 yrs), 0-20 mm/1 hr (>50 yrs)", "source_text": "E.S.R. (Westergren) 1st Hr. 20 mm"}
+      ],
+      "allergies": [],
+      "advice": []
+    }
+  },
+  "032b8459ba5b7af5281d3311f7bd23cb41fe4d932b504fc8e21186d30f6dd3a1": {
+    "fixture_id": "recording_prescription_ankan_bera",
+    "provider": "deterministic_document_fixture",
+    "document_type": "prescription",
+    "raw_text": "KHARAGPUR CLINIC\nDr. Sayan Chakraborty, M.B.B.S. (WBUHS), Medical Practitioner\nDate: 31/07/2026\nPatient Name: Ankan Bera\nAge: 21\nWeight: 84 kg\nSymptoms: Loose motion, body dehydration, food poisoning.\n\nRx\n1. ORS Powder - 1 packet in 1 litre of clean water; drink frequently.\n2. Tab. Racecadotril 100 mg - 1 tablet TDS after food for 3 days.\n3. Tab. Azithromycin 500 mg - 1 tablet OD after food for 3 days.\n4. Tab. Ondansetron 4 mg - 1 tablet SOS in case of nausea/vomiting.\n5. Tab. Paracetamol 650 mg - 1 tablet SOS if fever or body ache.\n6. Probiotic Capsule - 1 capsule BD after food for 5 days.\n\nAdvice: Drink plenty of fluids such as ORS, coconut water and rice water. Take light, easily digestible food. Avoid oily, spicy and outside food. Rest advised for 1 week. Follow up after 5 days.\n",
+    "structured_document": {
+      "document_type": "prescription",
+      "document_date": "2026-07-31T00:00:00Z",
+      "doctor_header": "Dr. Sayan Chakraborty, M.B.B.S. (WBUHS), Medical Practitioner",
+      "patient_name": "Ankan Bera",
+      "patient_age": "21 years",
+      "patient_weight": "84 kg",
+      "complaint": "Loose motion, body dehydration, food poisoning",
+      "raw_excerpt": "Prescription from Kharagpur Clinic dated 31 July 2026.",
+      "medications": [
+        {"name": "ORS Powder", "frequency": "Frequently", "instructions": "Mix 1 packet in 1 litre of clean water and drink frequently.", "source_text": "ORS Powder - 1 packet in 1 litre of clean water; drink frequently."},
+        {"name": "Racecadotril", "dosage": "100 mg", "frequency": "TDS", "duration": "3 days", "instructions": "Take 1 tablet TDS after food for 3 days.", "source_text": "Tab. Racecadotril 100 mg - 1 tablet TDS after food for 3 days."},
+        {"name": "Azithromycin", "dosage": "500 mg", "frequency": "OD", "duration": "3 days", "instructions": "Take 1 tablet OD after food for 3 days.", "source_text": "Tab. Azithromycin 500 mg - 1 tablet OD after food for 3 days."},
+        {"name": "Ondansetron", "dosage": "4 mg", "frequency": "SOS", "instructions": "Take 1 tablet in case of nausea or vomiting.", "source_text": "Tab. Ondansetron 4 mg - 1 tablet SOS in case of nausea/vomiting."},
+        {"name": "Paracetamol", "dosage": "650 mg", "frequency": "SOS", "instructions": "Take 1 tablet if fever or body ache.", "source_text": "Tab. Paracetamol 650 mg - 1 tablet SOS if fever or body ache."},
+        {"name": "Probiotic Capsule", "frequency": "BD", "duration": "5 days", "instructions": "Take 1 capsule BD after food for 5 days.", "source_text": "Probiotic Capsule - 1 capsule BD after food for 5 days."}
+      ],
+      "observations": [],
+      "allergies": [],
+      "investigations": [],
+      "advice": [
+        "Drink plenty of fluids such as ORS, coconut water and rice water.",
+        "Take light, easily digestible food.",
+        "Avoid oily, spicy and outside food.",
+        "Rest advised for 1 week.",
+        "Follow up after 5 days."
+      ]
+    }
   }
 }

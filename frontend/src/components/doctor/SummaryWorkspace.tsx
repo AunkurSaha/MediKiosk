@@ -402,6 +402,24 @@ export default function SummaryWorkspace({
             interview answers, medical facts, documents, or safety rules.
           </p>
 
+          {summary.coverage && (
+            <div className="card" data-testid="summary-coverage" style={{ marginBottom: '1rem' }}>
+              <h3>Clinical History Coverage</h3>
+              <p>
+                Confirmed: {summary.coverage.confirmed} · Needs confirmation:{' '}
+                {summary.coverage.document_supported_unconfirmed} · Conflicted:{' '}
+                {summary.coverage.conflicted} · Missing: {summary.coverage.missing}
+              </p>
+              {(summary.coverage.document_supported_unconfirmed > 0 ||
+                summary.coverage.conflicted > 0 ||
+                summary.coverage.missing > 0) && (
+                <p className="muted">
+                  Clinical history remains incomplete or requires clarification.
+                </p>
+              )}
+            </div>
+          )}
+
           {evidenceList.length === 0 ? (
             <p className="muted">No evidence references recorded.</p>
           ) : (
@@ -434,11 +452,15 @@ export default function SummaryWorkspace({
                       {ev.section.replace('_', ' ').toUpperCase()}
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span
-                        className="badge"
-                        style={{ backgroundColor: '#f1f5f9', color: '#475569' }}
-                      >
-                        Source: {ev.source_type}
+                      {typeof ev.source_metadata.document_id === 'string' && (
+                        <span className="source-badge">Prescription</span>
+                      )}
+                      <span className="source-badge">
+                        {ev.status === 'patient_confirmed'
+                          ? 'Patient Confirmed'
+                          : ev.status === 'clinician_verified'
+                            ? 'Clinician Verified'
+                            : ev.badge || `Source: ${ev.source_type}`}
                       </span>
                       <FieldVerificationBadge
                         sessionId={sessionId}
@@ -452,12 +474,61 @@ export default function SummaryWorkspace({
                     <span>
                       Original Source: <code>{ev.source_text}</code>
                     </span>
-                    {ev.source_id && (
-                      <span style={{ marginLeft: '1rem' }}>
-                        ID: <code>{ev.source_id.slice(0, 8)}</code>
-                      </span>
-                    )}
                   </div>
+                  <details className="provenance-details">
+                    <summary>Why is this here?</summary>
+                    <h4>
+                      Why is {ev.statement_text.split(/\s+/)[0] || 'this information'} in this
+                      summary?
+                    </h4>
+                    <ol className="provenance-chain">
+                      {typeof ev.source_metadata.document_id === 'string' && (
+                        <li>
+                          <strong>Uploaded prescription</strong>
+                          <span>Source document retained</span>
+                        </li>
+                      )}
+                      <li>
+                        <strong>Information extracted</strong>
+                        <span>{ev.source_text || ev.statement_text}</span>
+                      </li>
+                      {ev.status === 'patient_confirmed' && (
+                        <li>
+                          <strong>Patient verification</strong>
+                          <span>Patient confirmed current use</span>
+                        </li>
+                      )}
+                      <li>
+                        <strong>
+                          {ev.section === 'current_medications'
+                            ? 'Current medication'
+                            : 'Summary statement'}
+                        </strong>
+                        <span>
+                          {ev.status === 'patient_confirmed'
+                            ? 'Patient confirmed'
+                            : ev.status === 'conflicting'
+                              ? 'Requires clinician review'
+                              : ev.badge || 'Source linked'}
+                        </span>
+                      </li>
+                    </ol>
+                    {ev.provenance_explanation && ev.provenance_explanation.length > 0 && (
+                      <ul className="muted provenance-source-details">
+                        {ev.provenance_explanation.map((line) => (
+                          <li key={line}>{line}</li>
+                        ))}
+                      </ul>
+                    )}
+                    {typeof ev.source_metadata.document_id === 'string' && (
+                      <a
+                        href={`#document-${ev.source_metadata.document_id}`}
+                        aria-label={`View source for ${ev.statement_text}`}
+                      >
+                        View source
+                      </a>
+                    )}
+                  </details>
                 </div>
               ))}
             </div>

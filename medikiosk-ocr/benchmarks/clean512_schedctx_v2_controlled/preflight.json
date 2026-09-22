@@ -1,0 +1,16 @@
+{
+  "clean_unchanged": true,
+  "C_sha256": "c7dda1f89025f2053429fc2a16fb72a5ec569a1ecf30e3e8517fe69af182395b",
+  "pool_verification": {
+    "status": "passed",
+    "contexts": 263,
+    "variants": 1315,
+    "original_identity_exact": 263,
+    "outside_region_diff_total": 0,
+    "stored_overlap_total": 0,
+    "rotation_epochs": 20,
+    "clean_snapshot_files": 1005
+  },
+  "pool_plan_verified": true,
+  "test_inference": false
+}

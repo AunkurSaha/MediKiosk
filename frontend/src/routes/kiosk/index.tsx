@@ -2,23 +2,51 @@ import { useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { api, ApiError } from '../../api/client';
-import type { Detail, Hospital, Language, PatientQueueEstimate } from '../../api/client';
+import type {
+  Detail,
+  Hospital,
+  JourneyMode,
+  Language,
+  PatientQueueEstimate,
+} from '../../api/client';
 import Interview from '../../components/kiosk/Interview';
+import RapidRouting from '../../components/kiosk/RapidRouting';
+import CareLocation from '../../components/kiosk/CareLocation';
+import DoctorRecommendations from '../../components/kiosk/DoctorRecommendations';
+import PreArrivalPacket from '../../components/kiosk/PreArrivalPacket';
+import CompletionReadiness from '../../components/kiosk/CompletionReadiness';
 import { copy, errorText, languages } from '../../i18n';
 import { speechCopy } from '../../i18n/speech';
 
 const sessionKey = 'medikiosk.session';
+const journeyModeKey = 'medikiosk.journeyMode';
+const onSiteHospitalKey = 'medikiosk.onSiteHospital';
+
+const progressStages = [
+  { key: 'language', label: 'Language', routes: ['language'] },
+  { key: 'journey', label: 'Visit type', routes: ['journey', 'on-site-facility'] },
+  { key: 'details', label: 'Details', routes: ['identify', 'consent'] },
+  { key: 'safety', label: 'Safety', routes: ['rapid-routing', 'emergency'] },
+  { key: 'care', label: 'Care', routes: ['location', 'doctor'] },
+  { key: 'history', label: 'History', routes: ['interview'] },
+  { key: 'review', label: 'Review', routes: [] },
+  { key: 'ready', label: 'Ready', routes: ['complete'] },
+] as const;
 
 export function HospitalSelection({
   hospitals,
   load,
   busy,
   onSelect,
+  title = 'Which hospital are you visiting today?',
+  subtitle = 'This selection applies to this visit only.',
 }: {
   hospitals: Hospital[] | null;
   load: () => Promise<void>;
   busy: boolean;
   onSelect: (hospitalId: string) => void;
+  title?: string;
+  subtitle?: string;
 }) {
   const [error, setError] = useState(false);
   const initialLoad = useRef(load);
@@ -52,8 +80,8 @@ export function HospitalSelection({
     );
   return (
     <>
-      <h1>Which hospital are you visiting today?</h1>
-      <p className="muted">This selection applies to this visit only.</p>
+      <h1>{title}</h1>
+      <p className="muted">{subtitle}</p>
       <div className="language-grid" data-testid="hospital-list">
         {hospitals.map((hospital) => (
           <button
@@ -78,17 +106,29 @@ export default function Kiosk() {
   const [resumeId, setResumeId] = useState(() => sessionStorage.getItem(sessionKey));
   const pendingId = useRef(resumeId);
   const [language, setLanguage] = useState<Language>('en');
+  const [journeyMode, setJourneyMode] = useState<JourneyMode | null>(
+    () => sessionStorage.getItem(journeyModeKey) as JourneyMode | null,
+  );
+  const [onSiteHospitalId, setOnSiteHospitalId] = useState(
+    () => sessionStorage.getItem(onSiteHospitalKey) || '',
+  );
   const [record, setRecord] = useState<Detail | null>(null);
+  const [queue, setQueue] = useState<PatientQueueEstimate | null>(null);
+  const [queueError, setQueueError] = useState(false);
   const [loading, setLoading] = useState(Boolean(resumeId));
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const [name, setName] = useState('');
-  const [gender, setGender] = useState('');
-  const [age, setAge] = useState('');
-  const [height, setHeight] = useState('');
-  const [weight, setWeight] = useState('');
-  const [token, setToken] = useState('');
+  const demoPatient = sessionStorage.getItem('medikiosk.demoPatient') === 'true';
+  const [name, setName] = useState(demoPatient ? 'Patient' : '');
+  const [gender, setGender] = useState(demoPatient ? 'female' : '');
+  const [age, setAge] = useState(demoPatient ? '42' : '');
+  const [height, setHeight] = useState(demoPatient ? '162' : '');
+  const [weight, setWeight] = useState(demoPatient ? '64' : '');
+  // This is an internal intake reference.  The visit/queue token is issued after
+  // routing and doctor selection, so a patient planning a visit never has to know
+  // an institution-specific token up front.
+  const [token] = useState(`INTAKE-${crypto.randomUUID().slice(0, 8).toUpperCase()}`);
   const [abha, setAbha] = useState('');
   const [abhaVerified, setAbhaVerified] = useState(false);
   const [abhaChecking, setAbhaChecking] = useState(false);
@@ -97,13 +137,36 @@ export default function Kiosk() {
   const [voiceAgreed, setVoiceAgreed] = useState(false);
   const [docAgreed, setDocAgreed] = useState(false);
   const [hospitals, setHospitals] = useState<Hospital[] | null>(null);
-  const [queueEstimate, setQueueEstimate] = useState<PatientQueueEstimate | null>(null);
-  const [queueEstimateLoading, setQueueEstimateLoading] = useState(true);
-  const [queueEstimateError, setQueueEstimateError] = useState(false);
-  const [queueEstimateAttempt, setQueueEstimateAttempt] = useState(0);
   const step = location.pathname.split('/').pop() || 'language';
   const t = copy[language];
-  const queueSessionId = record?.session.id;
+  const currentProgressIndex = Math.max(
+    0,
+    progressStages.findIndex((stage) => stage.routes.includes(step as never)),
+  );
+
+  useEffect(() => {
+    if (step !== 'complete' || !record) return;
+    let active = true;
+    const refresh = () => {
+      api
+        .queueEstimate(record.session.id)
+        .then((result) => {
+          if (active) {
+            setQueue(result);
+            setQueueError(false);
+          }
+        })
+        .catch(() => {
+          if (active) setQueueError(true);
+        });
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 20000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
+  }, [step, record]);
 
   useEffect(() => {
     if (!resumeId) return;
@@ -114,6 +177,13 @@ export default function Kiosk() {
         if (!active) return;
         setRecord(result);
         setLanguage(result.session.language);
+        const persistedJourneyMode = result.session.journey_mode || 'PRE_ARRIVAL';
+        setJourneyMode(persistedJourneyMode);
+        sessionStorage.setItem(journeyModeKey, persistedJourneyMode);
+        if (result.session.journey_mode === 'ON_SITE' && result.session.hospital_id) {
+          setOnSiteHospitalId(result.session.hospital_id);
+          sessionStorage.setItem(onSiteHospitalKey, result.session.hospital_id);
+        }
         setAgreed(Boolean(result.consent?.share_with_doctor));
         setVoiceAgreed(Boolean(result.consent?.voice_processing));
         setDocAgreed(Boolean(result.consent?.document_processing));
@@ -137,26 +207,12 @@ export default function Kiosk() {
   }, [attempt, resumeId]);
 
   useEffect(() => {
-    if (step !== 'complete' || !queueSessionId) return;
-    let active = true;
-    api
-      .queueEstimate(queueSessionId)
-      .then((estimate) => {
-        if (!active) return;
-        setQueueEstimate(estimate);
-      })
-      .catch(() => {
-        if (!active) return;
-        setQueueEstimate(null);
-        setQueueEstimateError(true);
-      })
-      .finally(() => {
-        if (active) setQueueEstimateLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [queueEstimateAttempt, queueSessionId, step]);
+    if (journeyMode !== 'ON_SITE' || hospitals !== null) return;
+    void api
+      .hospitals()
+      .then((result) => setHospitals(result.items))
+      .catch(() => setHospitals([]));
+  }, [journeyMode, hospitals]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [fullscreenError, setFullscreenError] = useState('');
@@ -203,19 +259,18 @@ export default function Kiosk() {
   }
   function clear() {
     sessionStorage.removeItem(sessionKey);
+    sessionStorage.removeItem('medikiosk.demoPatient');
+    sessionStorage.removeItem(journeyModeKey);
+    sessionStorage.removeItem(onSiteHospitalKey);
     setResumeId(null);
     pendingId.current = null;
     setRecord(null);
-    setQueueEstimate(null);
-    setQueueEstimateLoading(false);
-    setQueueEstimateError(false);
-    setQueueEstimateAttempt(0);
+    setQueue(null);
     setName('');
     setGender('');
     setAge('');
     setHeight('');
     setWeight('');
-    setToken('');
     setAbha('');
     setAbhaVerified(false);
     setAbhaChecking(false);
@@ -224,12 +279,14 @@ export default function Kiosk() {
     setVoiceAgreed(false);
     setDocAgreed(false);
     setLanguage('en');
+    setJourneyMode(null);
+    setOnSiteHospitalId('');
     setError(null);
     navigate('/kiosk/language', { replace: true });
   }
   function identify(event: FormEvent) {
     event.preventDefault();
-    if (!name.trim() || !token.trim() || !gender || !age || !height || !weight) return;
+    if (!name.trim() || !gender || !age || !height || !weight) return;
     void action(async () => {
       const id = pendingId.current || crypto.randomUUID();
       pendingId.current = id;
@@ -246,20 +303,31 @@ export default function Kiosk() {
         },
         hospital_token: token.trim(),
         language,
+        journey_mode: journeyMode || 'PRE_ARRIVAL',
+        hospital_id: journeyMode === 'ON_SITE' ? onSiteHospitalId : undefined,
       });
       const result = await api.session(id);
       setRecord(result);
-      navigate('/kiosk/hospital');
+      navigate('/kiosk/consent');
+    });
+  }
+  function chooseJourneyMode(mode: JourneyMode) {
+    void action(async () => {
+      sessionStorage.setItem(journeyModeKey, mode);
+      sessionStorage.removeItem(onSiteHospitalKey);
+      setJourneyMode(mode);
+      setOnSiteHospitalId('');
+      if (record) {
+        const session = await api.updateJourneyMode(record.session.id, mode);
+        setRecord({ ...record, session });
+      }
+      navigate(mode === 'ON_SITE' ? '/kiosk/on-site-facility' : '/kiosk/identify');
     });
   }
   async function completeInterview() {
     if (!record) return;
     const session = await api.complete(record.session.id);
-    setRecord((current) => (current ? { ...current, session } : current));
-    sessionStorage.removeItem(sessionKey);
-    setResumeId(null);
-    setQueueEstimateLoading(true);
-    setQueueEstimateError(false);
+    setRecord({ ...record, session });
     navigate('/kiosk/complete', { replace: true });
   }
 
@@ -288,22 +356,30 @@ export default function Kiosk() {
         </button>
       </div>
     );
-  if (!record && !['language', 'identify'].includes(step))
+  if (!record && !['language', 'journey', 'on-site-facility', 'identify'].includes(step))
     return <Navigate to="/kiosk/language" replace />;
   if (record?.session.status !== 'intake' && record && step !== 'complete')
     return <Navigate to="/kiosk/complete" replace />;
   if (record?.session.status === 'intake') {
-    if (!record.session.hospital_id && step !== 'hospital')
-      return <Navigate to="/kiosk/hospital" replace />;
-    if (record.session.hospital_id && !record.consent?.share_with_doctor && step !== 'consent')
+    if (
+      !record.consent?.share_with_doctor &&
+      !['journey', 'on-site-facility', 'consent'].includes(step)
+    )
       return <Navigate to="/kiosk/consent" replace />;
-    if (record.consent?.share_with_doctor && !['consent', 'interview'].includes(step))
-      return <Navigate to="/kiosk/interview" replace />;
+    if (
+      record.consent?.share_with_doctor &&
+      !['consent', 'rapid-routing', 'location', 'doctor', 'emergency', 'interview'].includes(step)
+    )
+      return <Navigate to="/kiosk/rapid-routing" replace />;
   }
 
   return (
-    <div lang={language} className="kiosk">
-      <div className="flex items-center justify-end pb-3 mb-2 border-b border-slate-200">
+    <div lang={language} className={`kiosk${step === 'complete' ? ' kiosk-complete' : ''}`}>
+      <div className="kiosk-utility-bar">
+        <div>
+          <strong>Patient Intake</strong>
+          <span>Private pre-consultation history</span>
+        </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -322,12 +398,14 @@ export default function Kiosk() {
         </p>
       )}
       <div className="stepper" aria-label={t.kiosk}>
-        {['language', 'identify', 'hospital', 'consent', 'interview', 'complete'].map((s, i) => (
-          <span key={s} aria-current={s === step ? 'step' : undefined}>
-            <b>{i + 1}</b>
-            {s === 'hospital'
-              ? 'Hospital'
-              : t[s as 'language' | 'identify' | 'consent' | 'interview' | 'complete']}
+        {progressStages.map((stage, index) => (
+          <span
+            key={stage.key}
+            className={index < currentProgressIndex ? 'complete' : ''}
+            aria-current={index === currentProgressIndex ? 'step' : undefined}
+          >
+            <b>{index < currentProgressIndex ? '✓' : index + 1}</b>
+            {stage.label}
           </span>
         ))}
       </div>
@@ -349,7 +427,7 @@ export default function Kiosk() {
                   key={lang.id}
                   onClick={() => {
                     setLanguage(lang.id);
-                    navigate('/kiosk/identify');
+                    navigate('/kiosk/journey');
                   }}
                 >
                   <strong>{lang.native}</strong>
@@ -359,6 +437,52 @@ export default function Kiosk() {
               ))}
             </div>
           </>
+        )}
+        {step === 'journey' && (
+          <>
+            <p className="eyebrow">Visit setup</p>
+            <h1>How are you using MediKiosk today?</h1>
+            <div className="language-grid" data-testid="journey-mode-options">
+              <button
+                className="language-card"
+                disabled={busy}
+                onClick={() => chooseJourneyMode('PRE_ARRIVAL')}
+              >
+                <strong>Planning my visit</strong>
+                <span>At home or away from the hospital</span>
+                <span aria-hidden="true">→</span>
+              </button>
+              <button
+                className="language-card"
+                disabled={busy}
+                onClick={() => chooseJourneyMode('ON_SITE')}
+              >
+                <strong>Already at a hospital</strong>
+                <span>Using MediKiosk after arriving</span>
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </>
+        )}
+        {step === 'on-site-facility' && (
+          <HospitalSelection
+            hospitals={hospitals}
+            load={() => api.hospitals().then((result) => setHospitals(result.items))}
+            busy={busy}
+            title="Which hospital are you currently at?"
+            subtitle="Choose where you have already arrived. Nearby-hospital search will be skipped."
+            onSelect={(hospitalId) => {
+              sessionStorage.setItem(onSiteHospitalKey, hospitalId);
+              setOnSiteHospitalId(hospitalId);
+              if (record) {
+                void action(async () => {
+                  const session = await api.selectHospital(record.session.id, hospitalId);
+                  setRecord({ ...record, session });
+                  navigate('/kiosk/consent');
+                });
+              } else navigate('/kiosk/identify');
+            }}
+          />
         )}
         {step === 'identify' && (
           <form onSubmit={identify}>
@@ -426,16 +550,10 @@ export default function Kiosk() {
               required
               disabled={busy}
             />
-            <label htmlFor="token">{t.token}</label>
-            <input
-              id="token"
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              maxLength={80}
-              required
-              autoComplete="off"
-              disabled={busy}
-            />
+            <p className="notice" role="note">
+              <strong>No hospital token is needed.</strong> We will issue your visit token after a
+              facility and clinician are matched. Your intake reference stays in the background.
+            </p>
             <label htmlFor="abha">{t.abha}</label>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <input
@@ -465,7 +583,7 @@ export default function Kiosk() {
                     const res = await api.verifyAbha(abha.trim());
                     if (res.success && res.profile) {
                       setAbhaVerified(true);
-                      setAbhaMessage(`✓ ABHA Verified (Sandbox): ${res.profile.name}`);
+                      setAbhaMessage(`✓ ABHA identity verified: ${res.profile.name}`);
                     } else {
                       setAbhaVerified(false);
                       setAbhaMessage(`⚠️ ${res.message}`);
@@ -500,16 +618,12 @@ export default function Kiosk() {
               <button
                 type="button"
                 className="secondary"
-                onClick={() => navigate('/kiosk/language')}
+                onClick={() => navigate('/kiosk/journey')}
                 disabled={busy}
               >
                 {t.back}
               </button>
-              <button
-                disabled={
-                  busy || !name.trim() || !token.trim() || !gender || !age || !height || !weight
-                }
-              >
+              <button disabled={busy || !name.trim() || !gender || !age || !height || !weight}>
                 {busy ? t.saving : t.continue}
               </button>
             </div>
@@ -531,7 +645,7 @@ export default function Kiosk() {
         )}
         {step === 'consent' && record && (
           <>
-            <p className="eyebrow">{record.session.hospital_token}</p>
+            <p className="eyebrow">Privacy and consent</p>
             <h1>{t.consent}</h1>
             <p>{t.consentNote}</p>
             <label className="check">
@@ -587,7 +701,7 @@ export default function Kiosk() {
                       docAgreed,
                     );
                     setRecord({ ...record, consent });
-                    navigate('/kiosk/interview');
+                    navigate('/kiosk/rapid-routing');
                   })
                 }
               >
@@ -602,72 +716,159 @@ export default function Kiosk() {
             language={language}
             voiceConsent={Boolean(record.consent?.voice_processing)}
             documentConsent={Boolean(record.consent?.document_processing)}
-            selectedDoctorId={record.session.selected_doctor_id}
-            onDoctorSelected={(doctorId) =>
-              setRecord({
-                ...record,
-                session: { ...record.session, selected_doctor_id: doctorId },
-              })
-            }
             onComplete={completeInterview}
             onBusyChange={setBusy}
             onManageConsent={() => navigate('/kiosk/consent')}
           />
         )}
+        {step === 'rapid-routing' && record && (
+          <RapidRouting
+            sessionId={record.session.id}
+            language={language}
+            voiceConsent={Boolean(record.consent?.voice_processing)}
+            journeyMode={record.session.journey_mode || 'PRE_ARRIVAL'}
+            onContinue={(emergency) =>
+              navigate(
+                record.session.journey_mode === 'ON_SITE'
+                  ? emergency
+                    ? '/kiosk/emergency'
+                    : '/kiosk/doctor'
+                  : '/kiosk/location',
+              )
+            }
+          />
+        )}
+        {step === 'location' && record && (
+          <CareLocation
+            sessionId={record.session.id}
+            onSelected={(emergency) => navigate(emergency ? '/kiosk/emergency' : '/kiosk/doctor')}
+          />
+        )}
+        {step === 'doctor' && record && (
+          <>
+            {record.session.journey_mode === 'ON_SITE' && (
+              <div className="notice" data-testid="on-site-facility-context">
+                <strong>Current facility</strong>
+                <p>
+                  {hospitals?.find((item) => item.id === record.session.hospital_id)?.name ||
+                    'Selected hospital'}
+                </p>
+                <span>Already here — hospital search skipped</span>
+              </div>
+            )}
+            <DoctorRecommendations
+              sessionId={record.session.id}
+              onSelected={(doctorId) => {
+                setRecord({
+                  ...record,
+                  session: { ...record.session, selected_doctor_id: doctorId },
+                });
+                navigate('/kiosk/interview');
+              }}
+              onChooseFacility={() =>
+                navigate(
+                  record.session.journey_mode === 'ON_SITE'
+                    ? '/kiosk/on-site-facility'
+                    : '/kiosk/location',
+                )
+              }
+            />
+          </>
+        )}
+        {step === 'emergency' && record && (
+          <div className="kiosk-safety-advisory emergency" role="alert">
+            <h1>Potential emergency symptoms detected</h1>
+            <p>
+              Immediate clinical assessment recommended.{' '}
+              {record.session.journey_mode === 'ON_SITE'
+                ? 'Please seek immediate assistance from the clinical or triage team at your current hospital.'
+                : 'Please speak to staff at the selected emergency-capable facility now.'}
+            </p>
+            {record.session.journey_mode === 'ON_SITE' && (
+              <p data-testid="on-site-emergency-facility">
+                You are already at:{' '}
+                <strong>
+                  {hospitals?.find((item) => item.id === record.session.hospital_id)?.name ||
+                    'your selected hospital'}
+                </strong>
+              </p>
+            )}
+            <p>Routine doctor matching and the normal queue pathway are paused.</p>
+            <div className="emergency-explanation">
+              <h2>How was this detected?</h2>
+              <p>
+                Your symptom responses matched a predefined deterministic clinical safety rule. This
+                decision was not generated by an AI diagnosis model.
+              </p>
+            </div>
+          </div>
+        )}
         {step === 'complete' && record && (
           <div className="completion">
-            <span className="completion-icon" aria-hidden="true">
-              ✓
-            </span>
-            <p className="eyebrow">{t.saved}</p>
-            <h1>{t.complete}</h1>
-            <p>{t.doneText}</p>
-            <div className="queue-estimate" role="status" aria-live="polite">
-              {queueEstimateLoading && <p>{t.queueEstimateLoading}</p>}
-              {queueEstimateError && !queueEstimateLoading && (
-                <div>
-                  <p>{t.queueEstimateUnavailable}</p>
-                  <button
-                    type="button"
-                    className="secondary queue-estimate-retry"
-                    onClick={() => {
-                      setQueueEstimateLoading(true);
-                      setQueueEstimateError(false);
-                      setQueueEstimateAttempt((value) => value + 1);
-                    }}
-                  >
-                    {t.retry}
-                  </button>
-                </div>
-              )}
-              {queueEstimate && !queueEstimateLoading && (
-                <>
-                  <p>
-                    {t.queuePriority}: <strong>{queueEstimate.position}</strong>
-                    {' · '}
-                    <strong>{queueEstimate.doctor_name}</strong>
-                  </p>
-                  <p>
-                    {t.approximateWait}:{' '}
-                    <strong>
-                      {queueEstimate.estimated_wait_minutes} {t.minutes}
-                    </strong>
-                  </p>
-                  <p>
-                    {t.expectedMeeting}:{' '}
-                    <strong>
-                      {new Intl.DateTimeFormat(language, {
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      }).format(new Date(queueEstimate.expected_meeting_at))}
-                    </strong>
-                  </p>
-                </>
-              )}
-            </div>
-            <div className="token">
-              <span>{t.token}</span>
-              <strong>{record.session.hospital_token}</strong>
+            <p className="eyebrow">✓ {t.saved}</p>
+            <h1>
+              {record.session.journey_mode === 'ON_SITE'
+                ? 'Your hospital intake is ready'
+                : 'Your pre-consultation intake is ready'}
+            </h1>
+            <p>
+              Your information has been organized for the selected clinical team before
+              consultation.
+            </p>
+            <CompletionReadiness record={record} />
+            <div className="completion-grid">
+              <div className="card completion-visit" aria-label="Visit queue reservation">
+                <h2>Your visit</h2>
+                {queue && (
+                  <>
+                    <div className="completion-visit-grid">
+                      <div>
+                        <span>Selected Facility</span>
+                        <strong>{queue.hospital_name}</strong>
+                      </div>
+                      <div>
+                        <span>Doctor</span>
+                        <strong>{queue.doctor_name}</strong>
+                      </div>
+                      <div className="completion-visit-highlight">
+                        <span>Visit Token</span>
+                        <strong>{queue.visit_token ?? 'Pending'}</strong>
+                      </div>
+                      <div className="completion-visit-highlight">
+                        <span>Approx. Waiting Time</span>
+                        <strong>{queue.estimated_wait_minutes} minutes</strong>
+                      </div>
+                      <div>
+                        <span>Queue Status</span>
+                        <strong>{queue.status.replaceAll('_', ' ')}</strong>
+                      </div>
+                    </div>
+                    <p className="muted">
+                      Waiting time is an estimate and may change during clinical care.
+                    </p>
+                  </>
+                )}
+                {queueError && (
+                  <p role="alert">Queue status could not be loaded. Please retry or ask staff.</p>
+                )}
+                <button
+                  type="button"
+                  className="secondary"
+                  onClick={() =>
+                    record &&
+                    api
+                      .queueEstimate(record.session.id)
+                      .then(setQueue)
+                      .catch(() => setQueueError(true))
+                  }
+                >
+                  Refresh queue status
+                </button>
+                <p className="completion-reference">
+                  Intake reference: {record.session.hospital_token}
+                </p>
+              </div>
+              <PreArrivalPacket sessionId={record.session.id} />
             </div>
             <p className="muted">{t.doneNote}</p>
             <button onClick={clear}>{t.newPatient}</button>

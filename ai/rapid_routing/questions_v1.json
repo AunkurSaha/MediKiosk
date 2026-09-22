@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "complaints": {
+    "CHEST_DISCOMFORT": {"flow_id": "chest_pain", "specialty": "CARDIOLOGY", "questions": [
+      {"question_id":"rapid.chest.severity","concept_code":"SYMPTOM_SEVERITY","target_field":"hpi.severity","prompt":{"en":"How severe is the chest discomfort right now, from 0 to 10?","bn":"এখন বুকের অস্বস্তি ০ থেকে ১০-এর মধ্যে কতটা তীব্র?","hi":"अभी सीने की तकलीफ़ 0 से 10 में कितनी गंभीर है?"},"input_type":"severity","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["hpi.severity"]},
+      {"question_id":"rapid.chest.breathlessness","concept_code":"DYSPNEA","target_field":"rapid.dyspnea","prompt":{"en":"Are you short of breath now?","bn":"এখন কি আপনার শ্বাসকষ্ট হচ্ছে?","hi":"क्या अभी आपको सांस लेने में तकलीफ़ है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["concept:DYSPNEA"]},
+      {"question_id":"rapid.chest.radiation","concept_code":"PAIN_RADIATION","target_field":"hpi.radiation","prompt":{"en":"Does the discomfort spread to your arm, jaw, back, or another area?","bn":"অস্বস্তি কি হাত, চোয়াল, পিঠ বা অন্য কোথাও ছড়ায়?","hi":"क्या तकलीफ़ बांह, जबड़े, पीठ या किसी अन्य जगह फैलती है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["hpi.radiation"]}
+    ]},
+    "BREATHING_DIFFICULTY": {"flow_id":"cough_breathlessness","specialty":"PULMONOLOGY","questions":[
+      {"question_id":"rapid.breathing.sentences","concept_code":"INABILITY_FULL_SENTENCES","target_field":"rapid.inability_full_sentences","prompt":{"en":"Are you unable to speak a full sentence because of breathlessness?","bn":"শ্বাসকষ্টের কারণে কি আপনি পুরো বাক্য বলতে পারছেন না?","hi":"क्या सांस की तकलीफ़ के कारण आप पूरा वाक्य नहीं बोल पा रहे हैं?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":[]},
+      {"question_id":"rapid.breathing.constant","concept_code":"CONSTANT_BREATHLESSNESS","target_field":"hpi.timing","prompt":{"en":"Is the breathlessness constant right now?","bn":"শ্বাসকষ্ট কি এখন একটানা হচ্ছে?","hi":"क्या सांस की तकलीफ़ अभी लगातार है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["hpi.timing"]},
+      {"question_id":"rapid.breathing.chest","concept_code":"CHEST_DISCOMFORT_ASSOCIATED","target_field":"rapid.chest_discomfort","prompt":{"en":"Do you also have chest discomfort?","bn":"আপনার কি সঙ্গে বুকের অস্বস্তিও আছে?","hi":"क्या साथ में सीने में तकलीफ़ भी है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":[]}
+    ]},
+    "FEVER": {"flow_id":"fever","specialty":"GENERAL_MEDICINE","questions":[
+      {"question_id":"rapid.fever.temperature","concept_code":"BODY_TEMPERATURE","target_field":"hpi.temperature","prompt":{"en":"What is the highest measured temperature in °C?","bn":"মাপা সর্বোচ্চ তাপমাত্রা কত °C?","hi":"मापा गया सबसे अधिक तापमान °C में कितना है?"},"input_type":"number","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["hpi.temperature"]},
+      {"question_id":"rapid.fever.breathing","concept_code":"DYSPNEA","target_field":"rapid.dyspnea","prompt":{"en":"Do you have breathing difficulty?","bn":"আপনার কি শ্বাসকষ্ট হচ্ছে?","hi":"क्या आपको सांस लेने में तकलीफ़ है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["concept:DYSPNEA"]}
+    ]},
+    "HEADACHE": {"flow_id":"headache","specialty":"GENERAL_MEDICINE","questions":[
+      {"question_id":"rapid.headache.severity","concept_code":"SYMPTOM_SEVERITY","target_field":"hpi.severity","prompt":{"en":"How severe is the headache right now, from 0 to 10?","bn":"এখন মাথাব্যথা ০ থেকে ১০-এর মধ্যে কতটা তীব্র?","hi":"अभी सिरदर्द 0 से 10 में कितना गंभीर है?"},"input_type":"severity","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["hpi.severity"]},
+      {"question_id":"rapid.headache.neck","concept_code":"PAIN_RADIATION","target_field":"hpi.radiation","prompt":{"en":"Does the pain extend to your neck?","bn":"ব্যথা কি ঘাড় পর্যন্ত যায়?","hi":"क्या दर्द गर्दन तक जाता है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["hpi.radiation"]}
+    ]},
+    "ABDOMINAL_PAIN": {"flow_id":"abdominal_pain","specialty":"GENERAL_MEDICINE","questions":[
+      {"question_id":"rapid.abdominal.severity","concept_code":"SYMPTOM_SEVERITY","target_field":"hpi.severity","prompt":{"en":"How severe is the abdominal pain right now, from 0 to 10?","bn":"এখন পেটব্যথা ০ থেকে ১০-এর মধ্যে কতটা তীব্র?","hi":"अभी पेट दर्द 0 से 10 में कितना गंभीर है?"},"input_type":"severity","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["hpi.severity"]},
+      {"question_id":"rapid.abdominal.constant","concept_code":"CONSTANT_PAIN","target_field":"hpi.timing","prompt":{"en":"Is the pain constant?","bn":"ব্যথা কি একটানা?","hi":"क्या दर्द लगातार है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["hpi.timing"]},
+      {"question_id":"rapid.abdominal.vomiting","concept_code":"VOMITING","target_field":"rapid.vomiting","prompt":{"en":"Are you vomiting?","bn":"আপনার কি বমি হচ্ছে?","hi":"क्या आपको उल्टी हो रही है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["concept:VOMITING"]}
+    ]},
+    "COUGH":{"flow_id":"cough_breathlessness","specialty":"PULMONOLOGY","questions":[{"question_id":"rapid.cough.breathing","concept_code":"DYSPNEA","target_field":"rapid.dyspnea","prompt":{"en":"Do you also have breathing difficulty?","bn":"আপনার কি সঙ্গে শ্বাসকষ্টও আছে?","hi":"क्या साथ में सांस लेने में तकलीफ़ भी है?"},"input_type":"boolean","required_for_safety":true,"required_for_routing":true,"equivalent_fields":["concept:DYSPNEA"]}]},
+    "SKIN_PROBLEM":{"flow_id":null,"specialty":"DERMATOLOGY","questions":[]},
+    "INJURY":{"flow_id":null,"specialty":"ORTHOPEDICS","questions":[]},
+    "JOINT_PAIN":{"flow_id":"joint_pain","specialty":"ORTHOPEDICS","questions":[]},
+    "OTHER":{"flow_id":"other_complaint","specialty":"GENERAL_MEDICINE","questions":[]}
+  }
+}

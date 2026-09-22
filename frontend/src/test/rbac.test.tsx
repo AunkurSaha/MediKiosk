@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute';
 import { AuthProvider } from '../context/AuthContext';
@@ -44,6 +44,74 @@ describe('Role-Based Access Control (RBAC) - Frontend Guards', () => {
       speech_provider: 'mock',
       ocr_provider: 'mock',
     });
+  });
+
+  function LocationDisplay() {
+    const location = useLocation();
+    return (
+      <output data-testid="location">
+        {location.pathname}
+        {location.search}
+      </output>
+    );
+  }
+
+  function renderDoctorRoute() {
+    return render(
+      <MemoryRouter initialEntries={['/doctor']}>
+        <AuthProvider>
+          <Routes>
+            <Route
+              path="/doctor"
+              element={
+                <ProtectedRoute allowedRoles={['doctor']}>
+                  <div>Doctor Secret Content</div>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/login" element={<div>Login Page</div>} />
+          </Routes>
+          <LocationDisplay />
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+  }
+
+  it('does not redirect a pending authenticated doctor hydration away from /doctor', async () => {
+    let resolveAuth: (user: AuthUser) => void;
+    const pendingAuth = new Promise<AuthUser>((resolve) => {
+      resolveAuth = resolve;
+    });
+    vi.spyOn(api, 'getMe').mockReturnValue(pendingAuth);
+
+    renderDoctorRoute();
+
+    expect(screen.getByText(/Checking authentication/)).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/doctor');
+    expect(screen.queryByText('Login Page')).not.toBeInTheDocument();
+
+    resolveAuth!(doctorUser);
+
+    expect(await screen.findByText('Doctor Secret Content')).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/doctor');
+  });
+
+  it('redirects an unauthenticated doctor route only after hydration resolves', async () => {
+    let rejectAuth: (reason?: unknown) => void;
+    const pendingAuth = new Promise<AuthUser>((_, reject) => {
+      rejectAuth = reject;
+    });
+    vi.spyOn(api, 'getMe').mockReturnValue(pendingAuth);
+
+    renderDoctorRoute();
+
+    expect(screen.getByText(/Checking authentication/)).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/doctor');
+
+    rejectAuth!(new Error('AUTH_REQUIRED'));
+
+    expect(await screen.findByText('Login Page')).toBeInTheDocument();
+    expect(screen.getByTestId('location')).toHaveTextContent('/login?redirect=%2Fdoctor');
   });
 
   it('blocks patient from doctor route and displays Doctor Access Required', async () => {
@@ -193,7 +261,9 @@ describe('Role-Based Access Control (RBAC) - Frontend Guards', () => {
 
       const nav = await screen.findByRole('navigation', { name: /MediKiosk/i });
       expect(within(nav).getByRole('link', { name: /Patient intake/i })).toBeInTheDocument();
-      expect(within(nav).queryByRole('link', { name: /Doctor workspace/i })).not.toBeInTheDocument();
+      expect(
+        within(nav).queryByRole('link', { name: /Doctor workspace/i }),
+      ).not.toBeInTheDocument();
       expect(within(nav).queryByRole('link', { name: /Triage/i })).not.toBeInTheDocument();
     });
 
@@ -242,7 +312,9 @@ describe('Role-Based Access Control (RBAC) - Frontend Guards', () => {
 
       const nav = await screen.findByRole('navigation', { name: /MediKiosk/i });
       expect(within(nav).getByRole('link', { name: /Triage/i })).toBeInTheDocument();
-      expect(within(nav).queryByRole('link', { name: /Doctor workspace/i })).not.toBeInTheDocument();
+      expect(
+        within(nav).queryByRole('link', { name: /Doctor workspace/i }),
+      ).not.toBeInTheDocument();
       expect(within(nav).queryByRole('link', { name: /Patient intake/i })).not.toBeInTheDocument();
     });
   });

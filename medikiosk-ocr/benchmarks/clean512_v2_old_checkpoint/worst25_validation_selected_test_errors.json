@@ -1,0 +1,658 @@
+[
+  {
+    "id": "test_00088",
+    "renderer": "times",
+    "truth": "Tab  Amoxicillin  40  ml  1-1-1",
+    "prediction": "Tab Amoxillin 40 ml 1-1",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.25806451612903225,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 31,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 36,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.5555555555555554,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "hyphen loss / possible schedule truncation"
+    ]
+  },
+  {
+    "id": "test_00168",
+    "renderer": "times",
+    "truth": "Syp  Amoxicillin  650  g  AC  x 5d  before food",
+    "prediction": "Syp Amoxillin 650 g AC x 5d betfore fod",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.2127659574468085,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 47,
+    "adjacent_repeat_count": 8,
+    "minimum_ctc_steps": 55,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.327272727272727,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00156",
+    "renderer": "times",
+    "truth": "Inj  PCM  10  mcg  1-0-0",
+    "prediction": "Inj PCM 10 mcg  1-0",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.20833333333333334,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 24,
+    "adjacent_repeat_count": 4,
+    "minimum_ctc_steps": 28,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.571428571428571,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "hyphen loss / possible schedule truncation"
+    ]
+  },
+  {
+    "id": "test_00090",
+    "renderer": "times",
+    "truth": "Inj  Amoxicillin  650  ml  AC  x 3d",
+    "prediction": "Inj Amoxillin 650 ml AC x 3d",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.2,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 35,
+    "adjacent_repeat_count": 6,
+    "minimum_ctc_steps": 41,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.1219512195121952,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion"
+    ]
+  },
+  {
+    "id": "test_00046",
+    "renderer": "times",
+    "truth": "Paracetamol  5  g  1-1-1  x 3d  at bedtime",
+    "prediction": "Pacetamol 5 g 1-1  x 3d at bedtime",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.19047619047619047,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 42,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 47,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.723404255319149,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "hyphen loss / possible schedule truncation"
+    ]
+  },
+  {
+    "id": "test_00076",
+    "renderer": "times",
+    "truth": "Metformin  10  ml  PC  x 7d  as needed",
+    "prediction": "Metformin  10 ml PC x 7d as ned",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.18421052631578946,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 38,
+    "adjacent_repeat_count": 6,
+    "minimum_ctc_steps": 44,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.909090909090909,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00184",
+    "renderer": "times",
+    "truth": "Amoxicillin 10 g 1-0-0",
+    "prediction": "Amoxillin 10 g 1-0",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.18181818181818182,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 22,
+    "adjacent_repeat_count": 1,
+    "minimum_ctc_steps": 23,
+    "output_time_steps": 128,
+    "alignment_ratio": 5.565217391304348,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "hyphen loss / possible schedule truncation"
+    ]
+  },
+  {
+    "id": "test_00034",
+    "renderer": "times",
+    "truth": "Paracetamol  5  mg  QID  x 5d",
+    "prediction": "Pacetamol 5 mg QID  x 5d",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.1724137931034483,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 29,
+    "adjacent_repeat_count": 4,
+    "minimum_ctc_steps": 33,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.878787878787879,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion"
+    ]
+  },
+  {
+    "id": "test_00060",
+    "renderer": "times",
+    "truth": "Capsule  Paracetamol  625  g  1-0-0  x 5d",
+    "prediction": "Capsule Pacetmol 625 g 1-0-0  x 5d",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.17073170731707318,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 41,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 46,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.782608695652174,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion"
+    ]
+  },
+  {
+    "id": "test_00082",
+    "renderer": "times",
+    "truth": "Cap  Amoxicillin  625  mcg  HS  for 5 days  as needed",
+    "prediction": "Cap Amoxillin 6250 mcg  HS  for 5 days as ned",
+    "original_requested_font_size": 23,
+    "final_font_size": 22,
+    "fitted": true,
+    "cer": 0.16981132075471697,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 53,
+    "adjacent_repeat_count": 8,
+    "minimum_ctc_steps": 61,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.098360655737705,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00096",
+    "renderer": "times",
+    "truth": "Tablet  Amoxicillin  5  mcg  PC  x 7d  with water",
+    "prediction": "Tablet Amoxillin 5 mcg PC x 7d with water",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.16326530612244897,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 49,
+    "adjacent_repeat_count": 7,
+    "minimum_ctc_steps": 56,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.2857142857142856,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion"
+    ]
+  },
+  {
+    "id": "test_00144",
+    "renderer": "times",
+    "truth": "Tab  Amoxicillin  500  g  PRN  for 5 days  before food",
+    "prediction": "Tab Amoxillin 50  g PRN  for 5 days before fod",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.14814814814814814,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 54,
+    "adjacent_repeat_count": 9,
+    "minimum_ctc_steps": 63,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.0317460317460316,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00120",
+    "renderer": "times",
+    "truth": "Inj  Cetirizine  625  g  SOS  x 3d",
+    "prediction": "Inj Cetizine  625 g SOS  x 3d",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.14705882352941177,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 34,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 39,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.282051282051282,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion"
+    ]
+  },
+  {
+    "id": "test_00042",
+    "renderer": "times",
+    "truth": "Amoxicillin  650  ml  OD  for 5 days  before food",
+    "prediction": "Amoxillin 650 ml OD  for 5 days before fod",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.14285714285714285,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 49,
+    "adjacent_repeat_count": 7,
+    "minimum_ctc_steps": 56,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.2857142857142856,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00054",
+    "renderer": "times",
+    "truth": "Syp Amoxicillin 650 ml 1-0-0",
+    "prediction": "Syp Amoxillin 650 ml 1-0",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.14285714285714285,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 28,
+    "adjacent_repeat_count": 1,
+    "minimum_ctc_steps": 29,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.413793103448276,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "hyphen loss / possible schedule truncation"
+    ]
+  },
+  {
+    "id": "test_00108",
+    "renderer": "times",
+    "truth": "Syp  Pantoprazole  5  mcg  SOS  after food",
+    "prediction": "Syp  Pantoprazole 5 mcg SOS aftr fod",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.14285714285714285,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 42,
+    "adjacent_repeat_count": 6,
+    "minimum_ctc_steps": 48,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.6666666666666665,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00174",
+    "renderer": "times",
+    "truth": "Tab  Cetirizine  250  ml  1-0-1  x 3d  with water",
+    "prediction": "Tab Cetizine 250 ml 1-0-1  x 3d with water",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.14285714285714285,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 49,
+    "adjacent_repeat_count": 6,
+    "minimum_ctc_steps": 55,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.327272727272727,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion"
+    ]
+  },
+  {
+    "id": "test_00192",
+    "renderer": "times",
+    "truth": "Paracetamol 250 g 1-1-1 x 7d",
+    "prediction": "Pacetamol 250 g 1-1 x 7d",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.14285714285714285,
+    "buckets": [
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 28,
+    "adjacent_repeat_count": 0,
+    "minimum_ctc_steps": 28,
+    "output_time_steps": 128,
+    "alignment_ratio": 4.571428571428571,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "hyphen loss / possible schedule truncation"
+    ]
+  },
+  {
+    "id": "test_00114",
+    "renderer": "times",
+    "truth": "Capsule  Metformin  20  ml  BD  for 5 days  as needed",
+    "prediction": "Capsule  Metfrmin 20 ml BD  for 5 days as need",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.1320754716981132,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 53,
+    "adjacent_repeat_count": 7,
+    "minimum_ctc_steps": 60,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.1333333333333333,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00052",
+    "renderer": "times",
+    "truth": "Syrup  Paracetamol  20  mcg  QID  x 3d",
+    "prediction": "Syrup Pacetamol  20  mcg QID x 3d",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.13157894736842105,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 38,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 43,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.9767441860465116,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion"
+    ]
+  },
+  {
+    "id": "test_00006",
+    "renderer": "times",
+    "truth": "PCM 40 g BD before food",
+    "prediction": "PCM 10 g BD betore fod",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.13043478260869565,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "short_line"
+    ],
+    "target_length": 23,
+    "adjacent_repeat_count": 1,
+    "minimum_ctc_steps": 24,
+    "output_time_steps": 128,
+    "alignment_ratio": 5.333333333333333,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00040",
+    "renderer": "times",
+    "truth": "Paracetamol  500  mg  1-1-1  after food",
+    "prediction": "Pacetamol 500  mg  1-1-1 after fod",
+    "original_requested_font_size": 23,
+    "final_font_size": 23,
+    "fitted": false,
+    "cer": 0.1282051282051282,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 39,
+    "adjacent_repeat_count": 6,
+    "minimum_ctc_steps": 45,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.8444444444444446,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00012",
+    "renderer": "times",
+    "truth": "Syp  Paracetamol  5  mcg  1-0-0  for 7 days  after food",
+    "prediction": "Syp Pacetamol 5 mcg  1-0-0  for 7 days after fod",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.12727272727272726,
+    "buckets": [
+      "repeated_character",
+      "numeric_schedule",
+      "medication",
+      "punctuation_hyphen",
+      "spacing",
+      "long_line"
+    ],
+    "target_length": 55,
+    "adjacent_repeat_count": 7,
+    "minimum_ctc_steps": 62,
+    "output_time_steps": 128,
+    "alignment_ratio": 2.064516129032258,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion",
+      "instruction mismatch"
+    ]
+  },
+  {
+    "id": "test_00021",
+    "renderer": "trebuc",
+    "truth": "Tablet  Paracetamol  500  g  TDS",
+    "prediction": "Tablet Pacetamol  500  g TDS",
+    "original_requested_font_size": 22,
+    "final_font_size": 22,
+    "fitted": false,
+    "cer": 0.125,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 32,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 37,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.4594594594594597,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "medicine mismatch; inspect internal deletion"
+    ]
+  },
+  {
+    "id": "test_00164",
+    "renderer": "times",
+    "truth": "Capsule  PCM  10  mcg  QID  x 5d",
+    "prediction": "Capsule  PCM 10 mcg QID x 5d",
+    "original_requested_font_size": 24,
+    "final_font_size": 24,
+    "fitted": false,
+    "cer": 0.125,
+    "buckets": [
+      "repeated_character",
+      "medication",
+      "spacing",
+      "medium_line"
+    ],
+    "target_length": 32,
+    "adjacent_repeat_count": 5,
+    "minimum_ctc_steps": 37,
+    "output_time_steps": 128,
+    "alignment_ratio": 3.4594594594594597,
+    "alignment_status": "adequate",
+    "descriptive_patterns": [
+      "other substitution/insertion/deletion"
+    ]
+  }
+]

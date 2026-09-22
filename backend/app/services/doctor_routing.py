@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
 
@@ -21,14 +21,15 @@ DEMO_HOSPITAL_D = "10000000-0000-4000-8000-000000000004"
 DEMO_HOSPITAL_E = "10000000-0000-4000-8000-000000000005"
 DEMO_DOCTOR_A = "00000000-0000-4000-8000-000000000001"
 DEMO_DOCTOR_B = "20000000-0000-4000-8000-000000000002"
-DEMO_DOCTOR_D = "20000000-0000-4000-8000-000000000004"
 DEMO_DOCTOR_C = "20000000-0000-4000-8000-000000000003"
+DEMO_DOCTOR_D = "20000000-0000-4000-8000-000000000004"
 DEMO_DOCTOR_E = "20000000-0000-4000-8000-000000000005"
 DEMO_DOCTOR_F = "20000000-0000-4000-8000-000000000006"
 DEMO_DOCTOR_G = "20000000-0000-4000-8000-000000000007"
 DEMO_DOCTOR_H = "20000000-0000-4000-8000-000000000008"
 DEMO_DOCTOR_I = "20000000-0000-4000-8000-000000000009"
 DEMO_DOCTOR_J = "20000000-0000-4000-8000-000000000010"
+DEMO_DOCTOR_K = "20000000-0000-4000-8000-000000000011"
 
 DEMO_DOCTOR_PASSWORD = "Doctor@123"
 DEMO_GENERIC_COMPLAINTS = (
@@ -151,9 +152,9 @@ DEMO_DOCTORS = (
         DEMO_DOCTOR_D,
         "Dr. Mira Roy",
         "+919876500021",
-        "MD, Cardiology",
+        "MD, Dermatology",
         DEMO_HOSPITAL_B,
-        ("CARDIOLOGY",),
+        ("DERMATOLOGY",),
         4,
     ),
     (
@@ -192,7 +193,30 @@ DEMO_DOCTORS = (
         ("GASTROENTEROLOGY", "AYUSH"),
         3,
     ),
+    (
+        DEMO_DOCTOR_K,
+        "Dr. Riya Mukherjee",
+        "+919876500031",
+        "MS, Orthopedics",
+        DEMO_HOSPITAL_C,
+        ("ORTHOPEDICS",),
+        1,
+    ),
 )
+
+DEMO_DOCTOR_DIRECTORY = {
+    DEMO_DOCTOR_A: (["CHEST_PAIN"], 12, ["en", "bn"], "AVAILABLE"),
+    DEMO_DOCTOR_B: (["CHEST_PAIN", "ARRHYTHMIA"], 20, ["en", "hi"], "BUSY"),
+    DEMO_DOCTOR_C: (["FEVER", "HEADACHE"], 18, ["en", "hi"], "AVAILABLE"),
+    DEMO_DOCTOR_D: (["SKIN_CONDITIONS"], 14, ["en", "bn"], "AVAILABLE"),
+    DEMO_DOCTOR_E: (["RESPIRATORY_SYMPTOMS"], 11, ["en", "bn"], "AVAILABLE"),
+    DEMO_DOCTOR_F: (["ABDOMINAL_PAIN"], 9, ["en", "hi"], "UNKNOWN"),
+    DEMO_DOCTOR_G: (["FEVER", "HEADACHE"], 8, ["en", "bn"], "AVAILABLE"),
+    DEMO_DOCTOR_H: (["HEADACHE"], 16, ["en", "hi"], "BUSY"),
+    DEMO_DOCTOR_I: (["RESPIRATORY_SYMPTOMS"], 10, ["en", "bn"], "AVAILABLE"),
+    DEMO_DOCTOR_J: (["ABDOMINAL_PAIN"], 7, ["en", "hi"], "OFF_DUTY"),
+    DEMO_DOCTOR_K: (["MUSCULOSKELETAL", "INJURY"], 12, ["en", "bn", "hi"], "AVAILABLE"),
+}
 
 ACTIVE_QUEUE_STATUSES = {"WAITING", "CALLED", "IN_CONSULTATION"}
 ALLOWED_TRANSITIONS = {
@@ -211,6 +235,15 @@ def specialty_routes() -> dict[str, dict[str, list[str]]]:
     if not isinstance(routes, dict):
         raise RuntimeError("Invalid complaint-specialty routing configuration")
     return routes
+
+
+@lru_cache
+def eta_policy() -> dict:
+    path = Path(__file__).resolve().parents[3] / "ai" / "queue" / "eta_policy_v1.json"
+    policy = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(policy, dict):
+        raise RuntimeError("Invalid queue ETA policy configuration")
+    return policy
 
 
 def list_active_hospitals(db: Session) -> list[models.Hospital]:
@@ -269,110 +302,125 @@ def ensure_demo_routing_data(db: Session) -> None:
     bind = db.get_bind()
     if getattr(bind, "_medikiosk_demo_routing_ready", False):
         return
-    # The final deterministic fixture is a completion sentinel. Normal API
-    # requests must not rescan/rewrite the entire 30-patient demo dataset,
-    # especially when PostgreSQL is in a remote Supabase region.
-    final_doctor_id, *_, final_queue_count = DEMO_DOCTORS[-1]
-    final_session_id = str(
-        uuid.uuid5(
-            uuid.NAMESPACE_URL,
-            f"medikiosk:demo-queue:{final_doctor_id}:{final_queue_count - 1}",
-        )
-    )
-    if (
-        db.scalar(
-            select(models.ClinicalSummary.id).where(
-                models.ClinicalSummary.session_id == final_session_id
-            )
-        )
-        is not None
-    ):
-        bind._medikiosk_demo_routing_ready = True
-        return
+    # Demo hospitals for the MediRoute directory (facility directory)
+    # We'll create 5 demo facilities with varied capabilities as per the instruction.
     hospitals = [
+        # Facility A: General Medicine, Cardiology, Emergency, ICU, Imaging
         (
             DEMO_HOSPITAL_A,
             "DEMO-KOL-01",
             "MediKiosk City Hospital",
             "Central Kolkata",
-            True,
-            "22.5726",
-            "88.3639",
-            "General Medicine,Cardiology,Emergency,ICU,Imaging",
-            "demo_facilities_v1",
             "Kolkata",
+            22.5726,
+            88.3639,
+            "General Hospital",
+            "GENERAL_MEDICINE,CARDIOLOGY,EMERGENCY,ICU,IMAGING",
             True,
+            "OPEN",
+            True,
+            "demo_facilities_v1",
         ),
+        # Facility B: General Medicine, Dermatology, no emergency
         (
             DEMO_HOSPITAL_B,
             "DEMO-KOL-02",
             "MediKiosk Lake Medical Centre",
             "South Kolkata",
-            True,
-            "22.5448",
-            "88.3218",
-            "General Medicine,Dermatology",
-            "demo_facilities_v1",
             "Kolkata",
+            22.5448,
+            88.3426,
+            "Specialty Hospital",
+            "GENERAL_MEDICINE,DERMATOLOGY",
+            False,
+            "OPEN",
             True,
+            "demo_facilities_v1",
         ),
+        # Facility C: Orthopedics, Surgery, Imaging
         (
             DEMO_HOSPITAL_C,
             "DEMO-KOL-03",
-            "MediKiosk Ortho Specialist",
-            "West Kolkata",
-            True,
-            "22.5872",
-            "88.3456",
-            "Orthopedics,Surgery,Imaging",
-            "demo_facilities_v1",
+            "MediKiosk Ortho & Surgery Center",
+            "East Kolkata",
             "Kolkata",
+            22.5932,
+            88.4120,
+            "Specialty Hospital",
+            "ORTHOPEDICS,SURGERY,IMAGING",
+            False,
+            "OPEN",
             True,
+            "demo_facilities_v1",
         ),
+        # Facility D: Pulmonology, Emergency, ICU
         (
             DEMO_HOSPITAL_D,
             "DEMO-KOL-04",
-            "MediKiosk Pulmo Care",
-            "East Kolkata",
-            True,
-            "22.5632",
-            "88.3987",
-            "Pulmonology,Emergency,ICU",
-            "demo_facilities_v1",
+            "MediKiosk Pulmonology & Critical Care",
+            "West Kolkata",
             "Kolkata",
+            22.5210,
+            88.2980,
+            "Specialty Hospital",
+            "PULMONOLOGY,EMERGENCY,ICU",
             True,
+            "OPEN",
+            True,
+            "demo_facilities_v1",
         ),
+        # Facility E: General Medicine only
         (
             DEMO_HOSPITAL_E,
             "DEMO-KOL-05",
-            "MediKiosk General Clinic",
+            "MediKiosk Community Health Clinic",
             "North Kolkata",
-            True,
-            "22.6012",
-            "88.3109",
-            "General Medicine",
-            "demo_facilities_v1",
             "Kolkata",
+            22.6050,
+            88.3800,
+            "Clinic",
+            "GENERAL_MEDICINE",
+            False,
+            "OPEN",
             True,
+            "demo_facilities_v1",
         ),
     ]
-    for hospital_id, code, name, address, is_demo, latitude, longitude, capabilities, directory_version, city, active in hospitals:
-        if db.get(models.Hospital, hospital_id) is None:
-            db.add(
-                models.Hospital(
-                    id=hospital_id,
-                    code=code,
-                    name=name,
-                    address=address,
-                    city=city,
-                    active=active,
-                    is_demo=is_demo,
-                    latitude=latitude,
-                    longitude=longitude,
-                    capabilities=capabilities,
-                    directory_version=directory_version,
-                )
+    for (
+        hospital_id,
+        code,
+        name,
+        address,
+        city,
+        latitude,
+        longitude,
+        facility_type,
+        capabilities,
+        emergency_available,
+        opening_status,
+        is_demo,
+        directory_version,
+    ) in hospitals:
+        hospital = db.get(models.Hospital, hospital_id)
+        if hospital is None:
+            hospital = models.Hospital(
+                id=hospital_id,
+                code=code,
+                name=name,
+                address=address,
+                city=city,
             )
+            db.add(hospital)
+        hospital.latitude = latitude
+        hospital.longitude = longitude
+        hospital.locality = city
+        hospital.facility_type = facility_type
+        hospital.capabilities_json = capabilities.split(",")
+        hospital.emergency_available = emergency_available
+        hospital.opening_status = opening_status
+        hospital.is_demo = is_demo
+        hospital.directory_version = directory_version
+        hospital.active = True
         db.flush()
     password_hash: str | None = None
     for doctor_id, name, phone_number, qualification, hospital_id, specialties, _ in DEMO_DOCTORS:
@@ -410,6 +458,18 @@ def ensure_demo_routing_data(db: Session) -> None:
             profile.qualification = qualification
             profile.active = True
             profile.accepting_patients = True
+        expertise, experience, languages, availability = DEMO_DOCTOR_DIRECTORY[doctor_id]
+        profile.department = specialties[0]
+        profile.primary_specialty = specialties[0]
+        profile.subspecialties_json = list(specialties[1:])
+        profile.expertise_tags_json = expertise
+        profile.years_of_experience = experience
+        profile.languages_json = languages
+        profile.consultation_types_json = ["IN_PERSON"]
+        profile.availability_status = availability
+        profile.directory_version = "demo_doctors_v1"
+        profile.is_demo = True
+        profile.metadata_json = {"synthetic": True}
         if (
             db.scalar(
                 select(models.DoctorHospitalMembership.id).where(
@@ -767,6 +827,36 @@ def select_doctor(
     )
 
 
+def _queue_specialty_prefix(db: Session, doctor_id: str) -> str:
+    specialty = db.scalar(
+        select(models.DoctorProfile.primary_specialty).where(
+            models.DoctorProfile.doctor_user_id == doctor_id
+        )
+    )
+    if not specialty:
+        specialty = db.scalar(
+            select(models.DoctorSpecialtyMembership.specialty_code)
+            .where(models.DoctorSpecialtyMembership.doctor_id == doctor_id)
+            .order_by(models.DoctorSpecialtyMembership.specialty_code)
+        )
+    if not specialty:
+        raise WorkflowError("DOCTOR_SPECIALTY_REQUIRED", "Doctor specialty is required for queueing.", 409)
+    return specialty[:3]
+
+
+def _allocate_queue_sequence(
+    db: Session, *, hospital_id: str, doctor_id: str, service_date: date
+) -> int:
+    highest_sequence = db.scalar(
+        select(func.max(models.DoctorQueueEntry.sequence_number)).where(
+            models.DoctorQueueEntry.hospital_id == hospital_id,
+            models.DoctorQueueEntry.doctor_id == doctor_id,
+            models.DoctorQueueEntry.service_date == service_date,
+        )
+    )
+    return (highest_sequence or 0) + 1
+
+
 def enqueue_completed_session(db: Session, session: models.Session) -> models.DoctorQueueEntry:
     if not session.hospital_id or not session.selected_doctor_id:
         raise WorkflowError("DOCTOR_REQUIRED", "Choose a doctor before submitting intake.", 409)
@@ -774,11 +864,25 @@ def enqueue_completed_session(db: Session, session: models.Session) -> models.Do
         select(models.DoctorQueueEntry).where(models.DoctorQueueEntry.session_id == session.id)
     )
     if entry is None:
+        service_date = datetime.now(timezone.utc).date()
+        sequence_number = _allocate_queue_sequence(
+            db,
+            hospital_id=session.hospital_id,
+            doctor_id=session.selected_doctor_id,
+            service_date=service_date,
+        )
         entry = models.DoctorQueueEntry(
             session_id=session.id,
             doctor_id=session.selected_doctor_id,
             hospital_id=session.hospital_id,
+            patient_id=session.patient_id,
+            service_date=service_date,
+            sequence_number=sequence_number,
+            visit_token=(
+                f"MK-{_queue_specialty_prefix(db, session.selected_doctor_id)}-{sequence_number:03d}"
+            ),
             status="WAITING",
+            joined_at=datetime.now(timezone.utc),
         )
         db.add(entry)
     return entry
@@ -789,40 +893,69 @@ def patient_queue_estimate(
 ) -> PatientQueueEstimate:
     session = intake.get_session(db, session_id)
     intake.verify_session_access(db, session, user)
-    if not session.selected_doctor_id:
-        raise WorkflowError("DOCTOR_REQUIRED", "No doctor is assigned to this visit.", 409)
-
-    queue = db.scalars(
-        select(models.DoctorQueueEntry)
-        .where(
-            models.DoctorQueueEntry.doctor_id == session.selected_doctor_id,
-            models.DoctorQueueEntry.status == "WAITING",
-        )
-        .order_by(
-            models.DoctorQueueEntry.joined_at.asc(),
-            models.DoctorQueueEntry.session_id.asc(),
-        )
-    ).all()
-    position = next(
-        (index for index, entry in enumerate(queue, start=1) if entry.session_id == session.id),
-        None,
+    entry = db.scalar(
+        select(models.DoctorQueueEntry).where(models.DoctorQueueEntry.session_id == session.id)
     )
-    if position is None:
+    if entry is None:
         raise WorkflowError(
-            "QUEUE_ESTIMATE_UNAVAILABLE", "Queue estimate is not available for this visit.", 409
+            "QUEUE_ENTRY_NOT_FOUND", "No queue reservation exists for this visit.", 404
         )
 
-    doctor_name = db.scalar(
-        select(models.User.name).where(models.User.id == session.selected_doctor_id)
+    # REPLACED: Queue logic replaced with COUNT-based approach for proper FIFO handling
+    # DIAGNOSTIC: Count all matching entries first
+    total_matching = db.scalar(
+        select(func.count(models.DoctorQueueEntry.id))
+        .where(
+            models.DoctorQueueEntry.doctor_id == entry.doctor_id,
+            models.DoctorQueueEntry.hospital_id == entry.hospital_id,
+            models.DoctorQueueEntry.service_date == entry.service_date,
+            models.DoctorQueueEntry.status.in_(("WAITING", "CALLED")),
+        )
+    ) or 0
+    if entry.sequence_number is None:
+        fifo_ahead = models.DoctorQueueEntry.joined_at < entry.joined_at
+    else:
+        fifo_ahead = (models.DoctorQueueEntry.joined_at < entry.joined_at) | (
+            (models.DoctorQueueEntry.joined_at == entry.joined_at)
+            & (models.DoctorQueueEntry.sequence_number < entry.sequence_number)
+        )
+
+    # Apply FIFO ordering; legacy rows without a sequence use their joined timestamp only.
+    patients_ahead = db.scalar(
+        select(func.count(models.DoctorQueueEntry.id))
+        .where(
+            models.DoctorQueueEntry.doctor_id == entry.doctor_id,
+            models.DoctorQueueEntry.hospital_id == entry.hospital_id,
+            models.DoctorQueueEntry.service_date == entry.service_date,
+            models.DoctorQueueEntry.status.in_(("WAITING", "CALLED")),
+            fifo_ahead,
+        )
+    ) or 0
+    # For debugging, we could return both values, but let's just use patients_ahead for now
+    # In a real debug scenario, we might log or inspect these values
+    doctor_name = db.scalar(select(models.User.name).where(models.User.id == entry.doctor_id))
+    hospital_name = db.scalar(
+        select(models.Hospital.name).where(models.Hospital.id == entry.hospital_id)
     )
-    estimated_wait_minutes = position * 5
+    policy = eta_policy()
+    position = patients_ahead + 1 if patients_ahead is not None else 1
+    estimated_wait_minutes = patients_ahead * policy["default_consultation_minutes"]
+    patient_word = "patient" if patients_ahead == 1 else "patients"
     return PatientQueueEstimate(
         session_id=session.id,
-        doctor_id=session.selected_doctor_id,
+        doctor_id=entry.doctor_id,
         doctor_name=doctor_name or "your selected doctor",
+        hospital_name=hospital_name or "your selected facility",
         position=position,
+        patients_ahead=patients_ahead,
+        status=entry.status,
+        visit_token=entry.visit_token,
+        hospital_id=entry.hospital_id,
+        service_date=entry.service_date,
         estimated_wait_minutes=estimated_wait_minutes,
-        expected_meeting_at=datetime.now(timezone.utc) + timedelta(minutes=estimated_wait_minutes),
+        is_estimate=True,
+        calculation_basis=f"{patients_ahead} {patient_word} ahead × {policy['default_consultation_minutes']} min average consultation",
+        policy_version=policy["version"],
     )
 
 

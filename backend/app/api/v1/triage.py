@@ -34,7 +34,7 @@ def list_waiting_patients(
             models.Consent.share_with_doctor.is_(True),
             models.DoctorQueueEntry.status == "WAITING",
         )
-        .order_by(models.DoctorQueueEntry.joined_at, models.Session.id)
+        .order_by(models.DoctorQueueEntry.joined_at, models.DoctorQueueEntry.sequence_number)
     ).all()
     return schemas.SessionList(
         items=[

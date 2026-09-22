@@ -68,6 +68,9 @@ def _patient_medication_evidence(db: Session, session_id: str):
         if answer.status == "answered"
         and answer.field in ("medications", "medications.details")
         and isinstance(answer.value, str)
+        and not (
+            answer.question_id.startswith("document_confirmation.") and answer.value == "not_sure"
+        )
     ]
     explicit_none = next(
         (

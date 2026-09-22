@@ -1,0 +1,11 @@
+{
+  "report_script_sha256": "85d2edf8db95f85ee3aa01ccd1ffa57900ff0008168e4f93cef74237857c8127",
+  "audit_config_sha256": "a3aa60d0866b38587bfc981e747ffb0c040c31dcc9a938c375819cad46587f80",
+  "scope": "train/validation only; no test confirmation",
+  "cutoffs": {
+    "weak": 0.1,
+    "strong": 0.5,
+    "local_window_margin_frames": 3
+  },
+  "hypotheses": "A weak posterior; B greedy collapse; C beam ranking; D separation; E geometry correlation; F augmentation plausibility; G multiple/no single mechanism"
+}

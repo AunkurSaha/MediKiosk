@@ -139,11 +139,11 @@ export default function QuestionRenderer({
             <span className="rag-badge-icon" aria-hidden="true">
               ✨
             </span>
-            <span className="rag-badge-text">AI Grounded Follow-up</span>
+            <span className="rag-badge-text">Context-aware follow-up</span>
           </div>
           {ragSuggestion && (
             <details className="rag-provenance-details" data-testid="rag-provenance-details">
-              <summary className="rag-provenance-summary">Demo Details</summary>
+              <summary className="rag-provenance-summary">Question planning details</summary>
               <div className="rag-provenance-grid">
                 {ragSuggestion.source_title && (
                   <div>
@@ -160,12 +160,14 @@ export default function QuestionRenderer({
                 {ragSuggestion.similarity_score != null && (
                   <div>
                     <span className="rag-prov-label">Similarity</span>
-                    <span className="rag-prov-val">{ragSuggestion.similarity_score.toFixed(2)}</span>
+                    <span className="rag-prov-val">
+                      {ragSuggestion.similarity_score.toFixed(2)}
+                    </span>
                   </div>
                 )}
                 <div>
                   <span className="rag-prov-label">Retrieval</span>
-                  <span className="rag-prov-val">NVIDIA semantic embedding</span>
+                  <span className="rag-prov-val">Configured knowledge retrieval</span>
                 </div>
                 {ragSuggestion.generation_provider && (
                   <div>
@@ -184,7 +186,9 @@ export default function QuestionRenderer({
                 {ragSuggestion.source_chunk_ids && ragSuggestion.source_chunk_ids.length > 0 && (
                   <div>
                     <span className="rag-prov-label">Chunks</span>
-                    <span className="rag-prov-val">{ragSuggestion.source_chunk_ids.join(', ')}</span>
+                    <span className="rag-prov-val">
+                      {ragSuggestion.source_chunk_ids.join(', ')}
+                    </span>
                   </div>
                 )}
               </div>
@@ -233,26 +237,29 @@ export default function QuestionRenderer({
               }}
             />
             {voiceConsent && sessionId && (
-              <VoiceRecorder
-                sessionId={sessionId}
-                questionId={q.question_id}
-                language={language}
-                disabled={busy || blocked}
-                fixtureId={fixtureId}
-                onConfirmCandidate={(transcript, token) => {
-                  onSave({
-                    value: transcript,
-                    raw_value: transcript,
-                    status: 'answered',
-                    source: 'voice',
-                    voice_candidate: token,
-                  });
-                }}
-                onEditCandidate={(transcript) => {
-                  setText(transcript);
-                  setAnswerSource('typed');
-                }}
-              />
+              <div className="answer-mode-block">
+                <span>Speak or type</span>
+                <VoiceRecorder
+                  sessionId={sessionId}
+                  questionId={q.question_id}
+                  language={language}
+                  disabled={busy || blocked}
+                  fixtureId={fixtureId}
+                  onConfirmCandidate={(transcript, token) => {
+                    onSave({
+                      value: transcript,
+                      raw_value: transcript,
+                      status: 'answered',
+                      source: 'voice',
+                      voice_candidate: token,
+                    });
+                  }}
+                  onEditCandidate={(transcript) => {
+                    setText(transcript);
+                    setAnswerSource('typed');
+                  }}
+                />
+              </div>
             )}
           </>
         )}
@@ -329,12 +336,12 @@ export default function QuestionRenderer({
                             ? o.exclusive
                               ? [o.value]
                               : [
-                                  ...previous.filter(
-                                    (v) =>
-                                      !q.options.find((option) => option.value === v)?.exclusive,
-                                  ),
-                                  o.value,
-                                ]
+                                ...previous.filter(
+                                  (v) =>
+                                    !q.options.find((option) => option.value === v)?.exclusive,
+                                ),
+                                o.value,
+                              ]
                             : previous.filter((v) => v !== o.value),
                         );
                       }

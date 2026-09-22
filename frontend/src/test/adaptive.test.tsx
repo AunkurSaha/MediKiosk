@@ -230,6 +230,119 @@ it('retains input and reuses the exact request ID after a lost save response', a
   );
 });
 
+it('shows document provenance and submits an explicit medication confirmation', async () => {
+  const confirmation: InterviewState = {
+    ...legacyState(2),
+    question: {
+      ...question('single_choice'),
+      question_id: 'document_confirmation.abc123',
+      field: 'medications.details',
+      origin: 'document_confirmation',
+      text: {
+        ...label,
+        en: 'Your uploaded document mentions Metformin 500 mg. Are you currently taking this medicine?',
+      },
+      options: [
+        { value: 'yes', label: { ...label, en: 'Yes' }, exclusive: false },
+        { value: 'no', label: { ...label, en: 'No' }, exclusive: false },
+        { value: 'not_sure', label: { ...label, en: 'Not sure' }, exclusive: false },
+      ],
+    },
+    document_confirmation: {
+      question_source: 'DOCUMENT_CONFIRMATION',
+      target_field: 'medications.details',
+      evidence_id: 'evidence-1',
+      source_fact_id: 'fact-1',
+      source_document_id: 'document-1',
+      document_filename: 'prescription.png',
+      page_number: 1,
+      original_extracted_value: 'Metformin 500 mg',
+      verification_state: 'UNVERIFIED',
+    },
+  };
+  const nextFocusedQuestion = {
+    ...legacyState(3),
+    covered_domains: ['medications'],
+  };
+  vi.mocked(api.interview).mockResolvedValue(confirmation);
+  vi.mocked(api.interviewAnswer).mockResolvedValue(nextFocusedQuestion);
+  render(<Interview sessionId="session" language="en" onComplete={vi.fn()} />);
+  expect(await screen.findByTestId('document-confirmation-notice')).toHaveTextContent(
+    'prescription.png, page 1',
+  );
+  expect(screen.getByRole('heading', { name: /Metformin 500 mg/ })).toBeVisible();
+  fireEvent.click(screen.getByLabelText('Yes'));
+  fireEvent.click(screen.getByRole('button', { name: 'Save and continue' }));
+  await waitFor(() =>
+    expect(api.interviewAnswer).toHaveBeenCalledWith(
+      'session',
+      expect.objectContaining({ value: 'yes', source: 'touch' }),
+    ),
+  );
+  const optimized = await screen.findByTestId('medication-history-optimized');
+  expect(optimized).toHaveTextContent('History optimized');
+  expect(optimized).toHaveTextContent('Medication confirmed by you from your prescription.');
+  expect(optimized).toHaveTextContent('Medication history is covered');
+  expect(
+    screen.getByRole('heading', {
+      name: 'Do you have any allergies to medicines, foods, or anything else?',
+    }),
+  ).toBeVisible();
+  expect(screen.queryByText(/taking any medicines/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/names, doses/i)).not.toBeInTheDocument();
+});
+
+it('keeps the normal medication question when there is no document confirmation', async () => {
+  vi.mocked(api.interview).mockResolvedValue(legacyState(2));
+  render(<Interview sessionId="session" language="en" onComplete={vi.fn()} />);
+  expect(
+    await screen.findByRole('heading', { name: 'What medicines are you currently taking?' }),
+  ).toBeVisible();
+  expect(screen.queryByTestId('medication-history-optimized')).not.toBeInTheDocument();
+});
+
+it.each([
+  ['no', 'No'],
+  ['changed', 'Changed'],
+  ['not_sure', 'Not sure'],
+])(
+  'does not show covered-history success for a %s document response',
+  async (value, optionLabel) => {
+    const confirmation: InterviewState = {
+      ...legacyState(2),
+      question: {
+        ...question('single_choice'),
+        question_id: 'document_confirmation.abc123',
+        field: 'medications.details',
+        origin: 'document_confirmation',
+        text: { ...label, en: 'Are you still taking Metformin?' },
+        options: [{ value, label: { ...label, en: optionLabel }, exclusive: false }],
+      },
+      document_confirmation: {
+        question_source: 'DOCUMENT_CONFIRMATION',
+        target_field: 'medications.details',
+        evidence_id: 'evidence-1',
+        source_fact_id: 'fact-1',
+        source_document_id: 'document-1',
+        document_filename: 'prescription.png',
+        page_number: 1,
+        original_extracted_value: 'Metformin 500 mg',
+        verification_state: 'UNVERIFIED',
+      },
+    };
+    vi.mocked(api.interview).mockResolvedValue(confirmation);
+    vi.mocked(api.interviewAnswer).mockResolvedValue(legacyState(3));
+    render(<Interview sessionId="session" language="en" onComplete={vi.fn()} />);
+    fireEvent.click(await screen.findByLabelText(optionLabel));
+    fireEvent.click(screen.getByRole('button', { name: 'Save and continue' }));
+    await screen.findByRole('heading', {
+      name: 'Do you have any allergies to medicines, foods, or anything else?',
+    });
+    expect(screen.queryByTestId('medication-history-optimized')).not.toBeInTheDocument();
+    expect(api.coverage).not.toHaveBeenCalled();
+  },
+);
+
 it('uses server navigation and branch recalculation after editing an earlier answer', async () => {
   const parent = question('boolean');
   const child = {
@@ -294,7 +407,11 @@ describe('RAG Grounded Follow-up Indicator', () => {
       question_id: 'hpi.onset',
       field: 'hpi.onset',
       type: 'duration',
-      text: { en: 'When did your chest pain start?', bn: 'কখন শুরু হয়েছিল?', hi: 'कब शुरू हुआ था?' },
+      text: {
+        en: 'When did your chest pain start?',
+        bn: 'কখন শুরু হয়েছিল?',
+        hi: 'कब शुरू हुआ था?',
+      },
       required: true,
       allow_unknown: true,
       constraints: { max_length: 100 },
@@ -402,4 +519,3 @@ describe('RAG Grounded Follow-up Indicator', () => {
     expect(screen.queryByTestId('rag-provenance-details')).not.toBeInTheDocument();
   });
 });
-

@@ -2,6 +2,11 @@ import { useState } from 'react';
 import type { AlertItem } from '../../api/triage';
 import { getTriageCopy } from '../../i18n/triage';
 
+function recordingPatientName(name?: string | null) {
+  if (!name) return 'Patient';
+  return /^(synthetic|demo) patient\b/i.test(name.trim()) ? 'Patient' : name;
+}
+
 interface AlertCardProps {
   alert: AlertItem;
   onAcknowledge: (alertId: string, note?: string) => Promise<void>;
@@ -72,9 +77,13 @@ export default function AlertCard({
       </div>
 
       <div className="alert-patient-row">
-        <div className="patient-token-badge">{alert.hospital_token || 'NO-TOKEN'}</div>
+        <div className="patient-token-badge">
+          {alert.hospital_token?.startsWith('DEMO-')
+            ? 'Intake'
+            : alert.hospital_token || 'No visit token yet'}
+        </div>
         <div className="patient-name-wrapper">
-          <h3 id={`alert-heading-${alert.id}`}>{alert.patient_name || 'Patient'}</h3>
+          <h3 id={`alert-heading-${alert.id}`}>{recordingPatientName(alert.patient_name)}</h3>
           <span className="rule-id-label">{alert.rule_id}</span>
         </div>
       </div>
@@ -126,7 +135,7 @@ export default function AlertCard({
         <form className="acknowledge-form" onSubmit={handleConfirm}>
           <h4>{t.actionAcknowledge}</h4>
           {error && <p className="form-error">{error}</p>}
-          <p>Acknowledgement is attributed to the signed-in demo doctor.</p>
+          <p>Acknowledgement is attributed to the signed-in triage staff member.</p>
           <div className="form-group">
             <input
               type="text"

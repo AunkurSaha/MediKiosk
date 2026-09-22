@@ -1,0 +1,13 @@
+{
+  "description": "Stage-1 light training-only augmentation.",
+  "rotation_degrees": 1.5,
+  "perspective_fraction": 0.012,
+  "gaussian_blur_probability": 0.12,
+  "gaussian_blur_kernel": 3,
+  "gaussian_noise_probability": 0.0,
+  "gaussian_noise_sigma": 0.0,
+  "brightness_probability": 0.2,
+  "brightness_range": [0.92, 1.08],
+  "jpeg_probability": 0.0,
+  "jpeg_quality_range": [88, 96]
+}

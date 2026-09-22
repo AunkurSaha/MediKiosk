@@ -491,12 +491,42 @@ def test_patient_queue_estimate_uses_only_selected_doctors_waiting_queue(databas
     assert estimate.doctor_id == selected_doctor.id
     assert estimate.doctor_name == "Dr. Selected"
     assert estimate.position == 2
-    assert estimate.estimated_wait_minutes == 10
-    assert (
-        timedelta(minutes=9, seconds=55)
-        <= estimate.expected_meeting_at - datetime.now(timezone.utc)
-        <= timedelta(minutes=10)
+    assert estimate.patients_ahead == 1
+    assert estimate.estimated_wait_minutes == 12
+    assert estimate.is_estimate is True
+    assert estimate.policy_version == "1.0"
+
+
+def test_queue_tokens_are_daily_scoped_and_terminal_entries_leave_fifo(database):
+    hospital = models.Hospital(
+        id=str(uuid4()), code=f"QUEUE-{uuid4()}", name="Daily Queue Hospital", active=True
     )
+    database.add(hospital)
+    database.commit()
+    selected = doctor(database, "Dr. Daily Queue", hospital.id)
+    first_user = patient(database, "queue-first")
+    second_user = patient(database, "queue-second")
+    first = session_for(database, first_user, hospital.id, selected.id)
+    second = session_for(database, second_user, hospital.id, selected.id)
+
+    first_entry = doctor_routing.enqueue_completed_session(database, first)
+    database.commit()
+    second_entry = doctor_routing.enqueue_completed_session(database, second)
+    database.commit()
+
+    assert first_entry.visit_token != second_entry.visit_token
+    assert first_entry.sequence_number == 1
+    assert second_entry.sequence_number == 2
+    assert (
+        doctor_routing.patient_queue_estimate(database, second.id, second_user).patients_ahead == 1
+    )
+
+    first_entry.status = "COMPLETED"
+    database.commit()
+    refreshed = doctor_routing.patient_queue_estimate(database, second.id, second_user)
+    assert refreshed.position == 1
+    assert refreshed.patients_ahead == 0
+    assert refreshed.estimated_wait_minutes == 0
 
 
 def test_only_selected_doctor_can_list_view_and_transition_queue(client, database):
@@ -550,10 +580,26 @@ def test_only_selected_doctor_can_list_view_and_transition_queue(client, databas
     assert (
         client.put(
             f"/api/doctor/sessions/{visit.id}/queue",
-            headers=colleague_headers,
-            json={"status": "IN_CONSULTATION"},
+            headers=patient_headers,
+            json={"status": "CALLED"},
         ).status_code
         == 403
+    )
+    assert (
+        client.put(
+            f"/api/doctor/sessions/{visit.id}/queue",
+            headers=colleague_headers,
+            json={"status": "CALLED"},
+        ).status_code
+        == 403
+    )
+    assert (
+        client.put(
+            f"/api/doctor/sessions/{visit.id}/queue",
+            headers=selected_headers,
+            json={"status": "CALLED"},
+        ).status_code
+        == 200
     )
     assert (
         client.put(
@@ -580,3 +626,10 @@ def test_only_selected_doctor_can_list_view_and_transition_queue(client, databas
         )
         == "COMPLETED"
     )
+    invalid = client.put(
+        f"/api/doctor/sessions/{visit.id}/queue",
+        headers=selected_headers,
+        json={"status": "CALLED"},
+    )
+    assert invalid.status_code == 409
+    assert invalid.json()["error"]["code"] == "INVALID_QUEUE_TRANSITION"

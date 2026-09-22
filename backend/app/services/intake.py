@@ -28,10 +28,11 @@ def audit(db, action, entity_id, user=None, metadata=None):
     )
 
 
-def get_session(db: Session, session_id: str):
-    session = db.scalar(
-        select(models.Session).where(models.Session.id == session_id).with_for_update()
-    )
+def get_session(db: Session, session_id: str, for_update: bool = False):
+    stmt = select(models.Session).where(models.Session.id == session_id)
+    if for_update:
+        stmt = stmt.with_for_update()
+    session = db.scalar(stmt)
     if session is None:
         raise WorkflowError("NOT_FOUND", "Session not found.", 404)
     return session
@@ -131,7 +132,10 @@ def latest_answers(db, session_id):
         by_id = {row.id: row for row in all_rows}
         answers = [answer_response(by_id[fact.answer_id]) for fact in active.values()]
         for row in all_rows:
-            if row.question_id.startswith("rag_followup") and row.id in by_id:
+            if (
+                row.question_id.startswith(("rag_followup", "document_confirmation."))
+                and row.id in by_id
+            ):
                 answers.append(answer_response(row))
         return answers
     rows = db.scalars(
@@ -156,16 +160,40 @@ def enrich_summary_schema(
         return None
     structured = None
     evidence = None
-    if db is not None:
+    if summary.generated_structured_json:
         try:
-            from app.services.clinical_summary import ClinicalSummaryService
-
-            _, structured = ClinicalSummaryService.generate_draft(
-                db, summary.session_id, draft_version=summary.draft_version or 1
+            structured = schemas.StructuredClinicalSummary.model_validate_json(
+                summary.generated_structured_json
             )
+            if db is not None:
+                verified_ids = set(
+                    db.scalars(
+                        select(models.FieldVerification.field_id).where(
+                            models.FieldVerification.session_id == summary.session_id,
+                            models.FieldVerification.field_type == "summary_statement",
+                            models.FieldVerification.status == "verified",
+                        )
+                    )
+                )
+                if verified_ids:
+                    by_id = {item.statement_id: item for item in structured.evidence_references}
+                    for item in structured.evidence_references:
+                        if item.statement_id in verified_ids:
+                            item.status = "clinician_verified"
+                            item.badge = "Clinician Verified"
+                            item.provenance_explanation.append(
+                                "Verified by the reviewing clinician; original source evidence remains linked."
+                            )
+                    for section in structured.sections:
+                        section.evidence = [
+                            by_id.get(item.statement_id, item) for item in section.evidence
+                        ]
             evidence = structured.evidence_references
         except Exception:
             pass
+
+    coverage = structured.coverage if structured else None
+    packet = _pre_arrival_packet(db, summary, structured, coverage) if db is not None else None
 
     return schemas.ClinicalSummary(
         id=summary.id,
@@ -191,7 +219,151 @@ def enrich_summary_schema(
         updated_at=summary.updated_at,
         structured_summary=structured,
         evidence=evidence,
+        coverage=coverage,
+        pre_arrival_packet=packet,
     )
+
+
+def _pre_arrival_packet(db, summary, structured, coverage):
+    """Assemble the doctor-only read packet from existing persisted data."""
+    session = db.get(models.Session, summary.session_id)
+    if session is None:
+        return None
+    hospital = db.get(models.Hospital, session.hospital_id) if session.hospital_id else None
+    doctor = db.get(models.User, session.selected_doctor_id) if session.selected_doctor_id else None
+    queue = db.scalar(
+        select(models.DoctorQueueEntry).where(models.DoctorQueueEntry.session_id == session.id)
+    )
+    documents = list(
+        db.scalars(select(models.Document).where(models.Document.session_id == session.id))
+    )
+    alerts = list(db.scalars(select(models.Alert).where(models.Alert.session_id == session.id)))
+    routing_result = db.scalar(
+        select(models.ClinicalRoutingResult).where(
+            models.ClinicalRoutingResult.session_id == session.id
+        )
+    )
+    extractions = list(
+        db.scalars(
+            select(models.DocumentExtraction).where(
+                models.DocumentExtraction.session_id == session.id
+            )
+        )
+    )
+    extractions_by_document: dict[str, list] = {}
+    for extraction in extractions:
+        extractions_by_document.setdefault(extraction.document_id, []).append(extraction)
+    evidence_ids = select(models.ClinicalEvidence.id).where(
+        models.ClinicalEvidence.session_id == session.id
+    )
+    conflicts = list(
+        db.scalars(
+            select(models.ClinicalEvidenceConflict).where(
+                (models.ClinicalEvidenceConflict.evidence_a_id.in_(evidence_ids))
+                | (models.ClinicalEvidenceConflict.evidence_b_id.in_(evidence_ids))
+            )
+        )
+    )
+    chief_complaint = None
+    history: list[dict] = []
+    packet_timeline: list[dict] = []
+    if structured:
+        for section in structured.sections:
+            if section.section_key == "chief_complaint" and section.content_lines:
+                chief_complaint = section.content_lines[0]
+            history.append(
+                {
+                    "section": section.section_key,
+                    "items": section.items,
+                    "lines": section.content_lines,
+                }
+            )
+            if section.section_key == "clinical_timeline":
+                packet_timeline = [{"text": line} for line in section.content_lines]
+    return schemas.PreArrivalPacket(
+        packet_reference=f"mkp:{session.id}",
+        visit_context={
+            "session_id": session.id,
+            "hospital_token": session.hospital_token,
+            "language": session.language,
+            "status": session.status,
+        },
+        facility=(
+            {"id": hospital.id, "name": hospital.name, "city": hospital.city} if hospital else None
+        ),
+        selected_doctor=(
+            {"id": session.selected_doctor_id, "name": doctor.name if doctor else None}
+            if session.selected_doctor_id
+            else None
+        ),
+        queue={"visit_token": queue.visit_token, "status": queue.status} if queue else None,
+        routing={
+            "hospital_id": session.hospital_id,
+            "selected_doctor_id": session.selected_doctor_id,
+            "routing_state": routing_result.routing_state if routing_result else None,
+            "suggested_specialty": routing_result.suggested_specialty if routing_result else None,
+            "protocol_version": routing_result.protocol_version if routing_result else None,
+            "supporting_evidence_ids": routing_result.supporting_evidence_ids_json
+            if routing_result
+            else [],
+            "triggered_rule_ids": routing_result.triggered_rule_ids_json if routing_result else [],
+        },
+        chief_complaint=chief_complaint,
+        structured_history=history,
+        documents=[
+            {
+                "document_id": item.id,
+                "filename": item.original_filename,
+                "document_type": item.document_type,
+                "processing_status": item.processing_status,
+                "extractions": [
+                    {
+                        "extraction_id": extraction.id,
+                        "extractor": extraction.extractor,
+                        "extractor_version": extraction.extractor_version,
+                        "structured_data": extraction.structured_json,
+                        "confidence": extraction.confidence,
+                        "verification_status": extraction.verification_status,
+                    }
+                    for extraction in extractions_by_document.get(item.id, [])
+                ],
+            }
+            for item in documents
+        ],
+        timeline=packet_timeline,
+        red_flags=[
+            {
+                "alert_id": item.id,
+                "rule_id": item.rule_id,
+                "reason": item.reason,
+                "priority": item.priority,
+                "status": item.status,
+                "triggering_facts": item.triggering_facts_json,
+            }
+            for item in alerts
+        ],
+        coverage=coverage,
+        clinical_summary_id=summary.id,
+        clinical_summary_status=summary.status,
+        clinical_summary=structured,
+        conflicts=[
+            {
+                "conflict_id": item.id,
+                "evidence_a_id": item.evidence_a_id,
+                "evidence_b_id": item.evidence_b_id,
+                "reason": item.reason,
+            }
+            for item in conflicts
+        ],
+    )
+
+
+def build_pre_arrival_packet(db: Session, session_id: str) -> schemas.PreArrivalPacket:
+    summary = summary_for(db, session_id)
+    enriched = enrich_summary_schema(summary, db=db)
+    if enriched is None or enriched.pre_arrival_packet is None:
+        raise WorkflowError("PACKET_NOT_READY", "Completed summary state is required.", 409)
+    return schemas.PreArrivalPacket.model_validate(enriched.pre_arrival_packet)
 
 
 def detail(db, session_id, doctor=False, user=None):
@@ -273,7 +445,7 @@ def detail(db, session_id, doctor=False, user=None):
         patient=schemas.Patient.model_validate(patient),
         consent=consent_for(db, session_id),
         answers=latest_answers(db, session_id),
-        summary=enrich_summary_schema(summary_for(db, session_id)),
+        summary=enrich_summary_schema(summary_for(db, session_id), db=db),
         history=adaptive.history(db, session_id, user=user),
         alerts=alert_items,
         documents=doc_items,
@@ -289,6 +461,7 @@ def create_session(db, payload, user=None):
         if (
             existing.hospital_token != payload.hospital_token
             or existing.language != payload.language
+            or existing.journey_mode != payload.journey_mode
             or patient.name != payload.patient.name
             or patient.gender != payload.patient.gender
             or patient.age_years != payload.patient.age_years
@@ -309,10 +482,41 @@ def create_session(db, payload, user=None):
         hospital_id=payload.hospital_id,
         hospital_token=payload.hospital_token,
         language=payload.language,
+        journey_mode=payload.journey_mode,
         status="intake",
     )
     db.add(session)
     audit(db, "session_created", session_id, user=user)
+    db.commit()
+    db.refresh(session)
+    return session
+
+
+def update_journey_mode(db, session_id, journey_mode, user=None):
+    session = get_session(db, session_id)
+    verify_session_access(db, session, user)
+    if session.status != "intake" or db.scalar(
+        select(models.DoctorQueueEntry.id).where(models.DoctorQueueEntry.session_id == session.id)
+    ):
+        raise WorkflowError(
+            "JOURNEY_MODE_LOCKED", "Journey type cannot change after intake submission.", 409
+        )
+    if session.journey_mode == journey_mode:
+        return session
+    previous = session.journey_mode
+    session.journey_mode = journey_mode
+    # A facility selected under one journey has different semantics under the
+    # other. Require an explicit fresh confirmation instead of reusing it.
+    session.hospital_id = None
+    session.selected_doctor_id = None
+    session.updated_at = now()
+    audit(
+        db,
+        "journey_mode_changed",
+        session.id,
+        user=user,
+        metadata={"previous": previous, "journey_mode": journey_mode},
+    )
     db.commit()
     db.refresh(session)
     return session
@@ -375,6 +579,9 @@ def save_answer(db, session_id, payload, user=None):
     session.updated_at = now()
     audit(db, "answer_recorded", session_id, user=user, metadata={"field": payload.field})
     db.flush()
+    from app.services import clinical_evidence
+
+    clinical_evidence.create_patient_answer_evidence(db, answer, value=payload.value)
     from app.services import normalization
     from app.services.flow_registry import registry
 
@@ -397,7 +604,6 @@ def complete(db, session_id, user=None):
     from app.services import adaptive
     from app.services.clinical_summary import ClinicalSummaryService
 
-    history = adaptive.history(db, session_id, user=user)
     if db.get(models.InterviewRun, session_id):
         if not adaptive.state(db, session_id, user=user).is_complete:
             raise WorkflowError("ANSWERS_REQUIRED", "Address all applicable questions first.", 422)
@@ -415,9 +621,7 @@ def complete(db, session_id, user=None):
         models.ClinicalSummary(
             session_id=session_id,
             generated_text=draft_text,
-            generated_structured_json=history.model_dump_json()
-            if history
-            else structured_summary.model_dump_json(),
+            generated_structured_json=structured_summary.model_dump_json(),
             reviewed_text=draft_text,
             status="generated",
             draft_provider="deterministic",
@@ -436,17 +640,33 @@ def complete(db, session_id, user=None):
         ensure_demo_routing_data(db)
         session.hospital_id = session.hospital_id or DEMO_HOSPITAL_A
         session.selected_doctor_id = session.selected_doctor_id or DEMO_DOCTOR_A
-    if not session.hospital_id or not session.selected_doctor_id:
+    if not session.hospital_id:
         raise WorkflowError(
             "ROUTING_REQUIRED",
-            "Choose a hospital and an available doctor before completing the intake.",
+            "Choose an eligible facility before completing the intake.",
+            409,
+        )
+    routing = db.scalar(
+        select(models.ClinicalRoutingResult).where(
+            models.ClinicalRoutingResult.session_id == session_id
+        )
+    )
+    if (
+        routing is not None
+        and routing.routing_state != "EMERGENCY"
+        and not session.selected_doctor_id
+    ):
+        raise WorkflowError(
+            "DOCTOR_REQUIRED",
+            "Choose an eligible recommended doctor before completing the intake.",
             409,
         )
     session.status = "ready_for_review"
     session.completed_at = now()
-    from app.services.doctor_routing import enqueue_completed_session
+    if routing is None or routing.routing_state != "EMERGENCY":
+        from app.services.doctor_routing import enqueue_completed_session
 
-    enqueue_completed_session(db, session)
+        enqueue_completed_session(db, session)
     audit(db, "intake_completed", session_id, user=user)
     db.commit()
     db.refresh(session)
@@ -471,7 +691,7 @@ def review_summary(db, session_id, payload, user, confirm=False):
     if summary is None:
         raise WorkflowError("NOT_READY", "Complete the intake before review.")
     if confirm and summary.status == "confirmed" and payload.expected_version == summary.version:
-        return enrich_summary_schema(summary)
+        return enrich_summary_schema(summary, db=db)
     if summary.status == "confirmed":
         raise WorkflowError("CONFIRMED_IMMUTABLE", "The confirmed record is read-only.")
     if summary.version != payload.expected_version:
@@ -507,7 +727,7 @@ def review_summary(db, session_id, payload, user, confirm=False):
         audit(db, "summary_reviewed", session_id, user, {"version": summary.version})
     db.commit()
     db.refresh(summary)
-    return enrich_summary_schema(summary)
+    return enrich_summary_schema(summary, db=db)
 
 
 def regenerate_summary(db, session_id, payload, user) -> schemas.ClinicalSummary:
@@ -575,7 +795,7 @@ def regenerate_summary(db, session_id, payload, user) -> schemas.ClinicalSummary
     )
     db.commit()
     db.refresh(summary)
-    return enrich_summary_schema(summary)
+    return enrich_summary_schema(summary, db=db)
 
 
 def get_summary_revisions(db, session_id) -> list[schemas.SummaryRevisionRecord]:
@@ -729,8 +949,8 @@ def amend_summary(
             version=summary.version,
             revision_type="amendment",
             actor_type="DOCTOR",
-            reviewed_text=payload.amended_text,
             actor_user_id=user.id,
+            reviewed_text=payload.amended_text,
             review_notes=payload.amendment_notes,
             structured_snapshot=None,
             created_at=current_time,

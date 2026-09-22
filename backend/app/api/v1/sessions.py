@@ -58,6 +58,16 @@ def read_session(
     return intake.detail(db, str(session_id), user=user)
 
 
+@router.put("/{session_id}/journey-mode", response_model=schemas.Session)
+def choose_journey_mode(
+    session_id: UUID,
+    payload: schemas.JourneyModeUpdate,
+    db: Session = Depends(get_db),
+    user: models.User | None = Depends(require_patient_or_demo),
+):
+    return intake.update_journey_mode(db, str(session_id), payload.journey_mode, user=user)
+
+
 @router.post("/{session_id}/complete", response_model=schemas.Session)
 def complete_session(
     session_id: UUID,

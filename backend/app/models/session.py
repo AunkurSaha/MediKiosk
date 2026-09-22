@@ -16,6 +16,7 @@ class Session(Base):
     selected_doctor_id = Column(String, ForeignKey("doctor_profiles.doctor_user_id", ondelete="SET NULL"), nullable=True, index=True)
     hospital_token = Column(String, nullable=False)
     language = Column(String, nullable=False)  # e.g., 'en', 'bn', 'hi'
+    journey_mode = Column(String(24), nullable=False, server_default="PRE_ARRIVAL")
     status = Column(
         String, nullable=False
     )  # intake, ready_for_review, under_review, confirmed, cancelled

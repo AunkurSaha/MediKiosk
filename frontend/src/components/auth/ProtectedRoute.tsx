@@ -48,13 +48,17 @@ export function ProtectedRoute({ children, requiredRole, allowedRoles }: Protect
     );
   }
 
-  const effectiveAllowedRoles: ('patient' | 'doctor' | 'triage')[] = allowedRoles || (requiredRole ? [requiredRole] : ['patient', 'doctor', 'triage']);
+  const effectiveAllowedRoles: ('patient' | 'doctor' | 'triage')[] =
+    allowedRoles || (requiredRole ? [requiredRole] : ['patient', 'doctor', 'triage']);
   const isAuthorized = effectiveAllowedRoles.includes(user.role as 'patient' | 'doctor' | 'triage');
 
   if (!isAuthorized) {
-    const isDoctorRequired = effectiveAllowedRoles.length === 1 && effectiveAllowedRoles[0] === 'doctor';
-    const isTriageRequired = effectiveAllowedRoles.length === 1 && effectiveAllowedRoles[0] === 'triage';
-    const isPatientRequired = effectiveAllowedRoles.length === 1 && effectiveAllowedRoles[0] === 'patient';
+    const isDoctorRequired =
+      effectiveAllowedRoles.length === 1 && effectiveAllowedRoles[0] === 'doctor';
+    const isTriageRequired =
+      effectiveAllowedRoles.length === 1 && effectiveAllowedRoles[0] === 'triage';
+    const isPatientRequired =
+      effectiveAllowedRoles.length === 1 && effectiveAllowedRoles[0] === 'patient';
 
     const handleRoleSwitch = async (targetRole: 'doctor' | 'triage') => {
       setSwitching(true);
@@ -72,10 +76,10 @@ export function ProtectedRoute({ children, requiredRole, allowedRoles }: Protect
           {isDoctorRequired
             ? 'Doctor Access Required'
             : isTriageRequired
-            ? 'Triage Access Required'
-            : isPatientRequired
-            ? 'Patient Intake Access Only'
-            : 'Access Denied'}
+              ? 'Triage Access Required'
+              : isPatientRequired
+                ? 'Patient Intake Access Only'
+                : 'Access Denied'}
         </h2>
         <div
           role="alert"
@@ -91,19 +95,20 @@ export function ProtectedRoute({ children, requiredRole, allowedRoles }: Protect
         >
           {isDoctorRequired ? (
             <>
-              This clinical workspace requires verified staff authorization. Your current account role
-              is <strong>{user.role}</strong>. A patient mobile verification cannot grant doctor
-              privileges.
+              This clinical workspace requires verified staff authorization. Your current account
+              role is <strong>{user.role}</strong>. A patient mobile verification cannot grant
+              doctor privileges.
             </>
           ) : isTriageRequired ? (
             <>
-              This emergency dashboard requires verified triage staff authorization. Your current account
-              role is <strong>{user.role}</strong>. Patient accounts cannot access triage alerts.
+              This emergency dashboard requires verified triage staff authorization. Your current
+              account role is <strong>{user.role}</strong>. Patient accounts cannot access triage
+              alerts.
             </>
           ) : isPatientRequired ? (
             <>
-              The kiosk intake journey is reserved for patients. Hospital staff (<strong>{user.role}</strong>)
-              should work from their designated clinical workstation.
+              The kiosk intake journey is reserved for patients. Hospital staff (
+              <strong>{user.role}</strong>) should work from their designated clinical workstation.
             </>
           ) : (
             <>
@@ -127,7 +132,7 @@ export function ProtectedRoute({ children, requiredRole, allowedRoles }: Protect
               disabled={switching}
               style={{ minHeight: '44px', padding: '10px 18px' }}
             >
-              {switching ? 'Switching…' : 'Sign in as Demo Doctor'}
+              {switching ? 'Switching…' : 'Continue as clinician'}
             </button>
           )}
           {demoMode && isTriageRequired && (
@@ -137,7 +142,7 @@ export function ProtectedRoute({ children, requiredRole, allowedRoles }: Protect
               disabled={switching}
               style={{ minHeight: '44px', padding: '10px 18px' }}
             >
-              {switching ? 'Switching…' : 'Sign in as Demo Triage Staff'}
+              {switching ? 'Switching…' : 'Continue as triage staff'}
             </button>
           )}
           {!isPatientRequired && (

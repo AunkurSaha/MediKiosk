@@ -1,0 +1,102 @@
+{
+  "1-1-1": {
+    "n": 8,
+    "deltas": {
+      "primary_peak": {
+        "mean": 0.059415340428902355,
+        "median": 0.0667609125713121,
+        "min": 0.0006734246633118279,
+        "max": 0.1066012577083475,
+        "improved": 8,
+        "worsened": 0,
+        "unchanged": 0
+      },
+      "target_log_probability": {
+        "mean": 0.05716325851207432,
+        "median": 0.11672487225344219,
+        "min": -0.5900231728185608,
+        "max": 0.4566602035654195,
+        "improved": 6,
+        "worsened": 2,
+        "unchanged": 0
+      }
+    },
+    "incorrect_to_correct": 5,
+    "correct_to_incorrect": 0
+  },
+  "1-0-0": {
+    "n": 4,
+    "deltas": {
+      "primary_peak": {
+        "mean": 8.130050853240312e-05,
+        "median": 0.00012112752566572835,
+        "min": -9.013566788829142e-05,
+        "max": 0.00017308265068644718,
+        "improved": 3,
+        "worsened": 1,
+        "unchanged": 0
+      },
+      "target_log_probability": {
+        "mean": -0.019032068012036607,
+        "median": -0.018137560754853066,
+        "min": -0.03698969574818456,
+        "max": -0.0028634547902557372,
+        "improved": 0,
+        "worsened": 4,
+        "unchanged": 0
+      }
+    },
+    "incorrect_to_correct": 0,
+    "correct_to_incorrect": 0
+  },
+  "for 5 days": {
+    "n": 4,
+    "deltas": {
+      "primary_peak": {
+        "mean": -0.0011046261436969997,
+        "median": -0.00028686750690224815,
+        "min": -0.00371070373014519,
+        "max": -0.00013406583083831226,
+        "improved": 0,
+        "worsened": 4,
+        "unchanged": 0
+      },
+      "target_log_probability": {
+        "mean": -0.007531116444710828,
+        "median": -0.0012273096959929397,
+        "min": -0.051895752488039903,
+        "max": 0.02422590610118247,
+        "improved": 2,
+        "worsened": 2,
+        "unchanged": 0
+      }
+    },
+    "incorrect_to_correct": 0,
+    "correct_to_incorrect": 0
+  },
+  "for 7 days": {
+    "n": 4,
+    "deltas": {
+      "primary_peak": {
+        "mean": -5.6895008127617235e-05,
+        "median": -3.1891031769253064e-05,
+        "min": -0.00015031413004523708,
+        "max": -1.3483838926725729e-05,
+        "improved": 0,
+        "worsened": 4,
+        "unchanged": 0
+      },
+      "target_log_probability": {
+        "mean": 0.00012214857326997564,
+        "median": -0.003382086534614137,
+        "min": -0.011995922853650143,
+        "max": 0.01924869021595832,
+        "improved": 1,
+        "worsened": 3,
+        "unchanged": 0
+      }
+    },
+    "incorrect_to_correct": 0,
+    "correct_to_incorrect": 0
+  }
+}

@@ -48,7 +48,7 @@ function getInitialUser(): AuthUser | null {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(getInitialUser);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const refreshUser = async () => {
@@ -111,9 +111,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             .finally(() => {
               if (active) setLoading(false);
             });
+        } else if (active) {
+          setLoading(false);
         }
       } catch {
         // Safe fallback in mock test environments
+        if (active) setLoading(false);
       }
     }
     return () => {

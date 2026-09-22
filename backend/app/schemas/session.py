@@ -1,3 +1,4 @@
+from typing import Literal
 from uuid import UUID
 
 from pydantic import Field
@@ -11,6 +12,8 @@ from .document import DocumentResponse
 from .interview_answer import InterviewAnswer
 from .patient import Patient, PatientCreate
 
+JourneyMode = Literal["PRE_ARRIVAL", "ON_SITE"]
+
 
 class SessionCreate(APIModel):
     id: UUID
@@ -18,6 +21,11 @@ class SessionCreate(APIModel):
     hospital_token: str = Field(min_length=1, max_length=80)
     language: Language
     hospital_id: str | None = None
+    journey_mode: JourneyMode = "PRE_ARRIVAL"
+
+
+class JourneyModeUpdate(APIModel):
+    journey_mode: JourneyMode
 
 
 class Session(APIModel):
@@ -33,12 +41,14 @@ class Session(APIModel):
     user_id: str | None = None
     hospital_id: str | None = None
     selected_doctor_id: str | None = None
+    journey_mode: JourneyMode = "PRE_ARRIVAL"
 
 
 class SessionListItem(Session):
     patient_name: str
     queue_status: str | None = None
     queue_joined_at: UTCDate | None = None
+    visit_token: str | None = None
 
 
 class SessionList(APIModel):

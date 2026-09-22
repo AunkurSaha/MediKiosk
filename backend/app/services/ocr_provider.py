@@ -51,10 +51,18 @@ class MockOcrProvider:
         filename: str,
     ) -> tuple[str, float | None, dict[str, Any]]:
         catalog_path = Path(__file__).resolve().parents[3] / "ai/document_fixtures/catalog.json"
-        fixture = json.loads(catalog_path.read_text(encoding="utf-8")).get(hashlib.sha256(image_bytes).hexdigest())
+        fixture = json.loads(catalog_path.read_text(encoding="utf-8")).get(
+            hashlib.sha256(image_bytes).hexdigest()
+        )
         if fixture is None:
             return "", None, {"engine": self.name, "reason": "real_ocr_not_implemented"}
-        return fixture["raw_text"], None, {"engine": self.name, "fixture_id": fixture["fixture_id"]}
+        return fixture["raw_text"], None, {
+            "engine": self.name,
+            "fixture_id": fixture["fixture_id"],
+            "provider_name": fixture.get("provider", self.name),
+            "structured_document": fixture.get("structured_document"),
+            "document_type": fixture.get("document_type"),
+        }
 
 
 

@@ -1,0 +1,5 @@
+x 3d
+x 5d
+x 7d
+for 5 days
+for 7 days

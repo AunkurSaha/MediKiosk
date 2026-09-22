@@ -1,0 +1,234 @@
+{
+  "greedy": {
+    "train": {
+      "medicines": {
+        "overall_accuracy": 0.4857142857142857,
+        "present_count": 700,
+        "absent_count": 0,
+        "present_accuracy": 0.4857142857142857
+      },
+      "doses": {
+        "overall_accuracy": 0.98,
+        "present_count": 700,
+        "absent_count": 0,
+        "present_accuracy": 0.98
+      },
+      "frequencies": {
+        "overall_accuracy": 0.87,
+        "present_count": 700,
+        "absent_count": 0,
+        "present_accuracy": 0.87
+      },
+      "durations": {
+        "overall_accuracy": 0.9485714285714286,
+        "present_count": 493,
+        "absent_count": 207,
+        "present_accuracy": 0.9269776876267748
+      },
+      "forms": {
+        "overall_accuracy": 1.0,
+        "present_count": 508,
+        "absent_count": 192,
+        "present_accuracy": 1.0
+      },
+      "instructions": {
+        "overall_accuracy": 0.7485714285714286,
+        "present_count": 243,
+        "absent_count": 457,
+        "present_accuracy": 0.2757201646090535
+      }
+    },
+    "validation": {
+      "medicines": {
+        "overall_accuracy": 0.61,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.61
+      },
+      "doses": {
+        "overall_accuracy": 0.44,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.44
+      },
+      "frequencies": {
+        "overall_accuracy": 0.78,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.78
+      },
+      "durations": {
+        "overall_accuracy": 0.82,
+        "present_count": 60,
+        "absent_count": 40,
+        "present_accuracy": 0.7
+      },
+      "forms": {
+        "overall_accuracy": 1.0,
+        "present_count": 78,
+        "absent_count": 22,
+        "present_accuracy": 1.0
+      },
+      "instructions": {
+        "overall_accuracy": 0.61,
+        "present_count": 41,
+        "absent_count": 59,
+        "present_accuracy": 0.04878048780487805
+      }
+    },
+    "test": {
+      "medicines": {
+        "overall_accuracy": 0.49,
+        "present_count": 200,
+        "absent_count": 0,
+        "present_accuracy": 0.49
+      },
+      "doses": {
+        "overall_accuracy": 0.945,
+        "present_count": 200,
+        "absent_count": 0,
+        "present_accuracy": 0.945
+      },
+      "frequencies": {
+        "overall_accuracy": 0.83,
+        "present_count": 200,
+        "absent_count": 0,
+        "present_accuracy": 0.83
+      },
+      "durations": {
+        "overall_accuracy": 1.0,
+        "present_count": 144,
+        "absent_count": 56,
+        "present_accuracy": 1.0
+      },
+      "forms": {
+        "overall_accuracy": 1.0,
+        "present_count": 148,
+        "absent_count": 52,
+        "present_accuracy": 1.0
+      },
+      "instructions": {
+        "overall_accuracy": 0.75,
+        "present_count": 74,
+        "absent_count": 126,
+        "present_accuracy": 0.32432432432432434
+      }
+    }
+  },
+  "beam": {
+    "train": {
+      "medicines": {
+        "overall_accuracy": 0.8528571428571429,
+        "present_count": 700,
+        "absent_count": 0,
+        "present_accuracy": 0.8528571428571429
+      },
+      "doses": {
+        "overall_accuracy": 0.9914285714285714,
+        "present_count": 700,
+        "absent_count": 0,
+        "present_accuracy": 0.9914285714285714
+      },
+      "frequencies": {
+        "overall_accuracy": 0.9585714285714285,
+        "present_count": 700,
+        "absent_count": 0,
+        "present_accuracy": 0.9585714285714285
+      },
+      "durations": {
+        "overall_accuracy": 0.95,
+        "present_count": 493,
+        "absent_count": 207,
+        "present_accuracy": 0.9290060851926978
+      },
+      "forms": {
+        "overall_accuracy": 1.0,
+        "present_count": 508,
+        "absent_count": 192,
+        "present_accuracy": 1.0
+      },
+      "instructions": {
+        "overall_accuracy": 0.7871428571428571,
+        "present_count": 243,
+        "absent_count": 457,
+        "present_accuracy": 0.3868312757201646
+      }
+    },
+    "validation": {
+      "medicines": {
+        "overall_accuracy": 0.65,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.65
+      },
+      "doses": {
+        "overall_accuracy": 0.43,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.43
+      },
+      "frequencies": {
+        "overall_accuracy": 0.69,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.69
+      },
+      "durations": {
+        "overall_accuracy": 0.82,
+        "present_count": 60,
+        "absent_count": 40,
+        "present_accuracy": 0.7
+      },
+      "forms": {
+        "overall_accuracy": 1.0,
+        "present_count": 78,
+        "absent_count": 22,
+        "present_accuracy": 1.0
+      },
+      "instructions": {
+        "overall_accuracy": 0.65,
+        "present_count": 41,
+        "absent_count": 59,
+        "present_accuracy": 0.14634146341463414
+      }
+    },
+    "test": {
+      "medicines": {
+        "overall_accuracy": 0.795,
+        "present_count": 200,
+        "absent_count": 0,
+        "present_accuracy": 0.795
+      },
+      "doses": {
+        "overall_accuracy": 0.99,
+        "present_count": 200,
+        "absent_count": 0,
+        "present_accuracy": 0.99
+      },
+      "frequencies": {
+        "overall_accuracy": 0.94,
+        "present_count": 200,
+        "absent_count": 0,
+        "present_accuracy": 0.94
+      },
+      "durations": {
+        "overall_accuracy": 1.0,
+        "present_count": 144,
+        "absent_count": 56,
+        "present_accuracy": 1.0
+      },
+      "forms": {
+        "overall_accuracy": 1.0,
+        "present_count": 148,
+        "absent_count": 52,
+        "present_accuracy": 1.0
+      },
+      "instructions": {
+        "overall_accuracy": 0.78,
+        "present_count": 74,
+        "absent_count": 126,
+        "present_accuracy": 0.40540540540540543
+      }
+    }
+  }
+}

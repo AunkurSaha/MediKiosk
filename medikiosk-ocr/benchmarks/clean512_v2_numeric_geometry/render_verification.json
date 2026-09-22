@@ -1,0 +1,2226 @@
+{
+  "all_reconstructed_exact": true,
+  "pairs": [
+    {
+      "sample_id": "train_00000",
+      "pattern": "1-1-1",
+      "kind": "schedule",
+      "token_start": 11,
+      "token_end": 16,
+      "glyph_start": 11,
+      "glyph_end": 16,
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 22,
+      "text_position": [
+        7,
+        14
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "PCM 625 ml 1-1-1 for 5 days after food",
+      "prior_beam_prediction": "PCM 625 ml 1-1 for 5 days after fod",
+      "original_png_sha256": "139111a732f5aaf2ac0f26f106988dbc0f84cc5682b71ed5bef14343d716df70",
+      "reconstructed_pixel_sha256": "e91372aa1fb355d890013fed6d9423a0b8707b175b27417279d99f34eac65801",
+      "numeric_token": "1-1-1",
+      "original_token_bbox": [
+        135,
+        18,
+        180,
+        34
+      ],
+      "modified_token_bbox": [
+        135,
+        18,
+        184,
+        34
+      ],
+      "intervention_region": [
+        135,
+        18,
+        184,
+        34
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            135,
+            142
+          ],
+          "modified_x_range": [
+            135,
+            142
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            145,
+            152
+          ],
+          "modified_x_range": [
+            146,
+            153
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            154,
+            161
+          ],
+          "modified_x_range": [
+            156,
+            163
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            164,
+            171
+          ],
+          "modified_x_range": [
+            167,
+            174
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            173,
+            180
+          ],
+          "modified_x_range": [
+            177,
+            184
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 232,
+      "diff_bbox": [
+        145,
+        18,
+        184,
+        34
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "e91372aa1fb355d890013fed6d9423a0b8707b175b27417279d99f34eac65801",
+      "counterfactual_pixel_sha256": "acea59cf902621afb5a879da635537a54e5fe9f2074f7fe802c79693bcc006e1"
+    },
+    {
+      "sample_id": "train_00007",
+      "pattern": "1-1-1",
+      "kind": "schedule",
+      "token_start": 14,
+      "token_end": 19,
+      "glyph_start": 14,
+      "glyph_end": 19,
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 23,
+      "text_position": [
+        10,
+        15
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Tab PCM 625 g 1-1-1 for 5 days",
+      "prior_beam_prediction": "Tab PCM 625 g 1-1 for days",
+      "original_png_sha256": "e07d815c2ebab7b1a329114b52ff39e464ce2efbd716682736b85fd43377bc75",
+      "reconstructed_pixel_sha256": "4b113ef68e01acfe324e9c27f17816dc74dab743ae7484a6d7623cb44a9f44c3",
+      "numeric_token": "1-1-1",
+      "original_token_bbox": [
+        179,
+        19,
+        228,
+        36
+      ],
+      "modified_token_bbox": [
+        179,
+        19,
+        232,
+        36
+      ],
+      "intervention_region": [
+        179,
+        19,
+        232,
+        36
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            179,
+            186
+          ],
+          "modified_x_range": [
+            179,
+            186
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            190,
+            197
+          ],
+          "modified_x_range": [
+            191,
+            198
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            200,
+            207
+          ],
+          "modified_x_range": [
+            202,
+            209
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            211,
+            218
+          ],
+          "modified_x_range": [
+            214,
+            221
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            221,
+            228
+          ],
+          "modified_x_range": [
+            225,
+            232
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 242,
+      "diff_bbox": [
+        190,
+        19,
+        232,
+        36
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "4b113ef68e01acfe324e9c27f17816dc74dab743ae7484a6d7623cb44a9f44c3",
+      "counterfactual_pixel_sha256": "26707939686362a970d2f5d05527bc873b7c1c7ae2b523f8652227e50bb07de4"
+    },
+    {
+      "sample_id": "train_00014",
+      "pattern": "1-1-1",
+      "kind": "schedule",
+      "token_start": 14,
+      "token_end": 19,
+      "glyph_start": 14,
+      "glyph_end": 19,
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 24,
+      "text_position": [
+        9,
+        16
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Syp PCM 500 g 1-1-1 x 3d",
+      "prior_beam_prediction": "Syp PCM 500 g 1-1 x 3d",
+      "original_png_sha256": "33e356d2c8872ae05bba4398f840665aa84c9155f5665c1cb9effe10398dbe4f",
+      "reconstructed_pixel_sha256": "f778d105a2b03437643f1f87a641f43aad64e16ccb82eea496b169ca7ed8a6c6",
+      "numeric_token": "1-1-1",
+      "original_token_bbox": [
+        185,
+        21,
+        234,
+        38
+      ],
+      "modified_token_bbox": [
+        185,
+        21,
+        238,
+        38
+      ],
+      "intervention_region": [
+        185,
+        21,
+        238,
+        38
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            185,
+            192
+          ],
+          "modified_x_range": [
+            185,
+            192
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            196,
+            204
+          ],
+          "modified_x_range": [
+            197,
+            205
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            206,
+            213
+          ],
+          "modified_x_range": [
+            208,
+            215
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            217,
+            225
+          ],
+          "modified_x_range": [
+            220,
+            228
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            227,
+            234
+          ],
+          "modified_x_range": [
+            231,
+            238
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 242,
+      "diff_bbox": [
+        196,
+        21,
+        238,
+        38
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "f778d105a2b03437643f1f87a641f43aad64e16ccb82eea496b169ca7ed8a6c6",
+      "counterfactual_pixel_sha256": "82b0ac9df722eb78c7470605429c5034e590ea52d85676069e634859076d6a93"
+    },
+    {
+      "sample_id": "train_00018",
+      "pattern": "1-1-1",
+      "kind": "schedule",
+      "token_start": 18,
+      "token_end": 23,
+      "glyph_start": 18,
+      "glyph_end": 23,
+      "renderer": "consola",
+      "font_path": "C:\\Windows\\Fonts\\consola.ttf",
+      "font_sha256": "cf00b507b3286870cc5064ebd0633c303f70b491a4af25eec2d32df413db0179",
+      "font_size": 22,
+      "text_position": [
+        9,
+        14
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Pantoprazole 5 mg 1-1-1 x 7d",
+      "prior_beam_prediction": "Pantoprazole 5 mg 1-1 x 3d",
+      "original_png_sha256": "c813f564dc45b52cfddccdcd95d2eaae4af8ec79b5f389ecfc225ce0f4f1a322",
+      "reconstructed_pixel_sha256": "a3fcf57d8cc3a49e335c0afb962a50445baa958671d1d2a49c79074654295631",
+      "numeric_token": "1-1-1",
+      "original_token_bbox": [
+        226,
+        17,
+        284,
+        31
+      ],
+      "modified_token_bbox": [
+        226,
+        17,
+        288,
+        31
+      ],
+      "intervention_region": [
+        226,
+        17,
+        288,
+        31
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            226,
+            236
+          ],
+          "modified_x_range": [
+            226,
+            236
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            239,
+            247
+          ],
+          "modified_x_range": [
+            240,
+            248
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            250,
+            260
+          ],
+          "modified_x_range": [
+            252,
+            262
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            263,
+            271
+          ],
+          "modified_x_range": [
+            266,
+            274
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            274,
+            284
+          ],
+          "modified_x_range": [
+            278,
+            288
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 216,
+      "diff_bbox": [
+        239,
+        17,
+        288,
+        31
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "a3fcf57d8cc3a49e335c0afb962a50445baa958671d1d2a49c79074654295631",
+      "counterfactual_pixel_sha256": "7701dd93e8b89559cbcec4e00552f030436dee1c4e9bafa014c13b2ba11cc7de"
+    },
+    {
+      "sample_id": "train_00061",
+      "pattern": "1-1-1",
+      "kind": "schedule",
+      "token_start": 27,
+      "token_end": 32,
+      "glyph_start": 27,
+      "glyph_end": 32,
+      "renderer": "cour",
+      "font_path": "C:\\Windows\\Fonts\\cour.ttf",
+      "font_sha256": "e4a66a0259718d0c8f4b6e14319b4803ced45afbddf3abba8b8c3e2006856206",
+      "font_size": 15,
+      "text_position": [
+        8,
+        15
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Syp  Cetirizine  500  mcg  1-1-1  for 5 days  as needed",
+      "prior_beam_prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ed",
+      "original_png_sha256": "afde18a536640fc10146efec2cb21d01b7864387e61b7cfc71f41e494063b4d7",
+      "reconstructed_pixel_sha256": "e759196299ee33b906b2687a4e77912c31de71d88d6ce3a46ad98796391c1e7b",
+      "numeric_token": "1-1-1",
+      "original_token_bbox": [
+        252,
+        19,
+        295,
+        28
+      ],
+      "modified_token_bbox": [
+        252,
+        19,
+        299,
+        28
+      ],
+      "intervention_region": [
+        252,
+        19,
+        299,
+        28
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            252,
+            259
+          ],
+          "modified_x_range": [
+            252,
+            259
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            261,
+            268
+          ],
+          "modified_x_range": [
+            262,
+            269
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            270,
+            277
+          ],
+          "modified_x_range": [
+            272,
+            279
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            279,
+            286
+          ],
+          "modified_x_range": [
+            282,
+            289
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            288,
+            295
+          ],
+          "modified_x_range": [
+            292,
+            299
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 77,
+      "diff_bbox": [
+        261,
+        19,
+        299,
+        28
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "e759196299ee33b906b2687a4e77912c31de71d88d6ce3a46ad98796391c1e7b",
+      "counterfactual_pixel_sha256": "5ea58d2c5b66f107bf06d1b789a6549698284a258af16fdf70010482c265e977"
+    },
+    {
+      "sample_id": "train_00084",
+      "pattern": "1-1-1",
+      "kind": "schedule",
+      "token_start": 18,
+      "token_end": 23,
+      "glyph_start": 18,
+      "glyph_end": 23,
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 22,
+      "text_position": [
+        7,
+        14
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Syrup PCM 625 mcg 1-1-1 for 5 days",
+      "prior_beam_prediction": "Syrup PCM 625 mcg 1-1 for days",
+      "original_png_sha256": "c417ccd1d8d1880f10062b97332e3ad21512cffa4340ab4f813c7533fc7dc540",
+      "reconstructed_pixel_sha256": "b46d9e5d1c56b095bd6e0d6ea67afd0e8e7e68be61a7759d01cdfa6d09b7cf46",
+      "numeric_token": "1-1-1",
+      "original_token_bbox": [
+        216,
+        18,
+        261,
+        34
+      ],
+      "modified_token_bbox": [
+        216,
+        18,
+        265,
+        34
+      ],
+      "intervention_region": [
+        216,
+        18,
+        265,
+        34
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            216,
+            223
+          ],
+          "modified_x_range": [
+            216,
+            223
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            226,
+            233
+          ],
+          "modified_x_range": [
+            227,
+            234
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            235,
+            242
+          ],
+          "modified_x_range": [
+            237,
+            244
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            245,
+            252
+          ],
+          "modified_x_range": [
+            248,
+            255
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            254,
+            261
+          ],
+          "modified_x_range": [
+            258,
+            265
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 232,
+      "diff_bbox": [
+        226,
+        18,
+        265,
+        34
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "b46d9e5d1c56b095bd6e0d6ea67afd0e8e7e68be61a7759d01cdfa6d09b7cf46",
+      "counterfactual_pixel_sha256": "c75e1d4a40e1dd0eda08105423907e035d426924c96250b70114923476949286"
+    },
+    {
+      "sample_id": "train_00085",
+      "pattern": "1-1-1",
+      "kind": "schedule",
+      "token_start": 22,
+      "token_end": 27,
+      "glyph_start": 22,
+      "glyph_end": 27,
+      "renderer": "calibri",
+      "font_path": "C:\\Windows\\Fonts\\calibri.ttf",
+      "font_sha256": "57e93ff143572bcc092c1f56202d43ddc07bb119aa104c6d7af163470fb551f6",
+      "font_size": 23,
+      "text_position": [
+        8,
+        15
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Cap Cetirizine 10 mcg 1-1-1 as needed",
+      "prior_beam_prediction": "Cap Cetirizine 10 mcg 1-1 as need",
+      "original_png_sha256": "8064448f3b25a5808d5ddb30ed368c91de0cf4813b906f0aaf77ab46ef3e410e",
+      "reconstructed_pixel_sha256": "c723c1ed3c0678a736cbbe0221e731d7a2897636ca8fc54844c03baff5bd190e",
+      "numeric_token": "1-1-1",
+      "original_token_bbox": [
+        213,
+        18,
+        261,
+        33
+      ],
+      "modified_token_bbox": [
+        213,
+        18,
+        265,
+        33
+      ],
+      "intervention_region": [
+        213,
+        18,
+        265,
+        33
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            213,
+            223
+          ],
+          "modified_x_range": [
+            213,
+            223
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            224,
+            231
+          ],
+          "modified_x_range": [
+            225,
+            232
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            232,
+            242
+          ],
+          "modified_x_range": [
+            234,
+            244
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            243,
+            250
+          ],
+          "modified_x_range": [
+            246,
+            253
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            251,
+            261
+          ],
+          "modified_x_range": [
+            255,
+            265
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 240,
+      "diff_bbox": [
+        224,
+        18,
+        265,
+        33
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "c723c1ed3c0678a736cbbe0221e731d7a2897636ca8fc54844c03baff5bd190e",
+      "counterfactual_pixel_sha256": "dca562d88ecf5ac6132336eb1e77617a4ccb15a04813b276a87408a7a694b9f5"
+    },
+    {
+      "sample_id": "train_00095",
+      "pattern": "1-1-1",
+      "kind": "schedule",
+      "token_start": 22,
+      "token_end": 27,
+      "glyph_start": 22,
+      "glyph_end": 27,
+      "renderer": "consola",
+      "font_path": "C:\\Windows\\Fonts\\consola.ttf",
+      "font_sha256": "cf00b507b3286870cc5064ebd0633c303f70b491a4af25eec2d32df413db0179",
+      "font_size": 24,
+      "text_position": [
+        10,
+        16
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Tab Paracetamol 650 g 1-1-1",
+      "prior_beam_prediction": "Tab Paracetamol 650 g 1-1",
+      "original_png_sha256": "d33bba9ac0d4042b483825b124733c0dfccee124de3615b6fd766037a6184daf",
+      "reconstructed_pixel_sha256": "2fbfc6d65237de0fde26101a60b19eedbacf6832c33da895a5e5337b19773833",
+      "numeric_token": "1-1-1",
+      "original_token_bbox": [
+        297,
+        19,
+        360,
+        34
+      ],
+      "modified_token_bbox": [
+        297,
+        19,
+        364,
+        34
+      ],
+      "intervention_region": [
+        297,
+        19,
+        364,
+        34
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            297,
+            308
+          ],
+          "modified_x_range": [
+            297,
+            308
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            312,
+            320
+          ],
+          "modified_x_range": [
+            313,
+            321
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            323,
+            334
+          ],
+          "modified_x_range": [
+            325,
+            336
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            338,
+            346
+          ],
+          "modified_x_range": [
+            341,
+            349
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "1",
+          "original_x_range": [
+            349,
+            360
+          ],
+          "modified_x_range": [
+            353,
+            364
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 229,
+      "diff_bbox": [
+        312,
+        19,
+        364,
+        34
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "2fbfc6d65237de0fde26101a60b19eedbacf6832c33da895a5e5337b19773833",
+      "counterfactual_pixel_sha256": "a4bda736ec1d16e5ab33bcbfc49a4fabf5fb0276bc41cb8ee10a7b08245f2ade"
+    },
+    {
+      "sample_id": "train_00104",
+      "pattern": "1-0-0",
+      "kind": "schedule",
+      "token_start": 20,
+      "token_end": 25,
+      "glyph_start": 20,
+      "glyph_end": 25,
+      "renderer": "georgia",
+      "font_path": "C:\\Windows\\Fonts\\georgia.ttf",
+      "font_sha256": "38dffcaf1fac89492f7c56c600a14daf36ae42f7c21985cd4134ae113124a58f",
+      "font_size": 24,
+      "text_position": [
+        7,
+        16
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Pantoprazole  5  g  1-0-0",
+      "prior_beam_prediction": "Pantoprazole  5  g  0-1",
+      "original_png_sha256": "f5272380669f952d7a0db6a0f9a6feb38257750f59fb9297856d2872df9ca385",
+      "reconstructed_pixel_sha256": "8aa86afd184a54c63672036fa26b47400cbc2518c857fb022f46305ec61a09a8",
+      "numeric_token": "1-0-0",
+      "original_token_bbox": [
+        210,
+        26,
+        266,
+        39
+      ],
+      "modified_token_bbox": [
+        210,
+        26,
+        270,
+        39
+      ],
+      "intervention_region": [
+        210,
+        26,
+        270,
+        39
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            210,
+            219
+          ],
+          "modified_x_range": [
+            210,
+            219
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            220,
+            227
+          ],
+          "modified_x_range": [
+            221,
+            228
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "0",
+          "original_x_range": [
+            229,
+            242
+          ],
+          "modified_x_range": [
+            231,
+            244
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            244,
+            251
+          ],
+          "modified_x_range": [
+            247,
+            254
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "0",
+          "original_x_range": [
+            253,
+            266
+          ],
+          "modified_x_range": [
+            257,
+            270
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 355,
+      "diff_bbox": [
+        220,
+        26,
+        270,
+        39
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "8aa86afd184a54c63672036fa26b47400cbc2518c857fb022f46305ec61a09a8",
+      "counterfactual_pixel_sha256": "a1177aa8cbf40aadcf1bd8ac3194d34af5ad1233346c86a05370aff3c9da92d2"
+    },
+    {
+      "sample_id": "train_00159",
+      "pattern": "1-0-0",
+      "kind": "schedule",
+      "token_start": 18,
+      "token_end": 23,
+      "glyph_start": 18,
+      "glyph_end": 23,
+      "renderer": "cour",
+      "font_path": "C:\\Windows\\Fonts\\cour.ttf",
+      "font_sha256": "e4a66a0259718d0c8f4b6e14319b4803ced45afbddf3abba8b8c3e2006856206",
+      "font_size": 22,
+      "text_position": [
+        10,
+        14
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Tab  PCM  40  mg  1-0-0",
+      "prior_beam_prediction": "Tab  PCM  40  mg  0-1",
+      "original_png_sha256": "6c7ebc2c03536644b9db91759a3a03540b0f1048d66d84d1bf34c467af954247",
+      "reconstructed_pixel_sha256": "0903e312a337e872d50ced61f56b954ff4e7c26ef161d74d7fda493c7fd2b773",
+      "numeric_token": "1-0-0",
+      "original_token_bbox": [
+        246,
+        19,
+        307,
+        33
+      ],
+      "modified_token_bbox": [
+        246,
+        19,
+        311,
+        33
+      ],
+      "intervention_region": [
+        246,
+        19,
+        311,
+        33
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            246,
+            255
+          ],
+          "modified_x_range": [
+            246,
+            255
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            259,
+            269
+          ],
+          "modified_x_range": [
+            260,
+            270
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "0",
+          "original_x_range": [
+            272,
+            281
+          ],
+          "modified_x_range": [
+            274,
+            283
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            285,
+            295
+          ],
+          "modified_x_range": [
+            288,
+            298
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "0",
+          "original_x_range": [
+            298,
+            307
+          ],
+          "modified_x_range": [
+            302,
+            311
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 249,
+      "diff_bbox": [
+        259,
+        19,
+        311,
+        33
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "0903e312a337e872d50ced61f56b954ff4e7c26ef161d74d7fda493c7fd2b773",
+      "counterfactual_pixel_sha256": "a59ec9961d824ea1846abbd9009a438daa070e491718a88160275e24f9155ca5"
+    },
+    {
+      "sample_id": "train_00385",
+      "pattern": "1-0-0",
+      "kind": "schedule",
+      "token_start": 23,
+      "token_end": 28,
+      "glyph_start": 23,
+      "glyph_end": 28,
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 23,
+      "text_position": [
+        8,
+        15
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Tab Pantoprazole 625 g 1-0-0",
+      "prior_beam_prediction": "Tab Pantoprazole 625 g 0-1",
+      "original_png_sha256": "75170c4422586a732cd6b51d52b984cb19be097a9fc783473e2d184aea6450ee",
+      "reconstructed_pixel_sha256": "ad7f15a21b37d59afaed8741575d5906f708023aef264bada6f188d5ae475746",
+      "numeric_token": "1-0-0",
+      "original_token_bbox": [
+        263,
+        19,
+        315,
+        36
+      ],
+      "modified_token_bbox": [
+        263,
+        19,
+        319,
+        36
+      ],
+      "intervention_region": [
+        263,
+        19,
+        319,
+        36
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            263,
+            270
+          ],
+          "modified_x_range": [
+            263,
+            270
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            274,
+            281
+          ],
+          "modified_x_range": [
+            275,
+            282
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "0",
+          "original_x_range": [
+            282,
+            294
+          ],
+          "modified_x_range": [
+            284,
+            296
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            295,
+            302
+          ],
+          "modified_x_range": [
+            298,
+            305
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "0",
+          "original_x_range": [
+            303,
+            315
+          ],
+          "modified_x_range": [
+            307,
+            319
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 415,
+      "diff_bbox": [
+        274,
+        19,
+        319,
+        36
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "ad7f15a21b37d59afaed8741575d5906f708023aef264bada6f188d5ae475746",
+      "counterfactual_pixel_sha256": "d2c06ae24e263f070e166a3e2fb7b0cd9c1c95a61100d10fc28b0d67544b8439"
+    },
+    {
+      "sample_id": "train_00443",
+      "pattern": "1-0-0",
+      "kind": "schedule",
+      "token_start": 31,
+      "token_end": 36,
+      "glyph_start": 31,
+      "glyph_end": 36,
+      "renderer": "cambria",
+      "font_path": "C:\\Windows\\Fonts\\cambria.ttc",
+      "font_sha256": "84e70ccc1664482f4a960442c7a166c91a1b2cf98ff88c33cb73f79403f66d7b",
+      "font_size": 24,
+      "text_position": [
+        10,
+        16
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Syrup  Pantoprazole  650  mcg  1-0-0",
+      "prior_beam_prediction": "Syrup  Pantoprazole  650  mcg  0-1",
+      "original_png_sha256": "2fc7b0a7a0fd80f80769e6d549cbaff814e3d0e8b3417c76c94470dc80415fc9",
+      "reconstructed_pixel_sha256": "645f43ae194b04523961e95b566d74959ed9ace0c00da0a5e62fd4ab872e810c",
+      "numeric_token": "1-0-0",
+      "original_token_bbox": [
+        332,
+        23,
+        384,
+        39
+      ],
+      "modified_token_bbox": [
+        332,
+        23,
+        388,
+        39
+      ],
+      "intervention_region": [
+        332,
+        23,
+        388,
+        39
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "1",
+          "original_x_range": [
+            332,
+            342
+          ],
+          "modified_x_range": [
+            332,
+            342
+          ],
+          "dx": 0,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            344,
+            350
+          ],
+          "modified_x_range": [
+            345,
+            351
+          ],
+          "dx": 1,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "0",
+          "original_x_range": [
+            352,
+            363
+          ],
+          "modified_x_range": [
+            354,
+            365
+          ],
+          "dx": 2,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "-",
+          "original_x_range": [
+            365,
+            371
+          ],
+          "modified_x_range": [
+            368,
+            374
+          ],
+          "dx": 3,
+          "dy": 0,
+          "bitmap_unchanged": true
+        },
+        {
+          "symbol": "0",
+          "original_x_range": [
+            373,
+            384
+          ],
+          "modified_x_range": [
+            377,
+            388
+          ],
+          "dx": 4,
+          "dy": 0,
+          "bitmap_unchanged": true
+        }
+      ],
+      "changed_pixels": 382,
+      "diff_bbox": [
+        344,
+        23,
+        388,
+        39
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "645f43ae194b04523961e95b566d74959ed9ace0c00da0a5e62fd4ab872e810c",
+      "counterfactual_pixel_sha256": "5d9b6e244b8febd9f9a5f8e3fffd08460e287eb0abd709af1adbd08573a9b136"
+    },
+    {
+      "sample_id": "train_00010",
+      "pattern": "for 5 days",
+      "kind": "duration",
+      "token_start": 31,
+      "token_end": 41,
+      "glyph_start": 35,
+      "glyph_end": 36,
+      "renderer": "comic",
+      "font_path": "C:\\Windows\\Fonts\\comic.ttf",
+      "font_sha256": "fc7fbc3fb456a363f1f719b0ec62ae093c78124bb6da046006ae7e217a6b8575",
+      "font_size": 23,
+      "text_position": [
+        9,
+        15
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Capsule Amoxicillin 20 mcg PRN for 5 days",
+      "prior_beam_prediction": "Capsule Amoxicillin 20 mcg PRN for days",
+      "original_png_sha256": "542399de23512344f3d9ef39ccf888419789f436d253a0d18c0dcdfa7708d54e",
+      "reconstructed_pixel_sha256": "be87384371e199ef810c2adcc23ad5e22392984c52152fc036a334c81924cb3d",
+      "numeric_token": "5",
+      "original_token_bbox": [
+        396,
+        23,
+        408,
+        41
+      ],
+      "modified_token_bbox": [
+        396,
+        23,
+        409,
+        41
+      ],
+      "intervention_region": [
+        396,
+        23,
+        409,
+        41
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "5",
+          "original_bbox": [
+            396,
+            23,
+            408,
+            41
+          ],
+          "modified_bbox": [
+            396,
+            23,
+            409,
+            41
+          ],
+          "requested_scale": 1.1,
+          "realized_scale": 1.0833333333333333,
+          "interpolation": "OpenCV INTER_CUBIC",
+          "center_shift": 0.5,
+          "height_unchanged": true
+        }
+      ],
+      "changed_pixels": 123,
+      "diff_bbox": [
+        396,
+        23,
+        409,
+        41
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "be87384371e199ef810c2adcc23ad5e22392984c52152fc036a334c81924cb3d",
+      "counterfactual_pixel_sha256": "9a6c39914ef993d38138e65772023960a5f1b536ebcc3c3999e0dee9a8db18ae"
+    },
+    {
+      "sample_id": "train_00028",
+      "pattern": "for 5 days",
+      "kind": "duration",
+      "token_start": 28,
+      "token_end": 38,
+      "glyph_start": 32,
+      "glyph_end": 33,
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 23,
+      "text_position": [
+        7,
+        15
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Inj  Metformin  40  mg  BD  for 5 days",
+      "prior_beam_prediction": "Inj  Metformin  40  mg  BD  for days",
+      "original_png_sha256": "2b9a9ac169bb961518377adf8263998d0bb286b7d6f4d0487ff55432046bdc85",
+      "reconstructed_pixel_sha256": "ddbdca4e3e012862a66a6d7f0500dd7dcb86670b2922c1acba3e23a20af55aae",
+      "numeric_token": "5",
+      "original_token_bbox": [
+        316,
+        19,
+        328,
+        36
+      ],
+      "modified_token_bbox": [
+        317,
+        19,
+        329,
+        36
+      ],
+      "intervention_region": [
+        316,
+        19,
+        329,
+        36
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "5",
+          "original_bbox": [
+            316,
+            19,
+            328,
+            36
+          ],
+          "modified_bbox": [
+            316,
+            19,
+            329,
+            36
+          ],
+          "requested_scale": 1.1,
+          "realized_scale": 1.0833333333333333,
+          "interpolation": "OpenCV INTER_CUBIC",
+          "center_shift": 0.5,
+          "height_unchanged": true
+        }
+      ],
+      "changed_pixels": 109,
+      "diff_bbox": [
+        316,
+        19,
+        329,
+        36
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "ddbdca4e3e012862a66a6d7f0500dd7dcb86670b2922c1acba3e23a20af55aae",
+      "counterfactual_pixel_sha256": "7423e1604dfde5e2318a47a670f8ef975d57620a7589c2a0e4aba3fc0c98e51e"
+    },
+    {
+      "sample_id": "train_00039",
+      "pattern": "for 5 days",
+      "kind": "duration",
+      "token_start": 26,
+      "token_end": 36,
+      "glyph_start": 30,
+      "glyph_end": 31,
+      "renderer": "consola",
+      "font_path": "C:\\Windows\\Fonts\\consola.ttf",
+      "font_sha256": "cf00b507b3286870cc5064ebd0633c303f70b491a4af25eec2d32df413db0179",
+      "font_size": 22,
+      "text_position": [
+        10,
+        14
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Inj Cetirizine 625 mcg AC for 5 days",
+      "prior_beam_prediction": "Inj Cetirizine 625 mcg AC for days",
+      "original_png_sha256": "4544d30a4f0e46b7e3d192c4c33893f01f8caa57e4b339978dff1e904e418b58",
+      "reconstructed_pixel_sha256": "bd5aa8c886ba4165616d696b11f5bc6a885a660dc853f68fbdef6994980310eb",
+      "numeric_token": "5",
+      "original_token_bbox": [
+        371,
+        17,
+        381,
+        31
+      ],
+      "modified_token_bbox": [
+        371,
+        17,
+        382,
+        31
+      ],
+      "intervention_region": [
+        371,
+        17,
+        382,
+        31
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "5",
+          "original_bbox": [
+            371,
+            17,
+            381,
+            31
+          ],
+          "modified_bbox": [
+            371,
+            17,
+            382,
+            31
+          ],
+          "requested_scale": 1.1,
+          "realized_scale": 1.1,
+          "interpolation": "OpenCV INTER_CUBIC",
+          "center_shift": 0.5,
+          "height_unchanged": true
+        }
+      ],
+      "changed_pixels": 64,
+      "diff_bbox": [
+        371,
+        17,
+        382,
+        31
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "bd5aa8c886ba4165616d696b11f5bc6a885a660dc853f68fbdef6994980310eb",
+      "counterfactual_pixel_sha256": "2b94b53efb148d19874871008aa85e65dd7b8bd883280d75524146d567a9fa78"
+    },
+    {
+      "sample_id": "train_00044",
+      "pattern": "for 5 days",
+      "kind": "duration",
+      "token_start": 14,
+      "token_end": 24,
+      "glyph_start": 18,
+      "glyph_end": 19,
+      "renderer": "cambria",
+      "font_path": "C:\\Windows\\Fonts\\cambria.ttc",
+      "font_sha256": "84e70ccc1664482f4a960442c7a166c91a1b2cf98ff88c33cb73f79403f66d7b",
+      "font_size": 24,
+      "text_position": [
+        7,
+        16
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "PCM 10 ml QID for 5 days",
+      "prior_beam_prediction": "PCM 10 ml QID for days",
+      "original_png_sha256": "a5f618875ce580f091b583d111bc4d818af4af0e8d70631af7640649452cfe3b",
+      "reconstructed_pixel_sha256": "a3253517c6f07d0011508a37c400295d0778cef49521391496b9b3d4fcc90a4e",
+      "numeric_token": "5",
+      "original_token_bbox": [
+        204,
+        22,
+        215,
+        39
+      ],
+      "modified_token_bbox": [
+        204,
+        22,
+        216,
+        39
+      ],
+      "intervention_region": [
+        204,
+        22,
+        216,
+        39
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "5",
+          "original_bbox": [
+            204,
+            22,
+            215,
+            39
+          ],
+          "modified_bbox": [
+            204,
+            22,
+            216,
+            39
+          ],
+          "requested_scale": 1.1,
+          "realized_scale": 1.0909090909090908,
+          "interpolation": "OpenCV INTER_CUBIC",
+          "center_shift": 0.5,
+          "height_unchanged": true
+        }
+      ],
+      "changed_pixels": 91,
+      "diff_bbox": [
+        204,
+        22,
+        216,
+        39
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "a3253517c6f07d0011508a37c400295d0778cef49521391496b9b3d4fcc90a4e",
+      "counterfactual_pixel_sha256": "963fa6a1449605250fd90b1610e22aec6959e2e686f3a9bf1163d966370f5623"
+    },
+    {
+      "sample_id": "train_00009",
+      "pattern": "for 7 days",
+      "kind": "duration",
+      "token_start": 37,
+      "token_end": 47,
+      "glyph_start": 41,
+      "glyph_end": 42,
+      "renderer": "cambria",
+      "font_path": "C:\\Windows\\Fonts\\cambria.ttc",
+      "font_sha256": "84e70ccc1664482f4a960442c7a166c91a1b2cf98ff88c33cb73f79403f66d7b",
+      "font_size": 22,
+      "text_position": [
+        8,
+        14
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Tablet  Paracetamol  40  mcg  1-0-0  for 7 days",
+      "prior_beam_prediction": "Tablet  Paracetamol  40  mcg  1-0-0  for days",
+      "original_png_sha256": "69ddbfd6f321d2e5caf7ea6e7f108e60e7fb915089a7d51b7f59a27d89b25252",
+      "reconstructed_pixel_sha256": "84e20f8fe89b9cf2f3ecfd20b60b411b1c040a9a2b4fc1f8e7cef41e900007be",
+      "numeric_token": "7",
+      "original_token_bbox": [
+        384,
+        20,
+        395,
+        35
+      ],
+      "modified_token_bbox": [
+        384,
+        20,
+        395,
+        35
+      ],
+      "intervention_region": [
+        384,
+        20,
+        395,
+        35
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "7",
+          "original_bbox": [
+            384,
+            20,
+            395,
+            35
+          ],
+          "modified_bbox": [
+            384,
+            20,
+            396,
+            35
+          ],
+          "requested_scale": 1.1,
+          "realized_scale": 1.0909090909090908,
+          "interpolation": "OpenCV INTER_CUBIC",
+          "center_shift": 0.5,
+          "height_unchanged": true
+        }
+      ],
+      "changed_pixels": 63,
+      "diff_bbox": [
+        384,
+        20,
+        395,
+        35
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "84e20f8fe89b9cf2f3ecfd20b60b411b1c040a9a2b4fc1f8e7cef41e900007be",
+      "counterfactual_pixel_sha256": "2e4255539bb1a4ffeeb9de83a28e0b5dd28183064f663eb467a0f4ad036900d2"
+    },
+    {
+      "sample_id": "train_00042",
+      "pattern": "for 7 days",
+      "kind": "duration",
+      "token_start": 26,
+      "token_end": 36,
+      "glyph_start": 30,
+      "glyph_end": 31,
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 22,
+      "text_position": [
+        9,
+        14
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Syp Pantoprazole 40 mg AC for 7 days",
+      "prior_beam_prediction": "Syp Pantoprazole 40 mg AC for days",
+      "original_png_sha256": "31b5ec89b499f383a5a16e04ba257099cf5be3f6332455097a577eb5028836e2",
+      "reconstructed_pixel_sha256": "3628d3502a3dd76d1d387d0f7342321a15d3cd3159f2ebc8909c3b71e427a694",
+      "numeric_token": "7",
+      "original_token_bbox": [
+        322,
+        18,
+        333,
+        34
+      ],
+      "modified_token_bbox": [
+        322,
+        18,
+        334,
+        34
+      ],
+      "intervention_region": [
+        322,
+        18,
+        334,
+        34
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "7",
+          "original_bbox": [
+            322,
+            18,
+            333,
+            34
+          ],
+          "modified_bbox": [
+            322,
+            18,
+            334,
+            34
+          ],
+          "requested_scale": 1.1,
+          "realized_scale": 1.0909090909090908,
+          "interpolation": "OpenCV INTER_CUBIC",
+          "center_shift": 0.5,
+          "height_unchanged": true
+        }
+      ],
+      "changed_pixels": 66,
+      "diff_bbox": [
+        323,
+        18,
+        334,
+        34
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "3628d3502a3dd76d1d387d0f7342321a15d3cd3159f2ebc8909c3b71e427a694",
+      "counterfactual_pixel_sha256": "93764edbf5b27982e5be2684fd62197a8a8c2c51b574361e6e26cc01a6d51c59"
+    },
+    {
+      "sample_id": "train_00050",
+      "pattern": "for 7 days",
+      "kind": "duration",
+      "token_start": 23,
+      "token_end": 33,
+      "glyph_start": 27,
+      "glyph_end": 28,
+      "renderer": "calibri",
+      "font_path": "C:\\Windows\\Fonts\\calibri.ttf",
+      "font_sha256": "57e93ff143572bcc092c1f56202d43ddc07bb119aa104c6d7af163470fb551f6",
+      "font_size": 24,
+      "text_position": [
+        9,
+        16
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Amoxicillin 40 mcg SOS for 7 days",
+      "prior_beam_prediction": "Amoxicillin 40 mcg SOS for days",
+      "original_png_sha256": "3a4d6ec4729a1637a7ae938f414387042bc06d7f5c8ee821cd2a39ed0ccb73a9",
+      "reconstructed_pixel_sha256": "37735f8a1d5db46cfabddff642a048a8bfbbbb209f27c46c22a81d35d4452498",
+      "numeric_token": "7",
+      "original_token_bbox": [
+        274,
+        19,
+        285,
+        34
+      ],
+      "modified_token_bbox": [
+        274,
+        19,
+        285,
+        34
+      ],
+      "intervention_region": [
+        274,
+        19,
+        285,
+        34
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "7",
+          "original_bbox": [
+            274,
+            19,
+            285,
+            34
+          ],
+          "modified_bbox": [
+            274,
+            19,
+            286,
+            34
+          ],
+          "requested_scale": 1.1,
+          "realized_scale": 1.0909090909090908,
+          "interpolation": "OpenCV INTER_CUBIC",
+          "center_shift": 0.5,
+          "height_unchanged": true
+        }
+      ],
+      "changed_pixels": 63,
+      "diff_bbox": [
+        274,
+        19,
+        285,
+        34
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "37735f8a1d5db46cfabddff642a048a8bfbbbb209f27c46c22a81d35d4452498",
+      "counterfactual_pixel_sha256": "2d09c0df3bd90fbcbd42092a1ecfcb792cd789f42440a40890afcd5fdb18e412"
+    },
+    {
+      "sample_id": "train_00051",
+      "pattern": "for 7 days",
+      "kind": "duration",
+      "token_start": 22,
+      "token_end": 32,
+      "glyph_start": 26,
+      "glyph_end": 27,
+      "renderer": "cambria",
+      "font_path": "C:\\Windows\\Fonts\\cambria.ttc",
+      "font_sha256": "84e70ccc1664482f4a960442c7a166c91a1b2cf98ff88c33cb73f79403f66d7b",
+      "font_size": 22,
+      "text_position": [
+        10,
+        14
+      ],
+      "safe_area": [
+        4,
+        8,
+        504,
+        56
+      ],
+      "target": "Amoxicillin 10 mcg AC for 7 days",
+      "prior_beam_prediction": "Amoxicillin 10 mcg AC for days",
+      "original_png_sha256": "2fe7d25c4a7c7414dc852d5136e2e94b0ced7b9ebe4d29a84f96320f691183ba",
+      "reconstructed_pixel_sha256": "25424f19672ee7623a983ed750a0aed3bcbc1d9708cb71702898780a44554a0a",
+      "numeric_token": "7",
+      "original_token_bbox": [
+        260,
+        20,
+        271,
+        35
+      ],
+      "modified_token_bbox": [
+        260,
+        20,
+        271,
+        35
+      ],
+      "intervention_region": [
+        260,
+        20,
+        271,
+        35
+      ],
+      "coordinate_changes": [
+        {
+          "symbol": "7",
+          "original_bbox": [
+            260,
+            20,
+            271,
+            35
+          ],
+          "modified_bbox": [
+            260,
+            20,
+            272,
+            35
+          ],
+          "requested_scale": 1.1,
+          "realized_scale": 1.0909090909090908,
+          "interpolation": "OpenCV INTER_CUBIC",
+          "center_shift": 0.5,
+          "height_unchanged": true
+        }
+      ],
+      "changed_pixels": 63,
+      "diff_bbox": [
+        260,
+        20,
+        271,
+        35
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false,
+      "original_pixel_sha256": "25424f19672ee7623a983ed750a0aed3bcbc1d9708cb71702898780a44554a0a",
+      "counterfactual_pixel_sha256": "9bc553f5c14c8fba521d41b0ebb5c74e3a80aa92c513e9b412b82cc56451d995"
+    }
+  ],
+  "frozen_artifacts_unchanged": true
+}

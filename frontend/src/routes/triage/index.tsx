@@ -11,6 +11,10 @@ import {
 import AlertCard from '../../components/triage/AlertCard';
 import { getTriageCopy } from '../../i18n/triage';
 
+function recordingPatientName(name: string) {
+  return /^(synthetic|demo) patient\b/i.test(name.trim()) ? 'Patient' : name;
+}
+
 export default function Triage() {
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(() => {
@@ -102,7 +106,10 @@ export default function Triage() {
     function refreshAlerts() {
       const generation = ++refreshGeneration.current;
       return Promise.all([
-        triageApi.getAlerts({ hospital_id: activeHospitalId }),
+        // Safety alerts can be raised before a patient selects a facility.
+        // The triage role's existing alert endpoint covers all active kiosks;
+        // keep the waiting queue scoped to the selected hospital.
+        triageApi.getAlerts({}),
         triageApi.getQueue(activeHospitalId),
       ])
         .then(([res, queue]: [AlertList, { items: WaitingPatient[] }]) => {
@@ -465,6 +472,9 @@ export default function Triage() {
         </div>
       </header>
 
+      <p className="muted">
+        Safety alerts from all active kiosks; waiting queue for {selectedHospital.name}.
+      </p>
       {/* Metrics Row */}
       <section className="triage-metrics-row" aria-label="Triage Statistics">
         <div className="metric-card total">
@@ -515,11 +525,8 @@ export default function Triage() {
                 >
                   <span>
                     <strong>
-                      {index + 1}. {patient.patient_name}
+                      {index + 1}. {recordingPatientName(patient.patient_name)}
                     </strong>
-                    <span className="muted" style={{ display: 'block', fontSize: '0.8rem' }}>
-                      {patient.hospital_token}
-                    </span>
                   </span>
                   <span className="badge">WAITING</span>
                 </div>

@@ -25,6 +25,12 @@ test('seeded showcase is reviewable with safety and source evidence', async ({ p
   await expect(page.getByTestId('doctor-alerts-banner')).toContainText('RF-CHEST-001');
   await expect(page.getByTestId('doctor-alerts-banner')).toContainText('RF-CHEST-002');
   await expect(page.getByTestId('summary-workspace')).toBeVisible();
+  await page.getByRole('button', { name: /Evidence Attribution/i }).click();
+  await expect(page.getByText('Why is this here?').first()).toBeVisible();
+  await page.getByText('Why is this here?').first().click();
+  await expect(page.getByTestId('summary-workspace')).toContainText(
+    /Reported by|Extracted from|deterministic safety rule/i,
+  );
   await expect(page.getByTestId('document-viewer-panel')).toBeVisible();
   await expect(page.getByTestId('document-image-preview')).toBeVisible();
 });

@@ -138,6 +138,62 @@ export interface InterviewState {
   history: ClinicalHistory | null;
   red_flag_alert?: AlertSummary | null;
   rag_suggestions?: RAGSuggestion[];
+  document_confirmation?: {
+    question_source: 'DOCUMENT_CONFIRMATION';
+    target_field: string;
+    evidence_id: string;
+    source_fact_id: string;
+    source_document_id?: string | null;
+    document_filename?: string | null;
+    page_number?: number | null;
+    bounding_box?: Record<string, unknown> | unknown[] | null;
+    ocr_provider?: string | null;
+    ocr_model?: string | null;
+    original_extracted_value: string;
+    verification_state: string;
+  } | null;
+  continuity_reconfirmation?: {
+    question_source: 'CONTINUITY_RECONFIRMATION';
+    target_field: string;
+    evidence_id: string;
+    source_session_id: string;
+    historical_value: unknown;
+    canonical_field: string;
+    concept?: string | null;
+  } | null;
+}
+
+export type CoverageState =
+  'CONFIRMED' | 'DOCUMENT_SUPPORTED_UNCONFIRMED' | 'CONFLICTED' | 'MISSING' | 'NOT_APPLICABLE';
+
+export interface CoverageResponse {
+  session_id: string;
+  required: number;
+  confirmed: number;
+  document_supported_unconfirmed: number;
+  conflicted: number;
+  missing: number;
+  not_applicable: number;
+  fields: Array<{
+    field: string;
+    label: string;
+    required: boolean;
+    applicable: boolean;
+    state: CoverageState;
+    patient_answer_id?: string | null;
+    provenance: Array<{
+      evidence_id: string;
+      source_fact_id: string;
+      source_document_id?: string | null;
+      document_filename?: string | null;
+      page_number?: number | null;
+      bounding_box?: Record<string, unknown> | unknown[] | null;
+      ocr_provider?: string | null;
+      ocr_model?: string | null;
+      original_extracted_value?: string | null;
+      verification_state: string;
+    }>;
+  }>;
 }
 export interface Submission {
   request_id: string;

@@ -1,0 +1,842 @@
+[
+  {
+    "sample_id": "train_00000",
+    "direction": "1-1-1->1-0-0",
+    "original": {
+      "beam50": "PCM 625 ml 1-1 for 5 days after fod",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": 2,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "PCM 625 ml 1-1 for 5 days after fod",
+          "log_probability": -1.9677422046661377
+        },
+        {
+          "rank": 2,
+          "prediction": "PCM 625 ml 1-1-1 for 5 days after fod",
+          "log_probability": -2.160006523132324
+        },
+        {
+          "rank": 3,
+          "prediction": "PCM 625 ml 1-1 for 5 days after food",
+          "log_probability": -2.423285961151123
+        },
+        {
+          "rank": 4,
+          "prediction": "PCM 625 ml 1-1-1 for 5 days after food",
+          "log_probability": -2.6155505180358887
+        },
+        {
+          "rank": 5,
+          "prediction": "PCM 625 ml 1-1 for 5 days after fd",
+          "log_probability": -2.7589292526245117
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "PCM 625 ml 1-0-0 for 5 days after fod",
+      "projected_beam_token": "1-0-0",
+      "token_correct": true,
+      "exact_token_rank_top5": 1,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "PCM 625 ml 1-0-0 for 5 days after fod",
+          "log_probability": -1.3939012289047241
+        },
+        {
+          "rank": 2,
+          "prediction": "PCM 625 ml 1-0-0 for 5 days after food",
+          "log_probability": -1.9021716117858887
+        },
+        {
+          "rank": 3,
+          "prediction": "PCM 625 ml 1-0-0 for 5 days after fd",
+          "log_probability": -2.1309702396392822
+        },
+        {
+          "rank": 4,
+          "prediction": "PCM 625 ml  1-0-0 for 5 days after fod",
+          "log_probability": -2.166212558746338
+        },
+        {
+          "rank": 5,
+          "prediction": "PCM 625 ml  1-0-0 for 5 days after food",
+          "log_probability": -2.6767539978027344
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00007",
+    "direction": "1-1-1->1-0-0",
+    "original": {
+      "beam50": "Tab PCM 625 g 1-1 for days",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": 2,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab PCM 625 g 1-1 for days",
+          "log_probability": -1.1633929014205933
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab PCM 625 g 1-1-1 for days",
+          "log_probability": -1.5161526203155518
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab PCM 625 g 1-1  for days",
+          "log_probability": -2.306950092315674
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab PCM 625 g 1-1-1  for days",
+          "log_probability": -2.659316062927246
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab PCM 625 g 1-1-1-1 for days",
+          "log_probability": -3.364624261856079
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Tab PCM 625 g 1-0-0 for days",
+      "projected_beam_token": "1-0-0",
+      "token_correct": true,
+      "exact_token_rank_top5": 1,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab PCM 625 g 1-0-0 for days",
+          "log_probability": -0.3485852777957916
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab PCM 625 g 1-0-0 for 7 days",
+          "log_probability": -2.57305645942688
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab PCM 625 g 1-0-0 for 5 days",
+          "log_probability": -2.811591386795044
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab PCM 625 g 1-0-0-0 for days",
+          "log_probability": -3.730229139328003
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab PCM  625 g 1-0-0 for days",
+          "log_probability": -4.38754415512085
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00014",
+    "direction": "1-1-1->1-0-0",
+    "original": {
+      "beam50": "Syp PCM 500 g 1-1 x 3d",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": 2,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp PCM 500 g 1-1 x 3d",
+          "log_probability": -1.297906756401062
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp PCM 500 g 1-1-1 x 3d",
+          "log_probability": -1.7482659816741943
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp PCM 500 g 1-1 x 7d",
+          "log_probability": -2.598027467727661
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp PCM 50 g 1-1 x 3d",
+          "log_probability": -2.9987986087799072
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp PCM 500 g 1-1-1 x 7d",
+          "log_probability": -3.048387050628662
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Syp PCM 500 g 1-0-0 x 3d",
+      "projected_beam_token": "1-0-0",
+      "token_correct": true,
+      "exact_token_rank_top5": 1,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp PCM 500 g 1-0-0 x 3d",
+          "log_probability": -0.7648941278457642
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp PCM 500 g 1-0-0 x 7d",
+          "log_probability": -2.152216672897339
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp PCM 50 g 1-0-0 x 3d",
+          "log_probability": -2.450167179107666
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp PCM 5000 g 1-0-0 x 3d",
+          "log_probability": -2.9704041481018066
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp PCM 500 g 1-0-0 x 73d",
+          "log_probability": -3.088294506072998
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00018",
+    "direction": "1-1-1->1-0-0",
+    "original": {
+      "beam50": "Pantoprazole 5 mg 1-1 x 3d",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": 2,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Pantoprazole 5 mg 1-1 x 3d",
+          "log_probability": -1.4229457378387451
+        },
+        {
+          "rank": 2,
+          "prediction": "Pantoprazole 5 mg 1-1-1 x 3d",
+          "log_probability": -1.5313060283660889
+        },
+        {
+          "rank": 3,
+          "prediction": "Pantoprazole 5 mg 1-1 x 7d",
+          "log_probability": -2.2026238441467285
+        },
+        {
+          "rank": 4,
+          "prediction": "Pantoprazole 5 mg 1-1-1 x 7d",
+          "log_probability": -2.3109850883483887
+        },
+        {
+          "rank": 5,
+          "prediction": "Pantoprazole 5 mg 1-1-1-1 x 3d",
+          "log_probability": -2.904707670211792
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Pantoprazole 5 mg 1-0-0 x 3d",
+      "projected_beam_token": "1-0-0",
+      "token_correct": true,
+      "exact_token_rank_top5": 1,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Pantoprazole 5 mg 1-0-0 x 3d",
+          "log_probability": -0.849433958530426
+        },
+        {
+          "rank": 2,
+          "prediction": "Pantoprazole 5 mg 1-0-0 x 7d",
+          "log_probability": -1.7001547813415527
+        },
+        {
+          "rank": 3,
+          "prediction": "Pantoprazole 5 mg 1-0-0 x 73d",
+          "log_probability": -2.3117048740386963
+        },
+        {
+          "rank": 4,
+          "prediction": "Pantoprazole 5 mg 1-0-0 x d",
+          "log_probability": -2.5823206901550293
+        },
+        {
+          "rank": 5,
+          "prediction": "Pantoprazole 5 mg 1-0-0 x 37d",
+          "log_probability": -3.2580509185791016
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00061",
+    "direction": "1-1-1->1-0-0",
+    "original": {
+      "beam50": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ed",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": 5,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ed",
+          "log_probability": -5.2594428062438965
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp  Cetirizine  500  mcg  1-1  for 5 days  as ed",
+          "log_probability": -5.348743438720703
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as eded",
+          "log_probability": -5.687566757202148
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1  for 5 days  as ned",
+          "log_probability": -5.734294414520264
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp  Cetirizine  50  mcg  1-1-1  for 5 days  as ed",
+          "log_probability": -5.737273216247559
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Syp  Cetirizine  50  mcg  1-0-0  for 5 days  as ed",
+      "projected_beam_token": "1-0-0",
+      "token_correct": true,
+      "exact_token_rank_top5": 1,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syp  Cetirizine  50  mcg  1-0-0  for 5 days  as ed",
+          "log_probability": -4.276212215423584
+        },
+        {
+          "rank": 2,
+          "prediction": "Syp  Cetirizine  500  mcg  1-0-0  for 5 days  as ed",
+          "log_probability": -4.590672492980957
+        },
+        {
+          "rank": 3,
+          "prediction": "Syp  Cetirizine  50  mcg  1-0-0  for 5 days  as eded",
+          "log_probability": -4.781172752380371
+        },
+        {
+          "rank": 4,
+          "prediction": "Syp  Cetirizine  50  mcg  1-0-0  for 5 days  as ned",
+          "log_probability": -4.988499641418457
+        },
+        {
+          "rank": 5,
+          "prediction": "Syp  Cetirizine  500  mcg  1-0-0  for 5 days  as eded",
+          "log_probability": -5.124361515045166
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00084",
+    "direction": "1-1-1->1-0-0",
+    "original": {
+      "beam50": "Syrup PCM 625 mcg 1-1 for days",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": 2,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syrup PCM 625 mcg 1-1 for days",
+          "log_probability": -1.0024855136871338
+        },
+        {
+          "rank": 2,
+          "prediction": "Syrup PCM 625 mcg 1-1-1 for days",
+          "log_probability": -1.1564218997955322
+        },
+        {
+          "rank": 3,
+          "prediction": "Syrup PCM 625 mcg 1-1-1-1 for days",
+          "log_probability": -3.0046133995056152
+        },
+        {
+          "rank": 4,
+          "prediction": "Syrup PCM 625 mcg 1-1 for 7 days",
+          "log_probability": -3.2131524085998535
+        },
+        {
+          "rank": 5,
+          "prediction": "Syrup PCM 625 mcg 1-1-1 for 7 days",
+          "log_probability": -3.36708927154541
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Syrup PCM 625 mcg 1-0-0 for days",
+      "projected_beam_token": "1-0-0",
+      "token_correct": true,
+      "exact_token_rank_top5": 1,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syrup PCM 625 mcg 1-0-0 for days",
+          "log_probability": -0.3310641944408417
+        },
+        {
+          "rank": 2,
+          "prediction": "Syrup PCM 625 mcg 1-0-0 for 7 days",
+          "log_probability": -2.550307035446167
+        },
+        {
+          "rank": 3,
+          "prediction": "Syrup PCM 625 mcg 1-0-0 for 5 days",
+          "log_probability": -2.834653615951538
+        },
+        {
+          "rank": 4,
+          "prediction": "Syrup PCM 625 mcg 1-0-0-0 for days",
+          "log_probability": -4.3010382652282715
+        },
+        {
+          "rank": 5,
+          "prediction": "Syrup PCM  625 mcg 1-0-0 for days",
+          "log_probability": -4.7878193855285645
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00104",
+    "direction": "1-0-0->1-1-1",
+    "original": {
+      "beam50": "Pantoprazole  5  g  0-1",
+      "projected_beam_token": "0-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Pantoprazole  5  g  0-1",
+          "log_probability": -2.176903486251831
+        },
+        {
+          "rank": 2,
+          "prediction": "Pantoprazole  5  g  1-1",
+          "log_probability": -2.2911183834075928
+        },
+        {
+          "rank": 3,
+          "prediction": "Pantoprazole  5  g  -1",
+          "log_probability": -2.36470103263855
+        },
+        {
+          "rank": 4,
+          "prediction": "Pantoprazole  5  g  -0-1",
+          "log_probability": -3.583071708679199
+        },
+        {
+          "rank": 5,
+          "prediction": "Pantoprazole  5  g  -1-1",
+          "log_probability": -3.7088723182678223
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Pantoprazole  5  g  1-1",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Pantoprazole  5  g  1-1",
+          "log_probability": -2.140946865081787
+        },
+        {
+          "rank": 2,
+          "prediction": "Pantoprazole  5  g  0-1",
+          "log_probability": -2.2976505756378174
+        },
+        {
+          "rank": 3,
+          "prediction": "Pantoprazole  5  g  -1",
+          "log_probability": -2.3225367069244385
+        },
+        {
+          "rank": 4,
+          "prediction": "Pantoprazole  5  g  -1-1",
+          "log_probability": -3.6215789318084717
+        },
+        {
+          "rank": 5,
+          "prediction": "Pantoprazole  5  g  -0-1",
+          "log_probability": -3.62330961227417
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00159",
+    "direction": "1-0-0->1-1-1",
+    "original": {
+      "beam50": "Tab  PCM  40  mg  0-1",
+      "projected_beam_token": "0-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab  PCM  40  mg  0-1",
+          "log_probability": -2.4338181018829346
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab  PCM  40  mg  1-1",
+          "log_probability": -2.4508755207061768
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab  PCM  40  mg  -1",
+          "log_probability": -2.9809086322784424
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab  PCM  40  mg  0-1-1",
+          "log_probability": -3.8658955097198486
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab  PCM  40  mg  1-1-1",
+          "log_probability": -3.9158599376678467
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Tab  PCM  40  mg  1-1",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": 4,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab  PCM  40  mg  1-1",
+          "log_probability": -2.257181406021118
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab  PCM  40  mg  0-1",
+          "log_probability": -2.546011209487915
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab  PCM  40  mg  -1",
+          "log_probability": -2.8439085483551025
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab  PCM  40  mg  1-1-1",
+          "log_probability": -3.637075901031494
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab  PCM   40  mg  1-1",
+          "log_probability": -3.9013149738311768
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00385",
+    "direction": "1-0-0->1-1-1",
+    "original": {
+      "beam50": "Tab Pantoprazole 625 g 0-1",
+      "projected_beam_token": "0-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab Pantoprazole 625 g 0-1",
+          "log_probability": -1.9120718240737915
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab Pantoprazole 625 g 1-1",
+          "log_probability": -2.2508270740509033
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab Pantoprazole 625 g -1",
+          "log_probability": -2.6033222675323486
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab Pantoprazole 625 g 0-0-1",
+          "log_probability": -3.304823398590088
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab Pantoprazole 625 g 0-1-1",
+          "log_probability": -3.539476156234741
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Tab Pantoprazole 625 g 0-1",
+      "projected_beam_token": "0-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tab Pantoprazole 625 g 0-1",
+          "log_probability": -2.0023248195648193
+        },
+        {
+          "rank": 2,
+          "prediction": "Tab Pantoprazole 625 g 1-1",
+          "log_probability": -2.062703847885132
+        },
+        {
+          "rank": 3,
+          "prediction": "Tab Pantoprazole 625 g -1",
+          "log_probability": -2.4124224185943604
+        },
+        {
+          "rank": 4,
+          "prediction": "Tab Pantoprazole 625 g 0-0-1",
+          "log_probability": -3.487708806991577
+        },
+        {
+          "rank": 5,
+          "prediction": "Tab Pantoprazole 625 g -0-1",
+          "log_probability": -3.5018179416656494
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00443",
+    "direction": "1-0-0->1-1-1",
+    "original": {
+      "beam50": "Syrup  Pantoprazole  650  mcg  0-1",
+      "projected_beam_token": "0-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-1",
+          "log_probability": -2.382685661315918
+        },
+        {
+          "rank": 2,
+          "prediction": "Syrup  Pantoprazole  650  mcg  -1",
+          "log_probability": -2.817776679992676
+        },
+        {
+          "rank": 3,
+          "prediction": "Syrup  Pantoprazole  650  mcg  1-1",
+          "log_probability": -2.82327938079834
+        },
+        {
+          "rank": 4,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-0-1",
+          "log_probability": -3.698575258255005
+        },
+        {
+          "rank": 5,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-0",
+          "log_probability": -3.8683359622955322
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Syrup  Pantoprazole  650  mcg  1-1",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": 5,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Syrup  Pantoprazole  650  mcg  1-1",
+          "log_probability": -2.252091646194458
+        },
+        {
+          "rank": 2,
+          "prediction": "Syrup  Pantoprazole  650  mcg  0-1",
+          "log_probability": -2.4939708709716797
+        },
+        {
+          "rank": 3,
+          "prediction": "Syrup  Pantoprazole  650  mcg  -1",
+          "log_probability": -2.8412179946899414
+        },
+        {
+          "rank": 4,
+          "prediction": "Syrup  Pantoprazole  650  mcg  1-0-1",
+          "log_probability": -3.7344887256622314
+        },
+        {
+          "rank": 5,
+          "prediction": "Syrup  Pantoprazole  650  mcg  1-1-1",
+          "log_probability": -3.8361852169036865
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00551",
+    "direction": "1-0-0->1-1-1",
+    "original": {
+      "beam50": "Tablet  Metfrmin  650  mg  1-0  for 5 days  as needed",
+      "projected_beam_token": "1-0",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tablet  Metfrmin  650  mg  1-0  for 5 days  as needed",
+          "log_probability": -5.819214820861816
+        },
+        {
+          "rank": 2,
+          "prediction": "Tablet  Metfrmin  650  mg  1-0  for 5 days  as need",
+          "log_probability": -5.976704120635986
+        },
+        {
+          "rank": 3,
+          "prediction": "Tablet  Metfrmin  650  mg  1-0  for 5 days  as neded",
+          "log_probability": -6.211203098297119
+        },
+        {
+          "rank": 4,
+          "prediction": "Tablet  Metfrmin  6250  mg  1-0  for 5 days  as needed",
+          "log_probability": -6.434930324554443
+        },
+        {
+          "rank": 5,
+          "prediction": "Tablet  Metfrmin  6250  mg  1-0  for 5 days  as need",
+          "log_probability": -6.464571952819824
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Tablet  Metfrmin  650  mg  1-1  for 5 days  as needed",
+      "projected_beam_token": "1-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Tablet  Metfrmin  650  mg  1-1  for 5 days  as needed",
+          "log_probability": -6.536055088043213
+        },
+        {
+          "rank": 2,
+          "prediction": "Tablet Metfrmin  650  mg  1-1  for 5 days  as needed",
+          "log_probability": -6.585957050323486
+        },
+        {
+          "rank": 3,
+          "prediction": "Tablet  Metfrmin  650  mg  1-1  for 5 days  as need",
+          "log_probability": -6.718769550323486
+        },
+        {
+          "rank": 4,
+          "prediction": "Tablet Metfrmin  650  mg  1-1  for 5 days  as need",
+          "log_probability": -6.76867151260376
+        },
+        {
+          "rank": 5,
+          "prediction": "Tablet  Metfrmin  650  mg  1-1  for 5 days  as neded",
+          "log_probability": -7.0455451011657715
+        }
+      ]
+    }
+  },
+  {
+    "sample_id": "train_00658",
+    "direction": "1-0-0->1-1-1",
+    "original": {
+      "beam50": "Paracetamol 5 mcg 0-1",
+      "projected_beam_token": "0-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Paracetamol 5 mcg 0-1",
+          "log_probability": -2.7097280025482178
+        },
+        {
+          "rank": 2,
+          "prediction": "Paracetamol 5 mcg -1",
+          "log_probability": -2.845863103866577
+        },
+        {
+          "rank": 3,
+          "prediction": "Paracetamol 5 mcg 1-1",
+          "log_probability": -2.869746685028076
+        },
+        {
+          "rank": 4,
+          "prediction": "Pacetamol 5 mcg 0-1",
+          "log_probability": -2.97206711769104
+        },
+        {
+          "rank": 5,
+          "prediction": "Pacetamol 5 mcg -1",
+          "log_probability": -3.1082022190093994
+        }
+      ]
+    },
+    "counterfactual": {
+      "beam50": "Paracetamol 5 mcg -1",
+      "projected_beam_token": "-1",
+      "token_correct": false,
+      "exact_token_rank_top5": null,
+      "beam_candidates": [
+        {
+          "rank": 1,
+          "prediction": "Paracetamol 5 mcg -1",
+          "log_probability": -2.686957359313965
+        },
+        {
+          "rank": 2,
+          "prediction": "Paracetamol 5 mcg 1-1",
+          "log_probability": -2.7601261138916016
+        },
+        {
+          "rank": 3,
+          "prediction": "Paracetamol 5 mcg 0-1",
+          "log_probability": -2.7612640857696533
+        },
+        {
+          "rank": 4,
+          "prediction": "Pacetamol 5 mcg -1",
+          "log_probability": -2.9433157444000244
+        },
+        {
+          "rank": 5,
+          "prediction": "Pacetamol 5 mcg 1-1",
+          "log_probability": -3.016484498977661
+        }
+      ]
+    }
+  }
+]

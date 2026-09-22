@@ -1,0 +1,8 @@
+ImportError while loading conftest 'C:\MEDIKIOSK\backend\tests\conftest.py'.
+backend\tests\conftest.py:5: in <module>
+    from fastapi.testclient import TestClient
+backend\.venv\Lib\site-packages\fastapi\__init__.py:7: in <module>
+    from .applications import FastAPI as FastAPI
+backend\.venv\Lib\site-packages\fastapi\applications.py:6: in <module>
+    from annotated_doc import Doc
+E   ModuleNotFoundError: No module named 'annotated_doc'

@@ -70,20 +70,38 @@ def parse_prescription(raw_text: str) -> dict[str, Any]:
 
     rx_section = False
     med_pattern = re.compile(
-        r"^(?:\d+[\.\)]\s*)?(?:(Tab|Cap|Syp|Inj|Oint)\.?\s+)?([A-Za-z0-9\s]+?)\s+(\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g|IU)(?:/\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g|IU))?)?"
-        r"(?:\s*-\s*|\s+)(.+)?$",
+        r"^(?:\d+[\.\)]\s*)?(?:(Tab|Cap|Syp|Inj|Oint)\.?\s+)?([A-Za-z0-9\s]+?)(?:\s+(\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g|IU)(?:/\d+(?:\.\d+)?\s*(?:mg|ml|mcg|g|IU))?))?(?:\s*-\s*|\s+(.+))?$",
         re.IGNORECASE,
     )
 
     for line in lines:
-        if re.search(r"\bRx\b", line, re.IGNORECASE):
+        if re.search(r"\b(?:Rx|Prescription)\b", line, re.IGNORECASE):
             rx_section = True
+            continue
+
+        # Instructions are commonly printed on the line after the drug and dose.
+        if medications and re.match(r"^(?:take|use|apply|inject)\b", line, re.IGNORECASE):
+            previous = medications[-1]
+            previous["instructions"] = line
+            if previous["frequency"] is None:
+                freq_match = re.search(
+                    r"\b(OD|BD|TDS|QDS|HS|SOS|once daily|twice daily|thrice daily)\b",
+                    line,
+                    re.IGNORECASE,
+                )
+                if freq_match:
+                    frequency = freq_match.group(1)
+                    previous["frequency"] = (
+                        frequency.title() if " " in frequency else frequency.upper()
+                    )
             continue
 
         if rx_section or re.match(r"^(?:\d+[\.\)]\s*)?(?:Tab|Cap|Syp|Inj)\b", line, re.IGNORECASE):
             match = med_pattern.match(line)
             if match:
                 form, raw_name, dosage, rest = match.groups()
+                if not form and not dosage:
+                    continue
                 clean_name = (form + " " + raw_name).strip() if form else raw_name.strip()
                 if len(clean_name) < 3:
                     continue
@@ -97,7 +115,8 @@ def parse_prescription(raw_text: str) -> dict[str, Any]:
                         re.IGNORECASE,
                     )
                     if freq_match:
-                        freq = freq_match.group(1).upper()
+                        frequency = freq_match.group(1)
+                        freq = frequency.title() if " " in frequency else frequency.upper()
 
                     dur_match = re.search(r"x\s*(\d+\s*(?:days|weeks|months|d|w))", rest, re.IGNORECASE)
                     if dur_match:

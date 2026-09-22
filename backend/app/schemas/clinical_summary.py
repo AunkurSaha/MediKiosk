@@ -3,6 +3,7 @@ from typing import Any, Literal
 from pydantic import Field
 
 from .common import APIModel, UTCDate
+from .coverage import CoverageResponse
 
 
 class EvidenceReference(APIModel):
@@ -16,10 +17,26 @@ class EvidenceReference(APIModel):
         "document",
         "alert",
         "discrepancy",
+        "timeline",
     ]
     source_id: str
     source_text: str
     source_metadata: dict[str, Any] = Field(default_factory=dict)
+    status: Literal[
+        "patient_reported",
+        "patient_confirmed",
+        "clinician_verified",
+        "document_unverified",
+        "conflicting",
+        "normalized_unverified",
+        "safety_rule",
+        "timeline",
+        "not_reported",
+    ] = "patient_reported"
+    badge: str = "Patient"
+    evidence_refs: list[str] = Field(default_factory=list)
+    source_summary: list[str] = Field(default_factory=list)
+    provenance_explanation: list[str] = Field(default_factory=list)
 
 
 class StructuredSummarySection(APIModel):
@@ -38,6 +55,28 @@ class StructuredClinicalSummary(APIModel):
     sections: list[StructuredSummarySection] = Field(default_factory=list)
     evidence_references: list[EvidenceReference] = Field(default_factory=list)
     disclaimer: str | None = None
+    coverage: CoverageResponse | None = None
+
+
+class PreArrivalPacket(APIModel):
+    """Read-only doctor packet. The opaque reference contains no clinical data."""
+
+    packet_reference: str
+    visit_context: dict[str, Any] = Field(default_factory=dict)
+    facility: dict[str, Any] | None = None
+    selected_doctor: dict[str, Any] | None = None
+    queue: dict[str, Any] | None = None
+    routing: dict[str, Any] | None = None
+    chief_complaint: str | None = None
+    structured_history: list[dict[str, Any]] = Field(default_factory=list)
+    documents: list[dict[str, Any]] = Field(default_factory=list)
+    timeline: list[dict[str, Any]] = Field(default_factory=list)
+    red_flags: list[dict[str, Any]] = Field(default_factory=list)
+    coverage: CoverageResponse | None = None
+    clinical_summary_id: str
+    clinical_summary_status: str
+    clinical_summary: StructuredClinicalSummary | None = None
+    conflicts: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class ClinicalSummaryUpdate(APIModel):
@@ -100,4 +139,5 @@ class ClinicalSummary(APIModel):
     updated_at: UTCDate | None = None
     structured_summary: StructuredClinicalSummary | None = None
     evidence: list[EvidenceReference] | None = None
-
+    coverage: CoverageResponse | None = None
+    pre_arrival_packet: PreArrivalPacket | None = None

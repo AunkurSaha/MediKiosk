@@ -1,0 +1,189 @@
+{
+  "train": {
+    "n": 263,
+    "beam_correct": 153,
+    "greedy_correct": 124,
+    "transitions": [
+      {
+        "truth": "1-1-1",
+        "prediction": "1-1",
+        "n": 53
+      },
+      {
+        "truth": "1-0-1",
+        "prediction": "1-0-1",
+        "n": 49
+      },
+      {
+        "truth": "0-0-1",
+        "prediction": "0-0-1",
+        "n": 39
+      },
+      {
+        "truth": "1-0-0",
+        "prediction": "1-0-0",
+        "n": 37
+      },
+      {
+        "truth": "0-1-0",
+        "prediction": "0-1-0",
+        "n": 23
+      },
+      {
+        "truth": "0-1-0",
+        "prediction": "0-1",
+        "n": 12
+      },
+      {
+        "truth": "0-1-0",
+        "prediction": "0-0",
+        "n": 9
+      },
+      {
+        "truth": "1-0-1",
+        "prediction": "0-1",
+        "n": 8
+      },
+      {
+        "truth": "0-0-1",
+        "prediction": "0-1",
+        "n": 7
+      },
+      {
+        "truth": "1-0-0",
+        "prediction": "0-1",
+        "n": 6
+      },
+      {
+        "truth": "1-1-1",
+        "prediction": "1-1-1",
+        "n": 5
+      },
+      {
+        "truth": "0-0-1",
+        "prediction": "-1",
+        "n": 3
+      },
+      {
+        "truth": "1-1-1",
+        "prediction": "-1",
+        "n": 3
+      },
+      {
+        "truth": "0-0-1",
+        "prediction": "1-1",
+        "n": 2
+      },
+      {
+        "truth": "1-1-1",
+        "prediction": "1-1 ",
+        "n": 2
+      },
+      {
+        "truth": "0-1-0",
+        "prediction": " 0-1-0",
+        "n": 1
+      },
+      {
+        "truth": "1-0-0",
+        "prediction": "1-0",
+        "n": 1
+      },
+      {
+        "truth": "1-0-1",
+        "prediction": "-1",
+        "n": 1
+      },
+      {
+        "truth": "1-0-1",
+        "prediction": "1-1",
+        "n": 1
+      },
+      {
+        "truth": "1-1-1",
+        "prediction": " 1-1",
+        "n": 1
+      }
+    ],
+    "edit_counts": {
+      "digit_deletion": 115,
+      "hyphen_deletion": 107,
+      "digit_substitution": 9,
+      "insertion": 1
+    },
+    "prefix_deleted": 24,
+    "suffix_deleted": 64,
+    "multi_character_deletion": 106
+  },
+  "validation": {
+    "n": 35,
+    "beam_correct": 26,
+    "greedy_correct": 22,
+    "transitions": [
+      {
+        "truth": "0-1-0",
+        "prediction": "0-1-0",
+        "n": 8
+      },
+      {
+        "truth": "1-0-0",
+        "prediction": "1-0-0",
+        "n": 7
+      },
+      {
+        "truth": "0-0-1",
+        "prediction": "0-0-1",
+        "n": 5
+      },
+      {
+        "truth": "0-1-0",
+        "prediction": "0-1-1-0",
+        "n": 3
+      },
+      {
+        "truth": "1-0-1",
+        "prediction": "1-0-1",
+        "n": 3
+      },
+      {
+        "truth": "1-1-1",
+        "prediction": "1-1-1",
+        "n": 3
+      },
+      {
+        "truth": "1-1-1",
+        "prediction": "1-1",
+        "n": 2
+      },
+      {
+        "truth": "1-0-0",
+        "prediction": " -1",
+        "n": 1
+      },
+      {
+        "truth": "1-0-0",
+        "prediction": "0-1",
+        "n": 1
+      },
+      {
+        "truth": "1-0-1",
+        "prediction": " 1-0-1",
+        "n": 1
+      },
+      {
+        "truth": "1-1-1",
+        "prediction": "-1",
+        "n": 1
+      }
+    ],
+    "edit_counts": {
+      "digit_deletion": 6,
+      "hyphen_deletion": 5,
+      "insertion": 7,
+      "digit_substitution": 3
+    },
+    "prefix_deleted": 4,
+    "suffix_deleted": 1,
+    "multi_character_deletion": 5
+  }
+}

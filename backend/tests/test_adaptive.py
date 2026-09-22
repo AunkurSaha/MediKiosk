@@ -432,6 +432,87 @@ def test_contains_condition_and_inactive_parent_do_not_activate_descendant():
     assert "hpi.associated_details" not in InterviewEngine(flow, {}).pending
 
 
+def _fever_fact(question_id, value, raw_value="reported"):
+    flow = registry()["fever"]
+    question = next(q for _, q in flow.questions() if q.question_id == question_id)
+    return Fact(
+        answer_id=str(uuid4()),
+        question_id=question_id,
+        field=question.field,
+        label=question.text,
+        status="answered",
+        value=value,
+        raw_value=raw_value,
+        source="touch",
+        language="en",
+        recorded_at="2026-09-22T00:00:00Z",
+    )
+
+
+def test_fever_routine_core_is_minimum_necessary_after_rapid_and_document_coverage():
+    flow = registry()["fever"]
+    answers = {
+        "chief_complaint.description": _fever_fact(
+            "chief_complaint.description", "Fever since yesterday with chills and body ache."
+        ),
+        "hpi.temperature": _fever_fact("hpi.temperature", 38, "38"),
+        "medications.any": _fever_fact("medications.any", True, "Yes"),
+        "medications.details": _fever_fact(
+            "medications.details", "Metformin 500 mg Twice Daily", "Metformin 500 mg Twice Daily"
+        ),
+    }
+    expected = [
+        "hpi.onset",
+        "hpi.timing",
+        "hpi.associated",
+        "past_medical_history.conditions",
+        "allergies.any",
+        "review_of_systems.details",
+    ]
+
+    assert InterviewEngine(flow, answers).pending == expected
+
+
+@pytest.mark.parametrize(
+    "selected,expected_child",
+    [
+        (["cough"], "hpi.associated_details"),
+        (["gastrointestinal"], "hpi.gastrointestinal_details"),
+        (["urinary"], "hpi.urinary_details"),
+        (["rash"], "hpi.rash_details"),
+    ],
+)
+def test_fever_only_selected_symptom_branch_activates(selected, expected_child):
+    flow = registry()["fever"]
+    engine = InterviewEngine(
+        flow, {"hpi.associated": _fever_fact("hpi.associated", selected)}
+    )
+    symptom_children = {
+        "hpi.associated_details",
+        "hpi.gastrointestinal_details",
+        "hpi.abdominal_details",
+        "hpi.urinary_details",
+        "hpi.rash_details",
+    }
+
+    assert set(engine.pending).intersection(symptom_children) == {expected_child}
+
+
+def test_fever_none_selected_suppresses_all_symptom_children():
+    flow = registry()["fever"]
+    engine = InterviewEngine(
+        flow, {"hpi.associated": _fever_fact("hpi.associated", ["none"])}
+    )
+
+    assert not {
+        "hpi.associated_details",
+        "hpi.gastrointestinal_details",
+        "hpi.abdominal_details",
+        "hpi.urinary_details",
+        "hpi.rash_details",
+    }.intersection(engine.pending)
+
+
 def test_saved_flow_snapshot_survives_registry_change(client, monkeypatch):
     session_id, before = selected(client)
     changed = registry()["chest_pain"].model_copy(deep=True)

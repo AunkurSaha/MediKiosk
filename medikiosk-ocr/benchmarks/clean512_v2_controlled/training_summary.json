@@ -1,0 +1,370 @@
+{
+  "label": "This is a newly specified controlled clean512_v2 baseline, not an exact reproduction of the historical interrupted training run.",
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 155.47231223366478,
+      "validation_loss": 165.25000190734863,
+      "validation": {
+        "cer": 0.9647602541883304,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 293.35966060000646
+    },
+    {
+      "epoch": 2,
+      "train_loss": 113.25009259310636,
+      "validation_loss": 105.75040817260742,
+      "validation": {
+        "cer": 0.9844020797227037,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "early_stopping_counter": 1,
+      "elapsed_seconds": 549.5135725
+    },
+    {
+      "epoch": 3,
+      "train_loss": 97.61977039683948,
+      "validation_loss": 90.80295181274414,
+      "validation": {
+        "cer": 0.9754477180820335,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "early_stopping_counter": 2,
+      "elapsed_seconds": 804.7783051000006
+    },
+    {
+      "epoch": 4,
+      "train_loss": 84.32266720858487,
+      "validation_loss": 76.28632736206055,
+      "validation": {
+        "cer": 0.9075678798382438,
+        "wer": 1.0,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 1058.9798448000074
+    },
+    {
+      "epoch": 5,
+      "train_loss": 73.357177734375,
+      "validation_loss": 65.63326835632324,
+      "validation": {
+        "cer": 0.8541305603697285,
+        "wer": 0.9943019943019943,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 1320.1761098999996
+    },
+    {
+      "epoch": 6,
+      "train_loss": 62.715776443481445,
+      "validation_loss": 57.10684871673584,
+      "validation": {
+        "cer": 0.7772963604852686,
+        "wer": 0.9472934472934473,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.0,
+        "dose": 0.0,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 1575.48841060001
+    },
+    {
+      "epoch": 7,
+      "train_loss": 52.63358341563832,
+      "validation_loss": 43.51522350311279,
+      "validation": {
+        "cer": 0.646735990756788,
+        "wer": 0.9259259259259259,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.07,
+        "dose": 0.02,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 1841.9547303
+    },
+    {
+      "epoch": 8,
+      "train_loss": 44.00387607921254,
+      "validation_loss": 53.794782638549805,
+      "validation": {
+        "cer": 0.6718659734257655,
+        "wer": 0.9501424501424501,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.05,
+        "dose": 0.0,
+        "frequency": 0.01,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "early_stopping_counter": 1,
+      "elapsed_seconds": 2092.2488180000073
+    },
+    {
+      "epoch": 9,
+      "train_loss": 36.33113453604958,
+      "validation_loss": 42.981143951416016,
+      "validation": {
+        "cer": 0.5817446562680532,
+        "wer": 0.8660968660968661,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.12,
+        "dose": 0.02,
+        "frequency": 0.0,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 2338.7702560000034
+    },
+    {
+      "epoch": 10,
+      "train_loss": 30.32233290238814,
+      "validation_loss": 57.571072578430176,
+      "validation": {
+        "cer": 0.608318890814558,
+        "wer": 0.896011396011396,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.12,
+        "dose": 0.05,
+        "frequency": 0.01,
+        "duration": 0.4
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "early_stopping_counter": 1,
+      "elapsed_seconds": 2661.304066900004
+    },
+    {
+      "epoch": 11,
+      "train_loss": 24.488360665061258,
+      "validation_loss": 24.18869113922119,
+      "validation": {
+        "cer": 0.3396880415944541,
+        "wer": 0.6353276353276354,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.16,
+        "dose": 0.29,
+        "frequency": 0.24,
+        "duration": 0.41
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 3138.193610800008
+    },
+    {
+      "epoch": 12,
+      "train_loss": 20.06337868083607,
+      "validation_loss": 18.099340438842773,
+      "validation": {
+        "cer": 0.27469670710571925,
+        "wer": 0.5683760683760684,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.22,
+        "dose": 0.26,
+        "frequency": 0.23,
+        "duration": 0.52
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 3670.099496099996
+    },
+    {
+      "epoch": 13,
+      "train_loss": 16.84799861907959,
+      "validation_loss": 22.816736698150635,
+      "validation": {
+        "cer": 0.2536106296938186,
+        "wer": 0.5384615384615384,
+        "exact_line_accuracy": 0.01,
+        "medicine": 0.37,
+        "dose": 0.19,
+        "frequency": 0.31,
+        "duration": 0.59
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 4203.752955100004
+    },
+    {
+      "epoch": 14,
+      "train_loss": 14.106937495144932,
+      "validation_loss": 27.256282806396484,
+      "validation": {
+        "cer": 0.2758521086077412,
+        "wer": 0.5370370370370371,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.39,
+        "dose": 0.23,
+        "frequency": 0.3,
+        "duration": 0.57
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "early_stopping_counter": 1,
+      "elapsed_seconds": 17199.851357100008
+    },
+    {
+      "epoch": 15,
+      "train_loss": 12.054064880717885,
+      "validation_loss": 20.830652236938477,
+      "validation": {
+        "cer": 0.1975736568457539,
+        "wer": 0.37749287749287747,
+        "exact_line_accuracy": 0.03,
+        "medicine": 0.41,
+        "dose": 0.58,
+        "frequency": 0.52,
+        "duration": 0.6
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 17711.168491100005
+    },
+    {
+      "epoch": 16,
+      "train_loss": 10.628480911254883,
+      "validation_loss": 28.105250358581543,
+      "validation": {
+        "cer": 0.24003466204506066,
+        "wer": 0.48005698005698005,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.47,
+        "dose": 0.17,
+        "frequency": 0.42,
+        "duration": 0.55
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "early_stopping_counter": 1,
+      "elapsed_seconds": 18230.510701000007
+    },
+    {
+      "epoch": 17,
+      "train_loss": 9.187907912514426,
+      "validation_loss": 12.41214656829834,
+      "validation": {
+        "cer": 0.14355863662622761,
+        "wer": 0.2863247863247863,
+        "exact_line_accuracy": 0.03,
+        "medicine": 0.6,
+        "dose": 0.6,
+        "frequency": 0.61,
+        "duration": 0.69
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 18747.814054300004
+    },
+    {
+      "epoch": 18,
+      "train_loss": 8.478914369236339,
+      "validation_loss": 28.74131441116333,
+      "validation": {
+        "cer": 0.18370883882149047,
+        "wer": 0.36182336182336183,
+        "exact_line_accuracy": 0.0,
+        "medicine": 0.62,
+        "dose": 0.3,
+        "frequency": 0.49,
+        "duration": 0.68
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "early_stopping_counter": 1,
+      "elapsed_seconds": 19268.074703200007
+    },
+    {
+      "epoch": 19,
+      "train_loss": 7.119808998974887,
+      "validation_loss": 10.168588161468506,
+      "validation": {
+        "cer": 0.11987290583477758,
+        "wer": 0.28062678062678065,
+        "exact_line_accuracy": 0.04,
+        "medicine": 0.68,
+        "dose": 0.61,
+        "frequency": 0.62,
+        "duration": 0.73
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": true,
+      "early_stopping_counter": 0,
+      "elapsed_seconds": 19790.780288399998
+    },
+    {
+      "epoch": 20,
+      "train_loss": 6.969546014612371,
+      "validation_loss": 11.057047605514526,
+      "validation": {
+        "cer": 0.1322934719815136,
+        "wer": 0.25925925925925924,
+        "exact_line_accuracy": 0.05,
+        "medicine": 0.69,
+        "dose": 0.48,
+        "frequency": 0.65,
+        "duration": 0.75
+      },
+      "learning_rate": 0.0010000000474974513,
+      "checkpoint_improved": false,
+      "early_stopping_counter": 1,
+      "elapsed_seconds": 21037.08741780001
+    }
+  ],
+  "best_epoch": 19,
+  "best_validation_cer": 0.11987290583477758,
+  "stopping_epoch": 20,
+  "early_stopping_triggered": false,
+  "checkpoint_sha256": "c7dda1f89025f2053429fc2a16fb72a5ec569a1ecf30e3e8517fe69af182395b"
+}

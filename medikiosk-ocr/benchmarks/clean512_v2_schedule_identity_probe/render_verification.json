@@ -1,0 +1,1782 @@
+{
+  "all_originals_exact": true,
+  "zero_control_violations": true,
+  "pairs": [
+    {
+      "sample_id": "train_00000",
+      "source_schedule": "1-1-1",
+      "counterfactual_schedule": "1-0-0",
+      "start": 11,
+      "end": 16,
+      "target": "PCM 625 ml 1-1-1 for 5 days after food",
+      "counterfactual_target": "PCM 625 ml 1-0-0 for 5 days after food",
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 22,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "139111a732f5aaf2ac0f26f106988dbc0f84cc5682b71ed5bef14343d716df70",
+      "reconstructed_pixel_sha256": "e91372aa1fb355d890013fed6d9423a0b8707b175b27417279d99f34eac65801",
+      "counterfactual_pixel_sha256": "8164ef3085166c548d11c4a65e2af2ac8733cfeaf7e4550fc52aaed01152c643",
+      "source_bbox": [
+        135,
+        18,
+        180,
+        34
+      ],
+      "replacement_bbox": [
+        135,
+        18,
+        183,
+        34
+      ],
+      "intervention_region": [
+        135,
+        18,
+        183,
+        34
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            135,
+            18,
+            142,
+            34
+          ],
+          "replacement_bbox": [
+            135,
+            18,
+            142,
+            34
+          ],
+          "source_center_x": 138.5,
+          "replacement_center_x": 138.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            145,
+            27,
+            152,
+            29
+          ],
+          "replacement_bbox": [
+            145,
+            27,
+            152,
+            29
+          ],
+          "source_center_x": 148.5,
+          "replacement_center_x": 148.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            154,
+            18,
+            161,
+            34
+          ],
+          "replacement_bbox": [
+            152,
+            18,
+            164,
+            34
+          ],
+          "source_center_x": 157.5,
+          "replacement_center_x": 158.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            164,
+            27,
+            171,
+            29
+          ],
+          "replacement_bbox": [
+            164,
+            27,
+            171,
+            29
+          ],
+          "source_center_x": 167.5,
+          "replacement_center_x": 167.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            173,
+            18,
+            180,
+            34
+          ],
+          "replacement_bbox": [
+            171,
+            18,
+            183,
+            34
+          ],
+          "source_center_x": 176.5,
+          "replacement_center_x": 177.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 276,
+      "diff_bbox": [
+        152,
+        18,
+        183,
+        34
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00007",
+      "source_schedule": "1-1-1",
+      "counterfactual_schedule": "1-0-0",
+      "start": 14,
+      "end": 19,
+      "target": "Tab PCM 625 g 1-1-1 for 5 days",
+      "counterfactual_target": "Tab PCM 625 g 1-0-0 for 5 days",
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 23,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "e07d815c2ebab7b1a329114b52ff39e464ce2efbd716682736b85fd43377bc75",
+      "reconstructed_pixel_sha256": "4b113ef68e01acfe324e9c27f17816dc74dab743ae7484a6d7623cb44a9f44c3",
+      "counterfactual_pixel_sha256": "411be49ca0c25d8418ec1156513a79d60284542cab7955145c257bd316ddd6c8",
+      "source_bbox": [
+        179,
+        19,
+        228,
+        36
+      ],
+      "replacement_bbox": [
+        179,
+        19,
+        231,
+        36
+      ],
+      "intervention_region": [
+        179,
+        19,
+        231,
+        36
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            179,
+            19,
+            186,
+            36
+          ],
+          "replacement_bbox": [
+            179,
+            19,
+            186,
+            36
+          ],
+          "source_center_x": 182.5,
+          "replacement_center_x": 182.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            190,
+            29,
+            197,
+            31
+          ],
+          "replacement_bbox": [
+            190,
+            29,
+            197,
+            31
+          ],
+          "source_center_x": 193.5,
+          "replacement_center_x": 193.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            200,
+            19,
+            207,
+            36
+          ],
+          "replacement_bbox": [
+            198,
+            19,
+            210,
+            36
+          ],
+          "source_center_x": 203.5,
+          "replacement_center_x": 204.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            211,
+            29,
+            218,
+            31
+          ],
+          "replacement_bbox": [
+            211,
+            29,
+            218,
+            31
+          ],
+          "source_center_x": 214.5,
+          "replacement_center_x": 214.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            221,
+            19,
+            228,
+            36
+          ],
+          "replacement_bbox": [
+            219,
+            19,
+            231,
+            36
+          ],
+          "source_center_x": 224.5,
+          "replacement_center_x": 225.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 318,
+      "diff_bbox": [
+        198,
+        19,
+        231,
+        36
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00014",
+      "source_schedule": "1-1-1",
+      "counterfactual_schedule": "1-0-0",
+      "start": 14,
+      "end": 19,
+      "target": "Syp PCM 500 g 1-1-1 x 3d",
+      "counterfactual_target": "Syp PCM 500 g 1-0-0 x 3d",
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 24,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "33e356d2c8872ae05bba4398f840665aa84c9155f5665c1cb9effe10398dbe4f",
+      "reconstructed_pixel_sha256": "f778d105a2b03437643f1f87a641f43aad64e16ccb82eea496b169ca7ed8a6c6",
+      "counterfactual_pixel_sha256": "36ae78f042c0b942be1de1d9be09b684374e49be1bf9c465f67ef2d4a1e5ef6f",
+      "source_bbox": [
+        185,
+        21,
+        234,
+        38
+      ],
+      "replacement_bbox": [
+        185,
+        21,
+        237,
+        38
+      ],
+      "intervention_region": [
+        185,
+        21,
+        237,
+        38
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            185,
+            21,
+            192,
+            38
+          ],
+          "replacement_bbox": [
+            185,
+            21,
+            192,
+            38
+          ],
+          "source_center_x": 188.5,
+          "replacement_center_x": 188.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            196,
+            31,
+            204,
+            33
+          ],
+          "replacement_bbox": [
+            196,
+            31,
+            204,
+            33
+          ],
+          "source_center_x": 200.0,
+          "replacement_center_x": 200.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            206,
+            21,
+            213,
+            38
+          ],
+          "replacement_bbox": [
+            204,
+            21,
+            216,
+            38
+          ],
+          "source_center_x": 209.5,
+          "replacement_center_x": 210.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            217,
+            31,
+            225,
+            33
+          ],
+          "replacement_bbox": [
+            217,
+            31,
+            225,
+            33
+          ],
+          "source_center_x": 221.0,
+          "replacement_center_x": 221.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            227,
+            21,
+            234,
+            38
+          ],
+          "replacement_bbox": [
+            225,
+            21,
+            237,
+            38
+          ],
+          "source_center_x": 230.5,
+          "replacement_center_x": 231.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 308,
+      "diff_bbox": [
+        204,
+        21,
+        237,
+        38
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00018",
+      "source_schedule": "1-1-1",
+      "counterfactual_schedule": "1-0-0",
+      "start": 18,
+      "end": 23,
+      "target": "Pantoprazole 5 mg 1-1-1 x 7d",
+      "counterfactual_target": "Pantoprazole 5 mg 1-0-0 x 7d",
+      "renderer": "consola",
+      "font_path": "C:\\Windows\\Fonts\\consola.ttf",
+      "font_sha256": "cf00b507b3286870cc5064ebd0633c303f70b491a4af25eec2d32df413db0179",
+      "font_size": 22,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "c813f564dc45b52cfddccdcd95d2eaae4af8ec79b5f389ecfc225ce0f4f1a322",
+      "reconstructed_pixel_sha256": "a3fcf57d8cc3a49e335c0afb962a50445baa958671d1d2a49c79074654295631",
+      "counterfactual_pixel_sha256": "6fcb41298137f396d90e2806c5f2a3e1a61d2afa7a42e60df1a72470f42c27ef",
+      "source_bbox": [
+        226,
+        17,
+        284,
+        31
+      ],
+      "replacement_bbox": [
+        226,
+        17,
+        285,
+        31
+      ],
+      "intervention_region": [
+        226,
+        17,
+        285,
+        31
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            226,
+            17,
+            236,
+            31
+          ],
+          "replacement_bbox": [
+            226,
+            17,
+            236,
+            31
+          ],
+          "source_center_x": 231.0,
+          "replacement_center_x": 231.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            239,
+            24,
+            247,
+            26
+          ],
+          "replacement_bbox": [
+            239,
+            24,
+            247,
+            26
+          ],
+          "source_center_x": 243.0,
+          "replacement_center_x": 243.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            250,
+            17,
+            260,
+            31
+          ],
+          "replacement_bbox": [
+            249,
+            17,
+            261,
+            31
+          ],
+          "source_center_x": 255.0,
+          "replacement_center_x": 255.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            263,
+            24,
+            271,
+            26
+          ],
+          "replacement_bbox": [
+            263,
+            24,
+            271,
+            26
+          ],
+          "source_center_x": 267.0,
+          "replacement_center_x": 267.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            274,
+            17,
+            284,
+            31
+          ],
+          "replacement_bbox": [
+            273,
+            17,
+            285,
+            31
+          ],
+          "source_center_x": 279.0,
+          "replacement_center_x": 279.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 250,
+      "diff_bbox": [
+        249,
+        17,
+        285,
+        31
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00061",
+      "source_schedule": "1-1-1",
+      "counterfactual_schedule": "1-0-0",
+      "start": 27,
+      "end": 32,
+      "target": "Syp  Cetirizine  500  mcg  1-1-1  for 5 days  as needed",
+      "counterfactual_target": "Syp  Cetirizine  500  mcg  1-0-0  for 5 days  as needed",
+      "renderer": "cour",
+      "font_path": "C:\\Windows\\Fonts\\cour.ttf",
+      "font_sha256": "e4a66a0259718d0c8f4b6e14319b4803ced45afbddf3abba8b8c3e2006856206",
+      "font_size": 15,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "afde18a536640fc10146efec2cb21d01b7864387e61b7cfc71f41e494063b4d7",
+      "reconstructed_pixel_sha256": "e759196299ee33b906b2687a4e77912c31de71d88d6ce3a46ad98796391c1e7b",
+      "counterfactual_pixel_sha256": "b7277c76ba2decb008d1b040d992580da12c375733c36ca6b8da946be693c625",
+      "source_bbox": [
+        252,
+        19,
+        295,
+        28
+      ],
+      "replacement_bbox": [
+        252,
+        19,
+        295,
+        28
+      ],
+      "intervention_region": [
+        252,
+        19,
+        295,
+        28
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            252,
+            19,
+            259,
+            28
+          ],
+          "replacement_bbox": [
+            252,
+            19,
+            259,
+            28
+          ],
+          "source_center_x": 255.5,
+          "replacement_center_x": 255.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            261,
+            23,
+            268,
+            24
+          ],
+          "replacement_bbox": [
+            261,
+            23,
+            268,
+            24
+          ],
+          "source_center_x": 264.5,
+          "replacement_center_x": 264.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            270,
+            19,
+            277,
+            28
+          ],
+          "replacement_bbox": [
+            270,
+            19,
+            277,
+            28
+          ],
+          "source_center_x": 273.5,
+          "replacement_center_x": 273.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            279,
+            23,
+            286,
+            24
+          ],
+          "replacement_bbox": [
+            279,
+            23,
+            286,
+            24
+          ],
+          "source_center_x": 282.5,
+          "replacement_center_x": 282.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            288,
+            19,
+            295,
+            28
+          ],
+          "replacement_bbox": [
+            288,
+            19,
+            295,
+            28
+          ],
+          "source_center_x": 291.5,
+          "replacement_center_x": 291.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 96,
+      "diff_bbox": [
+        270,
+        19,
+        295,
+        28
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00084",
+      "source_schedule": "1-1-1",
+      "counterfactual_schedule": "1-0-0",
+      "start": 18,
+      "end": 23,
+      "target": "Syrup PCM 625 mcg 1-1-1 for 5 days",
+      "counterfactual_target": "Syrup PCM 625 mcg 1-0-0 for 5 days",
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 22,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "c417ccd1d8d1880f10062b97332e3ad21512cffa4340ab4f813c7533fc7dc540",
+      "reconstructed_pixel_sha256": "b46d9e5d1c56b095bd6e0d6ea67afd0e8e7e68be61a7759d01cdfa6d09b7cf46",
+      "counterfactual_pixel_sha256": "bf1f3e815978f1978fa1d997595cfa95c738ccee13da5ba6a79385f4d7d80b4d",
+      "source_bbox": [
+        216,
+        18,
+        261,
+        34
+      ],
+      "replacement_bbox": [
+        216,
+        18,
+        264,
+        34
+      ],
+      "intervention_region": [
+        216,
+        18,
+        264,
+        34
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            216,
+            18,
+            223,
+            34
+          ],
+          "replacement_bbox": [
+            216,
+            18,
+            223,
+            34
+          ],
+          "source_center_x": 219.5,
+          "replacement_center_x": 219.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            226,
+            27,
+            233,
+            29
+          ],
+          "replacement_bbox": [
+            226,
+            27,
+            233,
+            29
+          ],
+          "source_center_x": 229.5,
+          "replacement_center_x": 229.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            235,
+            18,
+            242,
+            34
+          ],
+          "replacement_bbox": [
+            233,
+            18,
+            245,
+            34
+          ],
+          "source_center_x": 238.5,
+          "replacement_center_x": 239.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            245,
+            27,
+            252,
+            29
+          ],
+          "replacement_bbox": [
+            245,
+            27,
+            252,
+            29
+          ],
+          "source_center_x": 248.5,
+          "replacement_center_x": 248.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "1",
+          "replacement": "0",
+          "source_bbox": [
+            254,
+            18,
+            261,
+            34
+          ],
+          "replacement_bbox": [
+            252,
+            18,
+            264,
+            34
+          ],
+          "source_center_x": 257.5,
+          "replacement_center_x": 258.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 276,
+      "diff_bbox": [
+        233,
+        18,
+        264,
+        34
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00104",
+      "source_schedule": "1-0-0",
+      "counterfactual_schedule": "1-1-1",
+      "start": 20,
+      "end": 25,
+      "target": "Pantoprazole  5  g  1-0-0",
+      "counterfactual_target": "Pantoprazole  5  g  1-1-1",
+      "renderer": "georgia",
+      "font_path": "C:\\Windows\\Fonts\\georgia.ttf",
+      "font_sha256": "38dffcaf1fac89492f7c56c600a14daf36ae42f7c21985cd4134ae113124a58f",
+      "font_size": 24,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "f5272380669f952d7a0db6a0f9a6feb38257750f59fb9297856d2872df9ca385",
+      "reconstructed_pixel_sha256": "8aa86afd184a54c63672036fa26b47400cbc2518c857fb022f46305ec61a09a8",
+      "counterfactual_pixel_sha256": "fe434bde181a6cf8d66f373aec224c6f9652c6bd1d150dcb75dc95e5d0cd1319",
+      "source_bbox": [
+        210,
+        26,
+        266,
+        39
+      ],
+      "replacement_bbox": [
+        210,
+        26,
+        264,
+        39
+      ],
+      "intervention_region": [
+        210,
+        26,
+        266,
+        39
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            210,
+            26,
+            219,
+            39
+          ],
+          "replacement_bbox": [
+            210,
+            26,
+            219,
+            39
+          ],
+          "source_center_x": 214.5,
+          "replacement_center_x": 214.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            220,
+            32,
+            227,
+            34
+          ],
+          "replacement_bbox": [
+            220,
+            32,
+            227,
+            34
+          ],
+          "source_center_x": 223.5,
+          "replacement_center_x": 223.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            229,
+            26,
+            242,
+            39
+          ],
+          "replacement_bbox": [
+            231,
+            26,
+            240,
+            39
+          ],
+          "source_center_x": 235.5,
+          "replacement_center_x": 235.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            244,
+            32,
+            251,
+            34
+          ],
+          "replacement_bbox": [
+            244,
+            32,
+            251,
+            34
+          ],
+          "source_center_x": 247.5,
+          "replacement_center_x": 247.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            253,
+            26,
+            266,
+            39
+          ],
+          "replacement_bbox": [
+            255,
+            26,
+            264,
+            39
+          ],
+          "source_center_x": 259.5,
+          "replacement_center_x": 259.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 264,
+      "diff_bbox": [
+        229,
+        26,
+        266,
+        39
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00159",
+      "source_schedule": "1-0-0",
+      "counterfactual_schedule": "1-1-1",
+      "start": 18,
+      "end": 23,
+      "target": "Tab  PCM  40  mg  1-0-0",
+      "counterfactual_target": "Tab  PCM  40  mg  1-1-1",
+      "renderer": "cour",
+      "font_path": "C:\\Windows\\Fonts\\cour.ttf",
+      "font_sha256": "e4a66a0259718d0c8f4b6e14319b4803ced45afbddf3abba8b8c3e2006856206",
+      "font_size": 22,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "6c7ebc2c03536644b9db91759a3a03540b0f1048d66d84d1bf34c467af954247",
+      "reconstructed_pixel_sha256": "0903e312a337e872d50ced61f56b954ff4e7c26ef161d74d7fda493c7fd2b773",
+      "counterfactual_pixel_sha256": "ef823fddfab598fc98a76d23814fdd58a26b6a70e4c76fdf3772aa3ff9878837",
+      "source_bbox": [
+        246,
+        19,
+        307,
+        33
+      ],
+      "replacement_bbox": [
+        246,
+        19,
+        307,
+        33
+      ],
+      "intervention_region": [
+        246,
+        19,
+        307,
+        33
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            246,
+            19,
+            255,
+            33
+          ],
+          "replacement_bbox": [
+            246,
+            19,
+            255,
+            33
+          ],
+          "source_center_x": 250.5,
+          "replacement_center_x": 250.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            259,
+            26,
+            269,
+            27
+          ],
+          "replacement_bbox": [
+            259,
+            26,
+            269,
+            27
+          ],
+          "source_center_x": 264.0,
+          "replacement_center_x": 264.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            272,
+            19,
+            281,
+            33
+          ],
+          "replacement_bbox": [
+            272,
+            19,
+            281,
+            33
+          ],
+          "source_center_x": 276.5,
+          "replacement_center_x": 276.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            285,
+            26,
+            295,
+            27
+          ],
+          "replacement_bbox": [
+            285,
+            26,
+            295,
+            27
+          ],
+          "source_center_x": 290.0,
+          "replacement_center_x": 290.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            298,
+            19,
+            307,
+            33
+          ],
+          "replacement_bbox": [
+            298,
+            19,
+            307,
+            33
+          ],
+          "source_center_x": 302.5,
+          "replacement_center_x": 302.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 186,
+      "diff_bbox": [
+        272,
+        19,
+        307,
+        33
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00385",
+      "source_schedule": "1-0-0",
+      "counterfactual_schedule": "1-1-1",
+      "start": 23,
+      "end": 28,
+      "target": "Tab Pantoprazole 625 g 1-0-0",
+      "counterfactual_target": "Tab Pantoprazole 625 g 1-1-1",
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 23,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "75170c4422586a732cd6b51d52b984cb19be097a9fc783473e2d184aea6450ee",
+      "reconstructed_pixel_sha256": "ad7f15a21b37d59afaed8741575d5906f708023aef264bada6f188d5ae475746",
+      "counterfactual_pixel_sha256": "71fb8a431bb595d35c750b9452eb48f8a7461ebaf47b0f2125c6f7f1c1e3707e",
+      "source_bbox": [
+        263,
+        19,
+        315,
+        36
+      ],
+      "replacement_bbox": [
+        263,
+        19,
+        313,
+        36
+      ],
+      "intervention_region": [
+        263,
+        19,
+        315,
+        36
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            263,
+            19,
+            270,
+            36
+          ],
+          "replacement_bbox": [
+            263,
+            19,
+            270,
+            36
+          ],
+          "source_center_x": 266.5,
+          "replacement_center_x": 266.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            274,
+            29,
+            281,
+            31
+          ],
+          "replacement_bbox": [
+            274,
+            29,
+            281,
+            31
+          ],
+          "source_center_x": 277.5,
+          "replacement_center_x": 277.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            282,
+            19,
+            294,
+            36
+          ],
+          "replacement_bbox": [
+            285,
+            19,
+            292,
+            36
+          ],
+          "source_center_x": 288.0,
+          "replacement_center_x": 288.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            295,
+            29,
+            302,
+            31
+          ],
+          "replacement_bbox": [
+            295,
+            29,
+            302,
+            31
+          ],
+          "source_center_x": 298.5,
+          "replacement_center_x": 298.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            303,
+            19,
+            315,
+            36
+          ],
+          "replacement_bbox": [
+            306,
+            19,
+            313,
+            36
+          ],
+          "source_center_x": 309.0,
+          "replacement_center_x": 309.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 296,
+      "diff_bbox": [
+        282,
+        19,
+        315,
+        36
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00443",
+      "source_schedule": "1-0-0",
+      "counterfactual_schedule": "1-1-1",
+      "start": 31,
+      "end": 36,
+      "target": "Syrup  Pantoprazole  650  mcg  1-0-0",
+      "counterfactual_target": "Syrup  Pantoprazole  650  mcg  1-1-1",
+      "renderer": "cambria",
+      "font_path": "C:\\Windows\\Fonts\\cambria.ttc",
+      "font_sha256": "84e70ccc1664482f4a960442c7a166c91a1b2cf98ff88c33cb73f79403f66d7b",
+      "font_size": 24,
+      "selection_origin": "previous_geometry_experiment",
+      "original_png_sha256": "2fc7b0a7a0fd80f80769e6d549cbaff814e3d0e8b3417c76c94470dc80415fc9",
+      "reconstructed_pixel_sha256": "645f43ae194b04523961e95b566d74959ed9ace0c00da0a5e62fd4ab872e810c",
+      "counterfactual_pixel_sha256": "8f72e1638f7e406a0b8e04b12bf0075bb79086a7d9d05aab04b98fb00fd95206",
+      "source_bbox": [
+        332,
+        23,
+        384,
+        39
+      ],
+      "replacement_bbox": [
+        332,
+        23,
+        384,
+        39
+      ],
+      "intervention_region": [
+        332,
+        23,
+        384,
+        39
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            332,
+            23,
+            342,
+            39
+          ],
+          "replacement_bbox": [
+            332,
+            23,
+            342,
+            39
+          ],
+          "source_center_x": 337.0,
+          "replacement_center_x": 337.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            344,
+            32,
+            350,
+            34
+          ],
+          "replacement_bbox": [
+            344,
+            32,
+            350,
+            34
+          ],
+          "source_center_x": 347.0,
+          "replacement_center_x": 347.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            352,
+            23,
+            363,
+            39
+          ],
+          "replacement_bbox": [
+            353,
+            23,
+            363,
+            39
+          ],
+          "source_center_x": 357.5,
+          "replacement_center_x": 358.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            365,
+            32,
+            371,
+            34
+          ],
+          "replacement_bbox": [
+            365,
+            32,
+            371,
+            34
+          ],
+          "source_center_x": 368.0,
+          "replacement_center_x": 368.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            373,
+            23,
+            384,
+            39
+          ],
+          "replacement_bbox": [
+            374,
+            23,
+            384,
+            39
+          ],
+          "source_center_x": 378.5,
+          "replacement_center_x": 379.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 292,
+      "diff_bbox": [
+        352,
+        23,
+        384,
+        39
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00551",
+      "source_schedule": "1-0-0",
+      "counterfactual_schedule": "1-1-1",
+      "start": 28,
+      "end": 33,
+      "target": "Tablet  Metformin  650  mg  1-0-0  for 5 days  as needed",
+      "counterfactual_target": "Tablet  Metformin  650  mg  1-1-1  for 5 days  as needed",
+      "renderer": "cour",
+      "font_path": "C:\\Windows\\Fonts\\cour.ttf",
+      "font_sha256": "e4a66a0259718d0c8f4b6e14319b4803ced45afbddf3abba8b8c3e2006856206",
+      "font_size": 14,
+      "selection_origin": "expanded_frozen_train_eligibility",
+      "original_png_sha256": "b5fccf2b3c108c1ad58b7606be7864ca096912dd6072adac85e71564ec063723",
+      "reconstructed_pixel_sha256": "e12df454a37ebc874761654bfa1f1f6331bbd601cb279bec1c327cbff5699139",
+      "counterfactual_pixel_sha256": "1ee6ceb99d56a8aa49937195dd9f5e7366def453500b6b68091d309f28f6a526",
+      "source_bbox": [
+        235,
+        19,
+        273,
+        28
+      ],
+      "replacement_bbox": [
+        235,
+        19,
+        273,
+        28
+      ],
+      "intervention_region": [
+        235,
+        19,
+        273,
+        28
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            235,
+            19,
+            241,
+            28
+          ],
+          "replacement_bbox": [
+            235,
+            19,
+            241,
+            28
+          ],
+          "source_center_x": 238.0,
+          "replacement_center_x": 238.0,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            243,
+            23,
+            250,
+            24
+          ],
+          "replacement_bbox": [
+            243,
+            23,
+            250,
+            24
+          ],
+          "source_center_x": 246.5,
+          "replacement_center_x": 246.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            251,
+            19,
+            257,
+            28
+          ],
+          "replacement_bbox": [
+            251,
+            19,
+            257,
+            28
+          ],
+          "source_center_x": 254.0,
+          "replacement_center_x": 254.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            259,
+            23,
+            266,
+            24
+          ],
+          "replacement_bbox": [
+            259,
+            23,
+            266,
+            24
+          ],
+          "source_center_x": 262.5,
+          "replacement_center_x": 262.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            267,
+            19,
+            273,
+            28
+          ],
+          "replacement_bbox": [
+            267,
+            19,
+            273,
+            28
+          ],
+          "source_center_x": 270.0,
+          "replacement_center_x": 270.0,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 98,
+      "diff_bbox": [
+        251,
+        19,
+        273,
+        28
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    },
+    {
+      "sample_id": "train_00658",
+      "source_schedule": "1-0-0",
+      "counterfactual_schedule": "1-1-1",
+      "start": 18,
+      "end": 23,
+      "target": "Paracetamol 5 mcg 1-0-0",
+      "counterfactual_target": "Paracetamol 5 mcg 1-1-1",
+      "renderer": "arial",
+      "font_path": "C:\\Windows\\Fonts\\arial.ttf",
+      "font_sha256": "b3658eadae55e682b5f69eb64c439c1ecc8f196c0bb8d4756d145d13bc86476a",
+      "font_size": 23,
+      "selection_origin": "expanded_frozen_train_eligibility",
+      "original_png_sha256": "ec666fee99bf43f8cdc3bd1ffd9bb3aa9c865d8683b0e50295e405666d8cea90",
+      "reconstructed_pixel_sha256": "8a7372ff87989a9cda285a0cc77b3fc7510aa3ec94b31f4fd6ee8a6b57c6381e",
+      "counterfactual_pixel_sha256": "7d94bcce3d0f3b4ad89f135a3f35554c40cfa6376ad73ddef7bf444f0527f2fc",
+      "source_bbox": [
+        216,
+        19,
+        268,
+        36
+      ],
+      "replacement_bbox": [
+        216,
+        19,
+        266,
+        36
+      ],
+      "intervention_region": [
+        216,
+        19,
+        268,
+        36
+      ],
+      "placements": [
+        {
+          "index": 0,
+          "source": "1",
+          "replacement": "1",
+          "source_bbox": [
+            216,
+            19,
+            223,
+            36
+          ],
+          "replacement_bbox": [
+            216,
+            19,
+            223,
+            36
+          ],
+          "source_center_x": 219.5,
+          "replacement_center_x": 219.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 1,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            227,
+            29,
+            234,
+            31
+          ],
+          "replacement_bbox": [
+            227,
+            29,
+            234,
+            31
+          ],
+          "source_center_x": 230.5,
+          "replacement_center_x": 230.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 2,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            235,
+            19,
+            247,
+            36
+          ],
+          "replacement_bbox": [
+            238,
+            19,
+            245,
+            36
+          ],
+          "source_center_x": 241.0,
+          "replacement_center_x": 241.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        },
+        {
+          "index": 3,
+          "source": "-",
+          "replacement": "-",
+          "source_bbox": [
+            248,
+            29,
+            255,
+            31
+          ],
+          "replacement_bbox": [
+            248,
+            29,
+            255,
+            31
+          ],
+          "source_center_x": 251.5,
+          "replacement_center_x": 251.5,
+          "method": "copied source glyph bitmap"
+        },
+        {
+          "index": 4,
+          "source": "0",
+          "replacement": "1",
+          "source_bbox": [
+            256,
+            19,
+            268,
+            36
+          ],
+          "replacement_bbox": [
+            259,
+            19,
+            266,
+            36
+          ],
+          "source_center_x": 262.0,
+          "replacement_center_x": 262.5,
+          "method": "same-font isolated raster centered on original ink-band center"
+        }
+      ],
+      "changed_pixels": 296,
+      "diff_bbox": [
+        235,
+        19,
+        268,
+        36
+      ],
+      "outside_region_changed_pixels": 0,
+      "overlap_pixels": 0,
+      "clipping": false,
+      "safe_area_overflow": false
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "sample_id": "train_00000",
+    "direction": "1-1-1->1-0-0",
+    "middle_peak_delta": 0.6207341457976494,
+    "first_peak_delta": 0.004431564149814049,
+    "final_peak_delta": 0.00894244191968474,
+    "target_logp_delta": 0.711564306065783
+  },
+  {
+    "sample_id": "train_00007",
+    "direction": "1-1-1->1-0-0",
+    "middle_peak_delta": 0.7994095766362761,
+    "first_peak_delta": 0.03941525888320352,
+    "final_peak_delta": 0.014692022558163598,
+    "target_logp_delta": 1.1553732168450495
+  },
+  {
+    "sample_id": "train_00014",
+    "direction": "1-1-1->1-0-0",
+    "middle_peak_delta": 0.7239245755497092,
+    "first_peak_delta": 0.0026263286070451475,
+    "final_peak_delta": 0.001384584206321371,
+    "target_logp_delta": 0.9833657960097522
+  },
+  {
+    "sample_id": "train_00018",
+    "direction": "1-1-1->1-0-0",
+    "middle_peak_delta": 0.804824554609319,
+    "first_peak_delta": 7.060961278471112e-05,
+    "final_peak_delta": 0.002878690852316179,
+    "target_logp_delta": 0.6108144543458272
+  },
+  {
+    "sample_id": "train_00061",
+    "direction": "1-1-1->1-0-0",
+    "middle_peak_delta": 0.40999273412248605,
+    "first_peak_delta": -0.011107878803942817,
+    "final_peak_delta": -0.0017770984690831382,
+    "target_logp_delta": 0.8602236856683172
+  },
+  {
+    "sample_id": "train_00084",
+    "direction": "1-1-1->1-0-0",
+    "middle_peak_delta": 0.6909619308199388,
+    "first_peak_delta": 0.011348826047422489,
+    "final_peak_delta": 0.0006784133314741148,
+    "target_logp_delta": 0.80515205266811
+  },
+  {
+    "sample_id": "train_00104",
+    "direction": "1-0-0->1-1-1",
+    "middle_peak_delta": 0.0876839541393691,
+    "first_peak_delta": 0.04330080288627586,
+    "final_peak_delta": 0.6191298998014612,
+    "target_logp_delta": 2.309586234978972
+  },
+  {
+    "sample_id": "train_00159",
+    "direction": "1-0-0->1-1-1",
+    "middle_peak_delta": 0.12980903444742425,
+    "first_peak_delta": 0.042006327936229326,
+    "final_peak_delta": 0.6493315194214562,
+    "target_logp_delta": 2.81167725585277
+  },
+  {
+    "sample_id": "train_00385",
+    "direction": "1-0-0->1-1-1",
+    "middle_peak_delta": 0.06471551340527995,
+    "first_peak_delta": 0.03469462278756802,
+    "final_peak_delta": 0.5483128782892217,
+    "target_logp_delta": 1.7297810751320006
+  },
+  {
+    "sample_id": "train_00443",
+    "direction": "1-0-0->1-1-1",
+    "middle_peak_delta": 0.052554978346068364,
+    "first_peak_delta": 0.15263958879996736,
+    "final_peak_delta": 0.5187011224745193,
+    "target_logp_delta": 1.7247417065448145
+  },
+  {
+    "sample_id": "train_00551",
+    "direction": "1-0-0->1-1-1",
+    "middle_peak_delta": -0.04096879987396218,
+    "first_peak_delta": 0.01682876358267138,
+    "final_peak_delta": 0.0002632712508788826,
+    "target_logp_delta": 0.06823906258435741
+  },
+  {
+    "sample_id": "train_00658",
+    "direction": "1-0-0->1-1-1",
+    "middle_peak_delta": 0.08274389925868914,
+    "first_peak_delta": 0.01066095101604253,
+    "final_peak_delta": 0.6016326325905589,
+    "target_logp_delta": 2.1197821829229797
+  }
+]

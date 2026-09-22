@@ -350,6 +350,10 @@ def evaluate_and_persist(
                 {"type": "alert_resolved", "session_id": session_id, "alert_id": alert.id}
             )
 
+    from app.services import clinical_evidence
+
+    for alert in results:
+        clinical_evidence.create_rule_evidence(db, alert)
     db.flush()
     return results
 

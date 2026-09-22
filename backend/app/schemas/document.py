@@ -22,6 +22,8 @@ class MedicationFact(APIModel):
     start_date: datetime | None = None
     end_date: datetime | None = None
     instructions: str | None = None
+    source_text: str | None = None
+    source_location: str | None = None
 
 
 class LabObservationFact(APIModel):
@@ -31,6 +33,8 @@ class LabObservationFact(APIModel):
     reference_range: str | None = None
     flag: str | None = None  # "normal", "high", "low", "abnormal"
     observation_timestamp: datetime | None = None
+    source_text: str | None = None
+    source_location: str | None = None
 
 
 class AllergyStatement(APIModel):
@@ -43,6 +47,14 @@ class StructuredDocument(APIModel):
     document_type: DocumentType | None = None
     document_date: str | None = None
     doctor_header: str | None = None
+    patient_name: str | None = None
+    patient_age: str | None = None
+    patient_sex: str | None = None
+    patient_weight: str | None = None
+    complaint: str | None = None
+    diagnosis_text: str | None = None
+    investigations: list[str] = Field(default_factory=list)
+    advice: list[str] = Field(default_factory=list)
     raw_excerpt: str | None = None
     medications: list[MedicationFact] = Field(default_factory=list)
     observations: list[LabObservationFact] = Field(

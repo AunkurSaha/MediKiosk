@@ -773,7 +773,7 @@ export default function StaffLogin() {
               }}
             >
               <div
-                aria-label="Choose demo hospital"
+                aria-label="Choose hospital"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: '1fr 1fr',
@@ -812,10 +812,11 @@ export default function StaffLogin() {
                 className="eyebrow"
                 style={{ fontSize: '0.75rem', marginBottom: '4px', color: '#6b7280' }}
               >
-                Demo doctors at the selected hospital
+                Clinicians at the selected hospital
               </p>
               <p className="muted" style={{ fontSize: '0.75rem', margin: '0 0 10px' }}>
-                Choose a doctor to fill their demo credentials. The badge shows waiting patients.
+                Choose a clinician to fill their recording credentials. The badge shows waiting
+                patients.
               </p>
               <div
                 data-testid="demo-doctor-buttons"
@@ -842,7 +843,7 @@ export default function StaffLogin() {
                       )
                     }
                     disabled={busy}
-                    aria-label={`Demo doctor ${doctor.name}, ${waitingCounts?.[doctor.name] ?? 'counting'} waiting patients`}
+                    aria-label={`Clinician ${doctor.name}, ${waitingCounts?.[doctor.name] ?? 'counting'} waiting patients`}
                     style={{
                       fontSize: '0.82rem',
                       padding: '9px 11px',
@@ -1070,7 +1071,7 @@ export default function StaffLogin() {
                       disabled={busy}
                       style={{ fontSize: '0.85rem', padding: '6px 14px', minHeight: '34px' }}
                     >
-                      ⚡ Auto-Fill Demo OTP
+                      Auto-fill access code
                     </button>
                   </div>
                 )}

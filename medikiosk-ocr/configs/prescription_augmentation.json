@@ -1,0 +1,13 @@
+{
+  "description": "Moderate phone-photo augmentation; training-only, not clinical truth.",
+  "rotation_degrees": 2.5,
+  "perspective_fraction": 0.025,
+  "gaussian_blur_probability": 0.2,
+  "gaussian_blur_kernel": 3,
+  "gaussian_noise_probability": 0.2,
+  "gaussian_noise_sigma": 5.0,
+  "brightness_probability": 0.25,
+  "brightness_range": [0.85, 1.1],
+  "jpeg_probability": 0.2,
+  "jpeg_quality_range": [70, 92]
+}

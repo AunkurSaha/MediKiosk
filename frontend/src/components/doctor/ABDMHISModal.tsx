@@ -196,7 +196,7 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                   borderRadius: '9999px',
                 }}
               >
-                Sandbox Demonstration
+                Connection status
               </span>
             </div>
             <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: '#64748b' }}>
@@ -240,9 +240,8 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
           >
             <span style={{ fontSize: '1.1rem' }}>ℹ️</span>
             <div>
-              <strong>ABDM Sandbox & Simulated HIS Gateway:</strong> Synthetic local demonstration
-              of National Health Stack M1, M2 & OPD HIS dispatch. No real Aadhaar or production NHA
-              gateway authentication claimed.
+              <strong>ABDM and HIS connection preview:</strong> Identity, consent and OPD dispatch
+              remain subject to authorized gateway configuration and clinician review.
             </div>
           </div>
 
@@ -302,7 +301,7 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                       color: isVerified ? '#166534' : '#854d0e',
                     }}
                   >
-                    {isVerified ? '✓ Verified (Sandbox Mock)' : '⚠️ Unverified'}
+                    {isVerified ? '✓ Verified' : '⚠️ Unverified'}
                   </span>
                 </div>
 
@@ -347,7 +346,7 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                       cursor: 'pointer',
                     }}
                   >
-                    Demo Address
+                    ABHA Address
                   </button>
                   <button
                     type="button"
@@ -362,7 +361,7 @@ export const ABDMHISModal: React.FC<ABDMHISModalProps> = ({
                       cursor: 'pointer',
                     }}
                   >
-                    Demo 14-Digit
+                    14-digit ABHA
                   </button>
                   <button
                     type="submit"

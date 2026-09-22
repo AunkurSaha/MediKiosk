@@ -1,0 +1,530 @@
+============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-9.1.1, pluggy-1.6.0
+rootdir: C:\MEDIKIOSK\backend
+configfile: pyproject.toml
+plugins: anyio-4.15.1
+collected 581 items
+
+backend\tests\test_abdm_his.py .....                                     [  0%]
+backend\tests\test_adaptive.py ...............FFFFFF...F................ [  7%]
+.............F..                                                         [ 10%]
+backend\tests\test_adaptive_rag.py ssF.s......ss.s                       [ 13%]
+backend\tests\test_bhashini_speech.py ....................               [ 16%]
+backend\tests\test_clinical_evidence.py ...........                      [ 18%]
+backend\tests\test_conversational_variety.py ..........                  [ 20%]
+backend\tests\test_demo_polish.py FFF...                                 [ 21%]
+backend\tests\test_doctor_routing.py ........                            [ 22%]
+backend\tests\test_documents.py ..........                               [ 24%]
+backend\tests\test_embedding_provider.py ...................             [ 27%]
+backend\tests\test_fhir_export.py .....                                  [ 28%]
+backend\tests\test_journey_auth_security.py ................             [ 31%]
+backend\tests\test_normalization.py .................................... [ 37%]
+....................................FFFFFFFFFF.                          [ 45%]
+backend\tests\test_nvidia_normalization.py .F........................... [ 50%]
+.......FFFFFFFF.......F...                                               [ 55%]
+backend\tests\test_paddleocr_ocr.py ......                               [ 56%]
+backend\tests\test_phase7_complete.py ...........                        [ 58%]
+backend\tests\test_phase7_repairs.py .......                             [ 59%]
+backend\tests\test_phase8_summary.py ....                                [ 59%]
+backend\tests\test_phase9_hardening.py .....                             [ 60%]
+backend\tests\test_phone_otp_auth.py .................                   [ 63%]
+backend\tests\test_rag_driven_interview.py ....                          [ 64%]
+backend\tests\test_rag_multilingual_speech.py ......FFF..FF              [ 66%]
+backend\tests\test_rag_semantic.py ....                                  [ 67%]
+backend\tests\test_rag_wording.py ..............................         [ 72%]
+backend\tests\test_rapid_routing.py ......                               [ 73%]
+backend\tests\test_rbac_security.py .........                            [ 75%]
+backend\tests\test_red_flags.py ................FFF                      [ 78%]
+backend\tests\test_sarvam_ocr.py ............                            [ 80%]
+backend\tests\test_sarvam_speech.py ..............                       [ 82%]
+backend\tests\test_sarvam_translation.py .............                   [ 85%]
+backend\tests\test_simulation.py ...                                     [ 85%]
+backend\tests\test_speech.py .................                           [ 88%]
+backend\tests\test_stabilization_alerts.py ......FF..                    [ 90%]
+backend\tests\test_stabilization_bhashini.py ...                         [ 90%]
+backend\tests\test_stabilization_documents.py ........                   [ 92%]
+backend\tests\test_stabilization_security.py .....                       [ 92%]
+backend\tests\test_stabilization_voice.py .......                        [ 94%]
+backend\tests\test_staff_auth.py .......                                 [ 95%]
+backend\tests\test_staff_expanded_auth.py .......                        [ 96%]
+backend\tests\test_workflow.py .F..F...............                      [100%]
+
+================================== FAILURES ===================================
+_________ test_all_flows_traverse_complete_review_confirm[chest_pain] _________
+backend\tests\test_adaptive.py:179: in test_all_flows_traverse_complete_review_confirm
+    assert client.post(f"/api/sessions/{session_id}/complete").status_code == 200
+E   AssertionError: assert 409 == 200
+E    +  where 409 = <Response [409 Conflict]>.status_code
+E    +    where <Response [409 Conflict]> = post('/api/sessions/0c08b3ba-da18-4527-9394-1b1c80bf7b8b/complete')
+E    +      where post = <starlette.testclient.TestClient object at 0x000001E42EB7C3B0>.post
+_______ test_all_flows_traverse_complete_review_confirm[abdominal_pain] _______
+backend\tests\test_adaptive.py:179: in test_all_flows_traverse_complete_review_confirm
+    assert client.post(f"/api/sessions/{session_id}/complete").status_code == 200
+E   AssertionError: assert 409 == 200
+E    +  where 409 = <Response [409 Conflict]>.status_code
+E    +    where <Response [409 Conflict]> = post('/api/sessions/6598de4c-f3da-4879-8618-2958ab565c2c/complete')
+E    +      where post = <starlette.testclient.TestClient object at 0x000001E42F246360>.post
+___________ test_all_flows_traverse_complete_review_confirm[fever] ____________
+backend\tests\test_adaptive.py:179: in test_all_flows_traverse_complete_review_confirm
+    assert client.post(f"/api/sessions/{session_id}/complete").status_code == 200
+E   AssertionError: assert 409 == 200
+E    +  where 409 = <Response [409 Conflict]>.status_code
+E    +    where <Response [409 Conflict]> = post('/api/sessions/59f4053c-2298-435d-8e05-f1ebbe81fef9/complete')
+E    +      where post = <starlette.testclient.TestClient object at 0x000001E42F24C380>.post
+__________ test_all_flows_traverse_complete_review_confirm[headache] __________
+backend\tests\test_adaptive.py:179: in test_all_flows_traverse_complete_review_confirm
+    assert client.post(f"/api/sessions/{session_id}/complete").status_code == 200
+E   AssertionError: assert 409 == 200
+E    +  where 409 = <Response [409 Conflict]>.status_code
+E    +    where <Response [409 Conflict]> = post('/api/sessions/5ede1046-02c2-4086-b8d8-00f2db4cfd83/complete')
+E    +      where post = <starlette.testclient.TestClient object at 0x000001E42F24FBD0>.post
+____ test_all_flows_traverse_complete_review_confirm[cough_breathlessness] ____
+backend\tests\test_adaptive.py:179: in test_all_flows_traverse_complete_review_confirm
+    assert client.post(f"/api/sessions/{session_id}/complete").status_code == 200
+E   AssertionError: assert 409 == 200
+E    +  where 409 = <Response [409 Conflict]>.status_code
+E    +    where <Response [409 Conflict]> = post('/api/sessions/04d7ee5a-4877-4c12-8b04-c8dc2b5c05ba/complete')
+E    +      where post = <starlette.testclient.TestClient object at 0x000001E42F472F10>.post
+_____ test_all_flows_traverse_complete_review_confirm[ayush_demo.history] _____
+backend\tests\test_adaptive.py:179: in test_all_flows_traverse_complete_review_confirm
+    assert client.post(f"/api/sessions/{session_id}/complete").status_code == 200
+E   AssertionError: assert 409 == 200
+E    +  where 409 = <Response [409 Conflict]>.status_code
+E    +    where <Response [409 Conflict]> = post('/api/sessions/b133fdfc-c193-463f-b580-9c1412662d32/complete')
+E    +      where post = <starlette.testclient.TestClient object at 0x000001E42F519E10>.post
+________ test_legacy_resume_uses_server_config_and_preserves_original _________
+backend\tests\test_adaptive.py:309: in test_legacy_resume_uses_server_config_and_preserves_original
+    assert client.post(f"/api/sessions/{session_id}/complete").status_code == 200
+E   AssertionError: assert 409 == 200
+E    +  where 409 = <Response [409 Conflict]>.status_code
+E    +    where <Response [409 Conflict]> = post('/api/sessions/119ff82b-cc06-435c-b1b9-3a05e6720665/complete')
+E    +      where post = <starlette.testclient.TestClient object at 0x000001E42F674490>.post
+______ test_latest_answers_stay_in_configuration_order_after_correction _______
+backend\tests\test_adaptive.py:451: in test_latest_answers_stay_in_configuration_order_after_correction
+    assert [a["question_id"] for a in answers] == ["chief_complaint.description", "hpi.onset"]
+E   AssertionError: assert ['chief_compl...pi.radiation'] == ['chief_compl..., 'hpi.onset']
+E     
+E     At index 1 diff: 'hpi.radiation' != 'hpi.onset'
+E     Use -v to get more diff
+______________________ test_red_flag_always_outranks_rag ______________________
+backend\tests\test_adaptive_rag.py:334: in test_red_flag_always_outranks_rag
+    state = submit_answer(client, session_id, state, val, stat, raw_value=str(val))
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_adaptive_rag.py:49: in submit_answer
+    assert response.status_code == 200, response.text
+E   AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred. Please retry.","details":null}}
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call ------------------------------
+ERROR    app.main:main.py:94 Unhandled application error: NameError
+_____________________ test_seed_showcase_patient_service ______________________
+backend\tests\test_demo_polish.py:21: in test_seed_showcase_patient_service
+    result = ShowcaseService.seed_showcase_patient(database)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\app\services\showcase.py:444: in seed_showcase_patient
+    draft_text, structured = ClinicalSummaryService.generate_draft(
+backend\app\services\clinical_summary.py:61: in generate_draft
+    history = adaptive.state(db, session_id, user=user).history if run else None
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\app\services\adaptive.py:135: in state
+    res.red_flag_alert = AlertSummary(
+                         ^^^^^^^^^^^^
+E   NameError: name 'AlertSummary' is not defined
+________________________ test_reset_demo_data_service _________________________
+backend\tests\test_demo_polish.py:132: in test_reset_demo_data_service
+    ShowcaseService.seed_showcase_patient(database)
+backend\app\services\showcase.py:444: in seed_showcase_patient
+    draft_text, structured = ClinicalSummaryService.generate_draft(
+backend\app\services\clinical_summary.py:61: in generate_draft
+    history = adaptive.state(db, session_id, user=user).history if run else None
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\app\services\adaptive.py:135: in state
+    res.red_flag_alert = AlertSummary(
+                         ^^^^^^^^^^^^
+E   NameError: name 'AlertSummary' is not defined
+___________________________ test_demo_api_endpoints ___________________________
+backend\tests\test_demo_polish.py:176: in test_demo_api_endpoints
+    assert res.status_code == 200
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call ------------------------------
+ERROR    app.main:main.py:94 Unhandled application error: NameError
+___________ test_typed_and_explicit_unknown_answers_bypass_provider ___________
+backend\tests\test_normalization.py:221: in test_typed_and_explicit_unknown_answers_bypass_provider
+    state = submit(client, session_id, state, {"amount": 2, "unit": "days"}, "answered")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_adaptive.py:45: in submit
+    assert response.status_code == 200, response.text
+E   AssertionError: {"error":{"code":"INVALID_ANSWER","message":"Answer does not match this question.","details":null}}
+E   assert 422 == 200
+E    +  where 422 = <Response [422 Unprocessable Content]>.status_code
+______________ test_source_edit_history_cache_and_flow_authority ______________
+backend\tests\test_normalization.py:232: in test_source_edit_history_cache_and_flow_authority
+    assert state["flow_id"] == "fever" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('fever' == 'fever'
+E     
+E       fever and 'past_medical_history.other' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + past_medical_history.other)
+_ test_inactive_normalization_is_historical_and_reactivation_reuses_snapshot __
+backend\tests\test_normalization.py:255: in test_inactive_normalization_is_historical_and_reactivation_reuses_snapshot
+    norm = next(f for f in state["active_answers"] if f["question_id"] == "hpi.radiation_site")[
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   StopIteration
+__ test_provider_failures_are_persisted_and_interview_continues[unavailable] __
+backend\tests\test_normalization.py:287: in test_provider_failures_are_persisted_and_interview_continues
+    assert state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation
+____ test_provider_failures_are_persisted_and_interview_continues[timeout] ____
+backend\tests\test_normalization.py:287: in test_provider_failures_are_persisted_and_interview_continues
+    assert state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation
+___ test_provider_failures_are_persisted_and_interview_continues[malformed] ___
+backend\tests\test_normalization.py:287: in test_provider_failures_are_persisted_and_interview_continues
+    assert state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation
+___ test_provider_failures_are_persisted_and_interview_continues[disabled] ____
+backend\tests\test_normalization.py:287: in test_provider_failures_are_persisted_and_interview_continues
+    assert state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation
+_ test_normalization_storage_failure_does_not_rollback_patient_answer[insert] _
+backend\tests\test_normalization.py:310: in test_normalization_storage_failure_does_not_rollback_patient_answer
+    assert state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation
+------------------------------ Captured log call ------------------------------
+WARNING  app.services.normalization:normalization.py:184 Normalization storage unavailable; source answer retained
+_ test_normalization_storage_failure_does_not_rollback_patient_answer[select] _
+backend\tests\test_normalization.py:310: in test_normalization_storage_failure_does_not_rollback_patient_answer
+    assert state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation
+------------------------------ Captured log call ------------------------------
+WARNING  app.services.normalization:normalization.py:197 Normalization results unavailable; using patient-reported history
+WARNING  app.services.normalization:normalization.py:197 Normalization results unavailable; using patient-reported history
+WARNING  app.services.normalization:normalization.py:197 Normalization results unavailable; using patient-reported history
+WARNING  app.services.normalization:normalization.py:197 Normalization results unavailable; using patient-reported history
+WARNING  app.services.normalization:normalization.py:184 Normalization storage unavailable; source answer retained
+WARNING  app.services.normalization:normalization.py:197 Normalization results unavailable; using patient-reported history
+WARNING  app.services.normalization:normalization.py:197 Normalization results unavailable; using patient-reported history
+WARNING  app.services.normalization:normalization.py:197 Normalization results unavailable; using patient-reported history
+____ test_completion_snapshot_and_confirmation_never_promote_machine_facts ____
+backend\tests\test_normalization.py:321: in test_completion_snapshot_and_confirmation_never_promote_machine_facts
+    assert client.post(f"/api/sessions/{session_id}/complete").status_code == 200
+E   AssertionError: assert 409 == 200
+E    +  where 409 = <Response [409 Conflict]>.status_code
+E    +    where <Response [409 Conflict]> = post('/api/sessions/c87cce50-8a48-4396-9b96-b1e4d9c6bf34/complete')
+E    +      where post = <starlette.testclient.TestClient object at 0x000001E43537EBE0>.post
+_ test_source_commit_precedes_provider_and_optional_commit_failure_preserves_answer _
+backend\tests\test_nvidia_normalization.py:86: in test_source_commit_precedes_provider_and_optional_commit_failure_preserves_answer
+    assert state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation
+------------------------------ Captured log call ------------------------------
+WARNING  app.services.normalization:normalization.py:142 Normalization unavailable after source answer committed
+________ test_http_failure_no_retry_no_leak[401-authentication_failed] ________
+backend\tests\test_nvidia_normalization.py:291: in test_http_failure_no_retry_no_leak
+    assert fact["raw_value"] == "chest pain" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('chest pain' == 'chest pain'
+E     
+E       chest pain and 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation)
+________ test_http_failure_no_retry_no_leak[403-authentication_failed] ________
+backend\tests\test_nvidia_normalization.py:291: in test_http_failure_no_retry_no_leak
+    assert fact["raw_value"] == "chest pain" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('chest pain' == 'chest pain'
+E     
+E       chest pain and 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation)
+____________ test_http_failure_no_retry_no_leak[429-rate_limited] _____________
+backend\tests\test_nvidia_normalization.py:291: in test_http_failure_no_retry_no_leak
+    assert fact["raw_value"] == "chest pain" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('chest pain' == 'chest pain'
+E     
+E       chest pain and 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation)
+____________ test_http_failure_no_retry_no_leak[500-server_error] _____________
+backend\tests\test_nvidia_normalization.py:291: in test_http_failure_no_retry_no_leak
+    assert fact["raw_value"] == "chest pain" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('chest pain' == 'chest pain'
+E     
+E       chest pain and 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation)
+____________ test_http_failure_no_retry_no_leak[503-server_error] _____________
+backend\tests\test_nvidia_normalization.py:291: in test_http_failure_no_retry_no_leak
+    assert fact["raw_value"] == "chest pain" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('chest pain' == 'chest pain'
+E     
+E       chest pain and 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation)
+________ test_http_failure_no_retry_no_leak[202-provider_unavailable] _________
+backend\tests\test_nvidia_normalization.py:291: in test_http_failure_no_retry_no_leak
+    assert fact["raw_value"] == "chest pain" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('chest pain' == 'chest pain'
+E     
+E       chest pain and 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation)
+________ test_http_failure_no_retry_no_leak[302-provider_unavailable] _________
+backend\tests\test_nvidia_normalization.py:291: in test_http_failure_no_retry_no_leak
+    assert fact["raw_value"] == "chest pain" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('chest pain' == 'chest pain'
+E     
+E       chest pain and 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation)
+________ test_http_failure_no_retry_no_leak[422-provider_unavailable] _________
+backend\tests\test_nvidia_normalization.py:291: in test_http_failure_no_retry_no_leak
+    assert fact["raw_value"] == "chest pain" and state["question"]["question_id"] == "hpi.onset"
+E   AssertionError: assert ('chest pain' == 'chest pain'
+E     
+E       chest pain and 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation)
+____ test_live_source_edit_branch_reactivation_and_confirmed_immutability _____
+backend\tests\test_nvidia_normalization.py:363: in test_live_source_edit_branch_reactivation_and_confirmed_immutability
+    branch = next(
+E   StopIteration
+_______________ test_bengali_rag_question_presentation_and_tts ________________
+backend\tests\test_rag_multilingual_speech.py:215: in test_bengali_rag_question_presentation_and_tts
+    assert q["question_id"] == "hpi.site"
+E   AssertionError: assert 'hpi.associated_details' == 'hpi.site'
+E     
+E     - hpi.site
+E     + hpi.associated_details
+________________ test_hindi_rag_question_presentation_and_tts _________________
+backend\tests\test_rag_multilingual_speech.py:249: in test_hindi_rag_question_presentation_and_tts
+    assert q["question_id"] == "hpi.site"
+E   AssertionError: assert 'hpi.associated_details' == 'hpi.site'
+E     
+E     - hpi.site
+E     + hpi.associated_details
+_______________ test_english_rag_question_presentation_and_tts ________________
+backend\tests\test_rag_multilingual_speech.py:277: in test_english_rag_question_presentation_and_tts
+    assert q["question_id"] == "hpi.site"
+E   AssertionError: assert 'hpi.associated_details' == 'hpi.site'
+E     
+E     - hpi.site
+E     + hpi.associated_details
+______________ test_template_fallback_passes_through_translation ______________
+backend\tests\test_rag_multilingual_speech.py:380: in test_template_fallback_passes_through_translation
+    assert q["question_id"] == "hpi.onset"
+E   AssertionError: assert 'hpi.radiation' == 'hpi.onset'
+E     
+E     - hpi.onset
+E     + hpi.radiation
+------------------------------ Captured log call ------------------------------
+WARNING  app.services.question_planner:question_planner.py:544 RAG retrieval failed safely in QuestionPlanner: synthetic retrieval outage
+___________ test_validated_english_wording_translated_not_template ____________
+backend\tests\test_rag_multilingual_speech.py:415: in test_validated_english_wording_translated_not_template
+    assert q["text"]["en"] == custom_validated_english
+           ^^^^^^^^^
+E   TypeError: 'NoneType' object is not subscriptable
+------------------------------ Captured log call ------------------------------
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open: 
+WARNING  app.services.adaptive:adaptive.py:242 RAG interview planning failed open:
+____________ test_interview_submission_triggers_red_flag_in_state _____________
+backend\tests\test_red_flags.py:316: in test_interview_submission_triggers_red_flag_in_state
+    state = submit(client, session_id, state, value=9, status="answered")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_adaptive.py:45: in submit
+    assert response.status_code == 200, response.text
+E   AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred. Please retry.","details":null}}
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call ------------------------------
+ERROR    app.main:main.py:94 Unhandled application error: NameError
+____________________ test_triage_api_list_and_acknowledge _____________________
+backend\tests\test_red_flags.py:330: in test_triage_api_list_and_acknowledge
+    state = submit(client, session_id, state, value=9, status="answered")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_adaptive.py:45: in submit
+    assert response.status_code == 200, response.text
+E   AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred. Please retry.","details":null}}
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call ------------------------------
+ERROR    app.main:main.py:94 Unhandled application error: NameError
+_________________________ test_triage_websocket_feed __________________________
+backend\tests\test_red_flags.py:388: in test_triage_websocket_feed
+    state = submit(client, session_id, state, value=9, status="answered")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_adaptive.py:45: in submit
+    assert response.status_code == 200, response.text
+E   AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred. Please retry.","details":null}}
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call ------------------------------
+ERROR    app.main:main.py:94 Unhandled application error: NameError
+____________ test_offline_explicit_symptom_triggers_existing_rule _____________
+backend\tests\test_stabilization_alerts.py:31: in test_offline_explicit_symptom_triggers_existing_rule
+    state = submit(client, sid, state, "shortness of breath", "answered")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_adaptive.py:45: in submit
+    assert response.status_code == 200, response.text
+E   AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred. Please retry.","details":null}}
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call ------------------------------
+ERROR    app.main:main.py:94 Unhandled application error: NameError
+_________________ test_answer_commit_delivers_creation_event __________________
+backend\tests\test_stabilization_alerts.py:41: in test_answer_commit_delivers_creation_event
+    state = submit(client, sid, state, 40, "answered")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend\tests\test_adaptive.py:45: in submit
+    assert response.status_code == 200, response.text
+E   AssertionError: {"error":{"code":"INTERNAL_ERROR","message":"An unexpected error occurred. Please retry.","details":null}}
+E   assert 500 == 200
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+------------------------------ Captured log call ------------------------------
+ERROR    app.main:main.py:94 Unhandled application error: NameError
+__________ test_full_intake_review_confirm_preserves_draft_and_audit __________
+backend\tests\test_workflow.py:92: in test_full_intake_review_confirm_preserves_draft_and_audit
+    assert listing[0]["patient_name"] == "Synthetic Patient"
+E   AssertionError: assert 'Synthetic Patient 01-2' == 'Synthetic Patient'
+E     
+E     - Synthetic Patient
+E     + Synthetic Patient 01-2
+E     ?                  +++++
+_____________ test_idempotent_session_consent_answers_completion ______________
+backend\tests\test_workflow.py:150: in test_idempotent_session_consent_answers_completion
+    assert database.scalar(select(func.count()).select_from(models.ClinicalSummary)) == 1
+E   AssertionError: assert 31 == 1
+E    +  where 31 = scalar(<sqlalchemy.sql.selectable.Select object at 0x000001E43CA16450>)
+E    +    where scalar = <sqlalchemy.orm.session.Session object at 0x000001E439CC0270>.scalar
+E    +    and   <sqlalchemy.sql.selectable.Select object at 0x000001E43CA16450> = select_from(<class 'app.models.clinical_summary.ClinicalSummary'>)
+E    +      where select_from = <sqlalchemy.sql.selectable.Select object at 0x000001E436EDE210>.select_from
+E    +        where <sqlalchemy.sql.selectable.Select object at 0x000001E436EDE210> = select(<sqlalchemy.sql.functions.count at 0x1e439cb9440; count>)
+E    +          where <sqlalchemy.sql.functions.count at 0x1e439cb9440; count> = <sqlalchemy.sql.functions._FunctionGenerator object at 0x000001E430B5AD60>()
+E    +            where <sqlalchemy.sql.functions._FunctionGenerator object at 0x000001E430B5AD60> = func.count
+E    +      and   <class 'app.models.clinical_summary.ClinicalSummary'> = models.ClinicalSummary
+============================== warnings summary ===============================
+backend\.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\MEDIKIOSK\backend\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+backend\.venv\Lib\site-packages\requests\__init__.py:86
+  C:\MEDIKIOSK\backend\.venv\Lib\site-packages\requests\__init__.py:86: RequestsDependencyWarning: Unable to find acceptable character detection dependency (chardet or charset_normalizer).
+    warnings.warn(
+
+tests/test_phone_otp_auth.py::test_verify_valid_otp
+tests/test_phone_otp_auth.py::test_logout_invalidates_session
+tests/test_phone_otp_auth.py::test_logout_invalidates_session
+tests/test_phone_otp_auth.py::test_logout_invalidates_session
+tests/test_phone_otp_auth.py::test_role_separation_patient_cannot_access_doctor
+  C:\MEDIKIOSK\backend\.venv\Lib\site-packages\starlette\testclient.py:455: DeprecationWarning: Setting per-request cookies=<...> is being deprecated, because the expected behaviour on cookie persistence is ambiguous. Set cookies directly on the client instance instead.
+    return super().request(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[chest_pain]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[abdominal_pain]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[fever]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[headache]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[cough_breathlessness]
+FAILED backend\tests\test_adaptive.py::test_all_flows_traverse_complete_review_confirm[ayush_demo.history]
+FAILED backend\tests\test_adaptive.py::test_legacy_resume_uses_server_config_and_preserves_original
+FAILED backend\tests\test_adaptive.py::test_latest_answers_stay_in_configuration_order_after_correction
+FAILED backend\tests\test_adaptive_rag.py::test_red_flag_always_outranks_rag
+FAILED backend\tests\test_demo_polish.py::test_seed_showcase_patient_service
+FAILED backend\tests\test_demo_polish.py::test_reset_demo_data_service - Name...
+FAILED backend\tests\test_demo_polish.py::test_demo_api_endpoints - assert 50...
+FAILED backend\tests\test_normalization.py::test_typed_and_explicit_unknown_answers_bypass_provider
+FAILED backend\tests\test_normalization.py::test_source_edit_history_cache_and_flow_authority
+FAILED backend\tests\test_normalization.py::test_inactive_normalization_is_historical_and_reactivation_reuses_snapshot
+FAILED backend\tests\test_normalization.py::test_provider_failures_are_persisted_and_interview_continues[unavailable]
+FAILED backend\tests\test_normalization.py::test_provider_failures_are_persisted_and_interview_continues[timeout]
+FAILED backend\tests\test_normalization.py::test_provider_failures_are_persisted_and_interview_continues[malformed]
+FAILED backend\tests\test_normalization.py::test_provider_failures_are_persisted_and_interview_continues[disabled]
+FAILED backend\tests\test_normalization.py::test_normalization_storage_failure_does_not_rollback_patient_answer[insert]
+FAILED backend\tests\test_normalization.py::test_normalization_storage_failure_does_not_rollback_patient_answer[select]
+FAILED backend\tests\test_normalization.py::test_completion_snapshot_and_confirmation_never_promote_machine_facts
+FAILED backend\tests\test_nvidia_normalization.py::test_source_commit_precedes_provider_and_optional_commit_failure_preserves_answer
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[401-authentication_failed]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[403-authentication_failed]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[429-rate_limited]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[500-server_error]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[503-server_error]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[202-provider_unavailable]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[302-provider_unavailable]
+FAILED backend\tests\test_nvidia_normalization.py::test_http_failure_no_retry_no_leak[422-provider_unavailable]
+FAILED backend\tests\test_nvidia_normalization.py::test_live_source_edit_branch_reactivation_and_confirmed_immutability
+FAILED backend\tests\test_rag_multilingual_speech.py::test_bengali_rag_question_presentation_and_tts
+FAILED backend\tests\test_rag_multilingual_speech.py::test_hindi_rag_question_presentation_and_tts
+FAILED backend\tests\test_rag_multilingual_speech.py::test_english_rag_question_presentation_and_tts
+FAILED backend\tests\test_rag_multilingual_speech.py::test_template_fallback_passes_through_translation
+FAILED backend\tests\test_rag_multilingual_speech.py::test_validated_english_wording_translated_not_template
+FAILED backend\tests\test_red_flags.py::test_interview_submission_triggers_red_flag_in_state
+FAILED backend\tests\test_red_flags.py::test_triage_api_list_and_acknowledge
+FAILED backend\tests\test_red_flags.py::test_triage_websocket_feed - Assertio...
+FAILED backend\tests\test_stabilization_alerts.py::test_offline_explicit_symptom_triggers_existing_rule
+FAILED backend\tests\test_stabilization_alerts.py::test_answer_commit_delivers_creation_event
+FAILED backend\tests\test_workflow.py::test_full_intake_review_confirm_preserves_draft_and_audit
+FAILED backend\tests\test_workflow.py::test_idempotent_session_consent_answers_completion
+====== 44 failed, 531 passed, 6 skipped, 7 warnings in 144.37s (0:02:24) ======

@@ -1,0 +1,438 @@
+image,text,writer_id,sample_id,source_type
+train_00001.png,Tab Pantoprazole 500 mcg HS x 5d,synthetic_renderer_calibri,train_00001,synthetic
+train_00002.png,Tablet Paracetamol 650 g AC x 5d,synthetic_renderer_cambria,train_00002,synthetic
+train_00003.png,Cap Pantoprazole 250 mg HS x 5d,synthetic_renderer_comic,train_00003,synthetic
+train_00004.png,Tab  Pantoprazole  250  ml  AC  x 5d,synthetic_renderer_consola,train_00004,synthetic
+train_00008.png,Tablet Paracetamol 625 mcg PC x 3d,synthetic_renderer_calibri,train_00008,synthetic
+train_00010.png,Capsule Amoxicillin 20 mcg PRN for 5 days,synthetic_renderer_comic,train_00010,synthetic
+train_00011.png,Tab Pantoprazole 500 g HS,synthetic_renderer_consola,train_00011,synthetic
+train_00012.png,Paracetamol 40 g HS x 7d,synthetic_renderer_cour,train_00012,synthetic
+train_00013.png,Cap  Pantoprazole  10  mg  OD,synthetic_renderer_georgia,train_00013,synthetic
+train_00015.png,Tab Paracetamol 625 g BD x 3d with water,synthetic_renderer_calibri,train_00015,synthetic
+train_00016.png,Cap Metformin 250 mg OD x 5d,synthetic_renderer_cambria,train_00016,synthetic
+train_00017.png,Syp  PCM  10  g  TDS  x 5d,synthetic_renderer_comic,train_00017,synthetic
+train_00020.png,Syrup Pantoprazole 5 g OD for 5 days with water,synthetic_renderer_georgia,train_00020,synthetic
+train_00021.png,Syp Cetirizine 10 ml PC x 7d before food,synthetic_renderer_arial,train_00021,synthetic
+train_00022.png,Tab Pantoprazole 625 ml OD,synthetic_renderer_calibri,train_00022,synthetic
+train_00023.png,Capsule Paracetamol 10 mcg AC x 3d,synthetic_renderer_cambria,train_00023,synthetic
+train_00024.png,Cap Metformin 40 ml PRN,synthetic_renderer_comic,train_00024,synthetic
+train_00025.png,Metformin  40  ml  SOS  x 5d,synthetic_renderer_consola,train_00025,synthetic
+train_00026.png,Paracetamol 20 g BD,synthetic_renderer_cour,train_00026,synthetic
+train_00027.png,Tablet PCM 40 mg OD,synthetic_renderer_georgia,train_00027,synthetic
+train_00028.png,Inj  Metformin  40  mg  BD  for 5 days,synthetic_renderer_arial,train_00028,synthetic
+train_00029.png,Capsule Paracetamol 500 g HS,synthetic_renderer_calibri,train_00029,synthetic
+train_00030.png,Cap PCM 250 mg TDS for 5 days before food,synthetic_renderer_cambria,train_00030,synthetic
+train_00031.png,Cap PCM 20 ml PC x 7d,synthetic_renderer_comic,train_00031,synthetic
+train_00032.png,Syrup  Paracetamol  40  g  TDS  x 3d  with water,synthetic_renderer_consola,train_00032,synthetic
+train_00033.png,Tablet Pantoprazole 650 ml OD x 5d,synthetic_renderer_cour,train_00033,synthetic
+train_00034.png,Amoxicillin  500  g  SOS,synthetic_renderer_georgia,train_00034,synthetic
+train_00035.png,Cetirizine 40 g QID,synthetic_renderer_arial,train_00035,synthetic
+train_00037.png,Tab  Metformin  250  g  PC  x 5d,synthetic_renderer_cambria,train_00037,synthetic
+train_00039.png,Inj Cetirizine 625 mcg AC for 5 days,synthetic_renderer_consola,train_00039,synthetic
+train_00040.png,Inj Metformin 10 ml PC x 3d before food,synthetic_renderer_cour,train_00040,synthetic
+train_00041.png,Capsule  Pantoprazole  250  ml  SOS,synthetic_renderer_georgia,train_00041,synthetic
+train_00042.png,Syp Pantoprazole 40 mg AC for 7 days,synthetic_renderer_arial,train_00042,synthetic
+train_00043.png,Syrup Amoxicillin 5 ml OD for 7 days before food,synthetic_renderer_calibri,train_00043,synthetic
+train_00044.png,PCM 10 ml QID for 5 days,synthetic_renderer_cambria,train_00044,synthetic
+train_00048.png,Tablet PCM 625 mg QID x 5d at bedtime,synthetic_renderer_georgia,train_00048,synthetic
+train_00049.png,Tab  Amoxicillin  5  ml  QID  x 3d,synthetic_renderer_arial,train_00049,synthetic
+train_00050.png,Amoxicillin 40 mcg SOS for 7 days,synthetic_renderer_calibri,train_00050,synthetic
+train_00051.png,Amoxicillin 10 mcg AC for 7 days,synthetic_renderer_cambria,train_00051,synthetic
+train_00052.png,Cap Paracetamol 10 g QID,synthetic_renderer_comic,train_00052,synthetic
+train_00053.png,Syp Amoxicillin 10 g TDS before food,synthetic_renderer_consola,train_00053,synthetic
+train_00056.png,Tablet Cetirizine 40 ml HS before food,synthetic_renderer_arial,train_00056,synthetic
+train_00057.png,Tablet  Metformin  10  mg  PC  x 7d  at bedtime,synthetic_renderer_calibri,train_00057,synthetic
+train_00058.png,Inj Cetirizine 10 ml SOS,synthetic_renderer_cambria,train_00058,synthetic
+train_00059.png,Tab Amoxicillin 625 ml AC,synthetic_renderer_comic,train_00059,synthetic
+train_00060.png,Syrup  Paracetamol  10  mg  PC  x 3d  as needed,synthetic_renderer_consola,train_00060,synthetic
+train_00062.png,Metformin 20 g TDS with water,synthetic_renderer_georgia,train_00062,synthetic
+train_00063.png,Pantoprazole 650 g OD x 5d,synthetic_renderer_arial,train_00063,synthetic
+train_00065.png,Pantoprazole 40 g PC for 7 days,synthetic_renderer_cambria,train_00065,synthetic
+train_00067.png,Inj Metformin 250 ml PC x 3d,synthetic_renderer_consola,train_00067,synthetic
+train_00069.png,Syrup Paracetamol 650 mcg TDS for 7 days,synthetic_renderer_georgia,train_00069,synthetic
+train_00071.png,Paracetamol 625 ml QID x 7d,synthetic_renderer_calibri,train_00071,synthetic
+train_00072.png,Syp PCM 500 ml OD for 5 days,synthetic_renderer_cambria,train_00072,synthetic
+train_00073.png,Syp PCM 10 mg OD x 3d,synthetic_renderer_comic,train_00073,synthetic
+train_00074.png,Capsule  Pantoprazole  40  g  OD  x 7d,synthetic_renderer_consola,train_00074,synthetic
+train_00075.png,Syrup  Amoxicillin  20  mcg  PC  at bedtime,synthetic_renderer_cour,train_00075,synthetic
+train_00077.png,Inj  Paracetamol  20  mg  PC  for 5 days  as needed,synthetic_renderer_arial,train_00077,synthetic
+train_00078.png,Capsule  Metformin  5  mg  BD,synthetic_renderer_calibri,train_00078,synthetic
+train_00079.png,Amoxicillin 20 ml QID x 7d,synthetic_renderer_cambria,train_00079,synthetic
+train_00080.png,Capsule Cetirizine 10 g BD for 7 days with water,synthetic_renderer_comic,train_00080,synthetic
+train_00086.png,PCM  5  mcg  AC,synthetic_renderer_cambria,train_00086,synthetic
+train_00087.png,Paracetamol 650 g TDS with water,synthetic_renderer_comic,train_00087,synthetic
+train_00088.png,Syrup PCM 650 mg PC,synthetic_renderer_consola,train_00088,synthetic
+train_00089.png,PCM 20 mcg QID for 7 days at bedtime,synthetic_renderer_cour,train_00089,synthetic
+train_00090.png,Tablet Paracetamol 5 ml BD x 5d,synthetic_renderer_georgia,train_00090,synthetic
+train_00091.png,Paracetamol 10 g QID,synthetic_renderer_arial,train_00091,synthetic
+train_00092.png,Cap Paracetamol 40 mcg PC x 5d,synthetic_renderer_calibri,train_00092,synthetic
+train_00093.png,Syrup Pantoprazole 20 mg OD before food,synthetic_renderer_cambria,train_00093,synthetic
+train_00094.png,Inj Paracetamol 5 ml AC for 7 days with water,synthetic_renderer_comic,train_00094,synthetic
+train_00097.png,Capsule  Cetirizine  625  ml  PRN  for 7 days,synthetic_renderer_georgia,train_00097,synthetic
+train_00099.png,Tab Pantoprazole 40 g QID x 7d,synthetic_renderer_calibri,train_00099,synthetic
+train_00101.png,Pantoprazole 250 mcg HS,synthetic_renderer_comic,train_00101,synthetic
+train_00102.png,Inj Cetirizine 5 mg OD x 7d,synthetic_renderer_consola,train_00102,synthetic
+train_00103.png,Tab Pantoprazole 625 mg PC,synthetic_renderer_cour,train_00103,synthetic
+train_00105.png,Metformin 10 mg HS for 7 days before food,synthetic_renderer_arial,train_00105,synthetic
+train_00107.png,Inj Paracetamol 10 g QID for 7 days,synthetic_renderer_cambria,train_00107,synthetic
+train_00108.png,Cetirizine 250 mcg HS at bedtime,synthetic_renderer_comic,train_00108,synthetic
+train_00109.png,Tablet Pantoprazole 40 mg PC for 7 days,synthetic_renderer_consola,train_00109,synthetic
+train_00112.png,Syp PCM 40 mcg AC x 7d,synthetic_renderer_arial,train_00112,synthetic
+train_00113.png,Pantoprazole  650  mcg  TDS  for 7 days  before food,synthetic_renderer_calibri,train_00113,synthetic
+train_00114.png,Syrup  Cetirizine  500  g  HS  for 5 days,synthetic_renderer_cambria,train_00114,synthetic
+train_00115.png,Syp Amoxicillin 40 ml HS x 7d as needed,synthetic_renderer_comic,train_00115,synthetic
+train_00116.png,Cetirizine  10  mcg  HS  x 3d  as needed,synthetic_renderer_consola,train_00116,synthetic
+train_00117.png,Tab  Amoxicillin  650  ml  QID,synthetic_renderer_cour,train_00117,synthetic
+train_00123.png,Tablet Pantoprazole 500 g SOS x 7d,synthetic_renderer_consola,train_00123,synthetic
+train_00124.png,Capsule Cetirizine 10 mcg PRN for 5 days,synthetic_renderer_cour,train_00124,synthetic
+train_00125.png,Metformin  500  g  HS  at bedtime,synthetic_renderer_georgia,train_00125,synthetic
+train_00126.png,Syp Paracetamol 5 mcg BD,synthetic_renderer_arial,train_00126,synthetic
+train_00127.png,Tablet  Amoxicillin  250  mcg  PC  for 5 days  as needed,synthetic_renderer_calibri,train_00127,synthetic
+train_00128.png,Tablet Pantoprazole 650 g OD for 5 days,synthetic_renderer_cambria,train_00128,synthetic
+train_00129.png,Inj Cetirizine 500 ml OD x 7d,synthetic_renderer_comic,train_00129,synthetic
+train_00131.png,Tab Amoxicillin 5 mg HS x 3d before food,synthetic_renderer_cour,train_00131,synthetic
+train_00132.png,Syrup Metformin 625 g OD for 7 days,synthetic_renderer_georgia,train_00132,synthetic
+train_00135.png,Capsule Metformin 5 mg HS for 7 days,synthetic_renderer_cambria,train_00135,synthetic
+train_00137.png,Amoxicillin  625  mcg  AC  x 5d,synthetic_renderer_consola,train_00137,synthetic
+train_00139.png,Syrup Amoxicillin 500 g QID for 7 days at bedtime,synthetic_renderer_georgia,train_00139,synthetic
+train_00141.png,Pantoprazole 40 ml HS x 3d,synthetic_renderer_calibri,train_00141,synthetic
+train_00143.png,Tablet  PCM  250  g  TDS,synthetic_renderer_comic,train_00143,synthetic
+train_00144.png,Cap  Metformin  250  g  PC  x 5d  at bedtime,synthetic_renderer_consola,train_00144,synthetic
+train_00148.png,Tab Paracetamol 5 g OD x 7d,synthetic_renderer_calibri,train_00148,synthetic
+train_00150.png,Metformin 650 mg PC,synthetic_renderer_comic,train_00150,synthetic
+train_00155.png,Inj Metformin 5 mg PRN for 7 days,synthetic_renderer_calibri,train_00155,synthetic
+train_00156.png,Capsule Amoxicillin 10 g SOS,synthetic_renderer_cambria,train_00156,synthetic
+train_00157.png,PCM 625 mg TDS x 5d as needed,synthetic_renderer_comic,train_00157,synthetic
+train_00158.png,Cap Metformin 250 g QID for 7 days,synthetic_renderer_consola,train_00158,synthetic
+train_00161.png,Capsule Paracetamol 5 mcg QID x 5d as needed,synthetic_renderer_arial,train_00161,synthetic
+train_00162.png,Syp Pantoprazole 650 mg PC for 7 days,synthetic_renderer_calibri,train_00162,synthetic
+train_00163.png,Amoxicillin 625 ml OD for 7 days,synthetic_renderer_cambria,train_00163,synthetic
+train_00165.png,Cap Paracetamol 250 mg QID x 5d after food,synthetic_renderer_consola,train_00165,synthetic
+train_00167.png,Syrup  PCM  5  ml  OD  for 5 days,synthetic_renderer_georgia,train_00167,synthetic
+train_00168.png,Pantoprazole 10 g QID x 5d as needed,synthetic_renderer_arial,train_00168,synthetic
+train_00169.png,Cap Pantoprazole 10 ml PC x 7d,synthetic_renderer_calibri,train_00169,synthetic
+train_00170.png,Tablet  Cetirizine  500  mcg  HS  x 7d  before food,synthetic_renderer_cambria,train_00170,synthetic
+train_00171.png,Paracetamol 500 mcg PC before food,synthetic_renderer_comic,train_00171,synthetic
+train_00173.png,Tablet Pantoprazole 250 g PC,synthetic_renderer_cour,train_00173,synthetic
+train_00176.png,Inj PCM 20 ml PC,synthetic_renderer_calibri,train_00176,synthetic
+train_00178.png,Tab  Metformin  5  g  HS  x 3d,synthetic_renderer_comic,train_00178,synthetic
+train_00180.png,Syrup  Pantoprazole  20  ml  PRN  for 5 days  with water,synthetic_renderer_cour,train_00180,synthetic
+train_00181.png,Tab Paracetamol 40 mg PRN for 5 days after food,synthetic_renderer_georgia,train_00181,synthetic
+train_00182.png,Syp Pantoprazole 10 mg AC,synthetic_renderer_arial,train_00182,synthetic
+train_00183.png,Tablet PCM 5 ml PC x 5d after food,synthetic_renderer_calibri,train_00183,synthetic
+train_00184.png,Tablet Cetirizine 650 mg BD x 5d after food,synthetic_renderer_cambria,train_00184,synthetic
+train_00186.png,Tablet Amoxicillin 5 mg QID x 7d,synthetic_renderer_consola,train_00186,synthetic
+train_00189.png,Pantoprazole  20  ml  AC,synthetic_renderer_arial,train_00189,synthetic
+train_00193.png,Inj  Paracetamol  40  mcg  BD  for 7 days,synthetic_renderer_consola,train_00193,synthetic
+train_00194.png,Paracetamol  625  mcg  BD  x 3d  after food,synthetic_renderer_cour,train_00194,synthetic
+train_00195.png,Syrup  PCM  650  mg  QID  for 7 days,synthetic_renderer_georgia,train_00195,synthetic
+train_00196.png,Syp Pantoprazole 500 mg AC for 7 days,synthetic_renderer_arial,train_00196,synthetic
+train_00199.png,Amoxicillin  10  mg  SOS  as needed,synthetic_renderer_comic,train_00199,synthetic
+train_00200.png,Cap Amoxicillin 625 ml BD x 5d,synthetic_renderer_consola,train_00200,synthetic
+train_00201.png,Inj Amoxicillin 20 mcg OD x 3d,synthetic_renderer_cour,train_00201,synthetic
+train_00202.png,Pantoprazole 500 mg PC for 7 days as needed,synthetic_renderer_georgia,train_00202,synthetic
+train_00206.png,Cap Paracetamol 10 mcg TDS,synthetic_renderer_comic,train_00206,synthetic
+train_00207.png,Tab PCM 625 mg QID after food,synthetic_renderer_consola,train_00207,synthetic
+train_00208.png,Metformin 10 g QID x 5d after food,synthetic_renderer_cour,train_00208,synthetic
+train_00211.png,Inj  Cetirizine  625  g  SOS  for 7 days  as needed,synthetic_renderer_calibri,train_00211,synthetic
+train_00213.png,Syp  Amoxicillin  250  mcg  HS  for 5 days,synthetic_renderer_comic,train_00213,synthetic
+train_00214.png,Cetirizine 5 mcg QID as needed,synthetic_renderer_consola,train_00214,synthetic
+train_00215.png,Syrup Pantoprazole 20 mg BD for 7 days with water,synthetic_renderer_cour,train_00215,synthetic
+train_00217.png,Capsule PCM 10 ml SOS x 7d,synthetic_renderer_arial,train_00217,synthetic
+train_00218.png,Inj  Metformin  625  ml  BD  with water,synthetic_renderer_calibri,train_00218,synthetic
+train_00220.png,Pantoprazole 5 ml OD x 3d at bedtime,synthetic_renderer_comic,train_00220,synthetic
+train_00221.png,Capsule Amoxicillin 500 mg QID for 5 days,synthetic_renderer_consola,train_00221,synthetic
+train_00222.png,Cap Amoxicillin 40 ml SOS,synthetic_renderer_cour,train_00222,synthetic
+train_00226.png,Tablet  Pantoprazole  10  mg  AC  x 3d,synthetic_renderer_cambria,train_00226,synthetic
+train_00227.png,Amoxicillin 650 mg AC x 7d,synthetic_renderer_comic,train_00227,synthetic
+train_00228.png,Syp Paracetamol 10 mg PRN,synthetic_renderer_consola,train_00228,synthetic
+train_00229.png,Metformin  250  ml  PRN,synthetic_renderer_cour,train_00229,synthetic
+train_00232.png,Syrup Paracetamol 250 mg AC as needed,synthetic_renderer_calibri,train_00232,synthetic
+train_00233.png,Cap Metformin 20 mg TDS for 5 days before food,synthetic_renderer_cambria,train_00233,synthetic
+train_00234.png,PCM  625  ml  BD  before food,synthetic_renderer_comic,train_00234,synthetic
+train_00237.png,PCM  500  mcg  PRN  for 7 days,synthetic_renderer_georgia,train_00237,synthetic
+train_00239.png,Tab Pantoprazole 650 mg TDS with water,synthetic_renderer_calibri,train_00239,synthetic
+train_00240.png,Inj  Cetirizine  5  mg  HS  x 3d,synthetic_renderer_cambria,train_00240,synthetic
+train_00241.png,Cetirizine  250  ml  OD  for 7 days  after food,synthetic_renderer_comic,train_00241,synthetic
+train_00242.png,Syrup  Amoxicillin  625  ml  PRN  with water,synthetic_renderer_consola,train_00242,synthetic
+train_00243.png,Syrup Amoxicillin 250 mcg HS after food,synthetic_renderer_cour,train_00243,synthetic
+train_00244.png,Syrup  Pantoprazole  40  mcg  TDS,synthetic_renderer_georgia,train_00244,synthetic
+train_00245.png,Syrup  Amoxicillin  500  mcg  QID  x 3d,synthetic_renderer_arial,train_00245,synthetic
+train_00247.png,Pantoprazole 20 mg OD for 7 days,synthetic_renderer_cambria,train_00247,synthetic
+train_00248.png,Inj  Paracetamol  500  g  QID  for 7 days,synthetic_renderer_comic,train_00248,synthetic
+train_00249.png,Cap Amoxicillin 40 ml HS,synthetic_renderer_consola,train_00249,synthetic
+train_00250.png,Tab PCM 650 mg PC x 5d,synthetic_renderer_cour,train_00250,synthetic
+train_00251.png,Inj Cetirizine 250 mcg PRN x 5d,synthetic_renderer_georgia,train_00251,synthetic
+train_00252.png,Tab Paracetamol 650 g AC for 7 days,synthetic_renderer_arial,train_00252,synthetic
+train_00253.png,Tablet Cetirizine 250 ml PRN,synthetic_renderer_calibri,train_00253,synthetic
+train_00255.png,Cap Pantoprazole 40 ml QID for 7 days,synthetic_renderer_comic,train_00255,synthetic
+train_00259.png,Inj  Metformin  250  g  AC,synthetic_renderer_arial,train_00259,synthetic
+train_00261.png,Syp Pantoprazole 5 mcg TDS,synthetic_renderer_cambria,train_00261,synthetic
+train_00262.png,PCM 10 mcg QID x 5d,synthetic_renderer_comic,train_00262,synthetic
+train_00263.png,Tablet Cetirizine 500 mcg AC x 5d,synthetic_renderer_consola,train_00263,synthetic
+train_00264.png,Syp Paracetamol 500 ml SOS before food,synthetic_renderer_cour,train_00264,synthetic
+train_00267.png,Metformin 40 ml HS for 5 days,synthetic_renderer_calibri,train_00267,synthetic
+train_00269.png,Syrup Metformin 40 ml BD for 5 days after food,synthetic_renderer_comic,train_00269,synthetic
+train_00273.png,Cap  Cetirizine  250  g  BD  x 5d,synthetic_renderer_arial,train_00273,synthetic
+train_00275.png,Syrup Metformin 500 ml BD x 3d,synthetic_renderer_cambria,train_00275,synthetic
+train_00276.png,Syrup PCM 650 mg PRN x 5d,synthetic_renderer_comic,train_00276,synthetic
+train_00277.png,Tab Amoxicillin 5 mg AC for 7 days after food,synthetic_renderer_consola,train_00277,synthetic
+train_00280.png,Tablet  Metformin  650  ml  PRN  for 5 days,synthetic_renderer_arial,train_00280,synthetic
+train_00281.png,Capsule Paracetamol 500 g AC x 3d before food,synthetic_renderer_calibri,train_00281,synthetic
+train_00283.png,Amoxicillin 5 mcg SOS x 3d,synthetic_renderer_comic,train_00283,synthetic
+train_00284.png,Syp Paracetamol 250 ml AC x 3d,synthetic_renderer_consola,train_00284,synthetic
+train_00288.png,Cap Pantoprazole 20 mg OD for 7 days as needed,synthetic_renderer_calibri,train_00288,synthetic
+train_00289.png,Cap Amoxicillin 650 mcg BD x 3d,synthetic_renderer_cambria,train_00289,synthetic
+train_00290.png,Syrup Cetirizine 40 mcg TDS x 7d at bedtime,synthetic_renderer_comic,train_00290,synthetic
+train_00293.png,Tab PCM 20 ml SOS x 5d,synthetic_renderer_georgia,train_00293,synthetic
+train_00295.png,Pantoprazole 500 g PRN as needed,synthetic_renderer_calibri,train_00295,synthetic
+train_00296.png,Syp PCM 10 mcg PRN for 7 days,synthetic_renderer_cambria,train_00296,synthetic
+train_00297.png,Tablet Amoxicillin 625 mcg PC for 7 days before food,synthetic_renderer_comic,train_00297,synthetic
+train_00298.png,Tab  Pantoprazole  5  ml  AC,synthetic_renderer_consola,train_00298,synthetic
+train_00300.png,PCM 20 mcg OD for 5 days,synthetic_renderer_georgia,train_00300,synthetic
+train_00302.png,Cetirizine 650 ml AC for 7 days,synthetic_renderer_calibri,train_00302,synthetic
+train_00303.png,Pantoprazole  20  g  HS  for 5 days,synthetic_renderer_cambria,train_00303,synthetic
+train_00307.png,Cap Paracetamol 5 g PRN for 7 days,synthetic_renderer_georgia,train_00307,synthetic
+train_00310.png,Amoxicillin  20  mcg  SOS  for 5 days,synthetic_renderer_cambria,train_00310,synthetic
+train_00312.png,Inj  Pantoprazole  650  mcg  PRN  before food,synthetic_renderer_consola,train_00312,synthetic
+train_00314.png,Paracetamol  5  ml  OD  x 7d,synthetic_renderer_georgia,train_00314,synthetic
+train_00315.png,Syrup Amoxicillin 10 mcg PRN for 5 days with water,synthetic_renderer_arial,train_00315,synthetic
+train_00316.png,Tablet Cetirizine 20 ml QID x 3d before food,synthetic_renderer_calibri,train_00316,synthetic
+train_00317.png,Inj  PCM  10  g  PRN  x 3d,synthetic_renderer_cambria,train_00317,synthetic
+train_00318.png,Amoxicillin 625 mcg QID x 3d,synthetic_renderer_comic,train_00318,synthetic
+train_00319.png,Cap Pantoprazole 250 mg PC,synthetic_renderer_consola,train_00319,synthetic
+train_00320.png,Capsule  Cetirizine  20  mg  PC  for 7 days,synthetic_renderer_cour,train_00320,synthetic
+train_00322.png,Tablet Paracetamol 40 mcg QID for 7 days after food,synthetic_renderer_arial,train_00322,synthetic
+train_00323.png,Metformin  500  mg  HS  x 7d,synthetic_renderer_calibri,train_00323,synthetic
+train_00325.png,Tablet Paracetamol 650 g SOS,synthetic_renderer_comic,train_00325,synthetic
+train_00326.png,Tab PCM 5 g OD x 7d after food,synthetic_renderer_consola,train_00326,synthetic
+train_00329.png,Pantoprazole 625 ml QID,synthetic_renderer_arial,train_00329,synthetic
+train_00332.png,Metformin 250 g QID for 7 days,synthetic_renderer_comic,train_00332,synthetic
+train_00333.png,PCM 20 g TDS at bedtime,synthetic_renderer_consola,train_00333,synthetic
+train_00335.png,Tab Metformin 500 g QID x 5d at bedtime,synthetic_renderer_georgia,train_00335,synthetic
+train_00337.png,Tab  Cetirizine  5  mg  SOS  x 3d,synthetic_renderer_calibri,train_00337,synthetic
+train_00339.png,Capsule PCM 5 ml OD before food,synthetic_renderer_comic,train_00339,synthetic
+train_00342.png,Inj  PCM  20  ml  OD  for 7 days  with water,synthetic_renderer_georgia,train_00342,synthetic
+train_00345.png,Syp  Paracetamol  650  mcg  TDS  x 5d,synthetic_renderer_cambria,train_00345,synthetic
+train_00346.png,Paracetamol 650 ml OD for 7 days,synthetic_renderer_comic,train_00346,synthetic
+train_00347.png,PCM 650 g TDS x 3d,synthetic_renderer_consola,train_00347,synthetic
+train_00350.png,Metformin  500  g  BD  x 3d,synthetic_renderer_arial,train_00350,synthetic
+train_00351.png,Paracetamol 40 mcg BD with water,synthetic_renderer_calibri,train_00351,synthetic
+train_00354.png,Amoxicillin 40 mg PC x 5d,synthetic_renderer_consola,train_00354,synthetic
+train_00355.png,Inj Paracetamol 250 ml TDS x 3d,synthetic_renderer_cour,train_00355,synthetic
+train_00356.png,Cetirizine 625 mcg SOS for 7 days at bedtime,synthetic_renderer_georgia,train_00356,synthetic
+train_00358.png,Syrup Cetirizine 625 ml QID for 5 days as needed,synthetic_renderer_calibri,train_00358,synthetic
+train_00359.png,Capsule Pantoprazole 5 mg HS x 7d,synthetic_renderer_cambria,train_00359,synthetic
+train_00360.png,Paracetamol 650 ml QID,synthetic_renderer_comic,train_00360,synthetic
+train_00361.png,Metformin  250  g  HS  x 5d,synthetic_renderer_consola,train_00361,synthetic
+train_00365.png,Capsule Cetirizine 650 g PRN x 7d,synthetic_renderer_calibri,train_00365,synthetic
+train_00366.png,Tablet  Metformin  250  mg  PRN  x 7d,synthetic_renderer_cambria,train_00366,synthetic
+train_00367.png,Syrup  Pantoprazole  650  mcg  OD  x 5d,synthetic_renderer_comic,train_00367,synthetic
+train_00368.png,Capsule  Cetirizine  500  g  PC  at bedtime,synthetic_renderer_consola,train_00368,synthetic
+train_00369.png,Amoxicillin 20 mg PC for 5 days,synthetic_renderer_cour,train_00369,synthetic
+train_00370.png,Inj  Paracetamol  20  mcg  PC  x 5d,synthetic_renderer_georgia,train_00370,synthetic
+train_00373.png,Capsule Amoxicillin 20 mg BD x 7d,synthetic_renderer_cambria,train_00373,synthetic
+train_00374.png,Pantoprazole  20  g  BD  x 7d  after food,synthetic_renderer_comic,train_00374,synthetic
+train_00375.png,Syp PCM 20 mg HS x 3d,synthetic_renderer_consola,train_00375,synthetic
+train_00377.png,Inj PCM 500 g SOS x 3d at bedtime,synthetic_renderer_georgia,train_00377,synthetic
+train_00378.png,Inj  Paracetamol  20  g  QID  x 7d,synthetic_renderer_arial,train_00378,synthetic
+train_00379.png,Capsule Amoxicillin 5 mg AC for 7 days with water,synthetic_renderer_calibri,train_00379,synthetic
+train_00380.png,Capsule PCM 20 mg OD,synthetic_renderer_cambria,train_00380,synthetic
+train_00386.png,Pantoprazole 250 mg SOS x 3d,synthetic_renderer_calibri,train_00386,synthetic
+train_00388.png,Tablet  PCM  40  g  PRN  for 5 days,synthetic_renderer_comic,train_00388,synthetic
+train_00389.png,Capsule PCM 500 g AC x 5d,synthetic_renderer_consola,train_00389,synthetic
+train_00390.png,Capsule Amoxicillin 5 g OD for 7 days,synthetic_renderer_cour,train_00390,synthetic
+train_00392.png,Pantoprazole 250 mg TDS for 5 days,synthetic_renderer_arial,train_00392,synthetic
+train_00393.png,Cap Metformin 40 mg HS,synthetic_renderer_calibri,train_00393,synthetic
+train_00395.png,Tablet  Metformin  650  g  TDS,synthetic_renderer_comic,train_00395,synthetic
+train_00397.png,Tab Metformin 5 mg OD x 5d,synthetic_renderer_cour,train_00397,synthetic
+train_00398.png,Tab Paracetamol 5 mcg HS after food,synthetic_renderer_georgia,train_00398,synthetic
+train_00400.png,Tab Paracetamol 250 mcg TDS for 7 days,synthetic_renderer_calibri,train_00400,synthetic
+train_00402.png,Tab Pantoprazole 250 mcg TDS for 5 days,synthetic_renderer_comic,train_00402,synthetic
+train_00404.png,Cetirizine 500 mcg AC x 7d with water,synthetic_renderer_cour,train_00404,synthetic
+train_00405.png,Amoxicillin 650 g PRN after food,synthetic_renderer_georgia,train_00405,synthetic
+train_00409.png,Inj  Pantoprazole  500  mcg  PRN  as needed,synthetic_renderer_comic,train_00409,synthetic
+train_00410.png,Tablet Amoxicillin 625 g AC x 7d,synthetic_renderer_consola,train_00410,synthetic
+train_00411.png,Tablet  Cetirizine  500  g  PC,synthetic_renderer_cour,train_00411,synthetic
+train_00412.png,Syp  Cetirizine  5  ml  QID  x 5d  with water,synthetic_renderer_georgia,train_00412,synthetic
+train_00413.png,Cap Amoxicillin 40 ml OD x 5d,synthetic_renderer_arial,train_00413,synthetic
+train_00415.png,Pantoprazole 500 ml OD,synthetic_renderer_cambria,train_00415,synthetic
+train_00417.png,Tablet Amoxicillin 20 mg PRN,synthetic_renderer_consola,train_00417,synthetic
+train_00418.png,Metformin 625 ml AC x 7d,synthetic_renderer_cour,train_00418,synthetic
+train_00419.png,Paracetamol 625 g TDS x 7d,synthetic_renderer_georgia,train_00419,synthetic
+train_00421.png,Inj PCM 10 ml SOS for 7 days,synthetic_renderer_calibri,train_00421,synthetic
+train_00422.png,Tab PCM 625 mcg HS for 7 days after food,synthetic_renderer_cambria,train_00422,synthetic
+train_00428.png,Syp Metformin 20 g PRN x 3d,synthetic_renderer_calibri,train_00428,synthetic
+train_00429.png,Pantoprazole  625  g  QID,synthetic_renderer_cambria,train_00429,synthetic
+train_00430.png,Syp  Pantoprazole  250  mg  SOS  x 5d  at bedtime,synthetic_renderer_comic,train_00430,synthetic
+train_00434.png,Metformin 5 mg AC for 5 days as needed,synthetic_renderer_arial,train_00434,synthetic
+train_00435.png,Metformin  625  mg  PC,synthetic_renderer_calibri,train_00435,synthetic
+train_00437.png,Inj  Pantoprazole  250  mcg  PC  for 7 days,synthetic_renderer_comic,train_00437,synthetic
+train_00439.png,Syp Amoxicillin 40 mg TDS for 7 days,synthetic_renderer_cour,train_00439,synthetic
+train_00442.png,Tablet Metformin 250 mcg OD x 3d,synthetic_renderer_calibri,train_00442,synthetic
+train_00444.png,Capsule Pantoprazole 20 g TDS for 5 days after food,synthetic_renderer_comic,train_00444,synthetic
+train_00445.png,Tablet PCM 650 g AC x 3d at bedtime,synthetic_renderer_consola,train_00445,synthetic
+train_00446.png,Syp Amoxicillin 625 g PRN,synthetic_renderer_cour,train_00446,synthetic
+train_00448.png,Syp Metformin 500 mcg PRN x 7d,synthetic_renderer_arial,train_00448,synthetic
+train_00449.png,Inj Metformin 650 g HS for 7 days with water,synthetic_renderer_calibri,train_00449,synthetic
+train_00450.png,Tablet  PCM  5  ml  PRN  x 5d  before food,synthetic_renderer_cambria,train_00450,synthetic
+train_00451.png,Cap Pantoprazole 5 g PRN with water,synthetic_renderer_comic,train_00451,synthetic
+train_00453.png,PCM  10  ml  BD  with water,synthetic_renderer_cour,train_00453,synthetic
+train_00454.png,Inj Pantoprazole 10 g QID,synthetic_renderer_georgia,train_00454,synthetic
+train_00455.png,Capsule Amoxicillin 250 mcg OD,synthetic_renderer_arial,train_00455,synthetic
+train_00457.png,Syp Cetirizine 250 ml OD for 7 days,synthetic_renderer_cambria,train_00457,synthetic
+train_00458.png,Amoxicillin 500 mg PRN x 3d after food,synthetic_renderer_comic,train_00458,synthetic
+train_00462.png,Cap Pantoprazole 40 mg OD x 7d,synthetic_renderer_arial,train_00462,synthetic
+train_00463.png,Metformin 650 mcg BD,synthetic_renderer_calibri,train_00463,synthetic
+train_00464.png,Cap  Paracetamol  500  mcg  SOS  for 5 days,synthetic_renderer_cambria,train_00464,synthetic
+train_00465.png,Cap PCM 650 g PC x 3d before food,synthetic_renderer_comic,train_00465,synthetic
+train_00466.png,Cap  Pantoprazole  625  mcg  PRN  x 5d,synthetic_renderer_consola,train_00466,synthetic
+train_00467.png,Inj  PCM  250  mg  AC  for 5 days,synthetic_renderer_cour,train_00467,synthetic
+train_00469.png,Cap Amoxicillin 20 ml BD for 7 days,synthetic_renderer_arial,train_00469,synthetic
+train_00470.png,Cetirizine 650 g SOS for 7 days,synthetic_renderer_calibri,train_00470,synthetic
+train_00471.png,Syrup Metformin 250 ml OD for 5 days,synthetic_renderer_cambria,train_00471,synthetic
+train_00472.png,Paracetamol 20 ml TDS before food,synthetic_renderer_comic,train_00472,synthetic
+train_00474.png,Pantoprazole  5  g  SOS  for 5 days  at bedtime,synthetic_renderer_cour,train_00474,synthetic
+train_00475.png,Tab Cetirizine 500 ml SOS x 7d,synthetic_renderer_georgia,train_00475,synthetic
+train_00477.png,Paracetamol 625 mg OD for 7 days,synthetic_renderer_calibri,train_00477,synthetic
+train_00479.png,Cap Cetirizine 625 g PC x 7d,synthetic_renderer_comic,train_00479,synthetic
+train_00481.png,Inj  PCM  20  mcg  OD  for 5 days,synthetic_renderer_cour,train_00481,synthetic
+train_00482.png,Cap Paracetamol 20 g AC x 7d at bedtime,synthetic_renderer_georgia,train_00482,synthetic
+train_00483.png,Syp Cetirizine 500 mg TDS,synthetic_renderer_arial,train_00483,synthetic
+train_00486.png,Amoxicillin 650 g AC,synthetic_renderer_comic,train_00486,synthetic
+train_00488.png,Cap  Metformin  500  g  QID  x 3d,synthetic_renderer_cour,train_00488,synthetic
+train_00489.png,Cap Paracetamol 40 g PRN for 5 days,synthetic_renderer_georgia,train_00489,synthetic
+train_00490.png,Inj Cetirizine 5 ml QID for 5 days,synthetic_renderer_arial,train_00490,synthetic
+train_00492.png,Cetirizine  250  mcg  BD  x 7d,synthetic_renderer_cambria,train_00492,synthetic
+train_00493.png,Inj Metformin 5 ml SOS x 5d,synthetic_renderer_comic,train_00493,synthetic
+train_00494.png,Capsule Pantoprazole 40 mcg PC at bedtime,synthetic_renderer_consola,train_00494,synthetic
+train_00495.png,Syrup PCM 500 g OD x 3d at bedtime,synthetic_renderer_cour,train_00495,synthetic
+train_00496.png,Inj Amoxicillin 250 mcg SOS x 7d,synthetic_renderer_georgia,train_00496,synthetic
+train_00497.png,Tablet Metformin 20 mg OD x 3d,synthetic_renderer_arial,train_00497,synthetic
+train_00498.png,Tablet Amoxicillin 250 ml PRN with water,synthetic_renderer_calibri,train_00498,synthetic
+train_00499.png,Inj Pantoprazole 40 g OD x 3d with water,synthetic_renderer_cambria,train_00499,synthetic
+train_00500.png,Paracetamol 10 mcg HS for 7 days,synthetic_renderer_comic,train_00500,synthetic
+train_00501.png,Tablet Cetirizine 5 ml SOS x 3d,synthetic_renderer_consola,train_00501,synthetic
+train_00502.png,Cap  Paracetamol  650  mg  QID,synthetic_renderer_cour,train_00502,synthetic
+train_00505.png,Syrup Amoxicillin 20 mg PC x 7d,synthetic_renderer_calibri,train_00505,synthetic
+train_00506.png,Syrup Metformin 10 ml TDS x 3d,synthetic_renderer_cambria,train_00506,synthetic
+train_00508.png,PCM 650 mcg PC at bedtime,synthetic_renderer_consola,train_00508,synthetic
+train_00509.png,Capsule Paracetamol 10 mcg PRN x 5d after food,synthetic_renderer_cour,train_00509,synthetic
+train_00510.png,Paracetamol  20  mg  TDS  at bedtime,synthetic_renderer_georgia,train_00510,synthetic
+train_00511.png,Syp Paracetamol 40 ml PRN x 7d,synthetic_renderer_arial,train_00511,synthetic
+train_00512.png,PCM  10  g  OD,synthetic_renderer_calibri,train_00512,synthetic
+train_00513.png,Amoxicillin 20 ml AC before food,synthetic_renderer_cambria,train_00513,synthetic
+train_00514.png,Tab Cetirizine 250 g TDS as needed,synthetic_renderer_comic,train_00514,synthetic
+train_00515.png,Paracetamol 10 g BD,synthetic_renderer_consola,train_00515,synthetic
+train_00516.png,Cetirizine 5 g AC with water,synthetic_renderer_cour,train_00516,synthetic
+train_00518.png,Syp Cetirizine 625 mcg AC x 7d,synthetic_renderer_arial,train_00518,synthetic
+train_00519.png,Capsule  PCM  5  mcg  PC  for 5 days,synthetic_renderer_calibri,train_00519,synthetic
+train_00521.png,Cap Pantoprazole 500 g TDS for 5 days,synthetic_renderer_comic,train_00521,synthetic
+train_00522.png,Tab Amoxicillin 250 g BD,synthetic_renderer_consola,train_00522,synthetic
+train_00523.png,Cap PCM 5 mg PRN after food,synthetic_renderer_cour,train_00523,synthetic
+train_00524.png,Cap Metformin 10 ml QID x 5d,synthetic_renderer_georgia,train_00524,synthetic
+train_00525.png,Tablet  Metformin  5  mcg  TDS  x 5d,synthetic_renderer_arial,train_00525,synthetic
+train_00527.png,Inj Amoxicillin 650 mg AC x 5d,synthetic_renderer_cambria,train_00527,synthetic
+train_00528.png,Tab Paracetamol 10 mg SOS x 3d,synthetic_renderer_comic,train_00528,synthetic
+train_00529.png,Inj PCM 500 ml AC x 7d after food,synthetic_renderer_consola,train_00529,synthetic
+train_00531.png,Syp Metformin 625 ml QID x 5d as needed,synthetic_renderer_georgia,train_00531,synthetic
+train_00534.png,Syp PCM 10 g PRN,synthetic_renderer_cambria,train_00534,synthetic
+train_00536.png,Metformin  20  ml  SOS,synthetic_renderer_consola,train_00536,synthetic
+train_00538.png,Syp  Cetirizine  250  mg  BD  for 5 days,synthetic_renderer_georgia,train_00538,synthetic
+train_00539.png,Cap Metformin 650 mg PC x 3d as needed,synthetic_renderer_arial,train_00539,synthetic
+train_00543.png,Inj  Pantoprazole  250  mg  SOS,synthetic_renderer_consola,train_00543,synthetic
+train_00544.png,Capsule  Metformin  250  mg  PRN,synthetic_renderer_cour,train_00544,synthetic
+train_00546.png,Tab Paracetamol 250 mcg TDS x 5d at bedtime,synthetic_renderer_arial,train_00546,synthetic
+train_00548.png,Amoxicillin 650 g HS,synthetic_renderer_cambria,train_00548,synthetic
+train_00550.png,Capsule Cetirizine 500 ml TDS for 7 days,synthetic_renderer_consola,train_00550,synthetic
+train_00553.png,Metformin 20 mcg QID for 5 days before food,synthetic_renderer_arial,train_00553,synthetic
+train_00554.png,Cap  Cetirizine  500  g  AC  after food,synthetic_renderer_calibri,train_00554,synthetic
+train_00555.png,Capsule PCM 20 mcg QID for 5 days at bedtime,synthetic_renderer_cambria,train_00555,synthetic
+train_00556.png,Cetirizine 250 g AC x 3d with water,synthetic_renderer_comic,train_00556,synthetic
+train_00558.png,Tab  Paracetamol  20  mcg  PRN  after food,synthetic_renderer_cour,train_00558,synthetic
+train_00559.png,Syp  Cetirizine  625  mg  BD  x 5d,synthetic_renderer_georgia,train_00559,synthetic
+train_00560.png,Syp PCM 650 mg TDS x 3d with water,synthetic_renderer_arial,train_00560,synthetic
+train_00561.png,Cap PCM 650 mcg BD x 5d,synthetic_renderer_calibri,train_00561,synthetic
+train_00562.png,Tab  Pantoprazole  625  g  HS  x 7d,synthetic_renderer_cambria,train_00562,synthetic
+train_00563.png,Syrup Amoxicillin 250 g SOS x 5d at bedtime,synthetic_renderer_comic,train_00563,synthetic
+train_00564.png,Capsule Paracetamol 250 mg SOS for 7 days at bedtime,synthetic_renderer_consola,train_00564,synthetic
+train_00565.png,Metformin 10 mg AC x 3d,synthetic_renderer_cour,train_00565,synthetic
+train_00566.png,Cap PCM 500 g QID,synthetic_renderer_georgia,train_00566,synthetic
+train_00572.png,Capsule Pantoprazole 250 mcg AC,synthetic_renderer_cour,train_00572,synthetic
+train_00574.png,Capsule Cetirizine 500 ml QID for 7 days after food,synthetic_renderer_arial,train_00574,synthetic
+train_00575.png,Metformin 250 mg TDS for 7 days,synthetic_renderer_calibri,train_00575,synthetic
+train_00576.png,Syrup Pantoprazole 5 mg PRN,synthetic_renderer_cambria,train_00576,synthetic
+train_00577.png,Metformin 10 ml QID for 5 days,synthetic_renderer_comic,train_00577,synthetic
+train_00578.png,Tablet  Paracetamol  650  ml  AC  as needed,synthetic_renderer_consola,train_00578,synthetic
+train_00580.png,Cap Pantoprazole 10 g SOS x 3d,synthetic_renderer_georgia,train_00580,synthetic
+train_00581.png,Syrup Amoxicillin 500 g SOS for 7 days,synthetic_renderer_arial,train_00581,synthetic
+train_00582.png,Syp  Paracetamol  625  g  OD  x 3d,synthetic_renderer_calibri,train_00582,synthetic
+train_00584.png,Syrup Paracetamol 250 mg OD x 3d,synthetic_renderer_comic,train_00584,synthetic
+train_00585.png,Inj  Amoxicillin  40  ml  BD  x 5d,synthetic_renderer_consola,train_00585,synthetic
+train_00586.png,Inj Amoxicillin 650 mcg QID for 7 days as needed,synthetic_renderer_cour,train_00586,synthetic
+train_00588.png,Metformin 500 ml QID for 5 days as needed,synthetic_renderer_arial,train_00588,synthetic
+train_00589.png,Tab Pantoprazole 625 ml QID for 5 days,synthetic_renderer_calibri,train_00589,synthetic
+train_00590.png,Inj PCM 250 g SOS for 7 days,synthetic_renderer_cambria,train_00590,synthetic
+train_00591.png,Tab  Paracetamol  500  mcg  HS  x 7d,synthetic_renderer_comic,train_00591,synthetic
+train_00592.png,Tab  Pantoprazole  650  ml  QID,synthetic_renderer_consola,train_00592,synthetic
+train_00595.png,Tablet  Amoxicillin  500  mcg  PC  x 5d,synthetic_renderer_arial,train_00595,synthetic
+train_00597.png,Syrup Metformin 625 mcg AC x 5d,synthetic_renderer_cambria,train_00597,synthetic
+train_00600.png,Inj Pantoprazole 250 ml TDS with water,synthetic_renderer_cour,train_00600,synthetic
+train_00601.png,Cap Paracetamol 625 ml AC x 7d as needed,synthetic_renderer_georgia,train_00601,synthetic
+train_00603.png,Syrup Metformin 650 mg HS,synthetic_renderer_calibri,train_00603,synthetic
+train_00604.png,Amoxicillin 20 mcg TDS for 7 days at bedtime,synthetic_renderer_cambria,train_00604,synthetic
+train_00605.png,Paracetamol  10  g  PRN,synthetic_renderer_comic,train_00605,synthetic
+train_00606.png,Inj  Amoxicillin  10  ml  AC  x 7d,synthetic_renderer_consola,train_00606,synthetic
+train_00608.png,Cap Pantoprazole 40 g QID,synthetic_renderer_georgia,train_00608,synthetic
+train_00610.png,Amoxicillin 10 mg QID as needed,synthetic_renderer_calibri,train_00610,synthetic
+train_00611.png,Metformin 625 g PC for 5 days,synthetic_renderer_cambria,train_00611,synthetic
+train_00612.png,Tablet Metformin 40 mg QID for 7 days with water,synthetic_renderer_comic,train_00612,synthetic
+train_00613.png,Tab Paracetamol 10 ml BD for 7 days,synthetic_renderer_consola,train_00613,synthetic
+train_00616.png,Inj  Amoxicillin  20  ml  HS  after food,synthetic_renderer_arial,train_00616,synthetic
+train_00617.png,Amoxicillin 500 g TDS x 3d,synthetic_renderer_calibri,train_00617,synthetic
+train_00619.png,Cetirizine 250 g HS x 3d,synthetic_renderer_comic,train_00619,synthetic
+train_00620.png,Tablet  Amoxicillin  625  mcg  QID  for 5 days  before food,synthetic_renderer_consola,train_00620,synthetic
+train_00621.png,Inj Paracetamol 40 mg PC for 5 days,synthetic_renderer_cour,train_00621,synthetic
+train_00622.png,Capsule  Paracetamol  500  ml  PRN,synthetic_renderer_georgia,train_00622,synthetic
+train_00624.png,Tablet PCM 500 mcg AC for 7 days with water,synthetic_renderer_calibri,train_00624,synthetic
+train_00626.png,Syrup Cetirizine 625 g HS x 3d at bedtime,synthetic_renderer_comic,train_00626,synthetic
+train_00629.png,Tablet Amoxicillin 10 g OD,synthetic_renderer_georgia,train_00629,synthetic
+train_00633.png,Inj Cetirizine 500 ml HS,synthetic_renderer_comic,train_00633,synthetic
+train_00635.png,Syp PCM 5 mg TDS with water,synthetic_renderer_cour,train_00635,synthetic
+train_00637.png,Tablet Paracetamol 5 g AC x 5d,synthetic_renderer_arial,train_00637,synthetic
+train_00638.png,Amoxicillin 10 g HS,synthetic_renderer_calibri,train_00638,synthetic
+train_00639.png,Tab Cetirizine 650 ml HS,synthetic_renderer_cambria,train_00639,synthetic
+train_00642.png,Capsule PCM 10 g QID x 5d at bedtime,synthetic_renderer_cour,train_00642,synthetic
+train_00644.png,Tab Metformin 650 mcg SOS,synthetic_renderer_arial,train_00644,synthetic
+train_00650.png,Cap PCM 650 mg SOS x 7d after food,synthetic_renderer_georgia,train_00650,synthetic
+train_00652.png,Syrup  Cetirizine  5  g  AC,synthetic_renderer_calibri,train_00652,synthetic
+train_00653.png,PCM 500 g PRN x 7d,synthetic_renderer_cambria,train_00653,synthetic
+train_00654.png,Amoxicillin 5 mg PRN x 3d,synthetic_renderer_comic,train_00654,synthetic
+train_00655.png,Inj Amoxicillin 650 mcg BD for 5 days,synthetic_renderer_consola,train_00655,synthetic
+train_00656.png,Capsule Cetirizine 5 g BD x 3d,synthetic_renderer_cour,train_00656,synthetic
+train_00657.png,Syrup Amoxicillin 500 mcg PC x 7d before food,synthetic_renderer_georgia,train_00657,synthetic
+train_00662.png,Tablet Cetirizine 40 mcg BD,synthetic_renderer_consola,train_00662,synthetic
+train_00663.png,Pantoprazole 625 mcg HS x 7d,synthetic_renderer_cour,train_00663,synthetic
+train_00664.png,Paracetamol  625  ml  PRN  for 7 days,synthetic_renderer_georgia,train_00664,synthetic
+train_00665.png,Cetirizine 500 g TDS x 5d,synthetic_renderer_arial,train_00665,synthetic
+train_00666.png,Tablet  Metformin  625  mg  BD  x 3d,synthetic_renderer_calibri,train_00666,synthetic
+train_00667.png,Metformin 250 mg PC for 7 days after food,synthetic_renderer_cambria,train_00667,synthetic
+train_00668.png,Syp Metformin 10 ml PRN,synthetic_renderer_comic,train_00668,synthetic
+train_00669.png,Tablet Pantoprazole 650 mg QID x 7d,synthetic_renderer_consola,train_00669,synthetic
+train_00670.png,Metformin  5  mcg  BD  for 5 days  at bedtime,synthetic_renderer_cour,train_00670,synthetic
+train_00671.png,Cetirizine 500 mcg OD after food,synthetic_renderer_georgia,train_00671,synthetic
+train_00673.png,Paracetamol 625 mcg SOS,synthetic_renderer_calibri,train_00673,synthetic
+train_00674.png,Capsule PCM 10 ml PRN for 5 days as needed,synthetic_renderer_cambria,train_00674,synthetic
+train_00675.png,Cap Paracetamol 40 g BD,synthetic_renderer_comic,train_00675,synthetic
+train_00676.png,Cap Cetirizine 625 ml QID for 5 days,synthetic_renderer_consola,train_00676,synthetic
+train_00678.png,Tablet  Pantoprazole  10  g  OD,synthetic_renderer_georgia,train_00678,synthetic
+train_00680.png,Syp  Amoxicillin  625  mg  HS  for 7 days,synthetic_renderer_calibri,train_00680,synthetic
+train_00682.png,Amoxicillin 5 g BD x 7d as needed,synthetic_renderer_comic,train_00682,synthetic
+train_00685.png,Inj  Metformin  40  mg  PC  for 5 days  before food,synthetic_renderer_georgia,train_00685,synthetic
+train_00690.png,Inj  Amoxicillin  500  mcg  AC  for 5 days  before food,synthetic_renderer_consola,train_00690,synthetic
+train_00691.png,Tablet  Cetirizine  250  g  TDS  for 5 days,synthetic_renderer_cour,train_00691,synthetic
+train_00692.png,Amoxicillin 20 mcg BD,synthetic_renderer_georgia,train_00692,synthetic
+train_00694.png,Cap  Metformin  40  mcg  BD  for 5 days,synthetic_renderer_calibri,train_00694,synthetic
+train_00696.png,Tablet  PCM  10  g  TDS  x 7d,synthetic_renderer_comic,train_00696,synthetic
+train_00698.png,Capsule  Cetirizine  625  mcg  OD  x 3d,synthetic_renderer_cour,train_00698,synthetic
+train_00699.png,Tablet Cetirizine 40 g PC for 5 days,synthetic_renderer_georgia,train_00699,synthetic

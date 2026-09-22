@@ -1,0 +1,862 @@
+{
+  "arial": {
+    "samples": 100,
+    "cer": 0.10470453241537579,
+    "wer": 0.1270949720670391,
+    "exact_line_accuracy": 0.19,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 1.0,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 1.0
+      },
+      "frequencies": {
+        "overall_accuracy": 0.9,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.9
+      },
+      "durations": {
+        "overall_accuracy": 1.0,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 1.0
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.696969696969697
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.9346153846153846,
+      "p10": 2.13181938559322,
+      "median": 2.567179144385027,
+      "p90": 2.855208333333333,
+      "max": 3.2708333333333335
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 11.0,
+      "p10": 20.9,
+      "median": 30.0,
+      "p90": 42.10000000000001,
+      "max": 48.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 10
+  },
+  "calibri": {
+    "samples": 100,
+    "cer": 0.1095811818703385,
+    "wer": 0.13687150837988826,
+    "exact_line_accuracy": 0.17,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 0.98,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.98
+      },
+      "frequencies": {
+        "overall_accuracy": 0.85,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.85
+      },
+      "durations": {
+        "overall_accuracy": 1.0,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 1.0
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.5454545454545454
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.7954545454545454,
+      "p10": 1.9129223820675811,
+      "median": 2.3,
+      "p90": 2.5211309523809526,
+      "max": 2.8333333333333335
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 11.0,
+      "p10": 20.0,
+      "median": 30.0,
+      "p90": 42.10000000000001,
+      "max": 54.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 1
+  },
+  "cambria": {
+    "samples": 100,
+    "cer": 0.10183591508892714,
+    "wer": 0.11731843575418995,
+    "exact_line_accuracy": 0.22,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 1.0,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 1.0
+      },
+      "frequencies": {
+        "overall_accuracy": 0.96,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.96
+      },
+      "durations": {
+        "overall_accuracy": 1.0,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 1.0
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.9090909090909091
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.9015151515151516,
+      "p10": 2.0447163611207197,
+      "median": 2.4541666666666666,
+      "p90": 2.6591666666666667,
+      "max": 2.9791666666666665
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 11.0,
+      "p10": 20.0,
+      "median": 30.0,
+      "p90": 43.0,
+      "max": 51.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 6
+  },
+  "comic": {
+    "samples": 100,
+    "cer": 0.11847389558232932,
+    "wer": 0.13547486033519554,
+    "exact_line_accuracy": 0.19,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 1.0,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 1.0
+      },
+      "frequencies": {
+        "overall_accuracy": 0.87,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.87
+      },
+      "durations": {
+        "overall_accuracy": 0.99,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 0.9855072463768116
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.6060606060606061
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.9346153846153846,
+      "p10": 2.2850710227272724,
+      "median": 2.7163737446197995,
+      "p90": 2.979326923076923,
+      "max": 3.1666666666666665
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 11.0,
+      "p10": 20.0,
+      "median": 30.0,
+      "p90": 41.0,
+      "max": 46.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 16
+  },
+  "consola": {
+    "samples": 100,
+    "cer": 0.15605278255880667,
+    "wer": 0.19134078212290503,
+    "exact_line_accuracy": 0.21,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 0.94,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.94
+      },
+      "frequencies": {
+        "overall_accuracy": 0.95,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.95
+      },
+      "durations": {
+        "overall_accuracy": 0.83,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 0.7536231884057971
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.8787878787878788
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.8923076923076922,
+      "p10": 2.418269230769231,
+      "median": 3.087662337662338,
+      "p90": 3.2291666666666665,
+      "max": 3.236842105263158
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 12.0,
+      "p10": 20.9,
+      "median": 30.0,
+      "p90": 37.0,
+      "max": 41.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 33
+  },
+  "cour": {
+    "samples": 100,
+    "cer": 0.20137693631669534,
+    "wer": 0.24720670391061453,
+    "exact_line_accuracy": 0.16,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 1.0,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 1.0
+      },
+      "frequencies": {
+        "overall_accuracy": 0.86,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.86
+      },
+      "durations": {
+        "overall_accuracy": 0.73,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 0.6086956521739131
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.6060606060606061
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.926923076923077,
+      "p10": 2.4055335595776772,
+      "median": 3.1744391025641026,
+      "p90": 3.4809065934065937,
+      "max": 3.4919354838709675
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 12.0,
+      "p10": 20.0,
+      "median": 29.0,
+      "p90": 34.0,
+      "max": 38.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 39
+  },
+  "georgia": {
+    "samples": 100,
+    "cer": 0.09954102122776821,
+    "wer": 0.12569832402234637,
+    "exact_line_accuracy": 0.19,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 1.0,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 1.0
+      },
+      "frequencies": {
+        "overall_accuracy": 0.88,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.88
+      },
+      "durations": {
+        "overall_accuracy": 1.0,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 1.0
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.6363636363636364
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.9346153846153846,
+      "p10": 2.1776954177897574,
+      "median": 2.5679723502304146,
+      "p90": 2.8338709677419356,
+      "max": 3.2291666666666665
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 11.0,
+      "p10": 21.0,
+      "median": 30.0,
+      "p90": 42.10000000000001,
+      "max": 51.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 10
+  },
+  "segoepr": {
+    "samples": 100,
+    "cer": 0.2051061388410786,
+    "wer": 0.3254189944134078,
+    "exact_line_accuracy": 0.05,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.6,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.6
+      },
+      "doses": {
+        "overall_accuracy": 0.37,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.37
+      },
+      "frequencies": {
+        "overall_accuracy": 0.76,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.76
+      },
+      "durations": {
+        "overall_accuracy": 0.66,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 0.5072463768115942
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.696969696969697
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.9,
+      "p10": 2.418269230769231,
+      "median": 3.050735294117647,
+      "p90": 3.4008333333333334,
+      "max": 3.8541666666666665
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 11.0,
+      "p10": 21.8,
+      "median": 32.0,
+      "p90": 40.0,
+      "max": 41.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 29
+  },
+  "times": {
+    "samples": 100,
+    "cer": 0.11417096959265634,
+    "wer": 0.15502793296089384,
+    "exact_line_accuracy": 0.16,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 0.89,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.89
+      },
+      "frequencies": {
+        "overall_accuracy": 0.84,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.84
+      },
+      "durations": {
+        "overall_accuracy": 1.0,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 1.0
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.5151515151515151
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.9346153846153846,
+      "p10": 2.06126007224229,
+      "median": 2.4277777777777776,
+      "p90": 2.653528225806452,
+      "max": 3.1458333333333335
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 11.0,
+      "p10": 19.0,
+      "median": 30.0,
+      "p90": 43.0,
+      "max": 53.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 4
+  },
+  "trebuc": {
+    "samples": 100,
+    "cer": 0.1069994262765347,
+    "wer": 0.1494413407821229,
+    "exact_line_accuracy": 0.17,
+    "fields": {
+      "medicines": {
+        "overall_accuracy": 0.47,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.47
+      },
+      "doses": {
+        "overall_accuracy": 0.9,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.9
+      },
+      "frequencies": {
+        "overall_accuracy": 0.84,
+        "present_count": 100,
+        "absent_count": 0,
+        "present_accuracy": 0.84
+      },
+      "durations": {
+        "overall_accuracy": 0.99,
+        "present_count": 69,
+        "absent_count": 31,
+        "present_accuracy": 0.9855072463768116
+      }
+    },
+    "numeric_schedule": {
+      "present_count": 33,
+      "accuracy": 0.5151515151515151
+    },
+    "alignment_ratio": {
+      "min": 1.9692307692307693,
+      "p10": 2.4615384615384617,
+      "median": 3.657142857142857,
+      "p90": 5.333333333333333,
+      "max": 10.666666666666666
+    },
+    "required_steps": {
+      "min": 12.0,
+      "p10": 24.0,
+      "median": 35.0,
+      "p90": 52.0,
+      "max": 65.0
+    },
+    "ink_steps_ratio": {
+      "min": 1.9346153846153846,
+      "p10": 2.190808823529412,
+      "median": 2.588621794871795,
+      "p90": 2.7585,
+      "max": 3.0208333333333335
+    },
+    "target_length": {
+      "min": 12.0,
+      "p10": 23.9,
+      "median": 34.0,
+      "p90": 48.10000000000001,
+      "max": 57.0
+    },
+    "adjacent_repeat_count": {
+      "min": 0.0,
+      "p10": 0.0,
+      "median": 1.0,
+      "p90": 5.1000000000000085,
+      "max": 8.0
+    },
+    "prediction_length": {
+      "min": 11.0,
+      "p10": 20.9,
+      "median": 30.5,
+      "p90": 43.0,
+      "max": 50.0
+    },
+    "output_time_steps": {
+      "min": 128.0,
+      "p10": 128.0,
+      "median": 128.0,
+      "p90": 128.0,
+      "max": 128.0
+    },
+    "clipped_count": 11
+  }
+}

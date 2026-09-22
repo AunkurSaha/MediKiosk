@@ -129,7 +129,11 @@ Retained legacy answers can resume through the adaptive state API using the auth
 
 Completion atomically marks ready_for_review, stores completed_at, creates a deterministic draft and typed structured snapshot, and writes audit metadata. Repeating completion does not create another summary. Completed/confirmed intake answers, flow selection and navigation are locked.
 
-`GET /sessions/{id}/queue-estimate` returns the authenticated patient-safe estimate for the visit's selected doctor. `position` is the one-based position among that doctor's `WAITING` entries, `estimated_wait_minutes` is `position * 5`, and `expected_meeting_at` is the current server time plus that estimate. Queue entries assigned to other doctors are excluded. The endpoint returns `QUEUE_ESTIMATE_UNAVAILABLE` when the visit is no longer waiting.
+`GET /sessions/{id}/queue-estimate` returns the authenticated patient's persisted visit token and current queue state. Position is derived among `WAITING` and `CALLED` entries for the same facility, doctor, and UTC service date, ordered by `joined_at` then queue-entry ID. Versioned ETA is `patients_ahead × configured average consultation minutes`; the response includes its basis, policy version, and `is_estimate=true`, never an exact meeting time. Terminal entries remain readable with no active position. The endpoint returns `QUEUE_ENTRY_NOT_FOUND` when no reservation exists.
+
+`GET /sessions/{id}/coverage` returns deterministic per-field clinical coverage for the authenticated patient or assigned doctor. States are `CONFIRMED`, `DOCUMENT_SUPPORTED_UNCONFIRMED`, `CONFLICTED`, `MISSING`, and `NOT_APPLICABLE`. Document-supported fields include source evidence/fact/document IDs, filename/page when available, OCR provider/version, original extracted display value, and verification state. The endpoint never promotes document evidence into a patient answer.
+
+`GET /sessions/{id}/coverage/demo-metrics` is available only when explicit demo mode is enabled. It derives counterfactual flow-question count, actual document-aware question count, avoided questions, and added confirmation turns from persisted deterministic flow/answer/evidence records. It is evaluation metadata, not clinical evidence.
 
 `ClinicalHistory` schema 1 contains flow identity/version/namespace, selected complaint/source and typed sections. Each section has a canonical enum ID and ordered facts; facts carry answer ID, question ID, canonical field, localized label, typed value, explicit status, raw wording, source, language, recorded timestamp and patient_reported verification. Empty sections remain explicit. The AYUSH section is isolated. Generated prose is not the canonical representation.
 
@@ -471,3 +475,12 @@ These routes require the configured demo doctor and are disabled unless `DEMO_MO
 - `GET /api/hospitals/{hospital_id}/doctors` returns the active doctor roster with a database-derived `waiting_count` for each doctor. Only queue entries whose current status is `WAITING` are counted.
 - `GET /api/triage/queue?hospital_id={hospital_id}` requires triage authentication and returns the consented waiting-patient queue for that hospital.
 - `GET /api/doctor/sessions` returns only sessions whose `selected_doctor_id` equals the authenticated doctor. Unassigned sessions and sessions assigned to colleagues are excluded.
+# Evidence-linked doctor summary
+
+`GET /api/doctor/sessions/{session_id}/summary` retains the existing doctor-assignment and consent authorization and now returns the persisted structured summary snapshot with:
+
+- evidence records containing `status`, `badge`, `evidence_refs`, `source_summary`, `provenance_explanation`, and source metadata;
+- `coverage` totals snapshotted when the draft was generated;
+- `pre_arrival_packet`, a read-only in-process data contract whose `packet_reference` is opaque and contains no clinical data.
+
+`GET /api/doctor/sessions/{session_id}/summary/evidence` returns those same stored evidence links. Repeated GET requests are read-only and do not regenerate or mutate a summary. Confirmed summaries remain immutable; later corrections use the existing amendment workflow.

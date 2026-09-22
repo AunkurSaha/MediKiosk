@@ -33,7 +33,7 @@ export default function Login() {
       .then((cfg) => {
         setDemoMode(Boolean(cfg.demo_mode));
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   // Countdown timer for resend
@@ -186,14 +186,19 @@ export default function Login() {
     }
   };
 
-  const handleDemoLogin = async (role: 'doctor' | 'triage') => {
+  const handleDemoLogin = async (role: 'patient' | 'doctor' | 'triage') => {
     setError(null);
     setBusy(true);
     try {
       await demoLogin(role);
-      navigate(role === 'doctor' ? '/doctor' : '/triage', { replace: true });
+      if (role === 'patient') {
+        sessionStorage.setItem('medikiosk.demoPatient', 'true');
+        navigate('/kiosk/language', { replace: true });
+      } else {
+        navigate(role === 'doctor' ? '/doctor' : '/triage', { replace: true });
+      }
     } catch {
-      setError('Demo login failed.');
+      setError('Quick access could not be completed.');
     } finally {
       setBusy(false);
     }
@@ -491,7 +496,17 @@ export default function Login() {
             <p className="eyebrow" style={{ fontSize: '0.7rem', marginBottom: '12px' }}>
               {t.orLoginWithDemo}
             </p>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+            <div
+              style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}
+            >
+              <button
+                type="button"
+                onClick={() => handleDemoLogin('patient')}
+                disabled={busy}
+                style={{ fontSize: '0.9rem', padding: '10px 18px', minHeight: '44px' }}
+              >
+                Continue as patient
+              </button>
               <button
                 type="button"
                 className="secondary"
@@ -508,7 +523,7 @@ export default function Login() {
                 disabled={busy}
                 style={{ fontSize: '0.85rem', padding: '10px 14px', minHeight: '44px' }}
               >
-                Quick Triage Demo
+                Continue to triage
               </button>
             </div>
           </div>
