@@ -59,3 +59,6 @@ docker-data/
 
 # Large generated OCR benchmark trace
 medikiosk-ocr/benchmarks/clean512_v2_ctc_schedule_audit/posterior_traces.jsonl
+
+# Claude Code temporary worktrees
+.claude/worktrees/
