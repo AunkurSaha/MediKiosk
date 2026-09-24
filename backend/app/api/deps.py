@@ -71,9 +71,12 @@ def require_doctor(
     request: Request,
     db: Session = Depends(get_db),
     x_demo_doctor: str | None = Header(default=None),
+    x_demo_triage: str | None = Header(default=None),
 ) -> models.User:
     """Require an authenticated user with role='doctor'."""
-    user = get_optional_auth_user(request, db, x_demo_doctor=x_demo_doctor)
+    user = get_optional_auth_user(
+        request, db, x_demo_doctor=x_demo_doctor, x_demo_triage=x_demo_triage
+    )
     if user is None:
         raise WorkflowError("AUTH_REQUIRED", "A configured doctor identity is required.", 401)
     if user.role != "doctor":

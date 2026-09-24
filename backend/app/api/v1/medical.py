@@ -13,11 +13,14 @@ from app.schemas.medical_fact import (
     MedicalFactsResponse,
     MedicationFactRecord,
     MedicationFactReview,
-    PatientEvidenceSearchRequest,
-    PatientEvidenceSearchResponse,
     TimelineResponse,
 )
-from app.services import discrepancies, medical_facts, patient_evidence_retrieval, timeline
+from app.schemas.patient_rag import (
+    PatientRAGIndexStatus,
+    PatientRAGSearchRequest,
+    PatientRAGSearchResponse,
+)
+from app.services import discrepancies, medical_facts, patient_rag, timeline
 
 router = APIRouter()
 
@@ -49,14 +52,34 @@ def read_discrepancies(
     return discrepancies.get_discrepancies(db, str(session_id))
 
 
-@router.post("/{session_id}/evidence-search", response_model=PatientEvidenceSearchResponse)
-def search_patient_document_evidence(
+@router.post("/{session_id}/evidence-search", response_model=PatientRAGSearchResponse)
+async def search_patient_document_evidence(
     session_id: UUID,
-    payload: PatientEvidenceSearchRequest,
+    payload: PatientRAGSearchRequest,
     db: Session = Depends(get_db),
     user: models.User = Depends(require_assigned_doctor_session),
 ):
-    return patient_evidence_retrieval.search(db, str(session_id), payload.query, payload.top_k)
+    return await patient_rag.search_patient(db, str(session_id), payload)
+
+
+@router.post("/{session_id}/evidence-search/reindex", response_model=PatientRAGIndexStatus)
+async def reindex_patient_evidence(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_assigned_doctor_session),
+):
+    session = db.get(models.Session, str(session_id))
+    return await patient_rag.reindex_patient(db, session.patient_id)
+
+
+@router.get("/{session_id}/evidence-search/status", response_model=PatientRAGIndexStatus)
+def patient_evidence_index_status(
+    session_id: UUID,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(require_assigned_doctor_session),
+):
+    session = db.get(models.Session, str(session_id))
+    return patient_rag.index_status(db, session.patient_id, str(session_id))
 
 
 @router.patch(

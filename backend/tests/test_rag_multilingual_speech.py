@@ -205,27 +205,34 @@ def _setup_full_chest_pain_interview(client, monkeypatch, language="en", grounde
     return session_id, state
 
 
+def _selected_rag_question(state):
+    """Check the planner's approved field and its presented wording agree."""
+    question = state["question"]
+    assert question["origin"] == "rag"
+    assert question["type"] in {"short_text", "boolean"}
+    assert len(state["rag_suggestions"]) == 1
+    suggestion = state["rag_suggestions"][0]
+    assert question["question_id"] == suggestion["target_field"]
+    assert question["text"]["en"] == suggestion["question"]
+    return question, suggestion
+
+
 def test_bengali_rag_question_presentation_and_tts(client, monkeypatch):
     """Bengali session displays translated question text and synthesizes Bengali speech."""
     session_id, st = _setup_full_chest_pain_interview(client, monkeypatch, language="bn")
 
     # We should now be at a RAG-planned canonical coverage question.
-    q = st.get("question")
-    assert q is not None
-    assert q["question_id"] == "hpi.site"
-    assert q["origin"] == "rag"
+    q, sug = _selected_rag_question(st)
     assert q["type"] == "short_text"
 
-    # In Bengali session, bn text must be non-empty and present
-    assert q["text"]["bn"] != ""
-    assert q["text"]["en"] != ""  # Canonical English preserved
+    # The translated presentation must derive from the selected English wording.
+    assert q["text"]["bn"] == f"[Mock Translation to BN]: {q['text']['en']}"
 
-    # Provenance check: RAGSuggestion preserves canonical English
-    assert len(st["rag_suggestions"]) > 0
-    sug = st["rag_suggestions"][0]
+    assert sug["source_chunk_ids"] == ["chest_pain-history_taking-001"]
     assert sug["display_language"] == "bn"
     assert sug["translated_question"] == q["text"]["bn"]
-    assert sug["candidate_id"] == "pain_site"
+    assert sug["translation_provider"] == "mock"
+    assert sug["translation_fallback_used"] is False
 
     # Speech synthesis check: TTS synthesizes the exact Bengali text
     tts_resp = client.post(
@@ -244,18 +251,16 @@ def test_hindi_rag_question_presentation_and_tts(client, monkeypatch):
     """Hindi session displays translated question text and synthesizes Hindi speech."""
     session_id, st = _setup_full_chest_pain_interview(client, monkeypatch, language="hi")
 
-    q = st.get("question")
-    assert q is not None
-    assert q["question_id"] == "hpi.site"
-    assert q["origin"] == "rag"
+    q, sug = _selected_rag_question(st)
+    assert q["type"] == "short_text"
 
-    # In Hindi session, hi text must be non-empty and present
-    assert q["text"]["hi"] != ""
-    assert q["text"]["en"] != ""
+    assert q["text"]["hi"] == f"[Mock Translation to HI]: {q['text']['en']}"
 
-    sug = st["rag_suggestions"][0]
+    assert sug["source_chunk_ids"] == ["chest_pain-history_taking-001"]
     assert sug["display_language"] == "hi"
     assert sug["translated_question"] == q["text"]["hi"]
+    assert sug["translation_provider"] == "mock"
+    assert sug["translation_fallback_used"] is False
 
     tts_resp = client.post(
         f"/api/sessions/{session_id}/interview/speech/synthesize",
@@ -272,13 +277,12 @@ def test_english_rag_question_presentation_and_tts(client, monkeypatch):
     """English session directly presents canonical English and synthesizes English speech without translation."""
     session_id, st = _setup_full_chest_pain_interview(client, monkeypatch, language="en")
 
-    q = st.get("question")
-    assert q is not None
-    assert q["question_id"] == "hpi.site"
-    assert q["origin"] == "rag"
-    assert q["text"]["en"] != ""
+    q, sug = _selected_rag_question(st)
+    assert q["type"] == "short_text"
+    assert q["text"]["bn"] == q["text"]["en"]
+    assert q["text"]["hi"] == q["text"]["en"]
 
-    sug = st["rag_suggestions"][0]
+    assert sug["source_chunk_ids"] == ["chest_pain-history_taking-001"]
     assert sug["display_language"] == "en"
     assert sug["translation_provider"] == "none"
     assert sug["translation_fallback_used"] is False
@@ -372,50 +376,84 @@ def test_tts_failure_does_not_break_interview(client, monkeypatch):
 
 
 def test_template_fallback_passes_through_translation(client, monkeypatch):
-    """A RAG outage exposes the configured localized question without stopping intake."""
+    """A retrieval outage uses local template wording and still translates for speech."""
     session_id, st = _setup_full_chest_pain_interview(
         client, monkeypatch, language="bn", grounded=False
     )
-    q = st["question"]
-    assert q["question_id"] == "hpi.onset"
-    assert q.get("origin") is None
+    q, sug = _selected_rag_question(st)
+    assert sug["source_chunk_ids"]
+    assert all(chunk_id.startswith("local-") for chunk_id in sug["source_chunk_ids"])
+    assert sug["generation_provider"] == "template"
 
-    # Even with wording fallback, Bengali translation occurs
-    assert q["text"]["bn"] != ""
-    assert q["text"]["en"] != ""
+    assert q["text"]["bn"] == f"[Mock Translation to BN]: {q['text']['en']}"
+    assert sug["translated_question"] == q["text"]["bn"]
+    assert sug["translation_provider"] == "mock"
+    assert sug["translation_fallback_used"] is False
 
-    assert st["rag_suggestions"] == []
+    tts_resp = client.post(
+        f"/api/sessions/{session_id}/interview/speech/synthesize",
+        json={"question_id": q["question_id"]},
+    )
+    assert tts_resp.status_code == 200
+    tts_data = tts_resp.json()
+    assert tts_data["status"] == "success"
+    assert tts_data["language"] == "bn"
+    assert tts_data["text"] == q["text"]["bn"]
+    assert len(tts_data["audio_base64"]) > 0
 
 
 def test_validated_english_wording_translated_not_template(client, monkeypatch):
-    """When NVIDIA wording succeeds, the generated English is translated, NOT the template."""
+    """Validated English for the selected field is translated, not replaced by its template."""
     from app.services import rag_interview_planner
     from app.services.rag_interview_planner import PlannedWording
 
-    custom_validated_english = "Where in your chest do you feel the pain?"
+    validated_wordings = {}
 
     def mock_template_plan(candidates):
-        selected = next(c for c in candidates if c["question_id"] == "hpi.site")
+        assert len(candidates) == 1
+        selected = candidates[0]
+        custom_validated_english = f"For this visit, {selected['fallback_question']}"
+        validated_wordings[selected["question_id"]] = custom_validated_english
         return PlannedWording(
             question_id=selected["question_id"],
             target_field=selected["target_field"],
             target_domain=selected["target_domain"],
             question=custom_validated_english,
-            provider="mock_nvidia",
+            provider="nvidia",
             model="test-model",
             latency_ms=42,
         )
 
     monkeypatch.setattr(rag_interview_planner, "_template_plan", mock_template_plan)
+    monkeypatch.setenv("RAG_GENERATION_PROVIDER", "nvidia")
 
-    session_id, st = _setup_full_chest_pain_interview(client, monkeypatch, language="bn")
-    q = st["question"]
+    for language in ("bn", "hi"):
+        session_id, st = _setup_full_chest_pain_interview(client, monkeypatch, language=language)
+        q, sug = _selected_rag_question(st)
+        custom_validated_english = validated_wordings[q["question_id"]]
 
-    # Canonical English must be the custom validated wording
-    assert q["text"]["en"] == custom_validated_english
+        # Canonical English must be the custom validated wording.
+        assert q["text"]["en"] == custom_validated_english
+        assert q["text"][language] == (
+            f"[Mock Translation to {language.upper()}]: {custom_validated_english}"
+        )
 
-    sug = st["rag_suggestions"][0]
-    assert sug["question"] == custom_validated_english
-    assert sug["template_question"] != custom_validated_english
-    assert sug["generation_fallback_used"] is False
-    assert sug["display_language"] == "bn"
+        assert sug["question"] == custom_validated_english
+        assert sug["template_question"] != custom_validated_english
+        assert sug["generation_provider"] == "nvidia"
+        assert sug["generation_fallback_used"] is False
+        assert sug["display_language"] == language
+        assert sug["translated_question"] == q["text"][language]
+        assert sug["translation_provider"] == "mock"
+        assert sug["translation_fallback_used"] is False
+
+        tts_resp = client.post(
+            f"/api/sessions/{session_id}/interview/speech/synthesize",
+            json={"question_id": q["question_id"]},
+        )
+        assert tts_resp.status_code == 200
+        tts_data = tts_resp.json()
+        assert tts_data["status"] == "success"
+        assert tts_data["language"] == language
+        assert tts_data["text"] == q["text"][language]
+        assert len(tts_data["audio_base64"]) > 0

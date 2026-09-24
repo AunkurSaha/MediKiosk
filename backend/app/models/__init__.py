@@ -28,6 +28,7 @@ from .mediroute import MediRouteRecommendation, MediRouteResult
 from .normalization import NormalizationResult
 from .otp_challenge import OTPChallenge
 from .patient import Patient
+from .patient_rag_chunk import HalfVector2048, PatientRAGChunk, VectorValue
 from .patient_routing_location import PatientRoutingLocation
 from .pre_arrival_packet import PreArrivalPacketRecord
 from .session import Session
@@ -67,6 +68,9 @@ __all__ = [
     "NormalizationResult",
     "OTPChallenge",
     "Patient",
+    "PatientRAGChunk",
+    "HalfVector2048",
+    "VectorValue",
     "MediRouteResult",
     "MediRouteRecommendation",
     "PatientRoutingLocation",

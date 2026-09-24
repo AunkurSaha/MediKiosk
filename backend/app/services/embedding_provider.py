@@ -25,6 +25,7 @@ class EmbeddingProvider(Protocol):
     name: str
     version: str
     model: str
+    dimension: int
 
     async def embed_query(self, text: str) -> List[float]:
         """Embed a single query text."""
@@ -46,8 +47,8 @@ class EmbeddingProvider(Protocol):
 class MockEmbeddingProvider:
     """Deterministic mock embedding provider for testing and demo.
 
-    Returns a fixed-size 384-dimensional unit vector based on SHA-256 hash.
-    Ensures offline reproducibility without external network dependencies.
+    Returns a fixed-size lexical feature-hash vector. Shared words and number/unit
+    tokens therefore remain meaningfully similar while tests stay fully offline.
     """
 
     name = "mock"
@@ -59,16 +60,19 @@ class MockEmbeddingProvider:
 
     def _hash_to_vector(self, text: str) -> List[float]:
         import hashlib
+        import re
 
         text_norm = (text or "").strip().lower()
         if not text_norm:
             raise ValueError("Text to embed must be non-empty")
-        hash_bytes = hashlib.sha256(text_norm.encode("utf-8")).digest()
-        raw = []
-        for i in range(self.dimension):
-            b = hash_bytes[i % len(hash_bytes)]
-            val = ((b + (i * 7)) % 256) / 127.5 - 1.0
-            raw.append(val)
+        tokens = re.findall(r"[a-z0-9]+", text_norm)
+        features = tokens + [f"{left}_{right}" for left, right in zip(tokens, tokens[1:])]
+        raw = [0.0] * self.dimension
+        for feature in features:
+            digest = hashlib.sha256(feature.encode("utf-8")).digest()
+            index = int.from_bytes(digest[:4], "big") % self.dimension
+            sign = 1.0 if digest[4] & 1 else -1.0
+            raw[index] += sign
         norm = math.sqrt(sum(x * x for x in raw))
         if norm > 0:
             return [x / norm for x in raw]
@@ -169,20 +173,12 @@ class NvidiaEmbeddingProvider:
     def __init__(self, settings: NvidiaEmbeddingSettings | None = None, *, transport=None):
         self.settings = settings or NvidiaEmbeddingSettings.from_environment()
         self.model = self.settings.model
+        self.dimension = self.settings.dimension
         self._transport = transport
         self.latency_ms: int | None = None
 
     def _validate_vector(self, vec: object, expected_dim: int | None = None) -> List[float]:
-        if not isinstance(vec, list) or len(vec) == 0:
-            raise ProviderFailure("empty_vector")
-        if expected_dim is not None and len(vec) != expected_dim:
-            raise ProviderFailure("dimension_mismatch")
-        cleaned: List[float] = []
-        for x in vec:
-            if not isinstance(x, (int, float)) or math.isnan(x) or math.isinf(x):
-                raise ProviderFailure("invalid_result")
-            cleaned.append(float(x))
-        return cleaned
+        return validate_embedding_vector(vec, expected_dim)
 
     async def _call_api(self, texts: List[str], input_type: str) -> List[List[float]]:
         if not texts:
@@ -283,13 +279,13 @@ class NvidiaEmbeddingProvider:
         return await self.embed_documents(texts)
 
 
-def configured_provider() -> EmbeddingProvider:
+def configured_provider(name: str | None = None) -> EmbeddingProvider:
     """Return the embedding provider based on environment variable.
 
     Environment variable: RAG_EMBEDDING_PROVIDER
     Values: mock (default), disabled, nvidia
     """
-    name = os.getenv("RAG_EMBEDDING_PROVIDER", "mock").strip().lower()
+    name = (name or os.getenv("RAG_EMBEDDING_PROVIDER", "mock")).strip().lower()
     if name == "mock":
         return MockEmbeddingProvider()
     if name == "disabled":
@@ -299,6 +295,39 @@ def configured_provider() -> EmbeddingProvider:
     raise ValueError(
         "RAG_EMBEDDING_PROVIDER must be mock, disabled, or nvidia"
     )
+
+
+def provider_identity(provider: EmbeddingProvider) -> tuple[str, str, str, int]:
+    """Return the exact persisted representation identity for a provider."""
+    name = str(provider.name)
+    model = str(getattr(provider, "model", name))
+    version = str(getattr(provider, "version", "unknown"))
+    dimension = getattr(provider, "dimension", None)
+    if dimension is None:
+        dimension = getattr(getattr(provider, "settings", None), "dimension", None)
+    if not isinstance(dimension, int) or isinstance(dimension, bool) or dimension <= 0:
+        raise ValueError("Embedding provider must expose a positive integer dimension.")
+    return name, model, version, dimension
+
+
+def validate_embedding_vector(
+    vector: object, expected_dimension: int | None = None
+) -> List[float]:
+    """Validate and normalize a provider vector before it becomes searchable."""
+    if not isinstance(vector, (list, tuple)) or not vector:
+        raise ProviderFailure("empty_vector")
+    if expected_dimension is not None and len(vector) != expected_dimension:
+        raise ProviderFailure("dimension_mismatch")
+    cleaned: List[float] = []
+    for item in vector:
+        if (
+            isinstance(item, bool)
+            or not isinstance(item, (int, float))
+            or not math.isfinite(float(item))
+        ):
+            raise ProviderFailure("invalid_result")
+        cleaned.append(float(item))
+    return cleaned
 
 
 def validate_configuration():

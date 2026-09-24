@@ -593,10 +593,41 @@ export interface PatientEvidenceSearchResult {
   source_location: string | null;
   score: number;
 }
+export interface PatientRAGEvidence {
+  chunk_id: string;
+  text: string;
+  source_type: string;
+  source_record_id: string;
+  session_id: string | null;
+  document_id: string | null;
+  source_filename: string | null;
+  page_number: number | null;
+  verification_status: string;
+  timestamp: string | null;
+  similarity: number;
+  score: number;
+  clinician_verified: boolean;
+  is_current: boolean;
+  is_conflicted: boolean;
+  provenance: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+}
 export interface PatientEvidenceSearchResponse {
+  answer: string;
+  evidence: PatientRAGEvidence[];
+  patient_id: string;
   query: string;
+  intent: string;
+  retrieval_strategy: 'patient_scoped_hybrid';
+  embedding_provider: string;
+  embedding_model: string;
+  index_latency_ms: number;
+  embedding_latency_ms: number;
+  retrieval_latency_ms: number;
+  generation_latency_ms: number;
+  total_latency_ms: number;
   retrieval_mode: 'deterministic_patient_scoped';
-  fallback_used: true;
+  fallback_used: boolean;
   disclaimer: string;
   results: PatientEvidenceSearchResult[];
 }
