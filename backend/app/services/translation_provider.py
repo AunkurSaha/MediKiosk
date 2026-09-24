@@ -168,6 +168,7 @@ class DisabledTranslationProvider:
 
 
 _sarvam_translation_instance = None
+_bhashini_translation_instance = None
 
 
 def get_translation_provider() -> TranslationProvider:
@@ -187,6 +188,20 @@ def get_translation_provider() -> TranslationProvider:
         if _sarvam_translation_instance is None or _sarvam_translation_instance.settings != settings:
             _sarvam_translation_instance = SarvamTranslationProvider(settings)
         return _sarvam_translation_instance
+    if provider_name == "bhashini":
+        global _bhashini_translation_instance
+        from app.services.bhashini import BhashiniComputeSettings
+        from app.services.bhashini_translation import BhashiniTranslationProvider
+
+
+        settings = BhashiniComputeSettings.from_environment()
+        if (
+            _bhashini_translation_instance is None
+            or _bhashini_translation_instance.settings != settings
+        ):
+            _bhashini_translation_instance = BhashiniTranslationProvider(settings)
+        return _bhashini_translation_instance
     raise RuntimeError(
-        f"Unsupported TRANSLATION_PROVIDER: '{provider_name}'. Allowed: 'mock', 'sarvam', 'disabled'."
+        "Unsupported TRANSLATION_PROVIDER: "
+        f"'{provider_name}'. Allowed: 'mock', 'sarvam', 'bhashini', 'disabled'."
     )

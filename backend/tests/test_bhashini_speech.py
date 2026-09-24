@@ -143,7 +143,7 @@ def test_bhashini_settings_invalid_urls(monkeypatch):
 
     # Query string forbidden
     monkeypatch.setenv("BHASHINI_ENDPOINT_URL", "https://bhashini.gov.in?token=123")
-    with pytest.raises(ValueError, match="HTTPS base URL without credentials"):
+    with pytest.raises(ValueError, match="BHASHINI_ENDPOINT_URL must be an HTTPS URL without query/fragment without credentials"):
         BhashiniSettings.from_environment()
 
     # Invalid timeout
@@ -173,7 +173,7 @@ def test_bhashini_validation_fails_when_keys_missing(monkeypatch):
     monkeypatch.delenv("BHASHINI_API_KEY", raising=False)
     monkeypatch.delenv("BHASHINI_USER_ID", raising=False)
 
-    with pytest.raises(RuntimeError, match="BHASHINI_API_KEY and BHASHINI_USER_ID are required"):
+    with pytest.raises(RuntimeError, match="BHASHINI_ASR_SERVICE_ID and BHASHINI_TTS_SERVICE_ID are required for direct SPEECH_PROVIDER=bhashini inference"):
         validate_speech_configuration()
 
 
@@ -322,6 +322,7 @@ async def test_bhashini_direct_inference_mode():
         user_id=SecretStr("u"),
         inference_url="https://direct.dhruva.ai/v1/asr",
         inference_api_key=SecretStr("direct-token-999"),
+        asr_service_id="test-asr-service",
     )
     provider = BhashiniSpeechProvider(settings=settings, transport=transport)
 
@@ -493,6 +494,8 @@ def test_transcribe_endpoint_with_bhashini_provider(client, monkeypatch):
     monkeypatch.setenv("SPEECH_PROVIDER", "bhashini")
     monkeypatch.setenv("BHASHINI_API_KEY", "test-key")
     monkeypatch.setenv("BHASHINI_USER_ID", "test-user")
+    monkeypatch.setenv("BHASHINI_INFERENCE_API_KEY", "test-inference-key")
+    monkeypatch.setenv("BHASHINI_ASR_SERVICE_ID", "test-asr-service")
 
     def handler(request: httpx.Request) -> httpx.Response:
         url_str = str(request.url)

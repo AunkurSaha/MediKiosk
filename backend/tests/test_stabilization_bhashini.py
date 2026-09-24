@@ -12,6 +12,8 @@ def test_direct_inference_configuration_does_not_require_discovery_credentials(m
     monkeypatch.setenv("BHASHINI_USER_ID", "")
     monkeypatch.setenv("BHASHINI_INFERENCE_URL", "https://dhruva-api.bhashini.gov.in/compute")
     monkeypatch.setenv("BHASHINI_INFERENCE_API_KEY", "synthetic-key")
+    monkeypatch.setenv("BHASHINI_ASR_SERVICE_ID", "synthetic-asr-service")
+    monkeypatch.setenv("BHASHINI_TTS_SERVICE_ID", "synthetic-tts-service")
     validate_speech_configuration()
 
 

@@ -256,8 +256,18 @@ def validate_speech_configuration() -> None:
     if provider.name == "bhashini":
         from app.services.bhashini_speech import BhashiniSettings
         settings = BhashiniSettings.from_environment()
-        if settings.inference_url and (settings.inference_api_key and settings.inference_api_key.get_secret_value()):
+        if settings.inference_api_key and settings.inference_api_key.get_secret_value():
+            if not settings.asr_service_id or not settings.tts_service_id:
+                raise RuntimeError(
+                    "BHASHINI_ASR_SERVICE_ID and BHASHINI_TTS_SERVICE_ID are required "
+                    "for direct SPEECH_PROVIDER=bhashini inference"
+                )
             return
+        if settings.inference_url:
+            raise RuntimeError(
+                "BHASHINI_INFERENCE_API_KEY or BHASHINI_INFERENCE_KEY is required "
+                "when BHASHINI_INFERENCE_URL is configured"
+            )
         if not settings.api_key.get_secret_value() or not settings.user_id.get_secret_value():
             raise RuntimeError(
                 "BHASHINI_API_KEY and BHASHINI_USER_ID are required when SPEECH_PROVIDER=bhashini"
